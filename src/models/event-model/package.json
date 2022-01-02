@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/event-model",
+  "description": "jTorm Event Model",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/event-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/models/event-model"
+  },
+  "dependencies": {}
+}

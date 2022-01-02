@@ -3,16 +3,6 @@
 module.exports = {
     jTormHandler: {
         context: {},
-        event: {
-            before: {
-                method: null,
-                view: null
-            },
-            after: {
-                method: null,
-                view: null
-            }
-        },
         handle: async function (h, t, m, c, v) {
             var s = this;
             if (!v)
@@ -45,7 +35,7 @@ module.exports = {
                 c: 1
             };
 
-            await s.loopEvent(s, v2, 'before', 'iteration');
+            await s.context.models.event.handle(s, v2, 'before', 'iteration');
 
             if (!v.r)
                 v.r = await s.handle("<body>" + h + "</body>", t2.c, m, v.c, v2);
@@ -53,7 +43,7 @@ module.exports = {
 
             // v.c.s = selector;// kan weg?
 
-            await s.loopEvent(s, v2, 'after', 'iteration');
+            await s.context.models.event.handle(s, v2, 'after', 'iteration');
 
             return v.r;
         },
@@ -84,12 +74,12 @@ module.exports = {
 
                         v.io.v = await m.validate(s, v);
 
-                        await s.loopEvent(s, v, 'before', 'method');
+                        await s.context.models.event.handle(s, v, 'before', 'method');
                         if (v.io.v && v._.isFunction(m.handle))
                             await m.handle(s, v);
                         else
                             v.io.r = 0;
-                        await s.loopEvent(s, v, 'after', 'method');
+                        await s.context.models.event.handle(s, v, 'after', 'method');
                     } else {
                         v.io.r = 0;
                         v.io.c = 1;
@@ -111,30 +101,6 @@ module.exports = {
         },
         set: function(object, path, value) {
             this.context._.set(object, path, value);
-        },
-        loopEvent: async function (j, v, e, t) {
-            var s = this,
-                k,
-                p = j.context.plugins,
-                c = s.event[e][t];
-
-            if (!c) {
-                c = [];
-                for (k in p) {
-                    if (p[k][e] && p[k][e][t]) {
-                        c.push(p[k][e][t]);
-                    }
-                }
-
-                c.sort(function (a, b) {
-                    return a.weight - b.weight;
-                });
-
-                s.event[e][t] = c;
-            }
-
-            for (let k in c)
-                await c[k].handle(s, v);
         }
     }
 };
