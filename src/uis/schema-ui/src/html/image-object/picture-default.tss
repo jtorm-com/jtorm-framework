@@ -1,0 +1,9 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+    c: '@m.picture';
+    t: 0;
+
+    picture->append->ui {
+        c: 'ImageObject.image';
+    }
+}

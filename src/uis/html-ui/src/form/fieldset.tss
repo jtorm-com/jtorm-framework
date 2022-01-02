@@ -1,0 +1,27 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+fieldset {
+  ->if {
+    d: disabled;
+    ->attr {
+      n: 'disabled';
+      v: true;
+    }
+  }
+  ->if {
+    d: form;
+    ->attr {
+      n: 'form';
+      v: form;
+    }
+  }
+  ->if {
+    d: name;
+    ->attr {
+      n: 'name';
+      v: name;
+    }
+  }
+  ->get {
+    t: '@h/replacable.tss';
+  }
+}

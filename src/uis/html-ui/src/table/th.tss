@@ -1,0 +1,49 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+th {
+  ->if {
+    d: colspan;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'colspan';
+      v: colspan;
+    }
+  }
+  ->if {
+    d: headers;
+    ->attr {
+      n: 'headers';
+      v: headers;
+    }
+  }
+  ->if {
+    d: abbr;
+    ->attr {
+      n: 'abbr';
+      v: abbr;
+    }
+  }
+  ->if {
+    d: rowspan;
+    ->attr {
+      n: 'rowspan';
+      v: rowspan;
+    }
+  }
+  ->if {
+    d: scope;
+    ->attr {
+      n: 'scope';
+      v: scope;
+    }
+  }
+  ->if {
+    d: sorted;
+    ->attr {
+      n: 'sorted';
+      v: sorted;
+    }
+  }
+  ->get {
+    t: '@h/replacable.tss';
+  }
+}

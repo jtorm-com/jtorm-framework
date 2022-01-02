@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/mediaquery-method",
+  "description": "jTorm Mediaquery Method",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/mediaquery-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/methods/mediaquery-method"
+  },
+  "dependencies": {}
+}

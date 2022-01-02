@@ -1,0 +1,29 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+video {
+  ->if {
+    d: height;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'height';
+      v: height;
+    }
+  }
+  ->if {
+    d: poster;
+    ->attr {
+      n: 'poster';
+      v: poster;
+    }
+  }
+  ->if {
+    d: width;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'width';
+      v: width;
+    }
+  }
+  ->get {
+    t: '@h/playable.tss';
+  }
+}

@@ -1,0 +1,107 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+// social, newsletter
+body > footer {
+  ->attrs {
+    n: 'id,class';
+    v: 'footer,footer';
+    m: 'p';
+  }
+  ->config(k: 'newsletter')->prepend->ui {// wanneer user, kan dit via account, zonder user, moet formulier
+    c: 'newsletter.register';
+  }
+  #footer > .header->append->ui {
+    c: 'grid.wrapper';
+    div->append->ui {
+      c: 'grid.container';
+      .container {
+        ->append->ui {
+          c: 'grid.fourColumns';
+/*
+          .first {
+            ->append(d: 1.title)->ui {
+              c: '@t.strong';
+            }
+            ->append(d: 1.list)->ui {
+              c: 'menu.list';
+            }
+          }
+          .second {
+            ->append(d: 2.title)->ui {
+              c: '@t.strong';
+            }
+            ->append(d: 2.list)->ui {
+              c: 'menu.list';
+            }
+          }
+          .third {
+            ->append(d: 3.title)->ui {
+              c: '@t.strong';
+            }
+            ->append(d: 3.list)->ui {
+              c: 'menu.list';
+            }
+          }
+          .last {
+            ->append(d: 4.title)->ui {
+              c: '@t.strong';
+            }
+            ->append(d: 4.list)->ui {
+              c: 'menu.list';// hoeft geen list te zijn, bol.com heeft een volgen blok en nieuwsbrief
+            }
+          }
+*/
+        }
+      }
+    }
+  }
+  #footer > .body->append->ui {
+    c: 'grid.wrapper';
+    div->append->ui {
+      c: 'grid.container';
+      .container {
+        ->append->ui {
+          c: 'grid.threeColumns';
+          .second {
+          }
+        }
+      }
+    }
+  }
+  #footer > .footer->append->ui {
+    c: 'grid.wrapper';
+    div->append->ui {
+      c: 'grid.container';
+      .container {
+        ->append->ui {
+          c: 'grid.oneColumn';
+          .first {
+            ->attr {
+              n: 'class';
+              v: 'copyright';
+              m: 'a';
+            }
+            ->append->ui {
+              c: '@e.a';
+              a {
+                ->attrs {
+                  n: 'class,href';
+                  v: 'logo,/';
+                }
+                ->append->ui {
+                  c: 'media.img';
+                  img->attrs {
+                    n: 'src';
+                    v: '/ui/img/2do-logo.png';
+                  }
+                }
+              }
+            }
+            ->append(d: copyright)->ui {
+              c: '@t.small';
+            }
+          }
+        }
+      }
+    }
+  }
+}

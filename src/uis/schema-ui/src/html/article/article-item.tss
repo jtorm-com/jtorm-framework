@@ -1,0 +1,14 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body > section->swap {
+    s: 'article';
+    ui: '@e.article';
+    a: 1;
+
+    article {
+        ->attr {
+            n: 'class';
+            v: 'schema-Article';
+            m: 'a';
+        }
+    }
+}

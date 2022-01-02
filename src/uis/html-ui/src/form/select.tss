@@ -1,0 +1,31 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+select {
+  ->inner {
+    h: html;
+  }
+  ->if {
+    d: multiple;
+    ->attr {
+      n: 'multiple';
+      v: true;
+    }
+  }
+  ->if {
+    d: required;
+    ->attr {
+      n: 'required';
+      v: true;
+    }
+  }
+  ->if {
+    d: size;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'size';
+      v: size;
+    }
+  }
+  ->get {
+    t: '@h/form/form-element.tss';
+  }
+}

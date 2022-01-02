@@ -1,0 +1,24 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+  ->attr {
+    n: 'type';
+    v: 'radio';
+  }
+  ->if {
+    d: checked;
+    ->attr {
+      n: 'checked';
+      v: true;
+    }
+  }
+  ->if {
+    d: required;
+    ->attr {
+      n: 'required';
+      v: required;
+    }
+  }
+  ->get {
+    t: '@h/form/form-element.tss';
+  }
+}

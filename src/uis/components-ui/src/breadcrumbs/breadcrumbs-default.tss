@@ -1,0 +1,16 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+nav {
+  ->attrs {
+    n: 'id,class,aria-label,role';
+    v: 'breadcrumbs,breadcrumb,Breadcrumb,navigation';
+  }
+  ->append->ui {
+    c: 'grid.container';
+    .container->append->ui {
+      c: 'grid.oneColumn';
+      .first->append->ui {
+        c: 'list.ol';
+      }
+    }
+  }
+}

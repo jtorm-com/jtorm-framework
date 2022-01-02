@@ -1,0 +1,25 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+div {
+    ->attrs {
+        n: 'id,class';
+        v: 'loading,loading';
+        m: 'p';
+    }
+    .loading->append->ui {
+        c: '@e.div';
+        t: 0;
+        div {
+            ->append->ui {
+                c: '@e.span';
+                t: 0;
+            }
+            ->append->ui {
+                c: '@t.small';
+                t: 0;
+                small->text(label: 'Loading')->inner {
+                    h: label;
+                }
+            }
+        }
+    }
+}

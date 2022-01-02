@@ -1,0 +1,5 @@
+{
+  "span": {
+    "@description": "Specifies the number of columns a column group should span"
+  }
+}

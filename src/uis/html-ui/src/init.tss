@@ -1,0 +1,20 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+head {
+    ->css {
+        href: '/ui/css/normalize.css';
+    }
+/*
+    ->css {
+        href: '/ui/magic-master/dist/magic.min.css';
+    }
+    ->js {
+        src: '/ui/requirejs/require-config.js';
+    }
+*/
+    ->js {
+        src: '/ui/requirejs/require.js';
+    }
+    ->js {
+        src: '/cache/jtorm.web.init.min.js';
+    }
+}

@@ -1,0 +1,29 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+  c: '@e.nav';
+  t: 0;
+  nav {
+    ->attrs {
+      n: 'id,class,aria-label,role';
+      v: 'breadcrumbs,breadcrumb,Breadcrumb,navigation';
+    }
+    ->append->ui {
+      c: 'grid.container';
+      .container->append->ui {
+        c: 'grid.oneColumn';
+        .first {
+          ->text(html: 'You are here')->append->ui {
+            c: '@e.span';
+            t: 0;
+            span->append {
+              h: html + ': ';
+            }
+          }
+          ->append->ui {
+            c: 'ItemList';
+          }
+        }
+      }
+    }
+  }
+}

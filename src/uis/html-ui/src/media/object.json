@@ -1,0 +1,23 @@
+{
+  "html": {
+    "@description": "Text or html"
+  },
+  "form": {
+    "@description": "Specifies one or more forms the <meter> element belongs to"
+  },
+  "height": {
+    "@description": "Specifies the height of the object"
+  },
+  "name": {
+    "@description": "Specifies a name for the object"
+  },
+  "type": {
+    "@description": "Specifies the media type of data specified in the data attribute"
+  },
+  "usemap": {
+    "@description": "Specifies the name of a client-side image map to be used with the object"
+  },
+  "width": {
+    "@description": "Specifies the width of the object"
+  }
+}

@@ -1,0 +1,47 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->if(to: 'array') {
+    ->each {
+        m: 'append';
+        body {
+            ->if(d: ImageObject) {
+                ->if(d: ImageObject.representativeOfPage.Boolean) {
+                    ->append(d: ImageObject)->ui {
+                        c: 'ImageObject.figure';
+                    }
+
+                    ->else {
+                        ->data(
+                            src: ImageObject.contentUrl.URL,
+                            media: ImageObject.size.QuantitativeValue.additionalProperty.PropertyValue.value.Text
+                        )->append()->ui {
+                            c: '@m.source';
+                        }
+                    }
+                }
+
+                ->else {
+                    ->data(src: URL)->append->ui {
+                        c: '@m.source';
+                    }
+                }
+            }
+        }
+    }
+
+    source->move {
+        l: 'picture';
+        m: 'append';
+    }
+
+    ->else {
+        ->if(d: ImageObject) {
+            ->append(d: ImageObject)->ui {
+                c: 'ImageObject.figure';
+            }
+
+            ->else->data(contentUrl.URL: URL)->append->ui {
+                c: 'ImageObject.figure';
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+{
+  "href": {
+    "@description": "Specifies the URL of the page the link goes to"
+  },
+  "target": {
+    "@description": "Specifies where to open the linked document",
+    "@options": [
+      {"value": "_blank", "description": ""},
+      {"value": "_parent", "description": ""},
+      {"value": "_self", "description": ""},
+      {"value": "_top", "description": ""},
+      {"value": "framename", "description": ""}
+    ]
+  }
+}

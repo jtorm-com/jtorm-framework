@@ -1,0 +1,92 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body > .schema-Thing > .body->before(d: associatedMedia)->ui {
+  c: 'ImageObject';
+}
+body > .schema-Thing > footer {
+  ->if(d: about) {// aanpassen met @c @k
+    ->if(d: about.CreativeWork||about.Article) {
+      ->append(d: about.CreativeWork)->ui {
+        c: 'CreativeWork.linkMulti';
+      }
+      ->append(d: about.Article)->ui {
+        c: 'Article.linkMulti';
+      }
+      ->else {
+        ->append(d: about)->ui {
+          c: 'Thing.linkMulti';
+        }
+      }
+    }
+  }
+  ->append(d: accountablePerson)->ui {
+    c: 'Person.linkMulti';
+  }
+  ->append(d: character)->ui {
+    c: 'Person.linkMulti';
+  }
+  ->append->ui {
+    c: '@e.section';
+    t: 0;
+    section {
+      ->attr {
+        n: 'class';
+        v: 'meta';
+      }
+      ->if(d: dateModified)->time(dT: dateModified.DateTime, as: 'html')->append->ui {
+        c: '@e.time';
+        time->prepend->ui {
+          c: '@t.small';
+          small->text(html: 'Updated')->inner {
+            h: html;
+            s: ': ';
+          }
+        }
+      }
+    }
+  }
+}
+body > .schema-Thing > .body->if(d: comment)->config(k: 'comments')->append->ui {
+  c: '@e.section';
+  section {
+    ->attr {
+      n: 'class';
+      v: 'comments';
+    }
+    .comments {
+      ->append->ui {
+        c: '@t.h5';
+        h5 {
+          ->text(lbl: 'Comments')->inner {
+            h: lbl;
+          }
+          ->append->ui {
+            c: '@t.sup';
+            sup->inner {
+              p: ' (';
+              h: commentCount.Integer;
+              s: ')';
+            }
+          }
+        }
+      }
+      /*->append->data(method: 'POST')->ui {
+        c: 'form.form';
+        form {
+          ->append->ui {
+            c: 'form.fieldset';
+            fieldset {
+
+            }
+          }
+        }
+      }*/
+      ->each {
+        d: comment;
+        m: 'append';
+        body->append(d: Comment)->ui {
+          c: 'Comment';
+        }
+      }
+    }
+  }
+}

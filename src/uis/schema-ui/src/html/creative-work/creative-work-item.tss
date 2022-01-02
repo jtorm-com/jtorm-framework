@@ -1,0 +1,68 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body > section->attr {
+  n: 'class';
+  v: 'schema-CreativeWork';
+  m: 'a';
+}
+body > section > .header {
+  ->append(d: aggregateRating)->ui {
+    c: 'AggregateRating';
+  }
+  ->append(d: alternativeHeadline)->ui {
+    c: 'Text';
+    span->attr {
+      n: 'class';
+      v: 'schema-alternativeHeadline';
+      m: 'a';
+    }
+  }
+  ->append->ui {
+    c: '@e.section';
+    t: 0;
+    section {
+      ->attr {
+        n: 'class';
+        v: 'meta';
+      }
+      ->append(d: audience)->ui {
+        c: 'Audience';
+      }
+      ->append(d: award)->ui {
+        c: 'Text.multi';
+        span->attr {
+          n: 'class';
+          v: 'schema-award';
+          m: 'a';
+        }
+      }
+      ->if(d: datePublished)->time(dT: datePublished.DateTime, as: 'html')->append->ui {
+        c: '@e.time';
+      }
+    }
+  }
+}
+body > section > .body {
+  ->prepend(d: abstract)->ui {
+    c: 'Text';
+    ->if(el: 'span') {
+      span->attr {
+        n: 'class';
+        v: 'schema-abstract';
+        m: 'a';
+      }
+    }
+  }
+  ->append(d: citation)->ui {
+    c: 'Text.multi';
+    ->if(el: 'span') {
+      span->attr {
+        n: 'class';
+        v: 'schema-citation';
+        m: 'a';
+      }
+    }
+  }
+  ->append(d: citation)->ui {
+    c: 'CreativeWork.linkMulti';
+  }
+}

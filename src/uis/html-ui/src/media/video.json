@@ -1,0 +1,11 @@
+{
+  "height": {
+    "@description": "Sets the height of the video player in pixels"
+  },
+  "poster": {
+    "@description": "Specifies an image to be shown while the video is downloading, or until the user hits the play button"
+  },
+  "width": {
+    "@description": "Sets the width of the video player in pixels"
+  }
+}

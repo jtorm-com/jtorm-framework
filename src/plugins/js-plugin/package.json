@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/js-plugin",
+  "description": "jTorm js Plugin",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/js-plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/plugins/js-plugin"
+  },
+  "dependencies": {}
+}

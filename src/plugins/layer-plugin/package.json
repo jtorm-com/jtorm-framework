@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/layer-plugin",
+  "description": "jTorm Layer Plugin",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/layer-plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/plugins/layer-plugin"
+  },
+  "dependencies": {}
+}

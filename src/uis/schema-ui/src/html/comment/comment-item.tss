@@ -1,0 +1,60 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body {
+  ->if(d: about.@c.url.URL, v: '\.json$') {
+    ->get {
+      d: about.@c.url.URL;
+      ->prepend(d: data.mainEntity.@c)->ui {
+        c: @type + '.listItem';
+      }
+    }
+    ->else->prepend(d: about.@c)->ui {
+      c: @type + '.listItem';
+    }
+  }
+  ->append->ui {
+    c: 'grid.twentyEightyColumns';
+    .first->append(d: author.@c)->ui {
+      c: @type + '.gridItem';
+    }
+    .last->append->ui {
+      c: 'CreativeWork.listItem';
+      body > section {
+        ->attr {
+          n: 'class';
+          v: 'schema-Comment';
+          m: 'a';
+        }
+        .body->append(d: description)->ui {
+          c: 'Text';
+          span {
+            ->attr {
+              n: 'class';
+              v: 'schema-description';
+              m: 'a';
+            }
+            ->swap {
+              s: 'div';
+              a: 1;
+              ui: '@e.div';
+            }
+          }
+        }
+        ->if(el: 'footer > a.schema-URL'){
+          footer > a.schema-URL {
+            ->text(lbl: 'Reply')->inner {
+              h: lbl;
+            }
+            ->append->ui {
+              c: '@t.sup';
+              sup->inner {
+                p: ' (';
+                h: commentCount.Integer;
+                s: ')';
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

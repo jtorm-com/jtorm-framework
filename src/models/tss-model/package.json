@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/tss-model",
+  "description": "jTorm TSS Model",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/tss-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm-nodejs.git",
+    "directory": "src/models/tss-model"
+  },
+  "dependencies": {}
+}

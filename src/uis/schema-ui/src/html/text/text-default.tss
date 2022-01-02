@@ -1,0 +1,14 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+  c: '@e.span';
+  t: 0;
+  span {
+    ->attr {
+      n: 'class';
+      v: 'schema-Text';
+    }
+    ->inner {
+      h: Text;
+    }
+  }
+}

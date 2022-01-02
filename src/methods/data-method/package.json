@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/data-method",
+  "description": "jTorm Data Method",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/data-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/methods/data-method"
+  },
+  "dependencies": {}
+}

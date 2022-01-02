@@ -1,0 +1,22 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+canvas {
+  ->if {
+    d: width;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'width';
+      v: width;
+    }
+  }
+  ->if {
+    d: height;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'height';
+      v: height;
+    }
+  }
+  ->get {
+    t: '@h/replacable.tss';
+  }
+}

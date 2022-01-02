@@ -1,0 +1,23 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body > section->swap {
+  s: 'footer';
+  ui: '@e.footer';
+  a: 1;
+  body > footer {
+    ->attr {
+      n: 'class';
+      v: 'schema-WPFooter';
+      m: 'a';
+    }
+  }
+  body > footer > header->swap {
+    s: 'section';
+    ui: '@e.section';
+    a: 1;
+  }
+  body > footer > footer->swap {
+    s: 'section';
+    ui: '@e.section';
+    a: 1;
+  }
+}

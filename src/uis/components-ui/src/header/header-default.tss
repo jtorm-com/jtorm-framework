@@ -1,0 +1,251 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+// todo refactor
+body > header {
+ ->attr {
+    n: 'id';
+    v: 'header';
+    m: 'p';
+  }
+  body > #header > .header->append->ui {
+    c: 'grid.wrapper';
+    body > div->append->ui {
+      c: '@e.div';
+      div {
+        ->append->ui {
+          c: 'grid.container';
+          div {
+            ->append->ui {
+              c: 'grid.twoColumns';
+              .last {
+
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  body > #header > .body->append->ui {
+    c: 'grid.wrapper';
+    body > div->append->ui {
+      c: '@e.div';
+      div {
+        ->append->ui {
+          c: 'grid.container';
+          div {
+            ->append->ui {
+              c: 'grid.twoColumns';
+              .first {
+                ->swap {
+                  s: 'section';
+                  ui: '@e.section';
+                  a: 1;
+                  ->append->ui {
+                    c: 'button.secondaryAnchor';
+                    a {
+                      ->attrs {
+                        n: 'id,tabindex';
+                        v: 'menu-button,-1';
+                      }
+                      ->append->ui {
+                        c: 'icon.menu';
+                      }
+                      ->append->ui {
+                        c: '@e.span';
+                        t: 0;
+                        span {
+                          ->attr {
+                            n: 'class';
+                            v: 'mdc-button__label';
+                          }
+                          ->text(label: 'Menu')->inner {
+                            h: label;
+                          }
+                        }
+                      }
+                    }
+                  }
+                  ->append->ui {
+                    c: '@e.a';
+                    a {
+                      ->attrs {
+                        n: 'class,href';
+                        v: 'logo,/';
+                      }
+                      /*
+                      ->append->ui {
+                        c: 'media.img';
+                        img->attrs {
+                          n: 'src';
+                          v: '/ui/img/2do-logo.png';
+                        }
+                      }*/
+                    }
+                  }
+                }
+              }
+
+              .last {
+                ->swap {
+                  s: 'section';
+                  ui: '@e.section';
+                  a: 1;
+                  ->append->ui {
+                    c: 'search.mini';
+                  }
+
+                  ->config(d: 'notifications')->append(d: notifications)->ui {
+                    c: 'button.secondaryAnchor';
+                    a {
+                      ->attr {
+                        n: 'id';
+                        v: 'notifications-button';
+                      }
+                      ->append->ui {
+                        c: 'icon.notifications';
+                      }
+                      ->append->ui {
+                        c: '@e.span';
+                        t: 0;
+                        span {
+                          ->attr {
+                            n: 'class';
+                            v: 'mdc-button__label';
+                          }
+                          ->text(label: 'Notifications')->inner {
+                            h: label;
+                          }
+                        }
+                      }
+                      ->append->ui {
+                        c: 'badge';
+                      }
+                    }
+                  }
+                  ->config(k: 'wishlist')->append(d: wishlist)->ui {
+                    c: 'button.secondaryAnchor';
+                    a {
+                      ->attr {
+                        n: 'id';
+                        v: 'wishlist-button';
+                      }
+                      ->append->ui {
+                        c: 'icon.wishlist';
+                      }
+                    ->append->ui {
+                        c: '@e.span';
+                        t: 0;
+                        span {
+                          ->attr {
+                            n: 'class';
+                            v: 'mdc-button__label';
+                          }
+                          ->text(label: 'Wishlist')->inner {
+                            h: label;
+                          }
+                        }
+                      }
+                      ->append->ui {
+                        c: 'badge';
+                      }
+                    }
+                  }
+                  ->config(k: 'compare')->append(d: compare)->ui {
+                    c: 'button.secondaryAnchor';
+                    a {
+                      ->attr {
+                        n: 'id';
+                        v: 'compare-button';
+                      }
+                      ->append->ui {
+                        c: 'icon.compare';
+                      }
+                    ->append->ui {
+                        c: '@e.span';
+                        t: 0;
+                        span {
+                          ->attr {
+                            n: 'class';
+                            v: 'mdc-button__label';
+                          }
+                          ->text(label: 'Compare')->inner {
+                            h: label;
+                          }
+                        }
+                      }
+                      ->append->ui {
+                        c: 'badge';
+                      }
+                    }
+                  }
+                  ->config(k: 'account')->append(d: account)->ui {
+                    c: 'button.secondaryAnchor';
+                    a {
+                      ->attr {
+                        n: 'id';
+                        v: 'account-button';
+                      }
+                      ->append->ui {
+                        c: 'icon.account';
+                      }
+                    ->append->ui {
+                        c: '@e.span';
+                        t: 0;
+                        span {
+                          ->attr {
+                            n: 'class';
+                            v: 'mdc-button__label';
+                          }
+                          ->text(label: 'Account')->inner {
+                            h: label;
+                          }
+                        }
+                      }
+                    }
+                  }
+                  ->config(k: 'cart')->append(d: cart)->ui {
+                    c: 'button.secondaryAnchor';
+                    a {
+                      ->attr {
+                        n: 'id';
+                        v: 'cart-button';
+                      }
+                      ->append->ui {
+                        c: 'icon.cart';
+                      }
+                      ->append->ui {
+                        c: '@e.span';
+                        t: 0;
+                        span {
+                          ->attr {
+                            n: 'class';
+                            v: 'mdc-button__label';
+                          }
+                          ->text(label: 'Cart')->inner {
+                            h: label;
+                          }
+                        }
+                      }
+                      ->append->ui {
+                        c: 'badge';
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+->layer {
+    z: 0;
+
+    #header > figure->move {
+      l: '.logo';
+      m: 'append';
+    }
+}

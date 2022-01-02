@@ -1,0 +1,47 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->data(name: 'description', content: disambiguatingDescription.Text)->append->ui {
+    c: 'doc.meta';
+}
+
+->data(rel: 'canonical', href: url.URL)->append->ui {// href doet het niet
+    c: 'doc.link';
+}
+
+->data(h: url.URL)->append->ui {
+    c: 'doc.link';
+    t: 0;
+    link {
+        ->attrs {
+            n: 'rel,type';
+            v: 'alternate,application/ld+json';
+        }
+        ->attr {
+            n: 'href';
+            v: h;
+            a: '.jsonld';
+        }
+    }
+}
+
+->if(d: workTranslation)->each {
+    m: 'append';
+    d: workTranslation;
+    ->ui {
+        c: 'doc.link';
+        link {
+            ->attrs {
+                n: 'rel,hreflang,href';
+                v: 'alternate,@c.inLanguage.Language.alternateName.Text,@c.url.URL';
+            }
+        }
+    }
+}
+
+->data(name: 'robots', content: @meta.robots||'index, follow')->append->ui {
+    c: 'doc.meta';
+}
+
+->data(name: 'referrer', content: @meta.referrer||'origin')->append->ui {
+    c: 'doc.meta';
+}

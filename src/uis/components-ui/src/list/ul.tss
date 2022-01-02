@@ -1,0 +1,8 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+ul->each {
+  d: items;
+  m: 'append';
+  ->ui {
+    c: '@t.li';
+  }
+}

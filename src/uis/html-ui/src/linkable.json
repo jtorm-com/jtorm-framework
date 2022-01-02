@@ -1,0 +1,14 @@
+{
+  "href": {
+    "@description": "Specifies the URL of the page the link goes to"
+  },
+  "hreflang": {
+    "@description": "Specifies the language (two-letter language code ISO 639-1) of the linked document"
+  },
+  "media": {
+    "@description": "Specifies the URL of the page the link goes to"
+  },
+  "type": {
+    "@description": "Specifies the media type of the linked document"
+  }
+}

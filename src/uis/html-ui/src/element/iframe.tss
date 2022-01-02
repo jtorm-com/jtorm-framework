@@ -1,0 +1,42 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+iframe {
+  ->if {
+    d: height;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'height';
+      v: height;
+    }
+  }
+  ->attr {
+    n: 'name';
+    v: name;
+  }
+  ->if {
+    d: sandbox;
+    v: '^(allow-forms|allow-pointer-lock|allow-popups|allow-same-origin|allow-scripts|allow-top-navigation)$';
+    ->attr {
+      n: 'sandbox';
+      v: sandbox;
+    }
+  }
+  ->attr {
+    n: 'src';
+    v: src;
+  }
+  ->attr {
+    n: 'srcdoc';
+    v: srcdoc;
+  }
+  ->if {
+    d: width;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'width';
+      v: width;
+    }
+  }
+  ->get {
+    t: '@h/replacable.tss';
+  }
+}

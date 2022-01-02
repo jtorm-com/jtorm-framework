@@ -1,0 +1,21 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+section {
+  ->attr {
+    n: 'class';
+    v: 'schema-CreativeWork';
+    m: 'a';
+  }
+  ->if(d: about) {
+    ->if(el: 'footer') {
+      ->else->append->ui {
+        c: '@e.footer';
+        t: 0;
+      }
+    }
+    footer {
+      ->append(d: about)->ui {
+        c: 'CreativeWork.linkMulti';
+      }
+    }
+  }
+}

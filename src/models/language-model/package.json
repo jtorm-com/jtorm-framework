@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/language-model",
+  "description": "jTorm Language Model",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/language-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/models/language-model"
+  },
+  "dependencies": {}
+}

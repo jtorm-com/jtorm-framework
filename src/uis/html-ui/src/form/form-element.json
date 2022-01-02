@@ -1,0 +1,17 @@
+{
+  "autofocus": {
+    "@description": "Specifies that it should automatically get focus when the page loads"
+  },
+  "disabled": {
+    "@description": "Specifies that it should be disabled"
+  },
+  "form": {
+    "@description": "Specifies the form it belongs to"
+  },
+  "name": {
+    "@description": "Specifies the name"
+  },
+  "value": {
+    "@description": "Specifies the value"
+  }
+}

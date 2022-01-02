@@ -1,0 +1,22 @@
+{
+  "autoplay": {
+    "@description": "Specifies that the video will start playing as soon as it is ready"
+  },
+  "controls": {
+    "@description": "Specifies that video controls should be displayed (such as a play/pause button etc)"
+  },
+  "loop": {
+    "@description": "Specifies that the video will start over again, every time it is finished"
+  },
+  "preload": {
+    "@description": "Specifies if and how the author thinks the video should be loaded when the page loads",
+    "@options": [
+      {"value": "auto", "description": ""},
+      {"value": "metadata", "description": ""},
+      {"value": "none", "description": ""}
+    ]
+  },
+  "src": {
+    "@description": "Specifies the URL of the media file"
+  }
+}

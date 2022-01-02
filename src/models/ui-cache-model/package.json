@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/ui-cache-model",
+  "description": "jTorm UI Cache Model",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/ui-cache-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/models/ui-cache-model"
+  },
+  "dependencies": {}
+}

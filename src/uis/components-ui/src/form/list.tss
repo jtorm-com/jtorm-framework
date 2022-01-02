@@ -1,0 +1,25 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+  c: "list";
+  ul->attr {
+    n: "role";
+    v: "listbox";
+  }
+  li->each {
+    d: items;
+    e: "li";
+    m: "replace";
+    li->wrap {
+      s: "label";
+      d: item;
+      ->ui {
+        c: "form.label";
+        t: 0;
+        label->attr {
+          n: "role";
+          v: "option";
+        }
+      }
+    }
+  }
+}

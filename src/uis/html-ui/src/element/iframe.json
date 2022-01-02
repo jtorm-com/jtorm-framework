@@ -1,0 +1,20 @@
+{
+  "height": {
+    "@description": "Sets the height in pixels"
+  },
+  "name": {
+    "@description": "Specifies the name"
+  },
+  "sandbox": {
+    "@description": "allow-forms|allow-pointer-lock|allow-popups|allow-same-origin|allow-scripts|allow-top-navigation"
+  },
+  "src": {
+    "@description": "Specifies the address of the document to embed"
+  },
+  "srcdoc": {
+    "@description": "Specifies the HTML content of the page to show"
+  },
+  "width": {
+    "@description": "Sets the width in pixels"
+  }
+}

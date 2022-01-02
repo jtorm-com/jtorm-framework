@@ -1,0 +1,25 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+  c: 'grid.grid';
+  div->append->ui {
+    c: 'grid.row';
+    body > div {
+      ->append->ui {
+        c: '@e.div';
+        t: 0;
+        div->attr {
+          n: 'class';
+          v: 'first cell cell-phone-4 cell-tablet-3 cell-desktop-3';
+        }
+      }
+      ->append->ui {
+        c: '@e.div';
+        t: 0;
+        div->attr {
+          n: 'class';
+          v: 'last cell cell-phone-8 cell-tablet-9 cell-desktop-9';
+        }
+      }
+    }
+  }
+}

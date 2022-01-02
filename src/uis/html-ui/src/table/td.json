@@ -1,0 +1,11 @@
+{
+  "html": {
+    "@description": "Text or html"
+  },
+  "colspan": {
+    "@description": "Specifies the number of columns a cell should span"
+  },
+  "headers": {
+    "@description": "Specifies one or more header cells a cell is related to"
+  }
+}

@@ -1,0 +1,13 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body > section->attr {
+  n: 'class';
+  v: 'schema-Person';
+  m: 'a';
+}
+->if(el: '.more') {
+  .more->remove {}
+}
+.schema-mainEntityOfPage->attr {
+  n: 'href';
+  v: url.URL;
+}

@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+figure {
+    ->append->ui {
+        c: '@m.picture';
+        f: 'c';
+    }
+
+    ->append->ui {
+        c: '@m.figcaption';
+    }
+}

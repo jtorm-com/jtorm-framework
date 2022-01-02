@@ -1,0 +1,17 @@
+{
+  "download": {
+    "@description": "Specifies that the target will be downloaded when a user clicks on the hyperlink"
+  },
+  "ping": {
+    "@description": "Specifies a space-separated list of URLs to which, when the link is followed, post requests with the body ping will be sent by the browser (in the background). Typically used for tracking."
+  },
+  "referrerpolicy": {
+    "@description": "no-referrer|no-referrer-when-downgrade|origin|origin-when-cross-origin|unsafe-url"
+  },
+  "rel": {
+    "@description": "alternate|author|bookmark|help|license|next|nofollow|noreferrer|prefetch|prev|search|tag"
+  },
+   "target": {
+    "@description": "Specifies where to open the linked document"
+  }
+}

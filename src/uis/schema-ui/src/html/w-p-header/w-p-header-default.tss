@@ -1,0 +1,26 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body > section->swap {
+  s: 'header';
+  ui: '@e.header';
+  a: 1;
+
+  body > header {
+    ->attr {
+      n: 'class';
+      v: 'schema-WPHeader';
+      m: 'a';
+    }
+  }
+
+  body > header > header->swap {
+    s: 'section';
+    ui: '@e.section';
+    a: 1;
+  }
+
+  body > header > footer->swap {
+    s: 'section';
+    ui: '@e.section';
+    a: 1;
+  }
+}

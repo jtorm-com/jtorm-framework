@@ -1,0 +1,46 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+  ->attr {
+    n: 'type';
+    v: 'date';
+  }
+  ->if {
+    d: autocomplete;
+    v: '^(on|off)$';
+    ->attr {
+      n: 'autocomplete';
+      v: autocomplete;
+    }
+  }
+  ->if {
+    d: max;
+    ->attr {
+      n: 'max';
+      v: max;
+    }
+  }
+  ->if {
+    d: min;
+    ->attr {
+      n: 'min';
+      v: min;
+    }
+  }
+  ->if {
+    d: pattern;
+    ->attr {
+      n: 'pattern';
+      v: pattern;
+    }
+  }
+  ->if {
+    d: step;
+    ->attr {
+      n: 'step';
+      v: step;
+    }
+  }
+  ->get {
+    t: '@h/form/input.tss';
+  }
+}

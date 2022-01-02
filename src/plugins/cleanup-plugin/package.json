@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/cleanup-plugin",
+  "description": "jTorm Cleanup Plugin",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/cleanup-plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/plugins/cleanup-plugin"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,20 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+optgroup {
+  ->if {
+    d: disabled;
+    ->attr {
+      n: 'disabled';
+      v: true;
+    }
+  }
+  ->if {
+    d: label;
+    ->attr {
+      n: 'label';
+      v: label;
+    }
+  }
+  ->get {
+    t: '@h/replacable.tss';
+  }
+}

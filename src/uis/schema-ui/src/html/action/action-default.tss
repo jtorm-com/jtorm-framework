@@ -1,0 +1,10 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->append(d: Action)->ui {
+  c: 'Action.action';
+}
+->if(to: 'array')->each {
+  m: 'append';
+  body->append->ui {
+    c: 'Action';
+  }
+}

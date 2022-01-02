@@ -1,0 +1,33 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+    c: '@e.footer';
+    t: 0;
+
+    footer->attr {
+        n: 'class';
+        v: 'footer';
+        m: 'a';
+    }
+
+    .footer {
+        ->append(d: url)->ui {
+            c: 'URL.multi';
+
+            a {
+                ->text(html: 'More')->inner {
+                    h: html;
+                }
+
+                ->attr {
+                    n: 'class';
+                    m: 'a';
+                    v: 'more';
+                }
+            }
+        }
+
+        ->append(d: subjectOf)->ui {
+            c: @type + '.linkMulti';
+        }
+    }
+}

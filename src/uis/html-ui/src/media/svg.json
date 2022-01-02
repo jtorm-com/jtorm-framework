@@ -1,0 +1,8 @@
+{
+  "height": {
+    "@description": "Specifies the height of the canvas"
+  },
+  "width": {
+    "@description": "Specifies the width of the canvas"
+  }
+}

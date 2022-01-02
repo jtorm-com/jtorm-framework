@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/config-model",
+  "description": "jTorm Config Model",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/config-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/models/config-model"
+  },
+  "dependencies": {}
+}

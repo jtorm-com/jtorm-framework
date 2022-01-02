@@ -1,0 +1,50 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+a {
+    ->inner {
+        h: html;
+    }
+
+    ->attr {
+        n: 'download';
+        v: download;
+    }
+
+    ->attr {
+        n: 'ping';
+        v: ping;
+    }
+
+    ->if {
+        d: referrerpolicy;
+        v: '^(no-referrer|no-referrer-when-downgrade|origin|origin-when-cross-origin|unsafe-url)$';
+
+        ->attr {
+            n: 'referrerpolicy';
+            v: referrerpolicy;
+        }
+    }
+
+    ->if {
+        d: rel;
+        v: '^(alternate|author|bookmark|help|license|next|nofollow|noreferrer|prefetch|prev|search|tag)$';
+
+        ->attr {
+            n: 'rel';
+            v: rel;
+        }
+    }
+
+    ->attr {
+        n: 'target';
+        v: target;
+    }
+
+    ->attr {
+        n: 'name';
+        v: name;
+    }
+
+    ->get {
+        t: '@h/linkable.tss';
+    }
+}

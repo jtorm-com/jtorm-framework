@@ -1,0 +1,64 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+    c: '@e.header';
+    t: 0;
+
+    header->attr {
+        n: 'class';
+        v: 'header';
+        m: 'a';
+    }
+
+    .header {
+        ->if(d: mainEntity||name)->append->ui {
+            c: '@t.h1';
+            t: 0;
+            h1 {
+                ->if(d: mainEntity.@c) {
+                    ->append(d: mainEntity.@c)->ui {
+                        c: @type + '.link';
+                    }
+
+                    ->else->append->ui {
+                        c: '@e.a';
+                        t: 0;
+
+                        a->append(d: name)->ui {
+                            c: 'Text.multi';
+                            span->attr {
+                                n: 'class';
+                                v: 'schema-name';
+                                m: 'a';
+                            }
+                        }
+                    }
+                }
+
+                a {
+                    ->attr {
+                        n: 'class';
+                        v: 'schema-mainEntityOfPage';
+                        m: 'a';
+                    }
+                }
+            }
+        }
+/*
+        ->append(d: alternateName)->ui {
+            c: '@t.h2';
+            h2->append->ui {
+                c: '@e.a';
+                t: 0;
+                a->append->ui {
+                    c: 'Text.multi';
+                    span->attr {
+                        n: 'class';
+                        v: 'schema-alternateName';
+                        m: 'a';
+                    }
+                }
+            }
+        }
+*/
+    }
+}

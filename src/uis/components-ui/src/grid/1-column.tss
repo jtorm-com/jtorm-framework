@@ -1,0 +1,15 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->ui {
+  c: 'grid.grid';
+  .grid->append->ui {
+    c: 'grid.row';
+    .row->append->ui {
+      c: '@e.div';
+      t: 0;
+      div->attr {
+        n: 'class';
+        v: 'first cell cell-phone-12';
+      }
+    }
+  }
+}

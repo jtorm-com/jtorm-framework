@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/html-ui",
+  "description": "jTorm HTML UI",
+  "version": "1.0.0",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/html-ui.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm.git",
+    "directory": "src/uis/html-ui"
+  },
+  "dependencies": {}
+}

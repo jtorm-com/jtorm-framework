@@ -1,0 +1,4 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+ul->get {
+  t: '@h/replacable.tss';
+}

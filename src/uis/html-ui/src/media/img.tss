@@ -1,0 +1,71 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+img {
+  ->if {
+    d: alt;
+    ->attr {
+      n: 'alt';
+      v: alt;
+    }
+  }
+  ->if {
+    d: height;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'height';
+      v: height;
+    }
+  }
+  ->if {
+    d: ismap;
+    ->attr {
+      n: 'ismap';
+      v: true;
+    }
+  }
+  ->if {
+    d: longdesc;
+    ->attr {
+      n: 'longdesc';
+      v: longdesc;
+    }
+  }
+  ->if {
+    d: sizes;
+    ->attr {
+      n: 'sizes';
+      v: sizes;
+    }
+  }
+  ->if {
+    d: src;
+    ->attr {
+      n: 'src';
+      v: src;
+    }
+  }
+  ->if {
+    d: srcset;
+    ->attr {
+      n: 'srcset';
+      v: srcset;
+    }
+  }
+  ->if {
+    d: usemap;
+    ->attr {
+      n: 'usemap';
+      v: usemap;
+    }
+  }
+  ->if {
+    d: width;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'width';
+      v: width;
+    }
+  }
+  ->get {
+    t: '@h/media/playable.tss';
+  }
+}

@@ -1,0 +1,28 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+.body->append(d: description)->ui {
+  c: 'Text';
+  span {
+    ->attr {
+      n: 'class';
+      v: 'schema-description';
+      m: 'a';
+    }
+    ->swap {
+      s: 'div';
+      a: 1;
+      ui: '@e.div';
+    }
+  }
+}
+footer->append(d: sameAs)->ui {
+  c: 'URL.multi';
+  a {
+    ->attr {
+      n: 'target';
+      v: '_blank';
+    }
+    ->text(html: 'Additional Information')->inner {
+      h: html;
+    }
+  }
+}

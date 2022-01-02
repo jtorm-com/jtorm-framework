@@ -1,0 +1,54 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+object {
+  ->attr {
+    n: 'value';
+    v: value;
+  }
+  ->if {
+    d: form;
+    ->attr {
+      n: 'form';
+      v: form;
+    }
+  }
+  ->if {
+    d: height;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'height';
+      v: height;
+    }
+  }
+  ->if {
+    d: name;
+    ->attr {
+      n: 'name';
+      v: name;
+    }
+  }
+  ->if {
+    d: type;
+    ->attr {
+      n: 'type';
+      v: type;
+    }
+  }
+  ->if {
+    d: usemap;
+    ->attr {
+      n: 'usemap';
+      v: usemap;
+    }
+  }
+  ->if {
+    d: width;
+    v: '^[0-9]+$';
+    ->attr {
+      n: 'width';
+      v: width;
+    }
+  }
+  ->get {
+    t: '@h/replacable.tss';
+  }
+}

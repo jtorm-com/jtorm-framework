@@ -1,0 +1,22 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+main->append->ui {
+  c: 'grid.container';
+  .container->append->ui {
+    c: 'grid.oneColumn';
+    .first {
+      ->append->ui {
+        c: '@e.div';
+        t: 0;
+        div {
+          ->attrs {
+            n: 'id,class';
+            v: 'content,content';
+          }
+          #content->append(d: mainEntity.@c)->ui {
+            c: @type + '.default';
+          }
+        }
+      }
+    }
+  }
+}
