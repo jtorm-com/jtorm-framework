@@ -4,7 +4,9 @@ module.exports = {
         id: "jtorm-components-ui",
         alias: "@c",
         framework: "c",
-        url: '',// CDN
+        url: [
+            // 'https://gitlab.com/jtorm/jtorm-framework/src/uis/components-ui/src'
+        ],
         mapper: {
             init: {
                 default: {

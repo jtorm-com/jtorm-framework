@@ -1,4 +1,4 @@
-# Universal document wrapper used in jTorm
+# jTorm - Document Model
 
 Universal document wrapper used in jTorm in combination with for example Node.js, RequireJS, CommonJS, Vanilla JS / plain javascript.
 Promise based XHR/XMLHttpRequests with [axios](https://github.com/axios/axios) for the browser and Node.js

@@ -5,7 +5,7 @@ module.exports = {
         alias: "@s",
         framework: "schema",
         url: [
-            'https://gitlab.com/jtorm/jtorm-framework/src/uis/html-ui/src'
+            // 'https://gitlab.com/jtorm/jtorm-framework/src/uis/schema-ui/src'
         ],
         mapper: {
             Text: {

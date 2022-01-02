@@ -1,13 +1,13 @@
 {
   "name": "@jtorm/handler",
   "description": "jTorm Handler",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "keywords": [],
   "main": "src/handler.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jtorm-com/jtorm.git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/handler"
   },
   "dependencies": {}

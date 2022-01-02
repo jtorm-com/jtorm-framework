@@ -4,10 +4,10 @@
   "version": "0.0.1",
   "license": "MIT",
   "keywords": [],
-  "main": "src/jtorm-schema.js",
+  "main": "src/schema-ui.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jtorm-com/jtorm.git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/uis/schema-ui"
   },
   "dependencies": {}

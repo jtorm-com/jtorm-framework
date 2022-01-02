@@ -41,21 +41,16 @@ module.exports = {
 
                 if (e) {
                     h = e.innerHTML;
-                    // const util = require('util');
-                    // console.log('handleChildren');
-                    // console.log(util.inspect(v.t.c, false, null, true /* enable colors */));
-                    // console.log(v.h.html());
-                    //
-                    // console.log('goood', h);
 
+                    // todo?
                     // deze hoeft geen html te bevatten, want als er al innerhtml bestaat dan wordt deze meerdere keren getoond wat niet moet
                     // maar bij swap is dit weer wel nodig...
-                    await j.handleChildren('', v.t, v.d.d ? v.d.d : v.m, v);// todo refactor want dit hoeft niet met allemaal viewmodel dingen, alleen de viewmodel
-// console.log('resultaat', v.r.html(), ' in ', v.h.html(), v.d.m, v.t.s);
+                    await j.handleChildren('', v.t, v.d.d ? v.d.d : v.m, v);
+
                     await s.process(j, v.h, v.r, v.t.s ? v.t.s : 'body', v.d.m, v);
 
                     c = 0;
-// console.log(v.t, v.h.html());
+
                     v.r = null;
                 } else throw new Error('test');
             }
@@ -75,7 +70,7 @@ module.exports = {
 
                     e.parentNode.replaceChild(h2.select(h2.getSelector(s, v.c.s)), e);
                 } else {
-                    var c = o ? h2.select('body').innerHTML : h2;// from isolation always is body, from html maybe not?
+                    var c = o ? h2.select('body').innerHTML : h2;// todo? from isolation always is body, from html maybe not?
 
                     if (m === 'i')
                         e.innerHTML = c;

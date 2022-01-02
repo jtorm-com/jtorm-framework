@@ -38,7 +38,7 @@ module.exports = {
 
                 d.isLoop = 1;
                 d.index = k;
-// console.log(d);
+
                 if (v.t.p.e) {
                     if (e.length && e[i])
                         h = e[i].outerHTML;
@@ -58,7 +58,7 @@ module.exports = {
             }
 
             if (!v.t.p.e) {
-                sv = j.copyViewModel(v);
+                sv = j.context.models.view.copy(j, v);
                 sv.t = {s: v.t.s, m: v.d.m, c: []};
                 sv.d = {h: r};
                 await j.context.methods[v.d.m].handle(j, sv);

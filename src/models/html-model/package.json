@@ -7,7 +7,7 @@
   "main": "src/html-model.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jtorm-com/jtorm-nodejs.git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/models/html-model"
   },
   "dependencies": {}

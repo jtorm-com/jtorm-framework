@@ -1,13 +1,13 @@
 {
   "name": "@jtorm/components-ui",
   "description": "jTorm Components UI",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "keywords": [],
   "main": "src/components-ui.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jtorm-com/jtorm.git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/uis/components-ui"
   },
   "dependencies": {}

@@ -7,7 +7,7 @@
   "main": "src/layer-method.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jtorm-com/jtorm.git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/methods/layer-method"
   },
   "dependencies": {}

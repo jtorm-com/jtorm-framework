@@ -1,21 +1,15 @@
 # jTorm If Method
 
-## Install
-
-```js
-npm install jtorm-com/jtorm-if-method
-```
-
 Todo klopt niks meer van die parameters
 ## Config
 
 | Option | Type     | Required | Description |
 |--------|----------|----------|-------------|
-| `d`    | `data`   | `true`   | [Data](https://github.com/jtorm-com/jtorm-data) |
+| `d`    | `data`   | `true`   | Data |
 | `v`    | `regex`  | `false`  | Test the data within the `if` scope using a regexp |
-| `u`    | `string` | `false`  | Use [Data](https://github.com/jtorm-com/jtorm-data) within `if` scope |
-| `else` | `method` | `false`  | When no data, it looks for an element with method "else". If it exists, then the [TSS](https://github.com/jtorm-com/jtorm-tss-parser) children will be used as an alternative. |
-| `eu`   | `string` | `false`  | Use [Data](https://github.com/jtorm-com/jtorm-data) within `else` scope |
+| `u`    | `string` | `false`  | Use Data within `if` scope |
+| `else` | `method` | `false`  | When no data, it looks for an element with method "else". If it exists, then the TSS children will be used as an alternative. |
+| `eu`   | `string` | `false`  | Use Data within `else` scope |
 
 ## Example
 

@@ -1,5 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormDocumentModel: class {
 

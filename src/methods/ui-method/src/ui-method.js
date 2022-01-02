@@ -136,7 +136,7 @@ module.exports = {
             var i, sV;
             if (di && di.m) {
                 for (i in di.m) {
-                    sV = j.copyViewModel(v);
+                    sV = j.context.models.view.copy(j, v);
                     sV.d = di.m[i];
                     await j.context.methods[i].handle(j, sV);
                     return sV.io.c;

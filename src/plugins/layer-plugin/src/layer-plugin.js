@@ -5,7 +5,6 @@
 // maar een global verzameling weten we pas na een render
 // dus kunnen we alle cache bij langs gaan en de global daarop toepassen en opslaan
 
-// const util = require("util");
 const handle = async function(j, v, e, t) {
     var c = j.context.models.layer.get(j, v, e, t, v.cid),
         vM;
@@ -17,7 +16,7 @@ const handle = async function(j, v, e, t) {
         // console.log('handleChildren');
         // console.log(v.h.html());
 
-        vM = j.copyViewModel(v, null, c);
+        vM = j.context.models.view.copy(j, v, null, c);
         // console.log(util.inspect(vM.tss, false, null, true /* enable colors */));
         await j.handle(null, null, null, 0, vM);
     }
@@ -32,7 +31,6 @@ module.exports = {
             handle: async function (j, v) {
                 if (v.cid) {
                     currentCid.push(v.cid);
-                    // console.log('JAAAA', currentCid);
 
                     j.context.models.layer.cid = v.cid;
                 }
@@ -60,7 +58,6 @@ module.exports = {
                         return el === v.cid;
                     });
 
-                    // console.log('VERWIJDER', v.cid, currentCid);
                     j.context.models.layer.cid = currentCid.length ? currentCid.pop() : 'default';
                 }
             }

@@ -45,7 +45,7 @@ module.exports = {
                     m: t.p.m
                 };
 
-                sv = j.copyViewModel(v, null, tR);
+                sv = j.context.models.view.copy(j, v, null, tR);
                 sv.d = tD;
 
                 await j.context.methods.attr.handle(j, sv);

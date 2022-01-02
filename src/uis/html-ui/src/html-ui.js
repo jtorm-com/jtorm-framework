@@ -13,7 +13,7 @@ module.exports = {
             m: 'media'
         },
         url: [
-            'https://gitlab.com/jtorm/jtorm-framework/src/uis/html-ui/src'
+            // 'https://gitlab.com/jtorm/jtorm-framework/src/uis/html-ui/src'
         ],
         mapper: {
             init: {

@@ -2,13 +2,6 @@
 
 Manipulate an attribute with help of the [getAttribute method](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute).
 
-
-## Install
-
-```js
-npm install @jtorm/attr-method
-```
-
 ## Properties
 
 | Option | Type     | Required | Description |
