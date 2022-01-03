@@ -4,23 +4,19 @@ module.exports = {
     jTormHandler: {
         context: {},
         handle: async function (h, t, m, c, v) {
-            var s = this;
+            let s = this;
+
             if (!v)
                 v = await s.context.models.view.create(s, h, t, m, c);
+
             await s.parse(v);
+
             return v.h;
         },
         handleChildren: async function (h, t, m, v) {
-            var s = this,
-                // selector = v.c.s,
-                v2;
+            var s = this, k, t2 = s.context._.cloneDeep(t), v2;
 
-            // if (!s.context._.isString(h))
-            //     h = h.select(v.c.s ? v.c.s : t.s).innerHTML;
-
-            var t2 = s.clone(t);
-
-            for (let k in t2.c)
+            for (k in t2.c)
                 t2.c[k].s = 'body';
 
             v2 = await s.context.models.view.create(s, "<body>" + h + "</body>", t2.c, m, v.c);
@@ -30,7 +26,6 @@ module.exports = {
                 v.c.s = t.s;
 
             v2.c = {
-                // s: t.s,
                 s: 'body',
                 c: 1
             };
@@ -39,17 +34,15 @@ module.exports = {
 
             if (!v.r)
                 v.r = await s.handle("<body>" + h + "</body>", t2.c, m, v.c, v2);
-            v2.cid = v.cid;
 
-            // v.c.s = selector;// kan weg?
+            v2.cid = v.cid;
 
             await s.context.models.event.handle(s, v2, 'after', 'iteration');
 
             return v.r;
         },
         parse: async function (v) {
-            var s = this, m, ms = s.context.methods;
-            let k, k2;
+            let s = this, m, ms = s.context.methods, k, k2;
             for (k in v.tss) {
                 v.t = v.tss[k];
 
@@ -92,15 +85,6 @@ module.exports = {
 
                 v.io.d = null;
             }
-        },
-        clone: function (o) {
-            return this.context._.cloneDeep(o);
-        },
-        get: function(object, path) {
-            return this.context._.get(object, path);
-        },
-        set: function(object, path, value) {
-            this.context._.set(object, path, value);
         }
     }
 };

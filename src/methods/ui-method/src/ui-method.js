@@ -68,11 +68,11 @@ module.exports = {
             }
 
             if (r) {
-                var nT = j.clone(v.t);
+                var nT = j.context._.cloneDeep(v.t);
 
                 nT.p = {};
 
-                tR = j.clone(r.c);
+                tR = j.context._.cloneDeep(r.c);
 
                 if (!v.d.t)
                     delete tR.t;
@@ -162,7 +162,7 @@ module.exports = {
             }
             f[k] = s.quotes(f[k]);
         },
-        findUIComponent(jT, f, c) {
+        findUIComponent(j, f, c) {
             var s = this, ui, k, k2, k3, tmp, r2, r;
 
             if (f === 'self')
@@ -181,9 +181,9 @@ module.exports = {
                     r2 = 0;
                     for (k2 in tmp) {
                         if (r[tmp[k2]]) {
-                            if (!r2) {
-                                r2 = jT.clone(r[tmp[k2]]);
-                            } else {
+                            if (!r2)
+                                r2 = j.context._.cloneDeep(r[tmp[k2]]);
+                            else {
                                 if (!r2.t)
                                     r2.t = [];
                                 for (k3 in r[tmp[k2]].t) {
@@ -197,7 +197,8 @@ module.exports = {
                     tmp = c[k].split('|');
                     for (k2 in tmp) {
                         if (r[tmp[k2]]) {
-                            r = jT.clone(r[tmp[k2]]);
+                            r = j.context._.cloneDeep(r[tmp[k2]]);
+
                             break;
                         }
                     }

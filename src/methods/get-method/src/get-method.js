@@ -1,5 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormGetMethod: {
         params: ['h', 't', 'd'],
@@ -14,7 +15,8 @@ module.exports = {
             var s = this, r, p, k, k2, nD, nT;
 
             if (v.d.d) {
-                nD = j.clone(v.m);
+                nD = j.context._.cloneDeep(v.m);
+
                 // todo test komt het voor dat dit nog een string is?
                 if (v._.isString(d.d)) {
                     v.d.d = [v.d.d];

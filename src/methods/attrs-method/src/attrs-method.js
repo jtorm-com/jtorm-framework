@@ -1,12 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormAttrsMethod: {
         alias: 'as',
         separator: ',',
         params: ['n', 'v', 'm'],
         parsed: function (j, v) {
-            var t = j.clone(v.t),
+            let t = j.context._.cloneDeep(v.t),
                 p = j.context.parsers.tss;
             t.p.n = p.quotes(t.p.n);
             t.p.v = p.quotes(t.p.v);

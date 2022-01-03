@@ -8,7 +8,7 @@ module.exports = {
             return j.context.models.language !== undefined;
         },
         handle: async function (j, v) {
-            var nD = j.clone(v.m), x, l = j.context.models.language, k;
+            let nD = j.context._.cloneDeep(v.m), x, l = j.context.models.language, k;
 
             for (k in v.t.p) {
                 x = j.context.parsers.data.parse(v.m, v.t.p[k]);
