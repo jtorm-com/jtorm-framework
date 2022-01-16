@@ -5,8 +5,8 @@
 
     a {
         ->attrs {
-            n: 'id,name,href,class';
-            v: 'identifier.Text,identifier.Text,url.URL,schema-URL';
+            n: 'id,href,class';
+            v: 'identifier.Text,url.URL,schema-URL';
         }
 
         ->append(d: name)->ui {
