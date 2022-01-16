@@ -1,18 +1,16 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 link {
-  ->attr {
-    n: 'rel';
-    v: 'icon';
-  }
-  ->if {
-    d: sizes;
-    v: '^([0-9]+x[0-9]+)|(any)$';
     ->attr {
-      n: 'sizes';
-      v: sizes;
+        n: 'rel';
+        v: 'icon';
     }
-  }
-  ->get {
-    t: '@h/doc/link.tss';
-  }
+
+    ->if(d: sizes, v: '^([0-9]+x[0-9]+)|(any)$')->attr {
+        n: 'sizes';
+        v: sizes;
+    }
+
+    ->get {
+        t: '@h/doc/link.tss';
+    }
 }

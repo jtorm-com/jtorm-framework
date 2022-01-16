@@ -1,4 +1,4 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 h6->get {
-  t: '@h/replacable.tss';
+    t: '@h/replacable.tss';
 }

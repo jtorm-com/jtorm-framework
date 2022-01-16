@@ -1,10 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 time {
-  ->attr {
-    n: 'datetime';
-    v: dateTime;
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+    ->attr {
+        n: 'datetime';
+        v: dateTime;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

@@ -1,49 +1,31 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 th {
-  ->if {
-    d: colspan;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'colspan';
-      v: colspan;
+    ->if(d: colspan, v: '^[0-9]+$')->attr {
+        n: 'colspan';
+        v: colspan;
     }
-  }
-  ->if {
-    d: headers;
-    ->attr {
-      n: 'headers';
-      v: headers;
+
+    ->if(d: rowspan, v: '^[0-9]+$')->attr {
+        n: 'rowspan';
+        v: rowspan;
     }
-  }
-  ->if {
-    d: abbr;
+
     ->attr {
-      n: 'abbr';
-      v: abbr;
+        n: 'headers';
+        v: headers;
     }
-  }
-  ->if {
-    d: rowspan;
+
     ->attr {
-      n: 'rowspan';
-      v: rowspan;
+        n: 'abbr';
+        v: abbr;
     }
-  }
-  ->if {
-    d: scope;
+
     ->attr {
-      n: 'scope';
-      v: scope;
+        n: 'scope';
+        v: scope;
     }
-  }
-  ->if {
-    d: sorted;
-    ->attr {
-      n: 'sorted';
-      v: sorted;
+
+    ->get {
+        t: '@h/replacable.tss';
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
 }

@@ -1,29 +1,31 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 script {
-  ->if(d: async)->attr {
-    n: 'async';
-    v: true;
-  }
-  ->attr {
-    n: 'charset';
-    v: charset;
-  }
-  ->if(d: defer)->attr {
-    n: 'defer';
-    v: true;
-  }
-  ->attr {
-    n: 'src';
-    v: src;
-  }
-  ->if {
-    d: type;
-    ->attr {
-      n: 'type';
-      v: type;
+    ->if(d: async)->attr {
+        n: 'async';
+        v: true;
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->attr {
+        n: 'charset';
+        v: charset;
+    }
+
+    ->if(d: defer)->attr {
+        n: 'defer';
+        v: true;
+    }
+
+    ->attr {
+        n: 'src';
+        v: src;
+    }
+
+    ->attr {
+        n: 'type';
+        v: type;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

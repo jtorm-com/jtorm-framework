@@ -1,10 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 data {
-  ->attr {
-    n: 'value';
-    v: value;
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+    ->attr {
+        n: 'value';
+        v: value;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

@@ -1,43 +1,35 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 input {
-  ->attr {
-    n: 'type';
-    v: 'image';
-  }
-  ->if {
-    d: alt;
     ->attr {
-      n: 'alt';
-      v: alt;
+        n: 'type';
+        v: 'image';
     }
-  }
-  ->if {
-    d: height;
-    v: '^[0-9]+$';
+
     ->attr {
-      n: 'height';
-      v: height;
+        n: 'alt';
+        v: alt;
     }
-  }
-  ->if {
-    d: src;
+
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
+    }
+
     ->attr {
-      n: 'src';
-      v: src;
+        n: 'src';
+        v: src;
     }
-  }
-  ->if {
-    d: width;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'width';
-      v: width;
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
     }
-  }
-  ->get {
-    t: '@h/form/form-submit.tss';
-  }
-  ->get {
-    t: '@h/form/form-element.tss';
-  }
+
+    ->get {
+        t: '@h/form/form-submit.tss';
+    }
+
+    ->get {
+        t: '@h/form/form-element.tss';
+    }
 }

@@ -1,71 +1,51 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 img {
-  ->if {
-    d: alt;
     ->attr {
-      n: 'alt';
-      v: alt;
+        n: 'alt';
+        v: alt;
     }
-  }
-  ->if {
-    d: height;
-    v: '^[0-9]+$';
+
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
+    }
+
+    ->if(d: ismap)->attr {
+        n: 'ismap';
+        v: true;
+    }
+
     ->attr {
-      n: 'height';
-      v: height;
+        n: 'longdesc';
+        v: longdesc;
     }
-  }
-  ->if {
-    d: ismap;
+
     ->attr {
-      n: 'ismap';
-      v: true;
+        n: 'sizes';
+        v: sizes;
     }
-  }
-  ->if {
-    d: longdesc;
+
     ->attr {
-      n: 'longdesc';
-      v: longdesc;
+        n: 'src';
+        v: src;
     }
-  }
-  ->if {
-    d: sizes;
+
     ->attr {
-      n: 'sizes';
-      v: sizes;
+        n: 'srcset';
+        v: srcset;
     }
-  }
-  ->if {
-    d: src;
+
     ->attr {
-      n: 'src';
-      v: src;
+        n: 'usemap';
+        v: usemap;
     }
-  }
-  ->if {
-    d: srcset;
-    ->attr {
-      n: 'srcset';
-      v: srcset;
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
     }
-  }
-  ->if {
-    d: usemap;
-    ->attr {
-      n: 'usemap';
-      v: usemap;
+
+    ->get {
+        t: '@h/media/playable.tss';
     }
-  }
-  ->if {
-    d: width;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'width';
-      v: width;
-    }
-  }
-  ->get {
-    t: '@h/media/playable.tss';
-  }
 }

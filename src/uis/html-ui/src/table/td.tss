@@ -1,21 +1,21 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 td {
-  ->if {
-    d: colspan;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'colspan';
-      v: colspan;
+    ->if(d: colspan, v: '^[0-9]+$')->attr {
+        n: 'colspan';
+        v: colspan;
     }
-  }
-  ->if {
-    d: headers;
-    ->attr {
-      n: 'headers';
-      v: headers;
+
+    ->if(d: rowspan, v: '^[0-9]+$')->attr {
+        n: 'rowspan';
+        v: rowspan;
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->attr {
+        n: 'headers';
+        v: headers;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

@@ -1,34 +1,26 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 option {
-  ->if {
-    d: disabled;
-    ->attr {
-      n: 'disabled';
-      v: true;
+    ->if(d: disabled)->attr {
+        n: 'disabled';
+        v: true;
     }
-  }
-  ->if {
-    d: label;
+
     ->attr {
-      n: 'label';
-      v: label;
+        n: 'label';
+        v: label;
     }
-  }
-  ->if {
-    d: selected;
+
+    ->if(d: selected)->attr {
+        n: 'selected';
+        v: true;
+    }
+
     ->attr {
-      n: 'selected';
-      v: true;
+        n: 'value';
+        v: value;
     }
-  }
-  ->if {
-    d: value;
-    ->attr {
-      n: 'value';
-      v: value;
+
+    ->get {
+        t: '@h/replacable.tss';
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
 }

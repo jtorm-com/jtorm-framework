@@ -1,58 +1,71 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 ->attr {
-  n: 'accesskey';
-  v: accesskey;
+    n: 'accesskey';
+    v: accesskey;
 }
+
 ->attr {
-  m: 'a';
-  n: 'class';
-  v: class;
+    m: 'a';
+    n: 'class';
+    v: class;
 }
+
 ->attr {
-  n: 'contenteditable';
-  v: contenteditable;
+    n: 'contenteditable';
+    v: contenteditable;
 }
+
 ->attr {
-  n: 'dir';
-  v: dir;
+    n: 'dir';
+    v: dir;
 }
+
 ->attr {
-  n: 'draggable';
-  v: draggable;
+    n: 'draggable';
+    v: draggable;
 }
+
 ->attr {
-  n: 'dropzone';
-  v: dropzone;
+    n: 'dropzone';
+    v: dropzone;
 }
+
 ->attr {
-  n: 'hidden';
-  v: hidden;
+    n: 'hidden';
+    v: hidden;
 }
+
 ->attr {
-  n: 'id';
-  v: id;
+    n: 'id';
+    v: id;
 }
+
 ->attr {
-  n: 'lang';
-  v: lang;
+    n: 'lang';
+    v: lang;
 }
+
 ->attr {
-  n: 'spellcheck';
-  v: spellcheck;
+    n: 'spellcheck';
+    v: spellcheck;
 }
+
 ->attr {
-  n: 'style';
-  v: style;
+    n: 'style';
+    v: style;
 }
+
 ->attr {
-  n: 'tabindex';
-  v: tabindex;
+    n: 'tabindex';
+    v: tabindex;
 }
+
 ->attr {
-  n: 'title';
-  v: title;
+    n: 'title';
+    v: title;
 }
+
 ->attr {
-  n: 'translate';
-  v: translate;
+    n: 'translate';
+    v: translate;
 }

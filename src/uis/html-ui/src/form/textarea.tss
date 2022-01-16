@@ -1,69 +1,50 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 textarea {
-  ->inner {
-    h: html;
-  }
-  ->if {
-    d: cols;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'cols';
-      v: cols;
+    ->inner {
+        h: html;
     }
-  }
-  ->if {
-    d: dirname;
-    ->attr {
-      n: 'dirname';
-      v: dirname;
+
+    ->if(d: cols, v: '^[0-9]+$')->attr {
+        n: 'cols';
+        v: cols;
     }
-  }
-  ->if {
-    d: readonly;
+
     ->attr {
-      n: 'readonly';
-      v: true;
+        n: 'dirname';
+        v: dirname;
     }
-  }
-  ->if {
-    d: maxlength;
-    v: '^[0-9]+$';
+
+    ->if(d: readonly)->attr {
+        n: 'readonly';
+        v: true;
+    }
+
+    ->if(d: maxlength, v: '^[0-9]+$')->attr {
+        n: 'maxlength';
+        v: true;
+    }
+
+    ->if(d: required)->attr {
+        n: 'required';
+        v: true;
+    }
+
     ->attr {
-      n: 'maxlength';
-      v: true;
+        n: 'placeholder';
+        v: placeholder;
     }
-  }
-  ->if {
-    d: required;
-    ->attr {
-      n: 'required';
-      v: required;
+
+    ->if(d: rows, v: '^[0-9]+$')->attr {
+        n: 'rows';
+        v: rows;
     }
-  }
-  ->if {
-    d: placeholder;
-    ->attr {
-      n: 'placeholder';
-      v: placeholder;
+
+    ->if(d: wrap, v: '^(hard|soft)$')->attr {
+        n: 'wrap';
+        v: wrap;
     }
-  }
-  ->if {
-    d: rows;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'rows';
-      v: rows;
+
+    ->get {
+        t: '@h/tags/form-element.tss';
     }
-  }
-  ->if {
-    d: wrap;
-    v: '^(hard|soft)$';
-    ->attr {
-      n: 'wrap';
-      v: wrap;
-    }
-  }
-  ->get {
-    t: '@h/tags/form-element.tss';
-  }
 }

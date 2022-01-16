@@ -1,7 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 ->inner {
-  h: html;
+    h: html;
 }
+
 ->get {
-  t: '@h/global.tss';
+    t: '@h/global.tss';
 }

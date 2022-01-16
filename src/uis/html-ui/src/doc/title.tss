@@ -1,4 +1,4 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 title->inner {
-  h: text;
+    h: text;
 }

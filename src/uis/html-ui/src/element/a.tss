@@ -14,24 +14,14 @@ a {
         v: ping;
     }
 
-    ->if {
-        d: referrerpolicy;
-        v: '^(no-referrer|no-referrer-when-downgrade|origin|origin-when-cross-origin|unsafe-url)$';
-
-        ->attr {
-            n: 'referrerpolicy';
-            v: referrerpolicy;
-        }
+    ->if(d: referrerpolicy, v: '^(no-referrer|no-referrer-when-downgrade|origin|origin-when-cross-origin|unsafe-url)$')->attr {
+        n: 'referrerpolicy';
+        v: referrerpolicy;
     }
 
-    ->if {
-        d: rel;
-        v: '^(alternate|author|bookmark|help|license|next|nofollow|noreferrer|prefetch|prev|search|tag)$';
-
-        ->attr {
-            n: 'rel';
-            v: rel;
-        }
+    ->if(d: rel, v: '^(alternate|author|bookmark|help|license|next|nofollow|noreferrer|prefetch|prev|search|tag)$')->attr {
+        n: 'rel';
+        v: rel;
     }
 
     ->attr {

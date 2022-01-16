@@ -1,39 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 input {
-  ->attr {
-    n: 'type';
-    v: 'datetime-local';
-  }
-  ->if {
-    d: autocomplete;
-    v: '^(on|off)$';
     ->attr {
-      n: 'autocomplete';
-      v: autocomplete;
+        n: 'type';
+        v: 'datetime-local';
     }
-  }
-  ->if {
-    d: max;
-    ->attr {
-      n: 'max';
-      v: max;
+
+    ->get {
+        t: '@h/form/input-range-attrs.tss';
     }
-  }
-  ->if {
-    d: min;
-    ->attr {
-      n: 'min';
-      v: min;
-    }
-  }
-  ->if {
-    d: step;
-    ->attr {
-      n: 'step';
-      v: step;
-    }
-  }
-  ->get {
-    t: '@h/form/input.tss';
-  }
 }

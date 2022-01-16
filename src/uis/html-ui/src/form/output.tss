@@ -1,27 +1,21 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 output {
-  ->if {
-    d: for;
     ->attr {
-      n: 'for';
-      v: for;
+        n: 'for';
+        v: for;
     }
-  }
-  ->if {
-    d: form;
+
     ->attr {
-      n: 'form';
-      v: form;
+        n: 'form';
+        v: form;
     }
-  }
-  ->if {
-    d: name;
+
     ->attr {
-      n: 'name';
-      v: name;
+        n: 'name';
+        v: name;
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

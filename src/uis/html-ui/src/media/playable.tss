@@ -1,47 +1,34 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-->if {
-  d: autoplay;
-  ->attr {
+->if(d: autoplay)->attr {
     n: 'autoplay';
     v: true;
-  }
 }
-->if {
-  d: controls;
-  ->attr {
+
+->if(d: controls)->attr {
     n: 'controls';
     v: true;
-  }
 }
-->if {
-  d: loop;
-  ->attr {
+
+->if(d: loop)->attr {
     n: 'loop';
     v: true;
-  }
 }
-->if {
-  d: muted;
-  ->attr {
+
+->if(d: muted)->attr {
     n: 'muted';
     v: true;
-  }
 }
-->if {
-  d: preload;
-  v: '^(auto|metadata|none)$';
-  ->attr {
+
+->if(d: preload, v: '^(auto|metadata|none)$')->attr {
     n: 'preload';
     v: preload;
-  }
 }
-->if {
-  d: src;
-  ->attr {
+
+->attr {
     n: 'src';
     v: src;
-  }
 }
+
 ->get {
-  t: '@h/replacable.tss';
+    t: '@h/replacable.tss';
 }

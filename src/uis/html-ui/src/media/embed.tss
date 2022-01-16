@@ -1,36 +1,26 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 embed {
-  ->if {
-    d: height;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'height';
-      v: height;
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
     }
-  }
-  ->if {
-    d: src;
+
     ->attr {
-      n: 'src';
-      v: src;
+        n: 'src';
+        v: src;
     }
-  }
-  ->if {
-    d: type;
+
     ->attr {
-      n: 'type';
-      v: type;
+        n: 'type';
+        v: type;
     }
-  }
-  ->if {
-    d: width;
-    v: '^[0-9]+$';
-    ->attr {
-      n: 'width';
-      v: width;
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

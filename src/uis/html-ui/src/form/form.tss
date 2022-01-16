@@ -1,50 +1,46 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 form {
-  ->attr {
-    n: 'accept-charset';
-    v: accept-charset;
-  }
-  ->attr {
-    n: 'action';
-    v: action;
-  }
-  ->if {
-    d: autocomplete;
-    v: '^(on|off)$';
     ->attr {
-      n: 'autocomplete';
-      v: autocomplete;
+        n: 'accept-charset';
+        v: accept-charset;
     }
-  }
-  ->if {
-    d: enctype;
-    v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$';
+
     ->attr {
-      n: 'enctype';
-      v: enctype;
+        n: 'action';
+        v: action;
     }
-  }
-  ->if {
-    d: method;
-    v: '^(get|post)$';
+
+    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+        n: 'autocomplete';
+        v: autocomplete;
+    }
+
+    ->if(d: enctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$')->attr {
+        n: 'enctype';
+        v: enctype;
+    }
+
+    ->if(d: method, v: '^(get|post)$')->attr {
+        n: 'method';
+        v: method;
+    }
+
     ->attr {
-      n: 'method';
-      v: method;
+        n: 'name';
+        v: name;
     }
-  }
-  ->attr {
-    n: 'name';
-    v: name;
-  }
-  ->if(d: novalidate)->attr {
-    n: 'novalidate';
-    v: true;
-  }
-  ->if(d: target)->attr {
-    n: 'target';
-    v: target;
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->if(d: novalidate)->attr {
+        n: 'novalidate';
+        v: true;
+    }
+
+    ->attr {
+        n: 'target';
+        v: target;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

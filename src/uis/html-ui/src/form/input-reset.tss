@@ -1,10 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 input {
-  ->attr {
-    n: 'type';
-    v: 'reset';
-  }
-  ->get {
-    t: '@h/form/form-element.tss';
-  }
+    ->attr {
+        n: 'type';
+        v: 'reset';
+    }
+
+    ->get {
+        t: '@h/form/form-element.tss';
+    }
 }

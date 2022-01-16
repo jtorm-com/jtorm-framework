@@ -1,10 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 input {
-    ->attr {
-        n: 'type';
-        v: 'email';
-    }
-
     ->if(d: autocomplete, v: '^(on|off)$')->attr {
         n: 'autocomplete';
         v: autocomplete;
@@ -15,14 +10,19 @@ input {
         v: list;
     }
 
-    ->if(d: multiple)->attr {
-        n: 'multiple';
-        v: true;
+    ->attr {
+        n: 'max';
+        v: max;
     }
 
     ->attr {
-        n: 'pattern';
-        v: pattern;
+        n: 'min';
+        v: min;
+    }
+
+    ->attr {
+        n: 'step';
+        v: step;
     }
 
     ->get {

@@ -1,13 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 colgroup {
-  ->if {
-    d: span;
     ->attr {
-      n: 'span';
-      v: span;
+        n: 'span';
+        v: span;
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

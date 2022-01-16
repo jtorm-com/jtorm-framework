@@ -1,14 +1,16 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 base {
-  ->attr {
-    n: 'href';
-    v: href;
-  }
-  ->attr {
-    n: 'target';
-    v: target;
-  }
-  ->get {
-    t: '@h/global.tss';
-  }
+    ->attr {
+        n: 'href';
+        v: href;
+    }
+
+    ->attr {
+        n: 'target';
+        v: target;
+    }
+
+    ->get {
+        t: '@h/global.tss';
+    }
 }

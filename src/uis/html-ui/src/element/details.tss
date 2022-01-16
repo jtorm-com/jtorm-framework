@@ -1,13 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 details {
-  ->if {
-    d: open;
-    ->attr {
-      n: 'open';
-      v: true;
+    ->if(d: open)->attr {
+        n: 'open';
+        v: true;
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

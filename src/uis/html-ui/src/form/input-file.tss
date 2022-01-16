@@ -1,24 +1,21 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 input {
-  ->attr {
-    n: 'type';
-    v: 'file';
-  }
-  ->if {
-    d: accept;
     ->attr {
-      n: 'accept';
-      v: accept;
+        n: 'type';
+        v: 'file';
     }
-  }
-  ->if {
-    d: multiple;
+
     ->attr {
-      n: 'multiple';
-      v: true;
+        n: 'accept';
+        v: accept;
     }
-  }
-  ->get {
-    t: '@h/form/form-element.tss';
-  }
+
+    ->if(d: multiple)->attr {
+        n: 'multiple';
+        v: true;
+    }
+
+    ->get {
+        t: '@h/form/form-element.tss';
+    }
 }

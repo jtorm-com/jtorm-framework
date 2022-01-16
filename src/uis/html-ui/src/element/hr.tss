@@ -1,4 +1,4 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 hr->get {
-  t: '@h/global.tss';
+    t: '@h/global.tss';
 }

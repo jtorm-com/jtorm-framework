@@ -1,41 +1,31 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 source {
-  ->if {
-    d: src;
     ->attr {
-      n: 'src';
-      v: src;
+        n: 'src';
+        v: src;
     }
-  }
-  ->if {
-    d: srcset;
+
     ->attr {
-      n: 'srcset';
-      v: srcset;
+        n: 'srcset';
+        v: srcset;
     }
-  }
-  ->if {
-    d: media;
+
     ->attr {
-      n: 'media';
-      v: media;
+        n: 'media';
+        v: media;
     }
-  }
-  ->if {
-    d: sizes;
+
     ->attr {
-      n: 'sizes';
-      v: sizes;
+        n: 'sizes';
+        v: sizes;
     }
-  }
-  ->if {
-    d: type;
+
     ->attr {
-      n: 'type';
-      v: type;
+        n: 'type';
+        v: type;
     }
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

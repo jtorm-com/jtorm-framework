@@ -1,9 +1,10 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 dl {
-  ->append(d: dt)->ui {
-    c: '@t.dt';
-  }
-  ->append(d: dd)->ui {
-    c: '@t.dd';
-  }
+    ->append(d: dt)->ui {
+        c: '@t.dt';
+    }
+
+    ->append(d: dd)->ui {
+        c: '@t.dd';
+    }
 }

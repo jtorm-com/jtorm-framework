@@ -1,18 +1,21 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 link {
-  ->attr {
-    n: 'crossorigin';
-    v: crossorigin;
-  }
-  ->attr {
-    n: 'rel';
-    v: rel;
-  }
-  ->attr {
-    n: 'sizes';
-    v: sizes;
-  }
-  ->get {
-    t: '@h/linkable.tss';
-  }
+    ->attr {
+        n: 'crossorigin';
+        v: crossorigin;
+    }
+
+    ->attr {
+        n: 'rel';
+        v: rel;
+    }
+
+    ->attr {
+        n: 'sizes';
+        v: sizes;
+    }
+
+    ->get {
+        t: '@h/linkable.tss';
+    }
 }

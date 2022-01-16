@@ -1,10 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 style {
-  ->attr {
-    n: 'media';
-    v: media;
-  }
-  ->get {
-    t: '@h/replacable.tss';
-  }
+    ->attr {
+        n: 'media';
+        v: media;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
 }

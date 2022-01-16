@@ -1,27 +1,21 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 area {
-  ->if {
-    d: alt;
     ->attr {
-      n: 'alt';
-      v: alt;
+        n: 'alt';
+        v: alt;
     }
-  }
-  ->if {
-    d: coords;
+
     ->attr {
-      n: 'coords';
-      v: coords;
+        n: 'coords';
+        v: coords;
     }
-  }
-  ->if {
-    d: shape;
+
     ->attr {
-      n: 'shape';
-      v: shape;
+        n: 'shape';
+        v: shape;
     }
-  }
-  ->get {
-    t: '@h/linkable.tss';
-  }
+
+    ->get {
+        t: '@h/linkable.tss';
+    }
 }
