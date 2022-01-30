@@ -48,15 +48,6 @@ module.exports = {
 //          t: ['@c/menu/list.tss']
 //        }
 //      },
-            WPHeader: {// is prototype
-                default: {
-                    ui: {
-                        f: 'schema',
-                        c: 'WPHeader'
-                    },
-                    t: ['@c/header/header-default.tss']
-                }
-            },
             loading: {
                 default: {
                     ui: {
@@ -75,15 +66,6 @@ module.exports = {
             //     t: ['@c/main/main-default.tss']
             //   }
             // },
-            WPFooter: {
-                default: {
-                    ui: {
-                        f: 'schema',
-                        c: 'WPFooter'
-                    },
-                    t: ['@c/footer/footer-default.tss']
-                }
-            },
             grid: {
                 container: {
                     t: ['@c/grid/container.tss']

@@ -5,9 +5,9 @@ body > section->swap {
     a: 1;
 
     body > footer {
-        ->attr {
-            n: 'class';
-            v: 'schema-WPFooter';
+        ->attrs {
+            n: 'class,id';
+            v: 'schema-WPFooter,footer';
             m: 'a';
         }
 
@@ -28,5 +28,35 @@ body > section->swap {
         s: 'section';
         ui: '@e.section';
         a: 1;
+
+        body > footer > .footer->append->ui {
+            c: 'grid.wrapper';
+
+            div->append->ui {
+                c: 'grid.container';
+
+                .container->append->ui {
+                    c: 'grid.oneColumn';
+
+                    .first {
+                        ->attr {
+                            n: 'class';
+                            v: 'copyright';
+                            m: 'a';
+                        }
+
+                        ->append->ui {
+                            c: '@t.small';
+
+                            small {
+                                ->append {
+                                    h: copyrightYear.Number + ' ' + copyrightNotice.Text;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
