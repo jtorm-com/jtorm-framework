@@ -1,9 +1,9 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 // social, newsletter
 body > footer {
-  ->attrs {
-    n: 'id,class';
-    v: 'footer,footer';
+  ->attr {
+    n: 'id';
+    v: 'footer';
     m: 'p';
   }
   ->config(k: 'newsletter')->prepend->ui {// wanneer user, kan dit via account, zonder user, moet formulier
