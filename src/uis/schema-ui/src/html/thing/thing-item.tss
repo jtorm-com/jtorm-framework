@@ -2,7 +2,7 @@
 body > section {
     ->attr {
         n: 'class';
-        v: 'schema-Thing item';
+        v: 'schema-Thing';
     }
 
     ->append->ui {

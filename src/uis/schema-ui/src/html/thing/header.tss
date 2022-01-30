@@ -15,6 +15,12 @@
             t: 0;
             h1 {
                 ->if(d: mainEntity.@c) {
+                    ->attr {
+                        n: 'class';
+                        v: 'schema-mainEntityOfPage';
+                        m: 'a';
+                    }
+
                     ->append(d: mainEntity.@c)->ui {
                         c: @type + '.link';
                     }
@@ -33,19 +39,12 @@
                         }
                     }
                 }
-
-                a {
-                    ->attr {
-                        n: 'class';
-                        v: 'schema-mainEntityOfPage';
-                        m: 'a';
-                    }
-                }
             }
         }
-/*
+
         ->append(d: alternateName)->ui {
             c: '@t.h2';
+            t: 0;
             h2->append->ui {
                 c: '@e.a';
                 t: 0;
@@ -59,6 +58,5 @@
                 }
             }
         }
-*/
     }
 }

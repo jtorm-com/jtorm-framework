@@ -18,5 +18,5 @@ module.exports = {
         }
     }
 };
-// deze moet denk ik na een iteratie ivm cache? anders wordt die altijd uitgevoerd,
-// maar per iteratie is ook wat overkill, voordat het wordt opgeslagen in cache oid?
+// todo deze moet denk ik na een iteratie ivm cache? anders wordt die altijd uitgevoerd,
+// todo maar per iteratie is ook wat overkill, voordat het wordt opgeslagen in cache oid?
