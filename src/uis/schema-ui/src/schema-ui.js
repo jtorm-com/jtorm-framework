@@ -67,8 +67,75 @@ module.exports = {
                 }
             },
             WebPage: {
+                init: {
+                    t: [
+                        '@s/html/web-page/init.tss'
+                    ]
+                },
                 default: {
-                    t: ['@s/html/web-page/web-page-default.tss']
+                    t: [
+                        '@s/html/web-page/web-page-default.tss'
+                    ]
+                },
+                defaultDesktop: {
+                    t: [
+                        '@s/html/web-page/web-page-default-desktop.tss'
+                    ]
+                },
+                defaultDesktopS: {
+                    t: [
+                        '@s/html/web-page/web-page-default-desktop-s.tss'
+                    ]
+                },
+                defaultDesktopM: {
+                    t: [
+                        '@s/html/web-page/web-page-default-desktop-m.tss'
+                    ]
+                },
+                defaultDesktopL: {
+                    t: [
+                        '@s/html/web-page/web-page-default-desktop-l.tss'
+                    ]
+                },
+                defaultTablet: {
+                    t: [
+                        '@s/html/web-page/web-page-default-tablet.tss'
+                    ]
+                },
+                defaultTabletS: {
+                    t: [
+                        '@s/html/web-page/web-page-default-tablet-s.tss'
+                    ]
+                },
+                defaultTabletM: {
+                    t: [
+                        '@s/html/web-page/web-page-default-tablet-m.tss'
+                    ]
+                },
+                defaultTabletL: {
+                    t: [
+                        '@s/html/web-page/web-page-default-tablet-l.tss'
+                    ]
+                },
+                defaultMobile: {
+                    t: [
+                        '@s/html/web-page/web-page-default-mobile.tss'
+                    ]
+                },
+                defaultMobileS: {
+                    t: [
+                        '@s/html/web-page/web-page-default-mobile-s.tss'
+                    ]
+                },
+                defaultMobileM: {
+                    t: [
+                        '@s/html/web-page/web-page-default-mobile-m.tss'
+                    ]
+                },
+                defaultMobileL: {
+                    t: [
+                        '@s/html/web-page/web-page-default-mobile-l.tss'
+                    ]
                 }
             },
             /*

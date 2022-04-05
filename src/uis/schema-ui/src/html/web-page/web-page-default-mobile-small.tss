@@ -1,4 +1,3 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-->ui {
-    c: 'grid.twoColumns';
+@media (min-width: 320px) and (max-width: 375px) {
 }

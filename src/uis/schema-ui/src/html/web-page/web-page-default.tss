@@ -1,63 +1,78 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-/*->get { oud
-  t: '@c/html.tss';
-}*/
+->ui {
+    c: 'WebPage.init';
+}
 
-head {
-    ->append(cid: 'head-global', cs: 'global')->get {
-        t: '@c/head-global.tss';
+// default stuff such as header, footer etc
+
+->mt(t: 'desktop') {
+    ->ui {
+        c: 'WebPage.defaultDesktop';
     }
 
-    ->append(cid: 'head-id', cs: identifier.Text)->get {
-        t: '@c/head-id.tss';
+    ->mt(t: 'desktopS') {
+        ->ui {
+            c: 'WebPage.defaultDesktopS';
+        }
+    }
+
+    ->mt(t: 'desktopM') {
+        ->ui {
+            c: 'WebPage.defaultDesktopM';
+        }
+    }
+
+    ->mt(t: 'desktopL') {
+        ->ui {
+            c: 'WebPage.defaultDesktopL';
+        }
     }
 }
 
-body {
-
-  ->append(d: hasPart.WPHeader, cid: 'WPHeader', cs: 'global')->ui {
-    c: 'WPHeader';
-  }
-
-  ->append(d: breadcrumb.BreadcrumbList, cid: 'BreadcrumbList', cs: 'global')->ui {
-    c: 'BreadcrumbList';
-  }
-
-
-// if mediaquery moeten hier denk ik op hoogste niveau? tablet/mobiel/desktop
-// denk dat die queries een stap hoger meer relevant zijn? material etc
-
-  ->append(d: mainEntity.@c, cid: 'mainEntity', cs: identifier.Text)->ui {
-    c: '@e.main';
-    main->append->ui {
-      c: 'grid.container';
-      .container->append->ui {
-        c: 'grid.oneColumn';
-        .first {
-          ->append->ui {
-            c: '@e.div';
-            t: 0;
-            div {
-              ->attrs {
-                n: 'id,class';
-                v: 'content,content';
-              }
-
-              #content->append->ui {
-                c: @type + '.default';
-              }
-            }
-          }
-        }
-      }
+->mt(t: 'tablet') {
+    ->ui {
+        c: 'WebPage.defaultTablet';
     }
-  }
 
-  ->append(d: hasPart.WPFooter, cid: 'WPFooter', cs: 'global')->ui {
-    c: 'WPFooter';
-  }
+    ->mt(t: 'tabletS') {
+        ->ui {
+            c: 'WebPage.defaultTabletS';
+        }
+    }
 
-  ->append(cid: 'loading', cs: 'global')->ui {
-    c: 'loading';
-  }
+    ->mt(t: 'tabletM') {
+        ->ui {
+            c: 'WebPage.defaultTabletM';
+        }
+    }
+
+    ->mt(t: 'tabletL') {
+        ->ui {
+            c: 'WebPage.defaultTabletL';
+        }
+    }
+}
+
+->mt(t: 'mobile') {
+    ->ui {
+        c: 'WebPage.defaultMobile';
+    }
+
+    ->mt(t: 'mobileS') {
+        ->ui {
+            c: 'WebPage.defaultMobileS';
+        }
+    }
+
+    ->mt(t: 'mobileM') {
+        ->ui {
+            c: 'WebPage.defaultMobileM';
+        }
+    }
+
+    ->mt(t: 'mobileL') {
+        ->ui {
+            c: 'WebPage.defaultMobileL';
+        }
+    }
 }

@@ -1,0 +1,14 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+/*->get {
+  t: '@c/html.tss';
+}*/
+
+head {
+    ->append(cid: 'head-global', cs: 'global')->get {
+        t: '@c/head-global.tss';
+    }
+
+    ->append(cid: 'head-id', cs: identifier.Text)->get {
+        t: '@c/head-id.tss';
+    }
+}

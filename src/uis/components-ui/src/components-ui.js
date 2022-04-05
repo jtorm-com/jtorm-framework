@@ -67,6 +67,9 @@ module.exports = {
             //   }
             // },
             grid: {
+                init: {
+                    t: ['@c/grid/init.tss']
+                },
                 container: {
                     t: ['@c/grid/container.tss']
                 },
@@ -79,6 +82,9 @@ module.exports = {
                 row: {
                     t: ['@c/grid/row.tss']
                 },
+                cell: {
+                    t: ['@c/grid/cell.tss']
+                },
                 oneColumn: {
                     t: ['@c/grid/1-column.tss']
                 },
@@ -90,9 +96,6 @@ module.exports = {
                 },
                 fourColumns: {
                     t: ['@c/grid/4-columns.tss']
-                },
-                "columns": {
-
                 },
                 twentyEightyColumns: {
                     t: ['@c/grid/20-80-columns.tss']

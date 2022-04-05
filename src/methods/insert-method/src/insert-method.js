@@ -52,7 +52,7 @@ module.exports = {
                     c = 0;
 
                     v.r = null;
-                } else throw new Error('test');
+                } else throw new Error('Invalid select ' + v.t.s);
             }
 
             v.cid = null;

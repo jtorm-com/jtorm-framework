@@ -1,0 +1,16 @@
+{
+  "name": "@jtorm/mediatarget-method",
+  "description": "jTorm mediatarget Method",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/mediatarget-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/mediatarget-method"
+  },
+  "dependencies": {
+    "@jtorm/mediatarget-method": "0.0.1"
+  }
+}
