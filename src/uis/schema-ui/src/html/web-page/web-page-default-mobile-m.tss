@@ -1,3 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-@media (min-width: 415px) and (max-width: 480px) {
+
+body->attr {
+    n: 'class';
+    v: 'mobile-m';
+    m: 'a';
 }

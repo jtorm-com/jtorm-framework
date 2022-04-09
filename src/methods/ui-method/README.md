@@ -15,6 +15,7 @@ npm install @jtorm/ui-method
 | `f`    | `string`  | `false`  | Registered framework, fallback `default` if set, else first key/value in object.
 | `t`    | `boolean` | `false`  | Use component tss
 | `h`    | `boolean` | `false`  | Use component html
+| `m`    | `boolean` | `false`  | Use mediatarget
 
 
 ### Component Options
@@ -26,3 +27,7 @@ In `jTormUiMethod.ui` you can define your own UI, when no framework is defined i
 | `&`    | Combines tss e.g. button.unelevated-anchor&dense-anchor              |
 | `|`    | Look for one within framework button.unelevated-anchor|dense-anchor  |
 
+
+## Notes
+
+Use mediatarget is not allowed for the fallback to default. You have to define it e.g. WPHeader > WPHeader.default

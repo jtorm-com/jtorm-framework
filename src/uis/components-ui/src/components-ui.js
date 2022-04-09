@@ -13,15 +13,6 @@ module.exports = {
                     t: ['@c/init.tss']
                 }
             },
-//      breadcrumbs: {// =schema
-//        default: {
-//          ui: {
-//            c: '@e.nav',
-//            t: 0
-//          },
-//          t: ['@c/breadcrumbs/breadcrumbs-default.tss']
-//        }
-//      },
             badge: {
                 default: {
                     ui: {
@@ -31,23 +22,6 @@ module.exports = {
                     t: ['@c/badge/badge-default.tss']
                 }
             },
-//      list: {=schema itemList
-//        ul: {
-//          ui: {
-//            c: '@t.ul',
-//            t: 0
-//          },
-//          t: ['@c/list/ul.tss']
-//        },
-//        ol: {
-//          t: ['@c/list/ol.tss']
-//        }
-//      },
-//      menu: {
-//        list: {
-//          t: ['@c/menu/list.tss']
-//        }
-//      },
             loading: {
                 default: {
                     ui: {
@@ -57,15 +31,6 @@ module.exports = {
                     t: ['@c/loading/loading-default.tss']
                 }
             },
-            // main: {
-            //   default: {
-            //     ui: {
-            //       c: '@e.main',
-            //       t: 0
-            //     },
-            //     t: ['@c/main/main-default.tss']
-            //   }
-            // },
             grid: {
                 init: {
                     t: ['@c/grid/init.tss']
@@ -101,24 +66,6 @@ module.exports = {
                     t: ['@c/grid/20-80-columns.tss']
                 }
             },
-
-            /* dit moet via schema
-            media: {
-                figure: {
-                    ui: {
-                        c: '@m.figure'
-                    },
-                    t: ['@c/media/figure-default.tss']
-                },
-
-                picture: {
-                    ui: {
-                        c: '@m.picture'
-                    },
-                    t: ['@c/media/picture-default.tss']
-                }
-            },*/
-
             search: {
                 mini: {
                     t: ['@c/search/search-mini.tss']

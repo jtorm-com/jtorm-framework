@@ -13,10 +13,10 @@ body {
   }
   ->append->ui {
     c: 'grid.twentyEightyColumns';
-    .first->append(d: author.@c)->ui {
+    .cell:first-child->append(d: author.@c)->ui {
       c: @type + '.gridItem';
     }
-    .last->append->ui {
+    .cell:last-child->append->ui {
       c: 'CreativeWork.listItem';
       body > section {
         ->attr {

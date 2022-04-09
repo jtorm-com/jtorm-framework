@@ -1,18 +1,21 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormUiMethod: {
         cache: {},
         default: 'default',
         framework: 'h',
-        params: ['f', 'c', 't', 'h'],
+        params: ['f', 'c', 't', 'h', 'm'],
         regexp: {},
         ui: {
             mapper: {}
         },
         uis: {},
+
         init: async function () {
-            var s = this, ui, k, k2;
+            let s = this, ui, k, k2;
+
             for (k in s.uis) {
                 ui = s.uis[k];
                 s.regexp[ui.alias] = {
@@ -25,6 +28,7 @@ module.exports = {
                         s.regexp[ui.alias].mapper[k2] = new RegExp("@" + k2 + '([\.\/])', '');
             }
         },
+
         validate: function (j, v) {
             v.d.t = v.d.t === undefined ? 1 : parseInt(v.d.t);
             v.d.h = v.d.h === undefined ? 1 : parseInt(v.d.h);
@@ -36,104 +40,132 @@ module.exports = {
 
             return !!v.d.c;
         },
+
         handle: async function (j, v) {
-            var s = this, r, f = v.d.f, tR, i, c = v.d.c;
+            let s = this, r, f = v.d.f, i, c = v.d.c, nT, k;
 
             if (!f)
                 f = 'self';
 
-            if (s.cache[c] && s.cache[c][f])
-                r = s.cache[c][f];
-            else {
-                r = await s.findUIComponent(j, f, c);
+            r = await s.getComponent(j, c, f, !v.d.m);
+            if (!r)
+                throw new Error('UI Component not found: ' + v.t.p.c);
 
-                if (!r) {
-                    if (f === 'self')
-                        r = await s.findUIComponent(j, s.framework, c);
-
-                    if (!r) {
-                        for (i in s.uis) {
-                            if (s.uis[i]) {
-                                r = await s.findUIComponent(j, i, c);
-                                if (r)
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                if (!s.cache[c])
-                    s.cache[c] = {};
-                s.cache[c][f] = r;
+            nT = await s.processComponent(j, v, r);
+            if (!nT) {
+                v.io = {c: 0, r: 0};
+                return;
             }
 
-            if (r) {
-                var nT = j.context._.cloneDeep(v.t);
+            if (v.d.m) {
+                r = j.context.methods.mediatarget ?? j.context.methods.mt;
 
-                nT.p = {};
+                if (r) {
+                    for (i in r.current) {
+                        k = await s.getComponent(j, c + r.current[i], f);
+                        if (k) {
+                            let nT2 = await s.processComponent(j, v, k);
 
-                tR = j.context._.cloneDeep(r.c);
-
-                if (!v.d.t)
-                    delete tR.t;
-                if (!v.d.h)
-                    delete tR.h;
-                if (tR.h)
-                    tR.h = [tR.h];
-
-                f = {};
-                await s.addLoop(j, tR, 'h', f, s, v);
-                await s.addLoop(j, tR, 't', f, s, v);
-                await s.addLoop(j, tR, 'd', f, s, v);
-
-                if (tR.ui) {
-                    nT.m = 'ui';
-                    if (tR.ui.c !== undefined)
-                        nT.p.c = "'" + tR.ui.c + "'";
-                    if (tR.ui.f !== undefined)
-                        nT.p.f = "'" + tR.ui.f + "'";
-                    if (tR.ui.t !== undefined)
-                        nT.p.t = "'" + tR.ui.t + "'";
-                    if (tR.ui.h !== undefined)
-                        nT.p.h = "'" + tR.ui.h + "'";
-                    if (tR.ui.d !== undefined)
-                        nT.p.d = "'" + tR.ui.d + "'";
-
-                    nT.c = [{s: nT.s, m: 'get', c: nT.c, p: f}];
-
-                    if (tR.di) {
-                        r = await s.add(j, tR.di.m, v);
-                        if (!r) {
-                            v.io = {c: 0, r: 0};
-                            return;
+                            nT.c.push(nT2);
                         }
                     }
-                } else if (tR.pT) {
-                    if (!Array.isArray(tR.pT.c))
-                        tR.pT.c = [];
-                    tR.pT.c.push({s: v.t.s, m: 'get', c: v.t.c, p: f});
-
-                    nT.c = [tR.pT];
-                } else {
-                    nT.m = 'get';
-                    nT.p = f;
                 }
+            }
 
-                for (i of s.params)
-                    delete v.d[i];
+            for (i of s.params)
+                delete v.d[i];
 
-                // const util = require('util');
-                // console.log('-----');
-                // console.log(util.inspect(nT, false, null, true /* enable colors */));
-
-                v.t = nT;
-
-                v.io = {c: 1, r: 1};
-            } else
-                throw new Error('UI Component not found: ' + v.t.p.c);
+            v.t = nT;
+            v.io = {c: 1, r: 1};
         },
+
+        getComponent: async function (j, c, f, d) {
+            let s = this, r, i;
+
+            if (s.cache[c] && s.cache[c][f] !== undefined)
+                return s.cache[c][f];
+
+            r = await s.findUIComponent(j, f, c, d);
+
+            if (!r) {
+                if (f === 'self')
+                    r = await s.findUIComponent(j, s.framework, c, d);
+
+                if (!r) {
+                    for (i in s.uis) {
+                        if (s.uis[i]) {
+                            r = await s.findUIComponent(j, i, c, d);
+                            if (r)
+                                break;
+                        }
+                    }
+                }
+            }
+
+            if (!s.cache[c])
+                s.cache[c] = {};
+            s.cache[c][f] = r;
+
+            return r;
+        },
+
+        processComponent: async function (j, v, r) {
+            let s = this, f, tR, nT;
+
+            tR = j.context._.cloneDeep(r.c);
+
+            nT = j.context._.cloneDeep(v.t);
+            nT.p = {};
+
+            if (!v.d.t)
+                delete tR.t;
+            if (!v.d.h)
+                delete tR.h;
+            if (tR.h)
+                tR.h = [tR.h];
+
+            f = {};
+            await s.addLoop(j, tR, 'h', f, s, v);
+            await s.addLoop(j, tR, 't', f, s, v);
+            await s.addLoop(j, tR, 'd', f, s, v);
+
+            if (tR.ui) {
+                nT.m = 'ui';
+                if (tR.ui.c !== undefined)
+                    nT.p.c = "'" + tR.ui.c + "'";
+                if (tR.ui.f !== undefined)
+                    nT.p.f = "'" + tR.ui.f + "'";
+                if (tR.ui.t !== undefined)
+                    nT.p.t = "'" + tR.ui.t + "'";
+                if (tR.ui.h !== undefined)
+                    nT.p.h = "'" + tR.ui.h + "'";
+                if (tR.ui.d !== undefined)
+                    nT.p.d = "'" + tR.ui.d + "'";
+
+                nT.c = [{s: nT.s, m: 'get', c: nT.c, p: f}];
+
+                if (tR.di) {
+                    r = await s.add(j, tR.di.m, v);
+                    if (!r) {
+                        return null;
+                    }
+                }
+            } else if (tR.pT) {
+                if (!Array.isArray(tR.pT.c))
+                    tR.pT.c = [];
+                tR.pT.c.push({s: v.t.s, m: 'get', c: v.t.c, p: f});
+
+                nT.c = [tR.pT];
+            } else {
+                nT.m = 'get';
+                nT.p = f;
+            }
+
+            return nT;
+        },
+
         add: async function (j, di, v) {
-            var i, sV;
+            let i, sV;
             if (di && di.m) {
                 for (i in di.m) {
                     sV = j.context.models.view.copy(j, v);
@@ -144,6 +176,7 @@ module.exports = {
             }
             return true;
         },
+
         addLoop: async function (j, t, k, f, s, v) {
             if (!t[k])
                 return f;
@@ -162,8 +195,9 @@ module.exports = {
             }
             f[k] = s.quotes(f[k]);
         },
-        findUIComponent(j, f, c) {
-            var s = this, ui, k, k2, k3, tmp, r2, r;
+
+        findUIComponent(j, f, c, d) {
+            let s = this, ui, k, k2, k3, tmp, r2, r;
 
             if (f === 'self')
                 ui = s.ui;
@@ -203,27 +237,28 @@ module.exports = {
                         }
                     }
                 } else {
-                    if (r[c[k]])
+                    if (r[c[k]]) {
                         r = r[c[k]];
-                    else if (r[s.default])
+                    } else if (d && r[s.default]) {
                         r = r[s.default];
-                    else {
+                    } else {
                         return 0;
                     }
                 }
             }
 
-            if (r.default)
-                r = r.default;
+            if (r[s.default])
+                r = r[s.default];
 
             if (f === 'self' && r.ui && !r.ui.f)
                 r.ui.f = s.framework;
 
             return {c: r, ui: ui, f: f};
         },
+
         parseAlias: function (ui, v) {
             if (ui.mapperAlias) {
-                var s = this, k;
+                let s = this, k;
                 for (k in ui.mapperAlias) {
                     if (s.regexp[ui.alias].mapper[k].test(v))
                         return v.replace(s.regexp[ui.alias].mapper[k], ui.mapperAlias[k] + '$1');
@@ -232,8 +267,9 @@ module.exports = {
             }
             return v;
         },
+
         parseUrl: function (url) {
-            var s = this, r, k, ui;
+            let s = this, r, k, ui;
             for (k in s.uis) {
                 ui = s.uis[k];
                 if (s.regexp[ui.alias].alias.test(url)) {
@@ -250,14 +286,16 @@ module.exports = {
             }
             return url;
         },
+
         quotes: function (d) {
             for (let k in d)
                 d[k] = "'" + d[k] + "'";
             return d;
         },
+
         parseComponent: function (c) {
             if (/@/.test(c)) {
-                var s = this, f, r;
+                let s = this, f, r;
                 for (f in s.uis) {
                     r = s.parseAlias(s.uis[f], c);
                     if (r) {

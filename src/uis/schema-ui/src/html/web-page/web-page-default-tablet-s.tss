@@ -2,6 +2,6 @@
 
 body->attr {
     n: 'class';
-    v: 'mobile';
+    v: 'tablet-s';
     m: 'a';
 }

@@ -11,6 +11,6 @@
     "directory": "src/methods/mediatarget-method"
   },
   "dependencies": {
-    "@jtorm/mediatarget-method": "0.0.1"
+    "@jtorm/mediaquery-method": ">=0.0.1"
   }
 }

@@ -10,5 +10,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/methods/ui-method"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/mediatarget-method": ">=0.0.1"
+  }
 }

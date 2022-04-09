@@ -67,11 +67,6 @@ module.exports = {
                 }
             },
             WebPage: {
-                init: {
-                    t: [
-                        '@s/html/web-page/init.tss'
-                    ]
-                },
                 default: {
                     t: [
                         '@s/html/web-page/web-page-default.tss'
@@ -173,6 +168,9 @@ module.exports = {
                         c: 'WebPageElement'
                     },
                     t: ['@s/html/w-p-header/w-p-header-default.tss']
+                },
+                defaultTablet: {
+                    t: ['@s/html/w-p-header/w-p-header-default-tablet.tss']
                 }
             },
             WPFooter: {

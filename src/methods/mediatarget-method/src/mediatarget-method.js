@@ -1,29 +1,48 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormMediatargetMethod: {
         alias: 'mt',
-        target: {
-            mobile: 'only screen and (min-width: 320px) and (max-width: 480px)',
-            mobileS: 'only screen and (min-width: 320px) and (max-width: 374px)',
-            mobileM: 'only screen and (min-width: 375px) and (max-width: 414px)',
-            mobileL: 'only screen and (min-width: 415px) and (max-width: 480px)',
-            tablet: 'only screen and (min-width: 481px) and (max-width: 1024px)',
-            tabletS: 'only screen and (min-width: 481px) and (max-width: 640px)',
-            tabletM: 'only screen and (min-width: 641px) and (max-width: 834px)',
-            tabletL: 'only screen and (min-width: 835px) and (max-width: 1024px)',
-            desktop: 'only screen and (min-width: 1025px)',
-            desktopS: 'only screen and (min-width: 1025px) and (max-width: 1280px)',
-            desktopM: 'only screen and (min-width: 1281px) and (max-width: 1440px)',
-            desktopL: 'only screen and (min-width: 1441px)'
-        },
+        current: [],
         params: ['t'],
+        target: {
+            Mobile: 'only screen and (min-width: 320px) and (max-width: 480px)',
+            MobileS: 'only screen and (min-width: 320px) and (max-width: 374px)',
+            MobileM: 'only screen and (min-width: 375px) and (max-width: 414px)',
+            MobileL: 'only screen and (min-width: 415px) and (max-width: 480px)',
+            Tablet: 'only screen and (min-width: 481px) and (max-width: 1024px)',
+            TabletS: 'only screen and (min-width: 481px) and (max-width: 640px)',
+            TabletM: 'only screen and (min-width: 641px) and (max-width: 834px)',
+            TabletL: 'only screen and (min-width: 835px) and (max-width: 1024px)',
+            Desktop: 'only screen and (min-width: 1025px)',
+            DesktopS: 'only screen and (min-width: 1025px) and (max-width: 1280px)',
+            DesktopM: 'only screen and (min-width: 1281px) and (max-width: 1440px)',
+            DesktopL: 'only screen and (min-width: 1441px)'
+        },
+
+        init: function(j) {
+            let k, v;
+
+            for (k in this.target) {
+                v = {d: {t: k}};
+                this.process(j, v);
+                if (v.io.c) {
+                    this.current.push(k);
+                }
+            }
+        },
+
         validate: function (j, v) {
             return !!v.d.t;
         },
+
         handle: function (j, v) {
+            v.io.c = this.current.indexOf(v.d.t) !== -1;
+        },
+
+        process: function (j, v) {
             v.d.q = this.target[v.d.t];
-            console.log(v.d);
             j.context.methods.mediaquery.handle(j ,v);
         }
     }

@@ -1,7 +1,1 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-
-body->attr {
-    n: 'class';
-    v: 'mobile';
-    m: 'a';
-}

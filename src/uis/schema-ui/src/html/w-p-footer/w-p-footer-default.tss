@@ -30,29 +30,21 @@ body > section->swap {
         a: 1;
 
         body > footer > .footer->append->ui {
-            c: 'grid.wrapper';
+            c: 'grid.oneColumn';
 
-            div->append->ui {
-                c: 'grid.container';
+            .cell {
+                ->attr {
+                    n: 'class';
+                    v: 'copyright';
+                    m: 'a';
+                }
 
-                .container->append->ui {
-                    c: 'grid.oneColumn';
+                ->append->ui {
+                    c: '@t.small';
 
-                    .first {
-                        ->attr {
-                            n: 'class';
-                            v: 'copyright';
-                            m: 'a';
-                        }
-
-                        ->append->ui {
-                            c: '@t.small';
-
-                            small {
-                                ->append {
-                                    h: copyrightYear.Number + ' ' + copyrightNotice.Text;
-                                }
-                            }
+                    small {
+                        ->append {
+                            h: copyrightYear.Number + ' ' + copyrightNotice.Text;
                         }
                     }
                 }
