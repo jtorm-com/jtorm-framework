@@ -9,7 +9,7 @@ module.exports = {
                 if (j.context.models.uiCache && v.cid) {
                     let r = await j.context.models.uiCache.get(j, v, v.cid, v.cs ? v.cs : 'global');
                     if (r)
-                        v.r = new j.context.models.document(j, r, v);
+                        v.r = new j.context.models.document(j, '<body>' + r + '</body>', v);
                 }
             }
         }
