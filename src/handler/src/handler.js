@@ -4,88 +4,48 @@
 module.exports = {
     jTormHandler: {
         context: {},
+
         handle: async function (h, t, m, c, v) {
-            let s = this;
-
-            if (!v)
-                v = await s.context.models.view.create(s, h, t, m, c);
-
-            await s.parse(v);
-
-            return v.h;
-        },
-        handleChildren: async function (h, t, m, v) {
-            let s = this,
-                sC = s.context,
-                cM = sC.models,
-                e = cM.event,
-                k,
-                t2 = sC._.cloneDeep(t),
-                v2;
-
-            for (k in t2.c)
-                t2.c[k].s = 'body';
-
-            v2 = await cM.view.create(s, "<body>" + h + "</body>", t2.c, m, v.c);
-            v2.cid = v.cid;
-
-            if (t.s)
-                v.c.s = t.s;
-
-            v2.c = {
-                s: 'body',
-                c: 1
-            };
-
-            await e.handle(s, v2, 'before', 'iteration');
-
-            if (!v.r)
-                v.r = await s.handle("<body>" + h + "</body>", t2.c, m, v.c, v2);
-
-            v2.cid = v.cid;
-
-            await e.handle(s, v2, 'after', 'iteration');
-
-            return v.r;
-        },
-        parse: async function (v) {
             let s = this,
                 sC = s.context,
                 e = sC.models.event,
-                m,
+                r,
                 ms = sC.methods,
                 k,
                 k2;
+
+            if (!v)
+                v = await s.context.models.view.create(s, h, t, m, c);
 
             for (k in v.tss) {
                 v.t = v.tss[k];
 
                 do {
-                    m = 0;
+                    r = 0;
 
                     if (v.t.m && ms[v.t.m])
-                        m = ms[v.t.m];
+                        r = ms[v.t.m];
                     else {
                         for (k2 in ms) {
                             if (ms[k2].alias === v.t.m) {
-                                m = ms[k2];
+                                r = ms[k2];
                                 break;
                             }
                         }
                     }
 
-                    if (m) {
-                        if (v._.isFunction(m.data))
-                            await m.data(s, v);
+                    if (r) {
+                        if (v._.isFunction(r.data))
+                            await r.data(s, v);
                         else
-                            sC.parsers.data.handle(s, v, m.params);
+                            sC.parsers.data.handle(s, v, r.params);
 
-                        v.io.v = await m.validate(s, v);
+                        v.io.v = await r.validate(s, v);
 
                         await e.handle(s, v, 'before', 'method');
 
-                        if (v.io.v && v._.isFunction(m.handle))
-                            await m.handle(s, v);
+                        if (v.io.v && v._.isFunction(r.handle))
+                            await r.handle(s, v);
                         else
                             v.io.r = 0;
 
@@ -101,6 +61,43 @@ module.exports = {
 
                 v.io.d = null;
             }
+
+            return v.h;
+        },
+
+        handleChildren: async function (h, t, m, v) {
+            let s = this,
+                sC = s.context,
+                cM = sC.models,
+                e = cM.event,
+                k,
+                t2 = t.c,
+                v2;
+
+            for (k in t2)
+                t2[k].s = 'body';
+
+            v2 = await cM.view.create(s, "<body>" + h + "</body>", t2, m, v.c);
+            v2.cid = v.cid;
+
+            if (t.s)
+                v.c.s = t.s;
+
+            v2.c = {
+                s: 'body',
+                c: 1
+            };
+
+            await e.handle(s, v2, 'before', 'iteration');
+
+            if (!v.r)
+                v.r = await s.handle("<body>" + h + "</body>", t2, m, v.c, v2);
+
+            v2.cid = v.cid;
+
+            await e.handle(s, v2, 'after', 'iteration');
+
+            return v.r;
         }
     }
 };

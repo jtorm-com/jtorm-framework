@@ -45,13 +45,13 @@ module.exports = {
 
                 // bij een sessie altijd uitvoeren
 
-                handle(j, v, 'after', 'view');
+                await handle(j, v, 'after', 'view');
             }
         },
         iteration: {
             weight: 0,
             handle: async function (j, v) {
-                handle(j, v, 'after', 'iteration');
+                await handle(j, v, 'after', 'iteration');
 
                 if (v.cid && v.cid !== 'default') {
                     v._.remove(currentCid, function (el) {

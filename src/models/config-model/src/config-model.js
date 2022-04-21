@@ -1,14 +1,17 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormConfigModel: {
         d: {},
+
         get: function (k) {
             return k ? this.d[k] : this.d;
         },
+
         set: function (k, v, d) {
             if (typeof v === 'object') {
-                var a = Array.isArray(v), k2;
+                let a = Array.isArray(v), k2;
 
                 if (d && d[k] === undefined) d[k] = a ? [] : {};
                 else if (this.d[k] === undefined) this.d[k] = a ? [] : {};

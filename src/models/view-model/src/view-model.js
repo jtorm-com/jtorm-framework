@@ -2,6 +2,7 @@
 'use strict';
 
 const jTormViewModel = {
+    copyAttrs: ['_', 't', 'params', 'io', 'c'],
     data: {
         cid: null,// cache id
         cs: null,// cache scope
@@ -22,8 +23,9 @@ const jTormViewModel = {
             v: 0 // validated
         }
     },
+
     create: async function(j, h, t, m, c) {
-        var sC = j.context,
+        let sC = j.context,
             v = sC.models.view.data;
 
         v = sC._.create(v, {
@@ -37,17 +39,19 @@ const jTormViewModel = {
 
         v.m = m;
 
-        if (sC._.isString(t))
+        if (v._.isString(t))
             t = await sC.parsers.tss.handle(t);
+
         v.tss = t;
 
-        if (j.context._.isString(h))
+        if (v._.isString(h))
             h = new sC.models.document(j, h, v);
+
         v.h = h;
 
         return v;
     },
-    copyAttrs: ['_', 't', 'params', 'io', 'c'],
+
     copy: function(j, v, h, t, d, a) {
         var sv = {};
 
@@ -65,6 +69,7 @@ const jTormViewModel = {
             else
                 sv[k] = j.context._.cloneDeep(v[k]);
         }
+
         return sv;
     }
 };
