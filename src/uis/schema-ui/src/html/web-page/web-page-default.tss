@@ -15,8 +15,14 @@ head {
 }
 
 body {
+/*
     ->append(d: hasPart.WPHeader, cid: 'WPHeader', cs: 'global')->ui {
         c: 'WPHeader.default';
+        m: '1';
+    }
+*/
+    ->append(d: hasPart.SiteNavigationElement, cid: 'SiteNavigationElement', cs: 'global')->ui {
+        c: 'SiteNavigationElement.default';
         m: '1';
     }
 
@@ -49,12 +55,12 @@ body {
             }
         }
     }
-
+/*
     ->append(d: hasPart.WPFooter, cid: 'WPFooter', cs: 'global')->ui {
         c: 'WPFooter.default';
         m: '1';
     }
-
+*/
     ->append(cid: 'loading', cs: 'global')->ui {
         c: 'loading.default';
         m: '1';

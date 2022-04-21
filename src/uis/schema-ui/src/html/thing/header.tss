@@ -1,4 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 ->ui {
     c: '@e.header';
     t: 0;
@@ -13,6 +14,7 @@
         ->if(d: mainEntity||name)->append->ui {
             c: '@t.h1';
             t: 0;
+
             h1 {
                 ->if(d: mainEntity.@c) {
                     ->attr {
@@ -31,6 +33,7 @@
 
                         a->append(d: name)->ui {
                             c: 'Text.multi';
+
                             span->attr {
                                 n: 'class';
                                 v: 'schema-name';
@@ -45,16 +48,14 @@
         ->append(d: alternateName)->ui {
             c: '@t.h2';
             t: 0;
+
             h2->append->ui {
-                c: '@e.a';
-                t: 0;
-                a->append->ui {
-                    c: 'Text.multi';
-                    span->attr {
-                        n: 'class';
-                        v: 'schema-alternateName';
-                        m: 'a';
-                    }
+                c: 'Text.multi';
+
+                span->attr {
+                    n: 'class';
+                    v: 'schema-alternateName';
+                    m: 'a';
                 }
             }
         }

@@ -1,4 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 ->ui {
     c: '@e.footer';
     t: 0;
@@ -10,24 +11,12 @@
     }
 
     .footer {
-        ->append(d: url)->ui {
-            c: 'URL.multi';
-
-            a {
-                ->text(html: 'More')->inner {
-                    h: html;
-                }
-
-                ->attr {
-                    n: 'class';
-                    m: 'a';
-                    v: 'more';
-                }
-            }
+        ->append(d: subjectOf)->ui {
+            c: 'Thing.linkMulti';
         }
 
-        ->append(d: subjectOf)->ui {
-            c: @type + '.linkMulti';
+        ->append(d: potentialAction)->ui {
+            c: 'Action.linkMulti';
         }
     }
 }

@@ -66,6 +66,13 @@ module.exports = {
                     t: ['@s/html/comment/comment-link-multi.tss']
                 }
             },
+            SiteNavigationElement: {
+                default: {
+                    t: [
+                        '@s/html/site-navigation-element/site-navigation-element-default.tss'
+                    ]
+                }
+            },
             WebPage: {
                 default: {
                     t: [
@@ -234,14 +241,14 @@ module.exports = {
                         c: '@e.section',
                         t: 0
                     },
-                    t: ['@s/html/thing/thing-item.tss']
+                    t: ['@s/html/thing/thing-default.tss']
                 },
                 /* dit was eerst omdat dan een description wordt toegevoegd, maar dit moet expliciet in ui worden gezet naar list vind ik
                 default: {
                   ui: {
                     c: 'Thing.listItem'
                   },
-                  t: ['@s/html/thing/thing-default.tss']
+                  t: ['@s/html/thing/thing-item.tss']
                 },*/
                 listItem: {
                     ui: {

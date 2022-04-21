@@ -1,28 +1,24 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-.body->append(d: description)->ui {
-  c: 'Text';
-  span {
+
+body > section {
     ->attr {
-      n: 'class';
-      v: 'schema-description';
-      m: 'a';
+        n: 'class';
+        v: 'schema-Thing';
     }
-    ->swap {
-      s: 'div';
-      a: 1;
-      ui: '@e.div';
+
+    ->append->ui {
+        c: 'Thing.header';
     }
-  }
-}
-footer->append(d: sameAs)->ui {
-  c: 'URL.multi';
-  a {
-    ->attr {
-      n: 'target';
-      v: '_blank';
+
+    ->append(d: image)->ui {
+        c: 'ImageObject';
     }
-    ->text(html: 'Additional Information')->inner {
-      h: html;
+
+    ->append->ui {
+        c: 'Thing.body';
     }
-  }
+
+    ->append->ui {
+        c: 'Thing.footer';
+    }
 }

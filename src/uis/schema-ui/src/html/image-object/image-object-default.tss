@@ -1,26 +1,22 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 ->if(to: 'array') {
     ->each {
         m: 'append';
-        body {
-            ->if(d: ImageObject) {
-                ->if(d: ImageObject.representativeOfPage.Boolean) {
-                    ->append(d: ImageObject)->ui {
-                        c: 'ImageObject.figure';
-                    }
 
-                    ->else {
-                        ->data(
-                            src: ImageObject.contentUrl.URL,
-                            media: ImageObject.size.QuantitativeValue.additionalProperty.PropertyValue.value.Text
-                        )->append()->ui {
-                            c: '@m.source';
-                        }
-                    }
+        ->if(d: ImageObject) {
+            ->if(d: ImageObject.representativeOfPage.Boolean) {
+                ->append(d: ImageObject)->ui {
+                    c: 'ImageObject.figure';
                 }
 
                 ->else {
-                    ->data(src: URL)->append->ui {
+                    ->data(
+                        srcset: ImageObject.contentUrl.URL,
+                        media: ImageObject.size.QuantitativeValue.additionalProperty.PropertyValue.value.Text,
+                        width: ImageObject.width.QuantitativeValue.value.Number,
+                        height: ImageObject.height.QuantitativeValue.value.Number
+                    )->append()->ui {
                         c: '@m.source';
                     }
                 }
@@ -30,7 +26,7 @@
 
     source->move {
         l: 'picture';
-        m: 'append';
+        m: 'prepend';
     }
 
     ->else {

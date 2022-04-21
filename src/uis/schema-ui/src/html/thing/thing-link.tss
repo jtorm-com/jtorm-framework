@@ -1,12 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 ->ui {
     c: '@e.a';
     t: 0;
 
     a {
         ->attrs {
-            n: 'id,href,class';
-            v: 'identifier.Text,url.URL,schema-URL';
+            n: 'href,class';
+            v: 'url.URL,schema-URL';
         }
 
         ->append(d: name)->ui {

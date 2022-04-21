@@ -30,6 +30,7 @@ module.exports = {
             return e.getAttribute(n);
         },
         set: function (e, n, v) {
+            if (v === true) v = '';
             e.setAttribute(n, v);
         },
         del: function (e, n) {
