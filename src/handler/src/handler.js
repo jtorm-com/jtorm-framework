@@ -96,6 +96,7 @@ module.exports = {
             v.r = await s.handle("<body>" + h + "</body>", t2, m, v.c, v2);
 
             v2.cid = v.cid;
+            v2.cs = v.cs;
 
             await e.handle(s, v2, 'after', 'iteration');
 
