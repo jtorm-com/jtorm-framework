@@ -1,22 +1,16 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-var r;
+'use strict';
+
 module.exports = {
     before: {
         iteration: {
             weight: 0,
             handle: async function (j, v) {
                 if (j.context.models.uiCache && v.cid) {
-                    r = await j.context.models.uiCache.get(j, v, v.cid, v.cs ? v.cs : 'global');
+                    let r = await j.context.models.uiCache.get(j, v, v.cid, v.cs ? v.cs : 'global');
                     if (r)
                         v.r = new j.context.models.document(j, r, v);
                 }
-            }
-        },
-        view: {
-            weight: 0,
-            handle: async function (j, v) {
-                if (j.context.models.uiCache)
-                    await j.context.models.uiCache.init();
             }
         }
     },
