@@ -1,7 +1,14 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormEachMethod: {
+        // DI
+        handler: null,
+        handlerWrapper: null,
+        methods: null,
+        viewModel: null,
+
         alias: "e",
         params: [
             'd',
@@ -9,6 +16,7 @@ module.exports = {
             'e',
             'a'
         ],
+
         validate: function (j, v) {
             return (
                 (
@@ -18,8 +26,9 @@ module.exports = {
                 && v.t.c.length
             );
         },
+
         handle: async function (j, v) {
-            var r = '', d, k, h, sv, i = 0, e;
+            let r = '', d, k, h, sv, i = 0, e;
 
             if (!v.d.d)
                 v.d.d = v.m;
@@ -45,11 +54,11 @@ module.exports = {
                     else
                         h = e[0].outerHTML;
 
-                    h = await j.handle('<body>' + h + '</body>', v.t.c, d, 1);
+                    h = await this.handler.handle('<body>' + h + '</body>', v.t.c, d, 1);
                     e[i].parentNode.replaceChild(h.select(v.t.s), e[i]);
                 } else {
-                    await j.handleChildren("", v.t, d, v);
-                    r += v.r.select('body').innerHTML;
+                    h = await this.handlerWrapper.handle("", v.t, d, v);
+                    r += h;
                 }
 
                 v.r = null;
@@ -58,10 +67,10 @@ module.exports = {
             }
 
             if (!v.t.p.e) {
-                sv = j.context.models.view.copy(j, v);
+                sv = this.viewModel.copy(j, v);
                 sv.t = {s: v.t.s, m: v.d.m, c: []};
                 sv.d = {h: r};
-                await j.context.methods[v.d.m].handle(j, sv);
+                await this.methods[v.d.m].handle(j, sv);// todo different method than this with tss repeat
             }
 
             v.io = {};

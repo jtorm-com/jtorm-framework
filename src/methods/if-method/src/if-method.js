@@ -1,15 +1,22 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormIfMethod: {
+        // DI
+        dataParser: null,
+        handler: null,
+
         or: '||',
         and: '&&',
         params: ['d', 'v', 'el', 'to'],
+
         validate: function () {
             return 1;
         },
+
         handle: async function (j, v) {
-            var r, e, t = [], k, to = 1, s = this, d = j.context.parsers.data;
+            let r, e, t = [], k, to = 1, o = this.or, a = this.and, d = this.dataParser;
 
             if (v.d.d === undefined)
                 v.d.d = v.m;
@@ -22,16 +29,16 @@ module.exports = {
             }
 
             if (v.d.d === null) {
-                if (v.t.p.d.indexOf(s.or) !== -1) {
-                    t = v.t.p.d.split(s.or);
+                if (v.t.p.d.indexOf(o) !== -1) {
+                    t = v.t.p.d.split(o);
                     for (k in t) {
                         if (d.parse(v.m, t[k].trim())) {
                             v.d.d = 1;
                             break;
                         }
                     }
-                } else if (v.t.p.d.indexOf(s.and) !== -1) {
-                    t = v.t.p.d.split(s.and);
+                } else if (v.t.p.d.indexOf(a) !== -1) {
+                    t = v.t.p.d.split(a);
                     v.d.d = 1;
                     for (k in t) {
                         if (!d.parse(v.m, t[k].trim())) {
@@ -75,7 +82,7 @@ module.exports = {
             }
 
             if (t.length)
-                await j.handle(v.h, t, v.m, v.c);
+                await this.handler.handle(v.h, t, v.m, v.c);
 
             v.io = {};
         }

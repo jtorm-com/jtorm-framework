@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
-    "directory": "src/handler"
+    "directory": "src/handlers/handler"
   },
   "dependencies": {}
 }

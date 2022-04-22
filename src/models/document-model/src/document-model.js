@@ -4,8 +4,12 @@
 module.exports = {
     jTormDocumentModel: class {
 
-        constructor(j, h, v) {
-            var s = this;
+        constructor(j, h, v, b) {
+            const s = this;
+
+            if (b)
+                h = "<body>" + h + "</body>";
+
             s.charset = 'utf-8';// todo config
 
             s.w = j.context.models.window;

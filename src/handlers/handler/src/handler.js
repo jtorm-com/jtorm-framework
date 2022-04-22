@@ -3,7 +3,10 @@
 
 module.exports = {
     jTormHandler: {
-        context: {},
+        // DI
+        event: null,
+
+        context: {},// todo remove
 
         handle: async function (h, t, m, c, v) {
             let s = this,
@@ -63,44 +66,6 @@ module.exports = {
             }
 
             return v.h;
-        },
-
-        handleChildren: async function (h, t, m, v) {
-            let s = this,
-                sC = s.context,
-                cM = sC.models,
-                e = cM.event,
-                k,
-                t2 = t.c,
-                v2;
-
-            for (k in t2)
-                t2[k].s = 'body';
-
-            v2 = await cM.view.create(s, "<body>" + h + "</body>", t2, m, v.c);
-            v2.cid = v.cid;
-
-            if (t.s)
-                v.c.s = t.s;
-
-            v2.c = {
-                s: 'body',
-                c: 1
-            };
-
-            await e.handle(s, v, 'before', 'iteration');
-
-            if (v.r)
-                return v.r;
-
-            v.r = await s.handle("<body>" + h + "</body>", t2, m, v.c, v2);
-
-            v2.cid = v.cid;
-            v2.cs = v.cs;
-
-            await e.handle(s, v2, 'after', 'iteration');
-
-            return v.r;
         }
     }
 };

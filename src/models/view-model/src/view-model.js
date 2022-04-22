@@ -24,7 +24,7 @@ const jTormViewModel = {
         }
     },
 
-    create: async function(j, h, t, m, c) {
+    create: async function(j, h, t, m, c, b) {
         let sC = j.context,
             v = sC.models.view.data;
 
@@ -45,7 +45,7 @@ const jTormViewModel = {
         v.tss = t;
 
         if (v._.isString(h))
-            h = new sC.models.document(j, h, v);
+            h = new sC.models.document(j, h, v, b);
 
         v.h = h;
 
