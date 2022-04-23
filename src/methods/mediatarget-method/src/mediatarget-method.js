@@ -3,6 +3,9 @@
 
 module.exports = {
     jTormMediatargetMethod: {
+        // DI
+        mediaqueryMethod: null,
+
         alias: 'mt',
         current: [],
         params: ['t'],
@@ -26,10 +29,11 @@ module.exports = {
 
             for (k in this.target) {
                 v = {d: {t: k}};
+
                 this.process(j, v);
-                if (v.io.c) {
+
+                if (v.io.c)
                     this.current.push(k);
-                }
             }
         },
 
@@ -43,7 +47,8 @@ module.exports = {
 
         process: function (j, v) {
             v.d.q = this.target[v.d.t];
-            j.context.methods.mediaquery.handle(j ,v);
+
+            this.mediaqueryMethod.handle(j ,v);
         }
     }
 };

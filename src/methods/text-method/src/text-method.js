@@ -1,21 +1,29 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormTextMethod: {
+        // DI
+        dataParser: null,
+        languageModel: null,
+
         alias: 't',
         params: [],
+
         validate: function (j) {
-            return j.context.models.language !== undefined;
+            return 1;
         },
+
         handle: async function (j, v) {
-            let nD = j.context._.cloneDeep(v.m), x, l = j.context.models.language, k;
+            let x, k;
 
             for (k in v.t.p) {
-                x = j.context.parsers.data.parse(v.m, v.t.p[k]);
-                nD[k] = l.get(l.getCurrent(j), x ? x : v.t.p[k]);
+                x = this.dataParser.parse(v.m, v.t.p[k]);
+
+                v.m[k] = this.languageModel.get(x ? x : v.t.p[k]);
             }
 
-            v.io = {c: 1, d: nD};
+            v.io = {c: 1, d: v.m};
         }
     }
 };

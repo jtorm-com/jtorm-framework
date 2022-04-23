@@ -3,6 +3,11 @@
 
 module.exports = {
     jTormUiMethod: {
+        // DI
+        mediatargetMethod: null,
+        methods: null,
+        viewModel: null,
+
         cache: {},
         default: 'default',
         framework: 'h',
@@ -58,7 +63,7 @@ module.exports = {
             }
 
             if (v.d.m) {
-                r = j.context.methods.mediatarget ?? j.context.methods.mt;
+                r = this.mediatargetMethod;
 
                 if (r) {
                     for (i in r.current) {
@@ -166,21 +171,27 @@ module.exports = {
 
         add: async function (j, di, v) {
             let i, sV;
+
             if (di && di.m) {
                 for (i in di.m) {
-                    sV = j.context.models.view.copy(j, v);
+                    sV = this.viewModel.copy(j, v);
                     sV.d = di.m[i];
-                    await j.context.methods[i].handle(j, sV);
+
+                    await this.methods[i].handle(j, sV);
+
                     return sV.io.c;
                 }
             }
+
             return true;
         },
 
         addLoop: async function (j, t, k, f, s, v) {
             if (!t[k])
                 return f;
+
             let r, i;
+
             f[k] = [];
             for (i in t[k]) {
                 if (typeof t[k][i] === 'object') {
@@ -270,11 +281,15 @@ module.exports = {
 
         parseUrl: function (url) {
             let s = this, r, k, ui;
+
             for (k in s.uis) {
                 ui = s.uis[k];
+
                 if (s.regexp[ui.alias].alias.test(url)) {
                     url = url.replace(s.regexp[ui.alias].alias, ui.id + "/");
+
                     r = s.parseComponent(url);
+
                     if (r)
                         url = r;
 
@@ -290,20 +305,24 @@ module.exports = {
         quotes: function (d) {
             for (let k in d)
                 d[k] = "'" + d[k] + "'";
+
             return d;
         },
 
         parseComponent: function (c) {
             if (/@/.test(c)) {
                 let s = this, f, r;
+
                 for (f in s.uis) {
                     r = s.parseAlias(s.uis[f], c);
+
                     if (r) {
                         c = r;
                         break;
                     }
                 }
             }
+
             return c;
         }
     }

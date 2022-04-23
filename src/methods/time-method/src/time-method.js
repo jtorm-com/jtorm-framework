@@ -1,33 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormTimeMethod: {
-        params: ['as', 'dT', 'd'],
-        validate: function (j, v) {
-            return v.d.as && (v.d.dT || v.d.d);
-        },
-        handle: function (j, v) {
-            var nD = {}, s = this, dT, r, l = j.context.models.language, lC = l.getCurrent(j);
+        // DI
+        languageModel: null,
 
-            if (v.d.dT) {
-                dT = new Date(v.d.dT);
-                nD.dateTime = v.d.dT;
-            } else if (v.d.d) {
-                dT = new Date(v.d.d);
-                nD.date = v.d.d;
-            }
-
-            nD.o = dT.toISOString();
-            nD.d = dT;
-
-            r = s.time(dT);
-            nD[v.d.as] = l.get(lC, r[0]);
-            if (r[1]) nD[v.d.as] = nD[v.d.as].replace('%d', r[1]);
-            nD.l = l.getDate(lC, nD.d);
-            nD.title = nD.l;
-
-            v.io = {c: 1, d: nD};
-        },
         labels: {
             future: [
                 'Just now',
@@ -68,6 +46,7 @@ module.exports = {
                 '%d centuries ago'
             ]
         },
+        params: ['as', 'dT', 'd'],
         secs: [
             [],
             [1],
@@ -87,6 +66,41 @@ module.exports = {
             [6289872000],
             [628987200000, 3144936000]
         ],
+
+        validate: function (j, v) {
+            return v.d.as && (v.d.dT || v.d.d);
+        },
+
+        handle: function (j, v) {
+            const l = this.languageModel,
+                  nD = {};
+
+            let dT, r;
+
+            if (v.d.dT) {
+                dT = new Date(v.d.dT);
+                nD.dateTime = v.d.dT;
+            } else if (v.d.d) {
+                dT = new Date(v.d.d);
+                nD.date = v.d.d;
+            }
+
+            nD.o = dT.toISOString();
+            nD.d = dT;
+
+            r = this.time(dT);
+
+            nD[v.d.as] = l.get(r[0]);
+
+            if (r[1])
+                nD[v.d.as] = nD[v.d.as].replace('%d', r[1]);
+
+            nD.l = l.getDate(nD.d);
+            nD.title = nD.l;
+
+            v.io = {c: 1, d: nD};
+        },
+
         time: function (t) {
             switch (typeof t) {
                 case 'number':
@@ -101,8 +115,7 @@ module.exports = {
                     t = +new Date();
             }
 
-            var
-                secs = (+new Date() - t) / 1000,
+            let secs = (+new Date() - t) / 1000,
                 c = 'past',
                 i = 1,
                 s = this,
@@ -128,8 +141,10 @@ module.exports = {
                         return [s.labels[c][i], t];
                     }
                 }
+
                 i++;
             }
+
             return [t];
         }
     }

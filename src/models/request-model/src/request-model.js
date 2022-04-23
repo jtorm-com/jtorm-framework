@@ -2,18 +2,47 @@
 'use strict';
 
 module.exports = {
-    jTormDataModel: {
-        cache: {},
+    jTormRequestModel: {
+        // DI
+        axios: null,
+        uiMethod: null,
+        windowModel: null,
 
-        get: async function (j, v, url) {
-            if (!this.cache[url])
-                await this.set(j, v, url);
+        url: null,
 
-            return this.cache[url];
+        init: function() {
+            let l = this.windowModel.location;
+
+            this.url = l.protocol + '//' + l.host + '/';
         },
 
-        set: async function (j, v, url) {
-            this.cache[url] = await v.h.request(j, url, "application/json");
+        xhr: async function(j, req) {
+            let r, xhr,
+                l = this.windowModel.location;
+
+            req.url = this.uiMethod.parseUrl(req.url);
+
+            if (/^http/.test(req.url) === false)
+                req.url = this.url + req.url;
+
+            xhr = await this.axios.request(req);
+
+            r = {
+                t: xhr.headers["cache-control"],
+                d: xhr.data
+            };
+
+            return r;
+        },
+
+        request: async function(j, url, h, m, c) {
+            return await this.xhr(j, {
+                method: m ? m : "GET",
+                url: url,
+                headers: {
+                    "Content-Type": h + '; charset=' + (c ? c : this.charset)
+                }
+            });
         }
     }
 };

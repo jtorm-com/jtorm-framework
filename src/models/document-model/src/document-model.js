@@ -2,105 +2,81 @@
 'use strict';
 
 module.exports = {
-    jTormDocumentModel: class {
+    jTormDocumentModel: {
+        // DI
+        windowModel: null,
 
-        constructor(j, h, v, b) {
-            const s = this;
+        charset: 'utf-8',
+
+        create: function(j, h, v, b) {
+            const r = {
+                d: v.c.c
+                    ? this.windowModel.document.implementation.createHTMLDocument()
+                    : this.windowModel.document,
+
+                head: function() {
+                    return this.d.head.innerHTML;
+                },
+
+                body: function() {
+                    return this.d.body.innerHTML;
+                },
+
+                html: function() {
+                    return this.d.documentElement.outerHTML;
+                },
+
+                select: function(s) {
+                    return this.d.querySelector(s);
+                },
+
+                selectAll: function(s) {
+                    return this.d.querySelectorAll(s);
+                },
+
+                getSelector: function(s, m) {
+                    if (!m)
+                        return s;
+
+                    if (s) {
+                        s = s.replace(/(?=[()\[\]])/g, '\\');
+
+                        let r = new RegExp(s, "m");
+
+                        if (m && r.test(m))
+                            s = s.replace(m, '');
+
+                        return s
+                            ? s
+                            : m;
+                    }
+
+                    return m;
+                },
+
+                set: async function(sl, fn, v) {// todo sl moet v worden
+                    let c, e;
+                    sl = this.getSelector(sl, v ? v.c.s : null);
+
+                    c = this.selectAll(sl);
+
+                    if (c.length)
+                        for (e of c)
+                            await fn(e);
+                    else {
+                        console.error(sl + ' not found', s.html());
+                        throw new Error();
+                    }
+                }
+            };
 
             if (b)
                 h = "<body>" + h + "</body>";
 
-            s.charset = 'utf-8';// todo config
-
-            s.w = j.context.models.window;
-            if (v.c.c)
-                s.d = s.w.document.implementation.createHTMLDocument();
-            else
-                s.d = s.w.document;
-
             if (h)
-                s.d.documentElement.innerHTML = h;
-        }
-
-        getSelector (s, m) {
-            if (!m) return s;
-
-            if (s) {
-                s = s.replace(/(?=[()\[\]])/g, '\\');
-
-                var r = new RegExp(s, "m");
-                if (m && r.test(m)) {
-                    s = s.replace(m, '');
-                }
-
-                return s ? s : m;
-            }
-
-            return m;
-        }
-
-        async set(sl, fn, v) {// todo sl moet v worden
-            var s = this, c, e;
-            sl = s.getSelector(sl, v ? v.c.s : null);
-
-            c = s.selectAll(sl);
-
-            if (c.length)
-                for (e of c)
-                    await fn(e);
-            else {
-                console.error(sl + ' not found', s.html());
-                throw new Error();
-            }
-        }
-
-        select(selector) {
-            return this.d.querySelector(selector);
-        }
-
-        selectAll(selector) {
-            return this.d.querySelectorAll(selector);
-        }
-
-        async xhr(j, req) {
-            var r, xhr,
-                l = this.w.location;
-
-            req.url = j.context.methods.ui.parseUrl(req.url);
-
-            if (/^http/.test(req.url) === false)
-                req.url = l.protocol + '//' + l.host + '/' + req.url;
-
-            xhr = await j.context.models.axios.request(req);
-
-            r = {
-                t: xhr.headers["cache-control"],
-                d: xhr.data
-            };
+                r.d.documentElement.innerHTML = h;
 
             return r;
-        }
-
-        head() {
-            return this.d.head.innerHTML;
-        }
-
-        body() {
-            return this.d.body.innerHTML;
-        }
-
-        html() {
-            return this.d.documentElement.outerHTML;
-        }
-
-        async request (j, url, h, m, c) {
-            return await this.xhr(j, {
-                method: m ? m : "GET",
-                url: url,
-                headers: {
-                    "Content-Type": h + '; charset=' + (c ? c : this.charset)
-                }
-            });
         }
     }
 };

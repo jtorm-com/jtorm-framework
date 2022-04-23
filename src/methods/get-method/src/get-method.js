@@ -4,7 +4,7 @@
 module.exports = {
     jTormGetMethod: {
         // DI
-        getModel: null,
+        models: null,
 
         params: ['h', 't', 'd'],
 
@@ -13,7 +13,8 @@ module.exports = {
         },
 
         get: async function(j, v, t, u) {
-            let r = await this.getModel[t].get(j, v, u);
+            let r = await this.models[t].get(j, v, u);
+
             return r.d;
         },
 
@@ -23,29 +24,22 @@ module.exports = {
             if (v.d.d) {
                 nD = v._.cloneDeep(v.m);
 
-                // todo test komt het voor dat dit nog een string is?
-                if (v._.isString(d.d)) {
+                if (v._.isString(v.d.d))
                     v.d.d = [v.d.d];
-                    for (k in v.d.d) {
-                        r = await this.get(j, v, 'data', v.d.d[k]);
 
-                        for (k2 in r)
-                            nD[k] = r[k];
-                    }
-                } else {
-                    r = d.d;
+                for (k in v.d.d) {
+                    r = await this.get(j, v, 'data', v.d.d[k]);
 
-                    for (k in r)
+                    for (k2 in r)
                         nD[k] = r[k];
                 }
-
             }
 
             if (v.d.h) {
                 r = '';
 
-                // todo test komt het voor dat dit nog een string is?
-                v.d.h = v._.isString(v.d.h) ? [v.d.h] : v.d.h;
+                if (v._.isString(v.d.h))
+                    v.d.h = [v.d.h];
 
                 for (k in v.d.h) {
                     p = await this.get(j, v, 'html', v.d.h[k]);
@@ -58,8 +52,8 @@ module.exports = {
             }
 
             if (v.d.t) {
-                // todo test komt het voor dat dit nog een string is?
-                v.d.t = v._.isString(v.d.t) ? [v.d.t] : v.d.t;
+                if (v._.isString(v.d.t))
+                    v.d.t = [v.d.t];
 
                 nT = {
                     // s: v.t.s,
@@ -79,8 +73,6 @@ module.exports = {
 
                 for (k in v.t.c)
                     nT.c.push(v.t.c[k]);
-
-                // nT = j.context.parsers.data.freeze(nT);
 
                 v.t = nT;
             }

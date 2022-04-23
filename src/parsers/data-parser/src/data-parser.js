@@ -1,72 +1,72 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormDataParser: {
+        // DI
+        tssParser: null,
+
         append: '+',
         current: '@c',
         objectSeparator: '.',
+
         init: function (j) {
-            var s = this, q;
-            s.dataRegex = new RegExp('(' + j.context.parsers.tss.c.quotes.join('|') + ')+', 'gm');
-            q = j.context.parsers.tss.c.quotes.join('');
-            s.appendRegex = new RegExp('(\\' + s.append + ')(?=(?:[^' + q + ']|[' + q + '][^' + q + ']*[' + q + '])*$)', '');
+            let c = this.tssParser.c.quotes, q;
+
+            this.dataRegex = new RegExp('(' + c.join('|') + ')+', 'gm');
+
+            q = c.join('');
+            this.appendRegex = new RegExp('(\\' + this.append + ')(?=(?:[^' + q + ']|[' + q + '][^' + q + ']*[' + q + '])*$)', '');
         },
-        freeze(o) {
-            var p = Object.getOwnPropertyNames(o), k, v;
 
-            for (k in p) {
-                v = o[p[k]];
-
-                if (v && typeof v === "object") {
-                    this.freeze(v);
-                }
-            }
-
-            return Object.freeze(o);
-        },
         handle: function (j, v, params) {
-            var tD = {}, s = this, p, k;
+            let tD = {}, p, k;
+
             for (p of params) {
-                if (!v.t.p)
-                    console.log('deze', v.t);
                 if (v.t.p[p]) {
                     if (v._.isString(v.t.p[p])) {
-                        tD[p] = s.parse(v.m, v.t.p[p]);
+                        tD[p] = this.parse(v.m, v.t.p[p]);
                     } else if (v._.isArray(v.t.p[p])) {
                         tD[p] = [];
                         for (k in v.t.p[p]) {
-                            tD[p].push(s.parse(v.m, v.t.p[p][k]));
+                            tD[p].push(this.parse(v.m, v.t.p[p][k]));
                         }
                     }
                 }
             }
 
-            v.d = tD;//s.freeze(tD);
+            v.d = tD;
         },
+
         parse: function (d, k) {
             if (!k)
                 return null;
 
-            var m, q, i = 0, tmp = d, p, ps, s = this;
+            const s = this;
+            let m, q, i = 0, tmp = d, p, ps;
 
-            m = k.split(this.appendRegex);
+            m = k.split(s.appendRegex);
+
             if (m.length > 1) {
                 tmp = '';
+
                 for (p of m) {
                     p = p.trim();
+
                     if (p !== '+') {// application/ld+json
                         q = s.parse(d, p);
-                        if (q) {
+
+                        if (q)
                             tmp += s.parse(d, p);
-                        }
                     }
                 }
+
                 return tmp;
             }
 
-            if (k.match(s.dataRegex)) {
+            if (k.match(s.dataRegex))
                 return k.replace(s.dataRegex, '');
-            } else if (k === 'true')
+            else if (k === 'true')
                 return true;
             else if (k === 'false')
                 return false;
@@ -79,7 +79,9 @@ module.exports = {
             } else if (!d)
                 return null;
 
-            ps = i ? [k] : k.split(s.objectSeparator);
+            ps = i
+                ? [k]
+                : k.split(s.objectSeparator);
 
             for (p of ps) {
                 if (p === s.current)
@@ -91,6 +93,7 @@ module.exports = {
                         else
                             return null;
                     }
+
                     tmp = tmp[p];
                 }
             }

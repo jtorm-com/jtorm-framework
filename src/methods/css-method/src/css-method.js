@@ -13,7 +13,7 @@ module.exports = {
         },
 
         handle: function (j, v) {
-            let s = this.cssPlugin.after.view;
+            const s = this.cssPlugin.after.view;
 
             if (v.c.c || !s.cache[v.t.p.href])
                 s.cache[v.d.href] = 0;

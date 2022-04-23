@@ -1,15 +1,29 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormLanguageModel: {
+        // DI
+        configModel: null,
+        sessionModel: null,
+
+        current: null,
         data: {},
         default: 'en',
-        getCurrent: function (jT) {
-            var s = this, l;
 
-            if (jT.context.session) l = jT.context.session.get('language');
-            if (!l && jT.context.config) l = jT.context.config.get('language');
-            if (!l) l = s.default;
+        init: function(j) {
+            this.current = this.getCurrent(j);
+        },
+
+        getCurrent: function() {
+            const s = this;
+            let l = s.sessionModel.get('language');
+
+            if (!l)
+                l = s.configModel.get('language');
+
+            if (!l)
+                l = s.default;
 
             if (!s.data[l]) {
                 if (/^[a-z][a-z]-[A-Z][A-Z]/.test(l))
@@ -18,19 +32,31 @@ module.exports = {
                 if (!s.data[l])
                     l = s.default;
 
-                if (jT.context.session) jT.context.session.set('language', l);
+                s.sessionModel.set('language', l);
             }
 
             return l;
         },
-        getDate(l, d) {
+
+        getDate(d) {
             return d.toUTCString();
         },
-        get: function (l, s) {
-            return this.data[l] !== undefined && this.data[l][s] !== undefined ? this.data[l][s] : s;
+
+        get: function (s) {
+            let l = this.current;
+
+            return (
+                this.data[l] !== undefined
+                && this.data[l][s] !== undefined
+            )
+                ? this.data[l][s]
+                : s;
         },
+
         set: function (l, k, v) {
-            if (this.data[l] === undefined) this.data[l] = {};
+            if (this.data[l] === undefined)
+                this.data[l] = {};
+
             this.data[l][k] = v;
         }
     }

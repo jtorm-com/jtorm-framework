@@ -3,14 +3,21 @@
 
 module.exports = {
     jTormHtmlModel: {
+        // DI
+        requestModel: null,
+
         cache: {},
+
         get: async function (j, v, url) {
             if (!this.cache[url])
                 await this.set(j, v, url);
+
             return this.cache[url];
         },
+
         set: async function (j, v, url) {
-            this.cache[url] = await v.h.request(j, url, "text/html");
+            this.cache[url] = await this.requestModel.request(j, url, "text/html");
+
             this.cache[url].d = this.cache[url].d.replace(/<!--[^>]*-->/g, '');
         }
     }
