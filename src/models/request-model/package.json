@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/data-model",
+  "description": "jTorm Data Model",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/data-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/models/data-model"
+  },
+  "dependencies": {}
+}
