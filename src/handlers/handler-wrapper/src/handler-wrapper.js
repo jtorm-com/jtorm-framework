@@ -16,7 +16,7 @@ module.exports = {
             for (k in t2)
                 t2[k].s = 'body';
 
-            v2 = await this.viewModel.create(this.handler, h, t2, m, v.c, 1);// todo s.handler moet weg
+            v2 = await this.viewModel.create(h, t2, m, v.c, 1);// todo s.handler moet weg
             v2.cid = v.cid;
 
             if (t.s)
@@ -27,7 +27,7 @@ module.exports = {
                 c: 1
             };
 
-            await this.event.handle(this.handler, v, 'before', 'iteration');
+            await this.event.handle(v, 'before', 'iteration');
 
             if (v.r)
                 return v.r;
@@ -37,7 +37,7 @@ module.exports = {
             v2.cid = v.cid;
             v2.cs = v.cs;
 
-            await this.event.handle(this.handler, v2, 'after', 'iteration');
+            await this.event.handle(v2, 'after', 'iteration');
 
             return v.r.body();
         }

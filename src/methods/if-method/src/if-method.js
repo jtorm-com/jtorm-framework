@@ -15,7 +15,7 @@ module.exports = {
             return 1;
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             let r, e, t = [], k, to = 1, o = this.or, a = this.and, d = this.dataParser;
 
             if (v.d.d === undefined)

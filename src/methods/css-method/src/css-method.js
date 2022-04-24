@@ -8,11 +8,11 @@ module.exports = {
 
         params: ['href'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.href;
         },
 
-        handle: function (j, v) {
+        handle: function (v) {
             const s = this.cssPlugin.after.view;
 
             if (v.c.c || !s.cache[v.t.p.href])

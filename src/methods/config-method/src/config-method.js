@@ -9,11 +9,11 @@ module.exports = {
         alias: 'c',
         params: ['k', 'v', 'a'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.k;
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             let k = this.configModel.get(v.d.k);
 
             if (k && (v.t.p.v === undefined || k === v.d.v)) {

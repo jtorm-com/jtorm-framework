@@ -17,7 +17,7 @@ module.exports = {
             'a'
         ],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return (
                 (
                     v._.isArray(v.d.d)
@@ -27,7 +27,7 @@ module.exports = {
             );
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             let r = '', d, k, h, sv, i = 0, e;
 
             if (!v.d.d)
@@ -67,10 +67,10 @@ module.exports = {
             }
 
             if (!v.t.p.e) {
-                sv = this.viewModel.copy(j, v);
+                sv = this.viewModel.copy(v);
                 sv.t = {s: v.t.s, m: v.d.m, c: []};
                 sv.d = {h: r};
-                await this.methods[v.d.m].handle(j, sv);// todo different method than this with tss repeat
+                await this.methods[v.d.m].handle(sv);// todo different method than this with tss repeat
             }
 
             v.io = {};

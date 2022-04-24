@@ -6,11 +6,11 @@ module.exports = {
         alias: 'r',
         params: [],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.t.s;
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             await v.h.set(v.t.s, function (e) {
                 e.parentElement.removeChild(e);
             }, v);

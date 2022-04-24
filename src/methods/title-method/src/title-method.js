@@ -5,11 +5,11 @@ module.exports = {
     jTormTitleMethod: {
         params: ['t'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.t;
         },
 
-        handle(j, v) {
+        handle(v) {
             v.h.d.title = v.d.t;
 
             v.io = {c: 1};

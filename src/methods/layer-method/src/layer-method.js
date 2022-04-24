@@ -13,12 +13,12 @@ module.exports = {
             'z'// int:z-index
         ],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return (v.t.c && v.t.c.length);
         },
 
-        handle: function (j, v) {
-            this.layerModel.set(j, v);
+        handle: function (v) {
+            this.layerModel.set(v);
 
             v.io = {};
         }

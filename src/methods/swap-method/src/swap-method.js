@@ -9,11 +9,11 @@ module.exports = {
         alias: 's',
         params: ['s', 'a', 'ui', 'h'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.s;
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             let w = v.d.s ? v.d.s : v.c.s, a = v.d.a, i;
 
             if (v.d.ui || v.d.h) {

@@ -67,11 +67,11 @@ module.exports = {
             [628987200000, 3144936000]
         ],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return v.d.as && (v.d.dT || v.d.d);
         },
 
-        handle: function (j, v) {
+        handle: function (v) {
             const l = this.languageModel,
                   nD = {};
 

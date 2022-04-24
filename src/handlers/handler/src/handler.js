@@ -4,21 +4,20 @@
 module.exports = {
     jTormHandler: {
         // DI
-        event: null,
-
-        context: {},// todo remove
+        dataParser: null,
+        eventModel: null,
+        methods: null,
+        viewModel: null,
 
         handle: async function (h, t, m, c, v) {
-            let s = this,
-                sC = s.context,
-                e = sC.models.event,
+            let e = this.eventModel,
+                ms = this.methods,
                 r,
-                ms = sC.methods,
                 k,
                 k2;
 
             if (!v)
-                v = await s.context.models.view.create(s, h, t, m, c);
+                v = await this.viewModel.create(h, t, m, c);
 
             for (k in v.tss) {
                 v.t = v.tss[k];
@@ -39,20 +38,20 @@ module.exports = {
 
                     if (r) {
                         if (v._.isFunction(r.data))
-                            await r.data(s, v);
+                            await r.data(v);
                         else
-                            sC.parsers.data.handle(s, v, r.params);
+                            this.dataParser.handle(v, r.params);
 
-                        v.io.v = await r.validate(s, v);
+                        v.io.v = await r.validate(v);
 
-                        await e.handle(s, v, 'before', 'method');
+                        await e.handle(v, 'before', 'method');
 
                         if (v.io.v && v._.isFunction(r.handle))
-                            await r.handle(s, v);
+                            await r.handle(v);
                         else
                             v.io.r = 0;
 
-                        await e.handle(s, v, 'after', 'method');
+                        await e.handle(v, 'after', 'method');
                     } else {
                         v.io.r = 0;
                         v.io.c = 1;
@@ -60,7 +59,7 @@ module.exports = {
                 } while (v.io.r);
 
                 if (v.io.c && v.t.c.length)
-                    await s.handle(v.h, v.t.c, v.io.d ? v.io.d : v.m, v.c);
+                    await this.handle(v.h, v.t.c, v.io.d ? v.io.d : v.m, v.c);
 
                 v.io.d = null;
             }

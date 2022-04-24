@@ -10,11 +10,11 @@ module.exports = {
         alias: 't',
         params: [],
 
-        validate: function (j) {
+        validate: function () {
             return 1;
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             let x, k;
 
             for (k in v.t.p) {

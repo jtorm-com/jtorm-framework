@@ -6,7 +6,7 @@ module.exports = {
         cid: null,
         layers: {},
 
-        get: function (j, v, e, t) {
+        get: function (v, e, t) {
             if (!v.cid)
                 v.cid = 'default';
 
@@ -28,7 +28,7 @@ module.exports = {
             return o;
         },
 
-        set: function (j, v) {
+        set: function (v) {
             if (!v.cid && !v.d.cid && !this.cid)
                 throw new Error('Cache ID not set');
 

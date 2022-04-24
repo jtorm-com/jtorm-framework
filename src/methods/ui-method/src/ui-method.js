@@ -34,7 +34,7 @@ module.exports = {
             }
         },
 
-        validate: function (j, v) {
+        validate: function (v) {
             v.d.t = v.d.t === undefined ? 1 : parseInt(v.d.t);
             v.d.h = v.d.h === undefined ? 1 : parseInt(v.d.h);
 
@@ -46,17 +46,17 @@ module.exports = {
             return !!v.d.c;
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             let s = this, r, f = v.d.f, i, c = v.d.c, nT, k;
 
             if (!f)
                 f = 'self';
 
-            r = await s.getComponent(j, c, f, !v.d.m);
+            r = await s.getComponent(c, f, !v.d.m);
             if (!r)
                 throw new Error('UI Component not found: ' + v.t.p.c);
 
-            nT = await s.processComponent(j, v, r);
+            nT = await s.processComponent(v, r);
             if (!nT) {
                 v.io = {c: 0, r: 0};
                 return;
@@ -67,9 +67,9 @@ module.exports = {
 
                 if (r) {
                     for (i in r.current) {
-                        k = await s.getComponent(j, c + r.current[i], f);
+                        k = await s.getComponent(c + r.current[i], f);
                         if (k) {
-                            let nT2 = await s.processComponent(j, v, k);
+                            let nT2 = await s.processComponent(v, k);
 
                             nT.c.push(nT2);
                         }
@@ -84,22 +84,22 @@ module.exports = {
             v.io = {c: 1, r: 1};
         },
 
-        getComponent: async function (j, c, f, d) {
+        getComponent: async function (c, f, d) {
             let s = this, r, i;
 
             if (s.cache[c] && s.cache[c][f] !== undefined)
                 return s.cache[c][f];
 
-            r = await s.findUIComponent(j, f, c, d);
+            r = await s.findUIComponent(f, c, d);
 
             if (!r) {
                 if (f === 'self')
-                    r = await s.findUIComponent(j, s.framework, c, d);
+                    r = await s.findUIComponent(s.framework, c, d);
 
                 if (!r) {
                     for (i in s.uis) {
                         if (s.uis[i]) {
-                            r = await s.findUIComponent(j, i, c, d);
+                            r = await s.findUIComponent(i, c, d);
                             if (r)
                                 break;
                         }
@@ -114,12 +114,12 @@ module.exports = {
             return r;
         },
 
-        processComponent: async function (j, v, r) {
+        processComponent: async function (v, r) {
             let s = this, f, tR, nT;
 
-            tR = j.context._.cloneDeep(r.c);
+            tR = v._.cloneDeep(r.c);
 
-            nT = j.context._.cloneDeep(v.t);
+            nT = v._.cloneDeep(v.t);
             nT.p = {};
 
             if (!v.d.t)
@@ -130,9 +130,9 @@ module.exports = {
                 tR.h = [tR.h];
 
             f = {};
-            await s.addLoop(j, tR, 'h', f, s, v);
-            await s.addLoop(j, tR, 't', f, s, v);
-            await s.addLoop(j, tR, 'd', f, s, v);
+            await s.addLoop(tR, 'h', f, s, v);
+            await s.addLoop(tR, 't', f, s, v);
+            await s.addLoop(tR, 'd', f, s, v);
 
             if (tR.ui) {
                 nT.m = 'ui';
@@ -150,7 +150,7 @@ module.exports = {
                 nT.c = [{s: nT.s, m: 'get', c: nT.c, p: f}];
 
                 if (tR.di) {
-                    r = await s.add(j, tR.di.m, v);
+                    r = await s.add(tR.di.m, v);
                     if (!r) {
                         return null;
                     }
@@ -169,15 +169,15 @@ module.exports = {
             return nT;
         },
 
-        add: async function (j, di, v) {
+        add: async function (di, v) {
             let i, sV;
 
             if (di && di.m) {
                 for (i in di.m) {
-                    sV = this.viewModel.copy(j, v);
+                    sV = this.viewModel.copy(v);
                     sV.d = di.m[i];
 
-                    await this.methods[i].handle(j, sV);
+                    await this.methods[i].handle(sV);
 
                     return sV.io.c;
                 }
@@ -186,7 +186,7 @@ module.exports = {
             return true;
         },
 
-        addLoop: async function (j, t, k, f, s, v) {
+        addLoop: async function (t, k, f, s, v) {
             if (!t[k])
                 return f;
 
@@ -196,7 +196,7 @@ module.exports = {
             for (i in t[k]) {
                 if (typeof t[k][i] === 'object') {
                     if (t[k][i].di) {
-                        r = await s.add(j, t[k][i].di, v);
+                        r = await s.add(t[k][i].di, v);
                         if (r)
                             f[k].push(t[k][i].url);
                     } else
@@ -207,7 +207,7 @@ module.exports = {
             f[k] = s.quotes(f[k]);
         },
 
-        findUIComponent(j, f, c, d) {
+        findUIComponent(f, c, d) {
             let s = this, ui, k, k2, k3, tmp, r2, r;
 
             if (f === 'self')
@@ -227,7 +227,7 @@ module.exports = {
                     for (k2 in tmp) {
                         if (r[tmp[k2]]) {
                             if (!r2)
-                                r2 = j.context._.cloneDeep(r[tmp[k2]]);
+                                r2 = this.viewModel._.cloneDeep(r[tmp[k2]]);
                             else {
                                 if (!r2.t)
                                     r2.t = [];
@@ -242,7 +242,7 @@ module.exports = {
                     tmp = c[k].split('|');
                     for (k2 in tmp) {
                         if (r[tmp[k2]]) {
-                            r = j.context._.cloneDeep(r[tmp[k2]]);
+                            r = this.viewModel._.cloneDeep(r[tmp[k2]]);
 
                             break;
                         }

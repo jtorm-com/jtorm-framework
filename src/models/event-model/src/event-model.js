@@ -6,38 +6,57 @@ module.exports = {
         // DI
         plugins: null,
 
-        data: {
+        event: {
             before: {
-                method: null,
-                view: null
+                iteration: [],
+                method: [],
+                view: []
             },
             after: {
-                method: null,
-                view: null
+                iteration: [],
+                method: [],
+                view: []
+            }
+        },
+        handlerName: {
+            before: {
+                iteration: 'beforeIteration',
+                method: 'beforeMethod',
+                view: 'beforeView'
+            },
+            after: {
+                iteration: 'afterIteration',
+                method: 'afterMethod',
+                view: 'afterView'
             }
         },
 
-        handle: async function (j, v, e, t) {
+        init: function () {
             let k,
-                p = this.plugins,
-                c = this.data[e][t];
+                k2,
+                k3,
+                e = this.event,
+                p = this.plugins;
 
-            if (!c) {
-                c = [];
+            for (k in e) {
+                for (k2 in e[k]) {
+                    for (k3 in p) {
+                        if (p[k3].event[k] && p[k3].event[k][k2])
+                            e[k][k2].push(p[k3]);
+                    }
 
-                for (k in p)
-                    if (p[k][e] && p[k][e][t])
-                        c.push(p[k][e][t]);
-
-                c.sort(function (a, b) {
-                    return a.weight - b.weight;
-                });
-
-                this.data[e][t] = c;
+                    e[k][k2].sort(function (a, b) {
+                        return a.weight - b.weight;
+                    });
+                }
             }
+        },
 
-            for (let k in c)
-                await c[k].handle(j, v);
+        handle: async function (v, e, t) {
+            let k, c = this.event[e][t];
+
+            for (k in c)
+                await c[k][this.handlerName[e][t]](v);
         }
     }
 };

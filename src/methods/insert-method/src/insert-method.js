@@ -17,15 +17,15 @@ module.exports = {
             'cs' // cache scope
         ],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return (
                 (v.d.h || v.t.c.length)
                 && (v.d.m || this.m)
             );
         },
 
-        handle: async function (j, v) {
-            var s = this, e, h, c = 1;
+        handle: async function (v) {
+            let e, h, c = 1;
 
             v.cid = v.d.cid;
             v.cs = v.d.cs;
@@ -35,7 +35,7 @@ module.exports = {
                     v.d.h = v.d.p + v.d.h;
                 if (v.d.s)
                     v.d.h += v.d.s;
-                await s.process(j, v.h, v.d.h, v.t.s, v.d.m, v);
+                await this.process(v.h, v.d.h, v.t.s, v.d.m, v);
                 v.d.m = 'r';
             }
 
@@ -48,12 +48,12 @@ module.exports = {
                 if (e) {
                     // h = e.innerHTML;
 
-                    // todo?
+                    // todo
                     // deze hoeft geen html te bevatten, want als er al innerhtml bestaat dan wordt deze meerdere keren getoond wat niet moet
                     // maar bij swap is dit weer wel nodig...
-                    h = await s.handlerWrapper.handle('', v.t, v.d.d ? v.d.d : v.m, v);
+                    h = await this.handlerWrapper.handle('', v.t, v.d.d ? v.d.d : v.m, v);
 
-                    await s.process(j, v.h, h, v.t.s ? v.t.s : 'body', v.d.m, v);
+                    await this.process(v.h, h, v.t.s ? v.t.s : 'body', v.d.m, v);
 
                     c = 0;
 
@@ -67,9 +67,9 @@ module.exports = {
             v.io = {c: c};
         },
 
-        process: async function (j, h, h2, s, m, v) {
+        process: async function (h, h2, s, m, v) {
             await h.set(s, async function (e) {
-                var o = v._.isObject(h2);
+                const o = v._.isObject(h2);
 
                 if (m === 'r') {
                     if (!o)
@@ -77,7 +77,7 @@ module.exports = {
 
                     e.parentNode.replaceChild(h2.select(h2.getSelector(s, v.c.s)), e);
                 } else {
-                    var c = o ? h2.select('body').innerHTML : h2;// todo? from isolation always is body, from html maybe not?
+                    let c = o ? h2.select('body').innerHTML : h2;// todo? from isolation always is body, from html maybe not?
 
                     if (m === 'i')
                         e.innerHTML = c;

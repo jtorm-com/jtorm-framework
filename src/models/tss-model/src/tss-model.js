@@ -9,15 +9,15 @@ module.exports = {
 
         cache: {},
 
-        get: async function (j, v, url) {
+        get: async function (v, url) {
             if (!this.cache[url])
-                await this.set(j, v, url);
+                await this.set(v, url);
 
             return this.cache[url];
         },
 
-        set: async function (j, v, url) {
-            this.cache[url] = await this.requestModel.request(j, url, "text/plain");
+        set: async function (v, url) {
+            this.cache[url] = await this.requestModel.request(url, "text/plain");
 
             this.cache[url].d = await this.tssParser.handle(this.cache[url].d);
         }

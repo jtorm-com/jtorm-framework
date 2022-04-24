@@ -13,7 +13,7 @@ module.exports = {
         separator: ',',
         params: ['n', 'v', 'm'],
 
-        parsed: function (j, v) {
+        parsed: function (v) {
             let t = v._.cloneDeep(v.t),
                 p = this.tssParser;
 
@@ -26,8 +26,8 @@ module.exports = {
             return t;
         },
 
-        validate: function (j, v) {
-            let t = this.parsed(j, v);
+        validate: function (v) {
+            let t = this.parsed(v);
             v.d.parsed = t;
 
             return (
@@ -37,7 +37,7 @@ module.exports = {
             );
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             let t = v.d.parsed,
                 k,
                 s = this.separator,
@@ -60,10 +60,10 @@ module.exports = {
                     m: t.p.m
                 };
 
-                sv = this.viewModel.copy(j, v, null, tR);
+                sv = this.viewModel.copy(v, null, tR);
                 sv.d = tD;
 
-                await this.attrMethod.handle(j, sv);
+                await this.attrMethod.handle(sv);
             }
 
             v.io = {c: 1};

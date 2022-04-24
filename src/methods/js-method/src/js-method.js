@@ -8,11 +8,11 @@ module.exports = {
 
         params: ['src'],
 
-        validate: function (j, v) {
-            return v.d.src;
+        validate: function (v) {
+            return !!v.d.src;
         },
 
-        handle: function (j, v) {
+        handle: function (v) {
             const s = this.jsPlugin.after.view;
 
             if (v.c.c || !s.cache[v.t.p.src]) {

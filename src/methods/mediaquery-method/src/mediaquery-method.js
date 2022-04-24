@@ -15,11 +15,11 @@ module.exports = {
             this.m = w.matchMedia || w.msMatchMedia;
         },
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.q;
         },
 
-        handle: function (j, v) {
+        handle: function (v) {
             v.io = {c: this.process(v.d.q)};
         },
 

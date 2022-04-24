@@ -6,11 +6,11 @@ module.exports = {
         alias: 'a',
         params: ['n', 'v', 'm', 'ns', 'a', 'p'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!(v.d.n && (v.d.v || v.d.m === 'r'));
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             const s = this;
 
             await v.h.set(v.t.s, function (e) {

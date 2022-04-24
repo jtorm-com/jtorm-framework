@@ -6,11 +6,11 @@ module.exports = {
         alias: 'u',
         params: ['s'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.s;
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             await v.h.set(v.d.s, async function (e) {
                 const h = e.innerHTML;
 

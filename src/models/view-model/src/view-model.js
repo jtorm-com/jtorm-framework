@@ -30,7 +30,7 @@ module.exports = {
             }
         },
 
-        create: async function(j, h, t, m, c, b) {
+        create: async function(h, t, m, c, b) {
             let v = this._.create(this.data, {
                 _: this._
             });
@@ -48,14 +48,14 @@ module.exports = {
             v.tss = t;
 
             if (this._.isString(h))
-                h = this.documentModel.create(j, h, v, b);
+                h = this.documentModel.create(h, v, b);
 
             v.h = h;
 
             return v;
         },
 
-        copy: function(j, v, h, t, d, a) {
+        copy: function(v, h, t, d, a) {
             let sv = {}, k;
 
             if (!a)

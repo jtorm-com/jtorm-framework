@@ -9,11 +9,11 @@ module.exports = {
         alias: 'w',
         params: ['s', 'h', 'd'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return (v.d.s && (v.d.h || v.t.c.length > 0));
         },
 
-        handle: async function (j, v) {
+        handle: async function (v) {
             const s = this;
 
             if (v.d.h)

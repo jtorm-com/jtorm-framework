@@ -19,7 +19,7 @@ module.exports = {
             this.appendRegex = new RegExp('(\\' + this.append + ')(?=(?:[^' + q + ']|[' + q + '][^' + q + ']*[' + q + '])*$)', '');
         },
 
-        handle: function (j, v, params) {
+        handle: function (v, params) {
             let tD = {}, p, k;
 
             for (p of params) {

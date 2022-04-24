@@ -8,7 +8,7 @@ module.exports = {
 
         charset: 'utf-8',
 
-        create: function(j, h, v, b) {
+        create: function(h, v, b) {
             const r = {
                 d: v.c.c
                     ? this.windowModel.document.implementation.createHTMLDocument()

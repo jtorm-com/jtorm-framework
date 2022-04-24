@@ -16,9 +16,8 @@ module.exports = {
             this.url = l.protocol + '//' + l.host + '/';
         },
 
-        xhr: async function(j, req) {
-            let r, xhr,
-                l = this.windowModel.location;
+        xhr: async function(req) {
+            let r, xhr;
 
             req.url = this.uiMethod.parseUrl(req.url);
 
@@ -35,8 +34,8 @@ module.exports = {
             return r;
         },
 
-        request: async function(j, url, h, m, c) {
-            return await this.xhr(j, {
+        request: async function(url, h, m, c) {
+            return await this.xhr({
                 method: m ? m : "GET",
                 url: url,
                 headers: {

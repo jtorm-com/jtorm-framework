@@ -8,17 +8,17 @@ module.exports = {
 
         params: ['h', 't', 'd'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!(v.d.h || v.d.t || v.d.d);
         },
 
-        get: async function(j, v, t, u) {
-            let r = await this.models[t].get(j, v, u);
+        get: async function(v, t, u) {
+            let r = await this.models[t].get(v, u);
 
             return r.d;
         },
 
-        async handle(j, v) {
+        async handle(v) {
             let r, p, k, k2, nD, nT;
 
             if (v.d.d) {
@@ -28,7 +28,7 @@ module.exports = {
                     v.d.d = [v.d.d];
 
                 for (k in v.d.d) {
-                    r = await this.get(j, v, 'data', v.d.d[k]);
+                    r = await this.get(v, 'data', v.d.d[k]);
 
                     for (k2 in r)
                         nD[k] = r[k];
@@ -42,7 +42,7 @@ module.exports = {
                     v.d.h = [v.d.h];
 
                 for (k in v.d.h) {
-                    p = await this.get(j, v, 'html', v.d.h[k]);
+                    p = await this.get(v, 'html', v.d.h[k]);
                     r += p;
                 }
 
@@ -62,7 +62,7 @@ module.exports = {
                 };
 
                 for (k in v.d.t) {
-                    r = await this.get(j, v, 'tss', v.d.t[k]);
+                    r = await this.get(v, 'tss', v.d.t[k]);
 
                     if (v.t.s)
                         v.c.s = v.t.s;

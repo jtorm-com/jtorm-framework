@@ -9,12 +9,12 @@ module.exports = {
         alias: 'ses',
         params: ['k', 'v', 'a'],
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.k;
         },
 
-        handle: async function (j, v) {
-            let p = this.sessionModel.get(j, v.d.k);
+        handle: async function (v) {
+            let p = this.sessionModel.get(v.d.k);
 
             if (p && (v.t.p.v === undefined || p === v.d.v)) {
                 if (v.d.a)

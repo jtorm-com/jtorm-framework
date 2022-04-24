@@ -14,7 +14,7 @@ module.exports = {
             return 1;
         },
 
-        data: async function (j, v) {
+        data: async function (v) {
             let tT, ks, k, k2, p, t = v.t, tD = {};
 
             for (k in t.p) {

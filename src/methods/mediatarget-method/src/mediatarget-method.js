@@ -30,25 +30,25 @@ module.exports = {
             for (k in this.target) {
                 v = {d: {t: k}};
 
-                this.process(j, v);
+                this.process(v);
 
                 if (v.io.c)
                     this.current.push(k);
             }
         },
 
-        validate: function (j, v) {
+        validate: function (v) {
             return !!v.d.t;
         },
 
-        handle: function (j, v) {
+        handle: function (v) {
             v.io.c = this.current.indexOf(v.d.t) !== -1;
         },
 
-        process: function (j, v) {
+        process: function (v) {
             v.d.q = this.target[v.d.t];
 
-            this.mediaqueryMethod.handle(j ,v);
+            this.mediaqueryMethod.handle(v);
         }
     }
 };
