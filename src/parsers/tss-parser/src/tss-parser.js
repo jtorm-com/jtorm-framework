@@ -1,10 +1,14 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
+
 module.exports = {
     jTormTSSParser: {
         c: {},
+
         find: function (from) {
-            var s = this, tmp, k;
+            const s = this;
+            let tmp, k;
+
             for (k in s.tree) {
                 if (s.tree[k].pair.from === from)
                     return s.tree[k];
@@ -17,14 +21,18 @@ module.exports = {
             }
             return 0;
         },
+
         whitespace: function (times) {
-            var r = '', i = 0;
+            let r = '', i = 0;
+
             for (i; i <= times; i++)
                 r += ' ';
+
             return r;
         },
+
         sortPairs: function () {
-            var r = {}, p, k2;
+            let r = {}, p, k2;
             for (p of this.pairs) {
                 for (k2 in r)
                     if (p.from > r[k2].from && p.close < r[k2].close)
@@ -32,22 +40,28 @@ module.exports = {
                 r[p.from] = p;
             }
         },
+
         parseCharacter: function (character, tss) {
-            var r = [], pos = 0, next = 0;
+            let r = [], pos = 0, next = 0;
             while ((next = tss.indexOf(character, pos)) > -1) {
                 pos = next + 1;
                 r.push(next);
             }
             return r;
         },
+
         parseOpenings: function (tss) {
             return this.parseCharacter(this.c.opening, tss);
         },
+
         parseClosings: function (tss) {
             return this.parseCharacter(this.c.closing, tss);
         },
+
         parseChildren: function () {
-            var s = this, i, sl, r, ps, t, p;
+            const s = this;
+            let i, sl, r, ps, t, p;
+
             for (p of s.pairs) {
                 sl = s.tss.substring(p.from, p.open);
                 ps = sl.split(s.c.methodSeparator);
@@ -79,8 +93,10 @@ module.exports = {
             }
             return 0;
         },
+
         parseFrom: function (start) {
-            var s = this, withinBrackets, delimiter, findSelector, lastDelimiter, test, pair;
+            const s = this;
+            let withinBrackets, delimiter, findSelector, lastDelimiter, test, pair;
             for (pair of s.pairs) {
                 withinBrackets = s.tss.substring(pair.open, pair.close);
                 findSelector = s.tss.substring(start, pair.open);
@@ -93,8 +109,9 @@ module.exports = {
                 pair.from = (lastDelimiter) ? lastDelimiter + 1 : 0;
             }
         },
+
         hasChildren: function (i, openings, closings) {
-            var hc = false, i2;
+            let hc = false, i2;
             for (i2 = i + 1; i2 < openings.length; i2++) {
                 if (openings[i2] < closings[i]) {
                     hc = [i2, i];
@@ -105,10 +122,12 @@ module.exports = {
             }
             return false;
         },
+
         parseShorthandProperties: function (p) {
-            var m = this.regexes['propertyShorthandOpening'].exec(p),
-                s = p.substr(0, m.index),
-                p = p.substr(m.index + 1);
+            let m = this.regexes['propertyShorthandOpening'].exec(p),
+                s = p.substr(0, m.index);
+
+            p = p.substr(m.index + 1);
 
             do {
                 m = this.regexes['propertyShorthandSeparator'].exec(p);
@@ -121,26 +140,30 @@ module.exports = {
 
             return {s: s, p: p};
         },
+
         parseProperties: function (str) {
-            var s = this, r = {}, m, m2, i = 0, v, k, p;
+            let r = {}, m, m2, i = 0, v, k, p;
             do {
-                m = s.regexes['propertyEnd'].exec(str);
+                m = this.regexes['propertyEnd'].exec(str);
                 if (m) {
                     p = str.substring(i, m.index);
-                    m2 = s.regexes['propertySeparator'].exec(p);
+                    m2 = this.regexes['propertySeparator'].exec(p);
                     if (m2) {
                         k = p.substring(0, m2.index).trim();
                         v = p.substring(m2.index + 1).trim();
                         r[k] = v;
                     }
-                    str = s.whitespace(m.index) + str.substring(m.index + 1);
+                    str = this.whitespace(m.index) + str.substring(m.index + 1);
                     i = m.index + 1;
                 }
             } while (m);
+
             return r;
         },
+
         parsePairs: function (openings, closings) {
-            var s = this, hc, open, close, i;
+            const s = this;
+            let hc, open, close, i;
             for (i = 0; i < openings.length; i++) {
                 hc = s.hasChildren(i, openings, closings);
                 if (hc) {
@@ -162,8 +185,11 @@ module.exports = {
             s.parseFrom(0);
             s.sortPairs();
         },
+
         parse: function (tss, pairs, currentPairs, parent, processed) {
-            var s = this, v, c, tmpP, p, k, parts;
+            const s = this;
+            let v, c, tmpP, p, k, parts;
+
             for (p of currentPairs) {
                 if (processed.indexOf(p.from) !== -1)
                     continue;
@@ -212,6 +238,7 @@ module.exports = {
 
             return tss;
         },
+
         clean: function (tree) {
             for (var tss of tree) {
                 delete tss.pair;
@@ -219,11 +246,13 @@ module.exports = {
                     this.clean(tss.c);
             }
         },
+
         quotes: function (v) {
-            var r = this.regexes.quotes;
+            const r = this.regexes.quotes;
             r.lastIndex = 0;
             return v.replace(r, '')
         },
+
         config: function (config) {
             this.c.opening = config.opening ? config.opening : '{';
             this.c.closing = config.closing ? config.closing : '}';
@@ -248,8 +277,10 @@ module.exports = {
                 quotes: new RegExp('(' + this.c.quotes.join('|') + ')+', 'gm')
             };
         },
+
         handle: function (tss) {
-            var s = this, r = s.regexes.clean;
+            const s = this, r = s.regexes.clean;
+
             s.tree = [];
             r.lastIndex = 0;
             s.tss = tss.replace(r, '$1');

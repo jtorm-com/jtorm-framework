@@ -10,7 +10,7 @@ module.exports = {
         current: '@c',
         objectSeparator: '.',
 
-        init: function (j) {
+        init: function () {
             let c = this.tssParser.c.quotes, q;
 
             this.dataRegex = new RegExp('(' + c.join('|') + ')+', 'gm');
