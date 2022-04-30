@@ -2,7 +2,7 @@
 
 ->ui {
     c: '@m.picture';
-    t: 0;
+    t: '0';
 
     picture->append->ui {
         c: 'ImageObject.image';

@@ -2,7 +2,7 @@
 
 ->ui {
     c: '@e.header';
-    t: 0;
+    t: '0';
 
     header->attr {
         n: 'class';
@@ -10,10 +10,10 @@
         m: 'a';
     }
 
-    .header {
+    header {
         ->if(d: mainEntity||name)->append->ui {
             c: '@t.h1';
-            t: 0;
+            t: '0';
 
             h1 {
                 ->if(d: mainEntity.@c) {
@@ -29,7 +29,7 @@
 
                     ->else->append->ui {
                         c: '@e.a';
-                        t: 0;
+                        t: '0';
 
                         a->append(d: name)->ui {
                             c: 'Text.multi';
@@ -47,7 +47,7 @@
 
         ->append(d: alternateName)->ui {
             c: '@t.h2';
-            t: 0;
+            t: '0';
 
             h2->append->ui {
                 c: 'Text.multi';

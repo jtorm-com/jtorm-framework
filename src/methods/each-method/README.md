@@ -12,5 +12,9 @@ npm install jtorm-com/jtorm-each-method
 |--------|----------|----------|--------------------------------------------|
 | `d`    | `string` | `true`   | Data collection                            |
 | `a`    | `string` | `true`   | As current item reference within the loop  |
-| `m`    | `string`  | method   | E.g. append, prepend, replace, etc.        |
-| `e`    | `false`  | method   | Element        |
+| `m`    | `string` | method   | E.g. append, prepend, replace, etc.        |
+| `e`    | `false`  | method   | Element                                    |
+
+To the data in the iteration is added:
+d.isLoop = 1;
+d.index = {key};

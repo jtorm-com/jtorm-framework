@@ -1,24 +1,23 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->append(d: Action)->ui {
-    c: 'Action.link';
+->append(d: EntryPoint)->ui {
+    c: 'EntryPoint.action';
 }
 
 ->if(to: 'array')->append->ui {
     c: '@e.div';
-    t: '0';
 
     div {
         ->attr {
             n: 'class';
-            v: 'schema-Action-group';
+            v: 'schema-EntryPoint-group';
         }
 
-        .schema-Action-group->each {
+        ->each {
             m: 'append';
 
-            body->append(d: @c)->ui {
-                c: @type + '.link';
+            body->append->ui {
+                c: 'EntryPoint.default';
             }
         }
     }

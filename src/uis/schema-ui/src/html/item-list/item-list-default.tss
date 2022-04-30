@@ -1,16 +1,16 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 ->ui {
   c: '@t.ol';
-  t: 0;
+  t: '0';
   ol->each {
     d: itemListElement;
     m: 'append';
     ->ui {
       c: '@t.li';
-      t: 0;
+      t: '0';
       li->append(d: ListItem.item.Thing)->ui {
         c: '@e.a';
-        t: 0;
+        t: '0';
         a {
           ->attr {
             n: 'href';
@@ -22,7 +22,7 @@
           }*/
           ->append->ui {
             c: '@e.span';
-            t: 0;
+            t: '0';
             span->inner(d: item.Thing) {
               h: name.Text;
             }

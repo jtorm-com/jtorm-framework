@@ -64,7 +64,7 @@ module.exports = {
                         for (e of c)
                             await fn(e);
                     else {
-                        console.error(sl + ' not found', s.html());
+                        console.error(sl + ' not found', v.h.html());
                         throw new Error();
                     }
                 }

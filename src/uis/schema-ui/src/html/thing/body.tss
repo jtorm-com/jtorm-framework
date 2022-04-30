@@ -2,7 +2,7 @@
 
 ->ui {
     c: '@e.section';
-    t: 0;
+    t: '0';
 
     section->attr {
         n: 'class';
@@ -13,7 +13,7 @@
         ->if(d: disambiguatingDescription && description) {
             ->append->ui {
                 c: '@e.details';
-                t: 0;
+                t: '0';
 
                 details {
                     ->attr {
@@ -23,7 +23,7 @@
 
                     ->append(d: disambiguatingDescription)->ui {
                         c: '@e.summary';
-                        t: 0;
+                        t: '0';
 
                         summary->append->get {
                             t: '@s/html/thing/disambiguating-description.tss';

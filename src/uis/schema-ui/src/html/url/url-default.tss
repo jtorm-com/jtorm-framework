@@ -2,7 +2,7 @@
 
 ->ui {
     c: '@e.a';
-    t: 0;
+    t: '0';
 
     a->attrs {
         n: 'href,class';

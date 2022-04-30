@@ -2,7 +2,7 @@
 
 ->ui {
     c: '@e.footer';
-    t: 0;
+    t: '0';
 
     footer->attr {
         n: 'class';
@@ -10,9 +10,15 @@
         m: 'a';
     }
 
-    .footer {
+    footer {
         ->append(d: subjectOf)->ui {
             c: 'Thing.linkMulti';
+
+            a->attr {
+                n: 'class';
+                v: 'subjectOf';
+                m: 'a';
+            }
         }
 
         ->append(d: potentialAction)->ui {

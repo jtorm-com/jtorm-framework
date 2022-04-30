@@ -35,7 +35,13 @@ module.exports = {
         },
 
         validate: function (v) {
-            v.d.t = v.d.t === undefined ? 1 : parseInt(v.d.t);
+            let t = v.d.t === undefined ? 1 : parseInt(v.d.t);
+            if (Number.isNaN(t)) {
+                // var 0 exists and should be t: '0';
+                throw new Error('NaN');
+            }
+
+            v.d.t = t;
             v.d.h = v.d.h === undefined ? 1 : parseInt(v.d.h);
 
             if (v.d.f && !this.uis[v.d.f])
@@ -53,8 +59,10 @@ module.exports = {
                 f = 'self';
 
             r = await s.getComponent(c, f, !v.d.m);
-            if (!r)
+            if (!r) {
+                console.log(v);
                 throw new Error('UI Component not found: ' + v.t.p.c);
+            }
 
             nT = await s.processComponent(v, r);
             if (!nT) {

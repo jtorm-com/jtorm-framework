@@ -373,7 +373,7 @@ module.exports = {
                         '@s/html/person/person-default.tss'
                     ]
                 },
-                link: {
+                link: {// is deze nodig??, ws linkmulti altijd goed
                     ui: {
                         c: 'Thing.link'
                     },
@@ -411,19 +411,55 @@ module.exports = {
                 default: {
                     t: ['@s/html/action/action-default.tss']
                 },
-                action: {
-                    ui: {
-                        c: 'Thing'
-                    },
-                    t: ['@s/html/action/action.tss']
-                },
                 link: {
-                    ui: {
-                        c: 'Thing.link'
-                    }
+                    t: ['@s/html/action/action-link.tss']
                 },
                 linkMulti: {
                     t: ['@s/html/action/action-link-multi.tss']
+                }
+            },
+            ConsumeAction: {
+                default: {
+                    ui: {
+                        c: 'Action.default'
+                    },
+                    t: [// todo
+                        '@s/html/consume-action/consume-action-default.tss'
+                    ]
+                },
+                link: {
+                    ui: {
+                        c: 'Action.link'
+                    },
+                    t: [// todo
+                        '@s/html/consume-action/consume-action-default.tss'
+                    ]
+                },
+            },
+            ViewAction: {
+                default: {
+                    ui: {
+                        c: 'ConsumeAction.default'
+                    },
+                    t: [
+                        '@s/html/view-action/view-action-default.tss'
+                    ]
+                },
+                link: {
+                    ui: {
+                        c: 'ConsumeAction.link'
+                    },
+                    t: [
+                        '@s/html/view-action/view-action-default.tss'
+                    ]
+                },
+            },
+            EntryPoint: {
+                default: {
+                    t: ['@s/html/entry-point/entry-point-default.tss']
+                },
+                action: {
+                    t: ['@s/html/entry-point/entry-point.tss']
                 }
             },
             AggregateRating: {},

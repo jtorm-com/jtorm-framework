@@ -3,7 +3,7 @@ head {
   ->append(d: fb) {
     ->if(d: profile_id)->append->ui {
       c: 'doc.meta';
-      t: 0;
+      t: '0';
       meta->attrs {
         n: 'property,content';
         v: 'fb:profile_id,profile_id';
@@ -11,7 +11,7 @@ head {
     }
     ->if(d: page_id)->append->ui {
       c: 'doc.meta';
-      t: 0;
+      t: '0';
       meta->attrs {
         n: 'property,content';
         v: 'fb:page_id,page_id';
@@ -19,7 +19,7 @@ head {
     }
     ->if(d: app_id)->append->ui {
       c: 'doc.meta';
-      t: 0;
+      t: '0';
       meta->attrs {
         n: 'property,content';
         v: 'fb:app_id,app_id';
@@ -27,7 +27,7 @@ head {
     }
     ->if(d: admins)->append->ui {
       c: 'doc.meta';
-      t: 0;
+      t: '0';
       meta->attrs {
         n: 'property,content';
         v: 'fb:admins,admins';

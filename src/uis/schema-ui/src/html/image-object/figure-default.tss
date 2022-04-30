@@ -2,7 +2,7 @@
 
 ->ui {
     c: '@m.figure';
-    t: 0;
+    t: '0';
 
     figure {
         ->append->ui {

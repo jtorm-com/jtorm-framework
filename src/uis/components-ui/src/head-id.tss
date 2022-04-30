@@ -10,7 +10,7 @@
 
 ->data(h: url.URL)->append->ui {
     c: 'doc.link';
-    t: 0;
+    t: '0';
     link {
         ->attrs {
             n: 'rel,type';

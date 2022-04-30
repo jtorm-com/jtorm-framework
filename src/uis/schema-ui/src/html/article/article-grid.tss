@@ -2,22 +2,22 @@
 article {
   ->append->ui {
     c: '@e.header';
-    t: 0;
+    t: '0';
     header {
       ->append->ui {
         c: '@t.h2';
-        t: 0;
+        t: '0';
       }
       ->append->ui {
         c: '@e.a';
-        t: 0;
+        t: '0';
         a->inner {
           h: articleSection;
         }
       }
       ->append->ui {
         c: '@e.time';
-        t: 0;
+        t: '0';
         time->attr {
           n: 'pubdate';
           v: 'pubdate';
@@ -30,6 +30,6 @@ article {
   }
   ->append->ui {
     c: '@e.footer';
-    t: 0;
+    t: '0';
   }
 }

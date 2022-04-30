@@ -27,7 +27,7 @@ body > section > .header {
   }
   ->append->ui {
     c: '@e.section';
-    t: 0;
+    t: '0';
     section {
       ->attr {
         n: 'class';

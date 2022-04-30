@@ -10,6 +10,7 @@ Todo klopt niks meer van die parameters
 | `u`    | `string` | `false`  | Use Data within `if` scope |
 | `else` | `method` | `false`  | When no data, it looks for an element with method "else". If it exists, then the TSS children will be used as an alternative. |
 | `eu`   | `string` | `false`  | Use Data within `else` scope |
+| `to`   | 'string' | `false`  | type check, check if `array`, `string`, `number`, etc for example |
 
 ## Example
 
@@ -18,7 +19,7 @@ Below an example when data component exists, use that, else use a default compon
 ```js
 .mdc-drawer__content->append {
   ->if {
-    data: component;
+    d: component;
     ->ui {
       component: component;
     }

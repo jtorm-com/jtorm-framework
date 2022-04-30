@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 ->append->ui {
     c: '@e.div';
-    t: 0;
+    t: '0';
 
     div->attr {
         n: 'class';

@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 ->ui {
     c: '@e.nav';
-    t: 0;
+    t: '0';
 
     nav {
         ->attrs {
@@ -15,7 +15,7 @@
             .cell {
                 ->text(html: 'You are here')->append->ui {
                     c: '@e.span';
-                    t: 0;
+                    t: '0';
 
                     span->append {
                         h: html + ': ';

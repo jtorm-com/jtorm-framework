@@ -10,7 +10,7 @@ section {
     ->if(el: 'footer') {
       ->else->append->ui {
         c: '@e.footer';
-        t: 0;
+        t: '0';
       }
     }
     footer {

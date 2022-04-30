@@ -1,0 +1,12 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+a->attr {
+    n: 'class';
+    v: 'schema-ConsumeAction ';
+    m: 'r';
+}
+a->attr {
+    n: 'class';
+    v: 'schema-ViewAction';
+    m: 'a';
+}
