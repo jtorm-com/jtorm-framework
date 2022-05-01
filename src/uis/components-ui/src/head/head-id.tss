@@ -4,7 +4,7 @@
     c: 'doc.meta';
 }
 
-->data(rel: 'canonical', href: url.URL)->append->ui {// href doet het niet
+->data(rel: 'canonical', href: url.URL)->append->ui {
     c: 'doc.link';
 }
 

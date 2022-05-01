@@ -1,16 +1,16 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-/*->get {
+->get {
   t: '@c/html.tss';
-}*/
+}
 
 head {
-    ->append(cid: 'head-global', cs: 'global')->get {
-        t: '@c/head-global.tss';
+    ->append(cid: 'head-default', cs: 'global')->ui {
+        c: 'head.default';
     }
 
-    ->append(cid: 'head-id', cs: identifier.Text)->get {
-        t: '@c/head-id.tss';
+    ->append(cid: 'head-id', cs: identifier.Text)->ui {
+        c: 'head.id';
     }
 }
 

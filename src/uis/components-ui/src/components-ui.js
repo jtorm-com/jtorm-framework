@@ -13,6 +13,14 @@ module.exports = {
                     t: ['@c/init.tss']
                 }
             },
+            head: {
+                default: {
+                    t: ['@c/head/head-default.tss']
+                },
+                id: {
+                    t: ['@c/head/head-id.tss']
+                }
+            },
             badge: {
                 default: {
                     ui: {
