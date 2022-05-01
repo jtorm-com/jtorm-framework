@@ -1,17 +1,18 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-a->attr {
-    n: 'class';
-    v: 'schema-Action ';
-    m: 'r';
-}
-a->attr {
-    n: 'class';
-    v: 'schema-ConsumeAction';
-    m: 'a';
-}
+.schema-Action {
+    ->attr {
+        n: 'class';
+        v: 'schema-ConsumeAction';
+        m: 'a';
+    }
 
-
+    ->attr {
+        n: 'class';
+        v: 'schema-Action ';
+        m: 'r';
+    }
+}
 // todo
 // actionAccessibilityRequirement
 // expectsAcceptanceOf

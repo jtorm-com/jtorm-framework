@@ -14,6 +14,12 @@
         ->append(d: subjectOf)->ui {
             c: 'Thing.linkMulti';
 
+            .schema-Thing-group->attr {
+                n: 'class';
+                v: 'subjectOf';
+                m: 'a';
+            }
+
             a->attr {
                 n: 'class';
                 v: 'subjectOf';

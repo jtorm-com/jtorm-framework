@@ -1,5 +1,17 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->append(d: target)->ui {
-    c: 'EntryPoint.default';
+->ui {
+    c: '@e.div';
+    t: '0';
+
+    div {
+        ->attr {
+            n: 'class';
+            v: 'schema-Action';
+        }
+
+        ->append(d: target)->ui {
+            c: 'EntryPoint.default';
+        }
+    }
 }
