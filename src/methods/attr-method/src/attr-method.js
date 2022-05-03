@@ -13,7 +13,7 @@ module.exports = {
         handle: async function (v) {
             const s = this;
 
-            await v.h.set(v.t.s, function (e) {
+            await v.h.set(v, function (e) {
                 if (v.d.v) {
                     let tV = s.get(e, v.d.n);
 
@@ -35,7 +35,7 @@ module.exports = {
                         s.set(e, v.d.n, v.d.v);
                 } else if (v.d.m === 'r')
                     s.del(e, v.d.n);
-            }, v);
+            });
 
             v.io = {c: 1};
         },

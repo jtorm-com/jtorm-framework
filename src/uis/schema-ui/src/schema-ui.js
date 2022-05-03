@@ -71,12 +71,40 @@ module.exports = {
                     t: [
                         '@s/html/site-navigation-element/site-navigation-element-default.tss'
                     ]
+                },
+                boxed: {
+                    ui: {
+                        c: 'SiteNavigationElement.default',
+                        m: '1'
+                    },
+                    t: ['@s/html/site-navigation-element/site-navigation-element-boxed.tss']
                 }
             },
             WebPage: {
                 default: {
                     t: [
                         '@s/html/web-page/web-page-default.tss'
+                    ]
+                },
+                boxed: {
+                    t: [
+                        '@s/html/web-page/web-page-boxed.tss'
+                    ]
+                },
+                contentsDefault: {
+                    ui: {
+                        c: '@e.main'
+                    },
+                    t: [
+                        '@s/html/web-page/contents-default.tss'
+                    ]
+                },
+                contentsBoxed: {
+                    ui: {
+                        c: 'WebPage.contentsDefault'
+                    },
+                    t: [
+                        '@s/html/web-page/contents-boxed.tss'
                     ]
                 },
                 defaultDesktop: {
@@ -176,6 +204,13 @@ module.exports = {
                     },
                     t: ['@s/html/w-p-header/w-p-header-default.tss']
                 },
+                boxed: {
+                    ui: {
+                        c: 'WPHeader.default',
+                        m: '1'
+                    },
+                    t: ['@s/html/w-p-header/w-p-header-boxed.tss']
+                },
                 defaultTablet: {
                     t: ['@s/html/w-p-header/w-p-header-default-tablet.tss']
                 }
@@ -186,6 +221,13 @@ module.exports = {
                         c: 'WebPageElement'
                     },
                     t: ['@s/html/w-p-footer/w-p-footer-default.tss']
+                },
+                boxed: {
+                    ui: {
+                        c: 'WPFooter.default',
+                        m: '1'
+                    },
+                    t: ['@s/html/w-p-footer/w-p-footer-boxed.tss']
                 }
             },
             Article: {

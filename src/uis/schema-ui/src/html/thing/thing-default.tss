@@ -7,18 +7,31 @@ body > section {
     }
 
     ->append->ui {
-        c: 'Thing.header';
-    }
+        c: '@e.div';
 
-    ->append(d: image)->ui {
-        c: 'ImageObject';
-    }
+        div {
+            ->attr {
+                n: 'class';
+                v: 'contents';
+            }
 
-    ->append->ui {
-        c: 'Thing.body';
-    }
+            .contents {
+                ->append->ui {
+                    c: 'Thing.header';
+                }
 
-    ->append->ui {
-        c: 'Thing.footer';
+                ->append(d: image)->ui {
+                    c: 'ImageObject';
+                }
+
+                ->append->ui {
+                    c: 'Thing.body';
+                }
+
+                ->append->ui {
+                    c: 'Thing.footer';
+                }
+            }
+        }
     }
 }

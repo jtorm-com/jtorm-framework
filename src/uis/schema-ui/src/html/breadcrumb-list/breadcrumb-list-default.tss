@@ -1,4 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 ->ui {
     c: '@e.nav';
     t: '0';
@@ -10,20 +11,27 @@
         }
 
         ->append->ui {
-            c: 'grid.oneColumn';
+            c: '@e.div';
 
-            .cell {
-                ->text(html: 'You are here')->append->ui {
-                    c: '@e.span';
-                    t: '0';
-
-                    span->append {
-                        h: html + ': ';
-                    }
+            div {
+                ->attr {
+                    n: 'class';
+                    v: 'contents';
                 }
 
-                ->append->ui {
-                    c: 'ItemList';
+                .contents {
+                    ->text(html: 'You are here')->append->ui {
+                        c: '@e.span';
+                        t: '0';
+
+                        span->append {
+                            h: html + ': ';
+                        }
+                    }
+
+                    ->append->ui {
+                        c: 'ItemList';
+                    }
                 }
             }
         }

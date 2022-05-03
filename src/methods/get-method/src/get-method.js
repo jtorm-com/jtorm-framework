@@ -46,9 +46,9 @@ module.exports = {
                     r += p;
                 }
 
-                await v.h.set(v.t.s, function (el) {
+                await v.h.set(v, function (el) {
                     el.innerHTML = r;
-                }, v);
+                });
             }
 
             if (v.d.t) {

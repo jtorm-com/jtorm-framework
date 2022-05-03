@@ -1,4 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 body > section->swap {
     s: 'footer';
     ui: '@e.footer';
@@ -18,18 +19,18 @@ body > section->swap {
         }
     }
 
-    body > footer > header->swap {
+    #footer > .contents > header->swap {
         s: 'section';
         ui: '@e.section';
         a: 1;
     }
 
-    body > footer > footer->swap {
+    #footer > .contents > footer->swap {
         s: 'section';
         ui: '@e.section';
         a: 1;
 
-        body > footer > .footer->append->ui {
+        #footer > .contents > .footer->append->ui {// todo debug this ?
             c: 'grid.oneColumn';
 
             .cell {

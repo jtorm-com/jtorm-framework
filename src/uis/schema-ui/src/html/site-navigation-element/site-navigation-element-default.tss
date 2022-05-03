@@ -2,4 +2,20 @@
 
 ->ui {
     c: '@e.nav';
+
+    nav {
+        ->append->ui {
+            c: '@e.div';
+
+            div {
+                ->attr {
+                    n: 'class';
+                    v: 'contents';
+                }
+
+                .contents {
+                }
+            }
+        }
+    }
 }

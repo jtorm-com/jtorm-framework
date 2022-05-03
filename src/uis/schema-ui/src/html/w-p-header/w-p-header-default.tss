@@ -1,13 +1,14 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 body > section->swap {
     s: 'header';
     ui: '@e.header';
     a: 1;
 
     body > header {
-        ->attr {
-            n: 'class';
-            v: 'schema-WPHeader';
+        ->attrs {
+            n: 'class,id';
+            v: 'schema-WPHeader,header';
             m: 'a';
         }
 
@@ -18,13 +19,13 @@ body > section->swap {
         }
     }
 
-    body > header > header->swap {
+    #header > .contents > header->swap {
         s: 'section';
         ui: '@e.section';
         a: 1;
     }
 
-    body > header > footer->swap {
+    #header > .contents > footer->swap {
         s: 'section';
         ui: '@e.section';
         a: 1;

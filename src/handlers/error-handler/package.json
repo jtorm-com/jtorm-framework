@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/error-handler",
+  "description": "jTorm Error Handler",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/error-handler.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/handlers/error-handler"
+  },
+  "dependencies": {}
+}

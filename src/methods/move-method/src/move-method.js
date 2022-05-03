@@ -17,7 +17,7 @@ module.exports = {
         handle: async function (v) {
             const s = this;
 
-            await v.h.set(v.t.s, async function (e) {
+            await v.h.set(v, async function (e) {
                 let sv = s.viewModel.copy(v);
 
                 sv.d = {h: e.outerHTML};
@@ -26,7 +26,7 @@ module.exports = {
                 e.parentElement.removeChild(e);
 
                 await s.methods[v.d.m].handle(sv);
-            }, v);
+            });
 
             v.io = {};
         }

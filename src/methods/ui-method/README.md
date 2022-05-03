@@ -15,7 +15,7 @@ npm install @jtorm/ui-method
 | `f`    | `string`  | `false`  | Registered framework, fallback `default` if set, else first key/value in object.
 | `t`    | `boolean` | `false`  | Use component tss
 | `h`    | `boolean` | `false`  | Use component html
-| `m`    | `boolean` | `false`  | Use mediatarget
+| `m`    | `boolean` | `false`  | Use mediatarget check if suffixes exists registered by it e.g. defaultDesktopL, defaultTabletS etc
 
 
 ### Component Options

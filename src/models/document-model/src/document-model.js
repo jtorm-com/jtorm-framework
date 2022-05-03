@@ -4,6 +4,7 @@
 module.exports = {
     jTormDocumentModel: {
         // DI
+        errorHandler: null,
         windowModel: null,
 
         charset: 'utf-8',
@@ -13,6 +14,8 @@ module.exports = {
                 d: v.c.c
                     ? this.windowModel.document.implementation.createHTMLDocument()
                     : this.windowModel.document,
+
+                errorHandler: this.errorHandler,
 
                 head: function() {
                     return this.d.head.innerHTML;
@@ -54,19 +57,16 @@ module.exports = {
                     return m;
                 },
 
-                set: async function(sl, fn, v) {// todo sl moet v worden
-                    let c, e;
-                    sl = this.getSelector(sl, v ? v.c.s : null);
+                set: async function(v, fn) {
+                    let c, e, s = this.getSelector(v.t.s, v.c.s);
 
-                    c = this.selectAll(sl);
+                    c = this.selectAll(s);
 
                     if (c.length)
                         for (e of c)
                             await fn(e);
-                    else {
-                        console.error(sl + ' not found', v.h.html());
-                        throw new Error();
-                    }
+                    else
+                        this.errorHandler.handle(s + ' not found', v);
                 }
             };
 

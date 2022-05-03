@@ -21,7 +21,7 @@ module.exports = {
                 v.d.s = jD2.select(v.d.s);
             }
 
-            await v.h.set(v.t.s, function (el) {
+            await v.h.set(v, function (el) {
                 if (typeof w === 'string')
                     w = v.h.d.createElement(w);
 
@@ -36,7 +36,7 @@ module.exports = {
                 }
 
                 el.parentNode.replaceChild(w, el);
-            }, v);
+            });
 
             v.io = {c: 1};
         }

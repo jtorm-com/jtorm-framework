@@ -11,7 +11,13 @@ module.exports = {
         cache: {},
         default: 'default',
         framework: 'h',
-        params: ['f', 'c', 't', 'h', 'm'],
+        params: [
+            'f',// Framework
+            'c',// Component
+            't',// Use component tss
+            'h',// Use component html
+            'm' // Use mediatarget
+        ],
         regexp: {},
         ui: {
             mapper: {}
