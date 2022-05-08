@@ -58,13 +58,11 @@ module.exports = {
                 },
 
                 set: async function(v, fn) {
-                    let c, e, s = this.getSelector(v.t.s, v.c.s);
+                    let s = this.getSelector(v.t.s, v.c.s),
+                        c = this.select(s);
 
-                    c = this.selectAll(s);
-
-                    if (c.length)
-                        for (e of c)
-                            await fn(e);
+                    if (c)
+                        await fn(c);
                     else
                         this.errorHandler.handle(s + ' not found', v);
                 }
