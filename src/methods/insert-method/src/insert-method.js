@@ -1,6 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
-// todo refactor
+
 module.exports = {
     jTormInsertMethod: {
         // DI
@@ -48,8 +48,6 @@ module.exports = {
                 (v.d.d === undefined || v.d.d)
                 && v.t.c.length > 0
             ) {
-                // e = v.c.s ? v.c.s : v.t.s;
-                // e = v.t.s ? v.t.s : v.c.s;
                 e = v.h.select(
                     v.t.s
                         ? v.t.s
@@ -57,18 +55,13 @@ module.exports = {
                 );
 
                 if (e) {
-                    // h = e.innerHTML;
-
-                    // todo
-                    // deze hoeft geen html te bevatten, want als er al innerhtml bestaat dan wordt deze meerdere keren getoond wat niet moet
-                    // maar bij swap is dit weer wel nodig...
                     h = await this.handlerWrapper.handle('', v.t, v.d.d ? v.d.d : v.m, v);
+
+                    v.r = null;
 
                     await this.process(v.h, h, null, v.d.m, v);
 
                     c = 0;
-
-                    v.r = null;
                 } else {
                     console.error(v.h.html());
                     throw new Error('Invalid select ' + v.t.s);
