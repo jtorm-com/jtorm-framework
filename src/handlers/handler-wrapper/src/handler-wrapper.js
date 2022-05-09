@@ -16,7 +16,7 @@ module.exports = {
             for (k in t2)
                 t2[k].s = 'body';
 
-            v2 = await this.viewModel.create(h, t2, m, v.c, 1);// todo s.handler moet weg
+            v2 = await this.viewModel.create(h, t2, m, v.c, 1);
             v2.cid = v.cid;
 
             if (t.s)

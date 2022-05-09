@@ -31,3 +31,53 @@ body > section->swap {
         a: 1;
     }
 }
+
+->layer {
+    c: '1';
+    z: '1';
+    e: 'after';
+    t: 'iteration';
+
+    #header h1->append->ui {
+        c: '@e.span';
+
+        span {
+            ->attr {
+                n: 'class';
+                v: 'layer-1';
+            }
+
+            ->inner {
+                h: 'Layer 1';
+            }
+        }
+    }
+}
+
+->layer {
+    c: '1';
+    z: '2';
+    e: 'after';
+    t: 'iteration';
+
+    #header h1 {
+        ->append(cid: 'WPHeader-2', cs: 'global')->ui {// op deze manier kan je toch cachen in een layer
+            c: '@e.span';
+
+            span {
+                ->attr {
+                    n: 'class';
+                    v: 'layer-2';
+                }
+
+                ->inner {
+                    h: 'Layer 2';
+                }
+            }
+        }
+
+        ->append {
+            h: ' user name';
+        }
+    }
+}

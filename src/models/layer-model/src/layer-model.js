@@ -4,25 +4,37 @@
 module.exports = {
     jTormLayerModel: {
         cid: null,
+        event: {
+            before: {
+                iteration: []
+            },
+            after: {
+                iteration: [],
+                view: []
+            }
+        },
         layers: {},
 
         get: function (v, e, t) {
-            if (!v.cid)
-                v.cid = 'default';
+            let o = [];
 
-            let r = (this.layers[e] && this.layers[e][t])
-                    ? this.layers[e][t][v.cid]
-                    : null,
-                o = [],
-                k;
+            if (
+                v.cid
+                && this.event[e][t].indexOf(v.cid) !== -1
+            ) {
+                let r = this.layers[v.cid]
+                        ? this.layers[v.cid]
+                        : null,
+                    k;
 
-            if (r) {
-                r.sort(function (a, b) {
-                    return a.z - b.z;
-                });
+                if (r) {
+                    r.sort(function (a, b) {
+                        return a.z - b.z;
+                    });
 
-                for (k in r)
-                    o.push(r[k].t);
+                    for (k in r)
+                        o.push(r[k].t);
+                }
             }
 
             return o;
@@ -37,37 +49,20 @@ module.exports = {
             else if (v.cid)
                 this.cid = v.cid;
 
-            if (!v.d.e)
-                v.d.e = 'after';
-
-            if (!v.d.t)
-                v.d.t = 'iteration';
-
             if (!v.d.z)
                 v.d.z = 0;
 
-            if (!this.layers[v.d.e])
-                this.layers[v.d.e] = {};
-
-            if (!this.layers[v.d.e][v.d.t])
-                this.layers[v.d.e][v.d.t] = {};
-
-            if (!this.layers[v.d.e][v.d.t][this.cid])
-                this.layers[v.d.e][v.d.t][this.cid] = [];
+            if (!this.layers[this.cid])
+                this.layers[this.cid] = [];
 
             for (let k in v.t.c)
-                this.layers[v.d.e][v.d.t][this.cid].push({
-                    z: v.d.z,
+                this.layers[this.cid].push({
+                    c: parseInt(v.d.c),
+                    z: parseInt(v.d.z),
                     t: v.t.c[k]
                 });
-        },
 
-        reset: function(e, t, cid) {
-            if (!cid)
-                cid = this.cid;
-
-            if (this.layers[e] && this.layers[e][t])
-                delete this.layers[e][t][cid];
+            this.event[v.d.e][v.d.t].push(this.cid);
         }
     }
 };

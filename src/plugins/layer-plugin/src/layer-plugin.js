@@ -27,11 +27,9 @@ module.exports = {
 
         handle: async function(v, e, t) {
             const m = this.layerModel,
-                  c = m.get(v, e, t, v.cid);
+                  c = m.get(v, e, t);
 
-            m.reset(e, t);
-
-            if (c)
+            if (c && c.length)
                 await this.handler.handle(null, null, null, 0, this.viewModel.copy(v, null, c));
         },
 
@@ -44,9 +42,9 @@ module.exports = {
         },
 
         afterIteration: async function(v) {
-            await this.handle(v, 'after', 'iteration');
+            if (v.cid) {
+                await this.handle(v, 'after', 'iteration');
 
-            if (v.cid && v.cid !== 'default') {
                 v._.remove(this.currentCid, function (el) {
                     return el === v.cid;
                 });

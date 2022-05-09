@@ -25,6 +25,8 @@ npm install @jtorm/insert-method
 | `d`    | `false`  | data    | When there are child items, alternative data to process can be set here |
 | `p`    | `false`  | data    | Prefix for 'h' |
 | `s`    | `false`  | data    | Suffix for 'h' |
+| `cid`  | `false`  | data    | Cache id |
+| `cs`   | `false`  | data    | Cache scope |
 
 
 ## Example
