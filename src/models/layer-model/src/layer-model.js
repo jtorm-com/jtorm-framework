@@ -3,6 +3,9 @@
 
 module.exports = {
     jTormLayerModel: {
+        // DI
+        saveModel: null,
+
         cid: null,
         event: {
             before: {
@@ -14,6 +17,17 @@ module.exports = {
             }
         },
         layers: {},
+        updated: 0,
+
+        init: async function () {
+            if (this.saveModel) {
+                let cache = this.saveModel.get();
+                if (cache) {
+                    this.event = cache.event;
+                    this.layers = cache.layers;
+                }
+            }
+        },
 
         get: function (v, e, t) {
             let o = [];
@@ -63,6 +77,15 @@ module.exports = {
                 });
 
             this.event[v.d.e][v.d.t].push(this.cid);
+
+            this.updated = 1;
+        },
+
+        save: async function () {
+            if (this.saveModel && this.updated)
+                this.saveModel.set(this.layers, this.event);
+
+            this.updated = 0;
         }
     }
 };

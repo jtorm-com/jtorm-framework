@@ -57,6 +57,8 @@ module.exports = {
 
         afterView: async function(v) {
             await this.handle(v, 'after', 'view');
+
+            this.layerModel.save(v);
         }
     }
 };

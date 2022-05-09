@@ -9,6 +9,8 @@ module.exports = {
         viewModel: null,
 
         handle: async function (h, t, m, v) {
+            await this.event.handle(v, 'before', 'iteration');
+
             let k,
                 t2 = t.c,
                 v2;
@@ -16,7 +18,7 @@ module.exports = {
             for (k in t2)
                 t2[k].s = 'body';
 
-            v2 = await this.viewModel.create(h, t2, m, v.c, 1);
+            v2 = await this.viewModel.create(h, t2, m, v.c, 1);// todo performance issue
             v2.cid = v.cid;
 
             if (t.s)
@@ -27,19 +29,18 @@ module.exports = {
                 c: 1
             };
 
-            await this.event.handle(v, 'before', 'iteration');
-
-            if (v.r)
-                return v.r;
-
-            v.r = await this.handler.handle("<body>" + h + "</body>", t2, m, v.c, v2);
+            if (v.r) {
+                v2.h.d.documentElement.innerHTML = "<body>" + v.r + "</body>";
+            } else {
+                v.r = await this.handler.handle("<body>" + h + "</body>", t2, m, v.c, v2);
+            }
 
             v2.cid = v.cid;
             v2.cs = v.cs;
 
             await this.event.handle(v2, 'after', 'iteration');
 
-            return v.r.body();
+            return v2.h.body();
         }
     }
 };
