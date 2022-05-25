@@ -24,7 +24,7 @@ body {
         m: '1';
     }
 
-    ->append(d: breadcrumb.BreadcrumbList, cid: 'BreadcrumbList', cs: 'global')->ui {
+    ->append(d: hasPart.BreadcrumbList, cid: 'BreadcrumbList', cs: 'global')->ui {
         c: 'BreadcrumbList.boxed';
         m: '1';
     }

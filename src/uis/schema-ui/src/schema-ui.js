@@ -509,6 +509,13 @@ module.exports = {
             BreadcrumbList: {
                 default: {
                     t: ['@s/html/breadcrumb-list/breadcrumb-list-default.tss']
+                },
+                boxed: {
+                    ui: {
+                        c: 'BreadcrumbList.default',
+                        m: '1'
+                    },
+                    t: ['@s/html/breadcrumb-list/breadcrumb-list-boxed.tss']
                 }
             },
             ItemList: {

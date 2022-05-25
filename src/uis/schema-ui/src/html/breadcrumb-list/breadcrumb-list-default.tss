@@ -11,26 +11,29 @@
         }
 
         ->append->ui {
-            c: '@e.div';
+            c: 'contents.default';
 
-            div {
-                ->attr {
-                    n: 'class';
-                    v: 'contents';
+            .contents {
+                ->text(html: 'You are here')->append->ui {
+                    c: '@e.span';
+                    t: '0';
+
+                    span->append {
+                        h: html + ': ';
+                    }
                 }
 
-                .contents {
-                    ->text(html: 'You are here')->append->ui {
-                        c: '@e.span';
+                ->append(d: hasPart)->ui {
+                    c: '@t.ol';
+                    t: '0';
+
+                    ol->each(m: 'append')->ui {
+                        c: '@t.li';
                         t: '0';
 
-                        span->append {
-                            h: html + ': ';
+                        li->append(d: @c)->ui {
+                            c: @type + '.link';
                         }
-                    }
-
-                    ->append->ui {
-                        c: 'ItemList';
                     }
                 }
             }
