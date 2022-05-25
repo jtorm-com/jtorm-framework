@@ -57,6 +57,7 @@ module.exports = {
                     h = await this.handler.handle('<body>' + h + '</body>', v.t.c, d, 1);
                     e[i].parentNode.replaceChild(h.select(v.t.s), e[i]);
                 } else {
+                    console.log(d);
                     h = await this.handlerWrapper.handle("", v.t, d, v);
                     r += h;
                 }

@@ -21,7 +21,7 @@ module.exports = {
             for (k in t2)
                 t2[k].s = 'body';
 
-            v2 = await this.viewModel.create(v.r ? v.r : h, t2, m, v.c, 1);// todo performance issue
+            v2 = await this.viewModel.create(v.r ? v.r : h, t2, m, v.c, 1);
             v2.cid = v.cid;
             v2.cs = v.cs;
             v2.c = {
@@ -30,7 +30,7 @@ module.exports = {
             };
 
             if (!v.r)
-                v.r = await this.handler.handle("<body>" + h + "</body>", t2, m, v.c, v2);
+                v.r = await this.handler.handle(null, null, null, null, v2);
 
             v2.cid = v.cid;
             v2.cs = v.cs;

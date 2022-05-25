@@ -13,6 +13,11 @@ module.exports = {
                     t: ['@c/init.tss']
                 }
             },
+            contents: {
+                default: {
+                    t: ['@c/contents/contents-default.tss']
+                }
+            },
             head: {
                 default: {
                     t: ['@c/head/head-default.tss']

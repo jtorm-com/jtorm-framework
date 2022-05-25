@@ -3,17 +3,19 @@
 ->ui {
     c: '@e.nav';
 
-    nav {
-        ->append->ui {
-            c: '@e.div';
+    nav->append->ui {
+        c: 'contents.default';
 
-            div {
-                ->attr {
-                    n: 'class';
-                    v: 'contents';
-                }
+        .contents->append(d: hasPart)->ui {
+            c: '@t.ol';
+            t: '0';
 
-                .contents {
+            ol->each(m: 'append')->ui {
+                c: '@t.li';
+                t: '0';
+
+                li->append(d: @c)->ui {
+                    c: @type + '.link';
                 }
             }
         }
