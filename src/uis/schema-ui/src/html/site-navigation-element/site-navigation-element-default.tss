@@ -3,19 +3,26 @@
 ->ui {
     c: '@e.nav';
 
-    nav->append->ui {
-        c: 'contents.default';
+    nav {
+        ->attrs {
+            n: 'id,aria-label';
+            v: 'primary-navigation,Primary';
+        }
 
-        .contents->append(d: hasPart)->ui {
-            c: '@t.ol';
-            t: '0';
+        ->append->ui {
+            c: 'contents.default';
 
-            ol->each(m: 'append')->ui {
-                c: '@t.li';
+            .contents->append(d: hasPart)->ui {
+                c: '@t.ol';
                 t: '0';
 
-                li->append(d: @c)->ui {
-                    c: @type + '.link';
+                ol->each(m: 'append')->ui {
+                    c: '@t.li';
+                    t: '0';
+
+                    li->append(d: @c)->ui {
+                        c: @type + '.link';
+                    }
                 }
             }
         }
