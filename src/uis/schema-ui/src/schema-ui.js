@@ -87,6 +87,10 @@ module.exports = {
                     ]
                 },
                 boxed: {
+                    ui: {
+                        c: 'WebPage.default',
+                        m: '1'
+                    },
                     t: [
                         '@s/html/web-page/web-page-boxed.tss'
                     ]

@@ -4,6 +4,7 @@
 module.exports = {
     jTormUiMethod: {
         // DI
+        errorHandler: null,
         mediatargetMethod: null,
         methods: null,
         viewModel: null,
@@ -25,30 +26,36 @@ module.exports = {
         uis: {},
 
         init: async function () {
-            let s = this, ui, k, k2;
+            let ui, k, k2;
 
-            for (k in s.uis) {
-                ui = s.uis[k];
-                s.regexp[ui.alias] = {
+            for (k in this.uis) {
+                ui = this.uis[k];
+                this.regexp[ui.alias] = {
                     alias: new RegExp("^" + ui.alias + "\/", ''),
                     mapper: {}
                 };
 
                 if (ui.mapperAlias)
                     for (k2 in ui.mapperAlias)
-                        s.regexp[ui.alias].mapper[k2] = new RegExp("@" + k2 + '([\.\/])', '');
+                        this.regexp[ui.alias].mapper[k2] = new RegExp("@" + k2 + '([\.\/])', '');
             }
         },
 
         validate: function (v) {
-            let t = v.d.t === undefined ? 1 : parseInt(v.d.t);
-            if (Number.isNaN(t)) {
-                // var 0 exists and should be t: '0';
-                throw new Error('NaN');
-            }
+            v.d.t = v.d.t === undefined
+                ? 1
+                : parseInt(v.d.t);
 
-            v.d.t = t;
-            v.d.h = v.d.h === undefined ? 1 : parseInt(v.d.h);
+            v.d.m = v.d.m === undefined
+                ? 0
+                : parseInt(v.d.m);
+
+            v.d.h = v.d.h === undefined
+                ? 1
+                : parseInt(v.d.h);
+
+            if (Number.isNaN(v.d.t))
+                this.errorHandler.handle('t is NaN', v);
 
             if (v.d.f && !this.uis[v.d.f])
                 return 0;
@@ -59,47 +66,54 @@ module.exports = {
         },
 
         handle: async function (v) {
-            let s = this, r, f = v.d.f, i, c = v.d.c, nT, k;
+            const s = this;
+            let f = v.d.f,
+                c = v.d.c,
+                r,
+                i,
+                t,
+                n,
+                k;
 
             if (!f)
                 f = 'self';
 
             r = await s.getComponent(c, f, !v.d.m);
-            if (!r) {
-                console.log(v);
-                throw new Error('UI Component not found: ' + v.t.p.c);
-            }
+            if (!r)
+                s.errorHandler.handle('Invalid UI Component', v);
 
-            nT = await s.processComponent(v, r);
-            if (!nT) {
+            t = await s.processComponent(v, r);
+
+            if (!t)
                 v.io = {c: 0, r: 0};
-                return;
-            }
+            else {
+                if (v.d.m) {
+                    r = s.mediatargetMethod;
 
-            if (v.d.m) {
-                r = this.mediatargetMethod;
+                    if (r) {
+                        for (i in r.current) {
+                            k = await s.getComponent(c + r.current[i], f);
+                            if (k) {
+                                n = await s.processComponent(v, k);
+                                n.c = [];
 
-                if (r) {
-                    for (i in r.current) {
-                        k = await s.getComponent(c + r.current[i], f);
-                        if (k) {
-                            let nT2 = await s.processComponent(v, k);
-
-                            nT.c.push(nT2);
+                                t.c.push(n);
+                            }
                         }
                     }
                 }
+
+                for (i of s.params)
+                    delete v.d[i];
+
+                v.t = t;
+                v.io = {c: 1, r: 1};
             }
-
-            for (i of s.params)
-                delete v.d[i];
-
-            v.t = nT;
-            v.io = {c: 1, r: 1};
         },
 
         getComponent: async function (c, f, d) {
-            let s = this, r, i;
+            const s = this;
+            let r, i;
 
             if (s.cache[c] && s.cache[c][f] !== undefined)
                 return s.cache[c][f];
@@ -129,7 +143,8 @@ module.exports = {
         },
 
         processComponent: async function (v, r) {
-            let s = this, f, tR, nT;
+            const s = this;
+            let f, tR, nT;
 
             tR = v._.cloneDeep(r.c);
 
@@ -158,8 +173,8 @@ module.exports = {
                     nT.p.t = "'" + tR.ui.t + "'";
                 if (tR.ui.h !== undefined)
                     nT.p.h = "'" + tR.ui.h + "'";
-                if (tR.ui.d !== undefined)
-                    nT.p.d = "'" + tR.ui.d + "'";
+                if (tR.ui.m !== undefined)
+                    nT.p.m = "'" + tR.ui.m + "'";
 
                 nT.c = [{s: nT.s, m: 'get', c: nT.c, p: f}];
 
