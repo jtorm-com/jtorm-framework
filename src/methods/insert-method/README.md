@@ -33,15 +33,32 @@ npm install @jtorm/insert-method
 
 ```js
 body->insert {
-  m: 'a';
-  h: '<div><b>append me</b></div>';
-  div {
-    ->prepend {
-      h: '<header><h3>Header</h3></header>';
+    m: 'a';
+    h: '<div><b>append me</b></div>';
+    div {
+        ->prepend {
+            h: '<header><h3>Header</h3></header>';
+        }
+
+        ->append {
+            h: '<footer>footer</footer>';
+        }
     }
-    ->append {
-      h: '<footer>footer</footer>';
-    }
-  }
 }
+// Result: <div><header><h3>Header</h3></header><b>append me</b><footer>footer</footer></div>
+```
+
+```js
+body->insert {
+m: 'a';
+h: '<div><b>append me</b></div>';
+
+    div {
+        ->replace {
+            s: 'h3';
+            h: '<header><h3>Header</h3></header>';
+        }
+    }
+}
+// Result: <h3>Header</h3>
 ```

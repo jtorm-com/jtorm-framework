@@ -5,8 +5,8 @@ module.exports = {
     jTormInsertMethod: {
         // DI
         errorHandler: null,
-        handler: null,
         handlerWrapper: null,
+        viewModel: null,
 
         alias: 'i',
         params: [
@@ -39,7 +39,7 @@ module.exports = {
                 if (v.d.s)
                     v.d.h += v.d.s;
 
-                await this.process(v.h, v.d.h, null, v.d.m, v);
+                await this.process(v.h, v.d.h, v.d.m, v);
             } else if (v.d.d === null)
                 c = 0;
             else if (
@@ -57,7 +57,7 @@ module.exports = {
 
                     v.r = null;
 
-                    await this.process(v.h, h, null, v.d.m, v);
+                    await this.process(v.h, h, v.d.m, v);
 
                     c = 0;
                 } else
@@ -70,16 +70,15 @@ module.exports = {
             v.io = {c: c};
         },
 
-        process: async function (h, h2, s, m, v) {
+        process: async function (h, h2, m, v) {
             await h.set(v, async e => {
                 const o = v._.isObject(h2);
 
                 if (m === 'r') {
-                    // todo test this properly
                     if (!o)
-                        h2 = await j.handle(h2, [], {});
+                        h2 = await this.viewModel.create(h2);
 
-                    e.parentNode.replaceChild(h2.select(h2.getSelector(s, v.c.s)), e);
+                    e.parentNode.replaceChild(h2.h.select(h2.h.getSelector(v.d.s, v.c.s)), e);
                 } else {
                     const c = o
                         ? h2.select('body').innerHTML
