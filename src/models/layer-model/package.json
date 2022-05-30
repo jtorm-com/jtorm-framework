@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/layer-model",
   "description": "jTorm Layer Model",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "keywords": [],
   "main": "src/layer-model.js",

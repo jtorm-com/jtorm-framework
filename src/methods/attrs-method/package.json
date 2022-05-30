@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/attrs-method",
   "description": "jTorm Attributes Method",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "keywords": [],
   "main": "src/attrs-method.js",
@@ -11,6 +11,6 @@
     "directory": "src/methods/attrs-method"
   },
   "dependencies": {
-    "@jtorm/attr-method": "^0.0.1"
+    "@jtorm/attr-method": ">=0.0.1"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/session-method",
   "description": "jTorm Session Method",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "keywords": [],
   "main": "src/session-method.js",
