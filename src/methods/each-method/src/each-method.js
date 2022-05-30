@@ -9,12 +9,12 @@ module.exports = {
         methods: null,
         viewModel: null,
 
-        alias: "e",
+        alias: 'e',
         params: [
-            'd',
-            'm',
-            'e',
-            'a'
+            'd',// Data
+            'm',// Method
+            'e',// Element
+            'a'// As reference
         ],
 
         validate: function (v) {
@@ -70,7 +70,7 @@ module.exports = {
                 sv = this.viewModel.copy(v);
                 sv.t = {s: v.t.s, m: v.d.m, c: []};
                 sv.d = {h: r};
-                await this.methods[v.d.m].handle(sv);// todo different method than this with tss repeat
+                await this.methods[v.d.m].handle(sv);
             }
 
             v.io = {};
