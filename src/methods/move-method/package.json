@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/move-method",
+  "description": "jTorm Move Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/move-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/move-method"
+  },
+  "dependencies": {}
+}

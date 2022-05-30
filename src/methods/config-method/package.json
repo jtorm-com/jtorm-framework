@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/config-method",
+  "description": "jTorm Config Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/config-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/config-method"
+  },
+  "dependencies": {}
+}

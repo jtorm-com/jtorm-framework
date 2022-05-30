@@ -1,0 +1,11 @@
+{
+  "multiple": {
+    "@description": "Specifies that multiple options can be selected at once"
+  },
+  "required": {
+    "@description": "Specifies that the user is required to select a value before submitting the form"
+  },
+  "size": {
+    "@description": "Defines the number of visible options in a drop-down list"
+  }
+}

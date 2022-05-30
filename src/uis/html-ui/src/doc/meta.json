@@ -1,0 +1,14 @@
+{
+  "charset": {
+    "@description": "Specifies the character encoding for the HTML document"
+  },
+  "content": {
+    "@description": "Gives the value associated with the http-equiv or name attribute"
+  },
+  "http-equiv": {
+    "@description": "content-type|default-style|refresh"
+  },
+  "name": {
+    "@description": "application-name|author|description|generator|keywords|viewport"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "disabled": {
+    "@description": "Specifies that an option-group should be disabled"
+  },
+  "label": {
+    "@description": "Specifies a label for an option-group"
+  }
+}

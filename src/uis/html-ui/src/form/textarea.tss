@@ -1,0 +1,50 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+textarea {
+    ->inner {
+        h: html;
+    }
+
+    ->if(d: cols, v: '^[0-9]+$')->attr {
+        n: 'cols';
+        v: cols;
+    }
+
+    ->attr {
+        n: 'dirname';
+        v: dirname;
+    }
+
+    ->if(d: readonly)->attr {
+        n: 'readonly';
+        v: true;
+    }
+
+    ->if(d: maxlength, v: '^[0-9]+$')->attr {
+        n: 'maxlength';
+        v: true;
+    }
+
+    ->if(d: required)->attr {
+        n: 'required';
+        v: true;
+    }
+
+    ->attr {
+        n: 'placeholder';
+        v: placeholder;
+    }
+
+    ->if(d: rows, v: '^[0-9]+$')->attr {
+        n: 'rows';
+        v: rows;
+    }
+
+    ->if(d: wrap, v: '^(hard|soft)$')->attr {
+        n: 'wrap';
+        v: wrap;
+    }
+
+    ->get {
+        t: '@h/tags/form-element.tss';
+    }
+}

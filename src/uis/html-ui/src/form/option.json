@@ -1,0 +1,14 @@
+{
+  "disabled": {
+    "@description": "Specifies that an option-group should be disabled"
+  },
+  "label": {
+    "@description": "Specifies a label for an option-group"
+  },
+  "selected": {
+    "@description": "Specifies that an option should be pre-selected when the page loads"
+  },
+  "value": {
+    "@description": "Specifies the value to be sent to a server"
+  }
+}

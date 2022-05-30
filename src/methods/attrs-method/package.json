@@ -1,0 +1,16 @@
+{
+  "name": "@jtorm/attrs-method",
+  "description": "jTorm Attributes Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/attrs-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/attrs-method"
+  },
+  "dependencies": {
+    "@jtorm/attr-method": ">=0.0.1"
+  }
+}

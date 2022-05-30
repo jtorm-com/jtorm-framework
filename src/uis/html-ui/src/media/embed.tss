@@ -1,0 +1,26 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+embed {
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
+    }
+
+    ->attr {
+        n: 'src';
+        v: src;
+    }
+
+    ->attr {
+        n: 'type';
+        v: type;
+    }
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

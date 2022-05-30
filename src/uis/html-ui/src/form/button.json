@@ -1,0 +1,13 @@
+{
+  "html": {
+    "@description": "Text or html"
+  },
+  "type": {
+    "@description": "Specifies the type",
+    "@options": [
+      {"value": "button", "description": ""},
+      {"value": "reset", "description": ""},
+      {"value": "submit", "description": ""}
+    ]
+  }
+}

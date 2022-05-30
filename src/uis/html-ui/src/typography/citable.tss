@@ -1,0 +1,9 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->attr {
+    n: 'cite';
+    v: cite;
+}
+
+->get {
+  t: '@h/replacable.tss';
+}

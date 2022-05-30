@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+bdo {
+    ->if(d: dir, v: '^(ltr|rtl)$')->attr {
+        n: 'dir';
+        v: dir;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

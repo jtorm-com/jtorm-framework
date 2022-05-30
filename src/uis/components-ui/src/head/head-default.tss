@@ -1,0 +1,37 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->each {
+    m: 'append';
+    d: @config.appleTouchIcon;
+    ->append->ui {
+        c: 'doc.link';
+        link->attr {
+            n: 'rel';
+            v: 'apple-touch-icon';
+        }
+    }
+}
+
+->append(d: @config.favicon)->ui {
+    c: 'doc.link';
+    link->attr {
+        n: 'rel';
+        v: 'icon';
+    }
+}
+
+->data(charset: @meta.charset||'UTF-8')->append->ui {
+    c: 'doc.meta';
+}
+
+->data(httpEquiv: 'X-UA-Compatible', content: @meta.XUACompatible||'IE=Edge')->append->ui {
+    c: 'doc.meta';
+}
+
+->data(name: 'viewport', content: @meta.viewport||'width=device-width, initial-scale=1')->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: @config.google)->get {
+    t: '@c/google.tss';
+}

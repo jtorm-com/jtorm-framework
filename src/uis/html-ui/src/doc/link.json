@@ -1,0 +1,13 @@
+{
+  "crossorigin": {
+    "field": "crossorigin",
+    "description": "anonymous|use-credentials"
+  },
+  "rel": {
+    "field": "rel",
+    "description": "alternate|author|dns-prefetch|help|icon|license|next|pingback|preconnect|prefetch|preload|prerender|nofollow|prev|search|stylesheet"
+  },
+  "@includes": [
+    "jtorm-html-ui/global"
+  ]
+}

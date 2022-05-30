@@ -1,0 +1,17 @@
+{
+  "alt": {
+    "@description": "Specifies an alternate text for the area. Required if the href attribute is present"
+  },
+  "coords": {
+    "@description": "Specifies the coordinates of the area"
+  },
+  "shape": {
+    "@description": "Specifies an alternate text for the area. Required if the href attribute is present",
+    "@options": [
+      {"value": "default", "description": "Specifies the entire region"},
+      {"value": "rect", "description": "Defines a rectangular region"},
+      {"value": "circle", "description": "Defines a circular region"},
+      {"value": "poly", "description": "Defines a polygonal region"}
+    ]
+  }
+}

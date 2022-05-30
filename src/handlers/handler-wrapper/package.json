@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/handler-wrapper",
+  "description": "jTorm Handler Wrapper",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/handler-wrapper.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/handlers/handler-wrapper"
+  },
+  "dependencies": {}
+}

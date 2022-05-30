@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/insert-method",
+  "description": "jTorm Insert Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/insert-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/insert-method"
+  },
+  "dependencies": {}
+}

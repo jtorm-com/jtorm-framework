@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/css-method",
+  "description": "jTorm CSS Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/css-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/css-method"
+  },
+  "dependencies": {}
+}

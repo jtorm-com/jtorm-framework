@@ -1,0 +1,32 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+body {
+    ->prepend->ui {
+        c: 'grid.oneColumn';
+    }
+
+    #header->move {
+        l: 'body >  .wrapper > .container > .grid > .row > .cell';
+        m: 'append';
+    }
+
+    #primary-navigation->move {
+        l: 'body >  .wrapper > .container > .grid > .row > .cell';
+        m: 'append';
+    }
+
+    #breadcrumbs->move {
+        l: 'body > .wrapper > .container > .grid > .row > .cell';
+        m: 'append';
+    }
+
+    #body->move {
+        l: 'body >  .wrapper > .container > .grid > .row > .cell';
+        m: 'append';
+    }
+
+    #footer->move {
+        l: 'body >  .wrapper > .container > .grid > .row > .cell';
+        m: 'append';
+    }
+}

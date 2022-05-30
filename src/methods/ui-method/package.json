@@ -1,0 +1,16 @@
+{
+  "name": "@jtorm/ui-method",
+  "description": "jTorm UI Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/ui-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/ui-method"
+  },
+  "dependencies": {
+    "@jtorm/mediatarget-method": ">=0.0.1"
+  }
+}

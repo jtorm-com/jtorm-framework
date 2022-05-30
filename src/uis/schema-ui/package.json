@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/schema-ui",
+  "description": "jTorm Schema UI",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/schema-ui.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/uis/schema-ui"
+  },
+  "dependencies": {}
+}

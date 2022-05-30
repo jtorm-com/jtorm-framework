@@ -1,0 +1,5 @@
+{
+  "datetime": {
+    "@description": "Represent a machine-readable date/time"
+  }
+}

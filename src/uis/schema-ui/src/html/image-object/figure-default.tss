@@ -1,0 +1,16 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@m.figure';
+    t: '0';
+
+    figure {
+        ->append->ui {
+            c: 'ImageObject.picture';
+        }
+
+        ->if(d: caption.Text)->data(html: caption.Text)->append->ui {
+            c: '@m.figcaption';
+        }
+    }
+}

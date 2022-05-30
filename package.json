@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "dependencies": {},
+  "description": "jTorm - Javascript Template ORM Engine and UI framework",
+  "devDependencies": {},
+  "homepage": "https://jtorm.com",
+  "keywords": [
+    "javascript template engine",
+    "javascript ui framework",
+    "web ui framework"
+  ],
+  "license": "MIT",
+  "scripts": {},
+  "version": "0.0.2"
+}

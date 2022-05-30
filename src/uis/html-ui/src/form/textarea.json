@@ -1,0 +1,14 @@
+{
+  "html": {
+    "@description": "Text or html"
+  },
+  "cols": {
+    "@description": "Specifies the visible width of a text area"
+  },
+  "rows": {
+    "@description": "Specifies the visible number of lines in a text area"
+  },
+  "width": {
+    "@description": "Sets the width of the video player in pixels"
+  }
+}

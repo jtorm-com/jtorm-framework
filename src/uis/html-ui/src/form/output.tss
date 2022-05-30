@@ -1,0 +1,21 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+output {
+    ->attr {
+        n: 'for';
+        v: for;
+    }
+
+    ->attr {
+        n: 'form';
+        v: form;
+    }
+
+    ->attr {
+        n: 'name';
+        v: name;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

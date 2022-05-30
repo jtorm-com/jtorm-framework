@@ -1,0 +1,9 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+head {
+  /*->css {
+    href: '/ui/css/normalize.css';
+  }
+  ->js {
+    src: '/ui/requirejs/require-config.js';
+  }*/
+}

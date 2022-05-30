@@ -1,0 +1,10 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+span/*->data(count: '0')*/->if(d: count) {
+  ->attr {
+    n: 'class';
+    v: 'badge';
+  }
+  ->inner {
+    h: count;
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": {
+    "@description": "Specifies the name of a parameter"
+  },
+  "value": {
+    "@description": "Specifies the value of the parameter"
+  }
+}

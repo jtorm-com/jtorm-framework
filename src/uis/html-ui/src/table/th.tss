@@ -1,0 +1,31 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+th {
+    ->if(d: colspan, v: '^[0-9]+$')->attr {
+        n: 'colspan';
+        v: colspan;
+    }
+
+    ->if(d: rowspan, v: '^[0-9]+$')->attr {
+        n: 'rowspan';
+        v: rowspan;
+    }
+
+    ->attr {
+        n: 'headers';
+        v: headers;
+    }
+
+    ->attr {
+        n: 'abbr';
+        v: abbr;
+    }
+
+    ->attr {
+        n: 'scope';
+        v: scope;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

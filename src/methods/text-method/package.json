@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/text-method",
+  "description": "jTorm Text Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/text-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/text-method"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,21 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+area {
+    ->attr {
+        n: 'alt';
+        v: alt;
+    }
+
+    ->attr {
+        n: 'coords';
+        v: coords;
+    }
+
+    ->attr {
+        n: 'shape';
+        v: shape;
+    }
+
+    ->get {
+        t: '@h/linkable.tss';
+    }
+}

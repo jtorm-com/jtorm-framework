@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/wrap-method",
+  "description": "jTorm Wrap Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/wrap-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/wrap-method"
+  },
+  "dependencies": {}
+}

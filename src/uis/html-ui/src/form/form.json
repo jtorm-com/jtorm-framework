@@ -1,0 +1,29 @@
+{
+  "accept-charset": {
+    "@description": "Specifies the character encodings that are to be used for the form submission"
+  },
+  "action": {
+    "@description": "Specifies where to send the form-data when a form is submitted"
+  },
+  "autocomplete": {
+    "@description": "Specifies whether a form should have autocomplete on or off"
+  },
+  "autocomplete": {
+    "@description": ""
+  },
+  "enctype": {
+    "@description": "Specifies how the form-data should be encoded when submitting it to the server (only for method=post)"
+  },
+  "method": {
+    "@description": "Specifies the HTTP method to use when sending form-data"
+  },
+  "name": {
+    "@description": "Specifies the name of a form"
+  },
+  "novalidate": {
+    "@description": "Specifies that the form should not be validated when submitted"
+  },
+  "target": {
+    "@description": "Specifies where to display the response that is received after submitting the form"
+  }
+}

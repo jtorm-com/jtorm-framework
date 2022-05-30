@@ -1,0 +1,11 @@
+{
+  "html": {
+    "@description": "Text or html"
+  },
+  "for": {
+    "@description": "Specifies which form element a label is bound to"
+  },
+  "form": {
+    "@description": "Specifies one or more forms the label belongs to"
+  }
+}

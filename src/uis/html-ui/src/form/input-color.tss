@@ -1,0 +1,21 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+    ->attr {
+        n: 'type';
+        v: 'color';
+    }
+
+    ->attr {
+        n: 'list';
+        v: list;
+    }
+
+    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+        n: 'autocomplete';
+        v: autocomplete;
+    }
+
+    ->get {
+        t: '@h/form/form-element.tss';
+    }
+}

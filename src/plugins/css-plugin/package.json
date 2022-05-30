@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/css-plugin",
+  "description": "jTorm css Plugin",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/css-plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/plugins/css-plugin"
+  },
+  "dependencies": {}
+}

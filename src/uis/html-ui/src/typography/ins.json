@@ -1,0 +1,5 @@
+{
+  "datetime": {
+    "@description": "Specifies the date and time of when the text was deleted"
+  }
+}

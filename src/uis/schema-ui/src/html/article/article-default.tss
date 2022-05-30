@@ -1,0 +1,9 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+body > .schema-CreativeWork {
+    ->attr {
+        n: 'class';
+        v: 'schema-CreativeWork';
+        m: 'r';
+    }
+}

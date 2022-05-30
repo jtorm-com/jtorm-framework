@@ -1,0 +1,5 @@
+{
+  "open": {
+    "@description": "Specifies that the dialog element is active and that the user can interact with it"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/title-method",
+  "description": "jTorm Title Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/title-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/title-method"
+  },
+  "dependencies": {}
+}

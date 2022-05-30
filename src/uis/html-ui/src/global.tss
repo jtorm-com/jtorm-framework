@@ -1,0 +1,71 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->attr {
+    n: 'accesskey';
+    v: accesskey;
+}
+
+->attr {
+    m: 'a';
+    n: 'class';
+    v: class;
+}
+
+->attr {
+    n: 'contenteditable';
+    v: contenteditable;
+}
+
+->attr {
+    n: 'dir';
+    v: dir;
+}
+
+->attr {
+    n: 'draggable';
+    v: draggable;
+}
+
+->attr {
+    n: 'dropzone';
+    v: dropzone;
+}
+
+->attr {
+    n: 'hidden';
+    v: hidden;
+}
+
+->attr {
+    n: 'id';
+    v: id;
+}
+
+->attr {
+    n: 'lang';
+    v: lang;
+}
+
+->attr {
+    n: 'spellcheck';
+    v: spellcheck;
+}
+
+->attr {
+    n: 'style';
+    v: style;
+}
+
+->attr {
+    n: 'tabindex';
+    v: tabindex;
+}
+
+->attr {
+    n: 'title';
+    v: title;
+}
+
+->attr {
+    n: 'translate';
+    v: translate;
+}

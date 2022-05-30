@@ -1,0 +1,41 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+object {
+    ->attr {
+        n: 'value';
+        v: value;
+    }
+
+    ->attr {
+        n: 'form';
+        v: form;
+    }
+
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
+    }
+
+    ->attr {
+        n: 'name';
+        v: name;
+    }
+
+    ->attr {
+        n: 'type';
+        v: type;
+    }
+
+    ->attr {
+        n: 'usemap';
+        v: usemap;
+    }
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

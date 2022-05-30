@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/time-method",
+  "description": "jTorm Time Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/time-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/time-method"
+  },
+  "dependencies": {}
+}

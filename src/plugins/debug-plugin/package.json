@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/debug-plugin",
+  "description": "jTorm Debug Plugin",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/debug-plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/plugins/debug-plugin"
+  },
+  "dependencies": {}
+}

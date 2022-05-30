@@ -1,0 +1,4 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+blockquote->get {
+    t: '@h/typo/citable.tss';
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/swap-method",
+  "description": "jTorm Swap Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/swap-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/swap-method"
+  },
+  "dependencies": {}
+}

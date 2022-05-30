@@ -1,0 +1,31 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+track {
+    ->attr {
+        n: 'default';
+        v: default;
+    }
+
+    ->if(d: kind, v: '^(captions|chapters|descriptions|metadata|subtitles)$')->attr {
+        n: 'kind';
+        v: kind;
+    }
+
+    ->attr {
+        n: 'label';
+        v: label;
+    }
+
+    ->attr {
+        n: 'src';
+        v: src;
+    }
+
+    ->attr {
+        n: 'srclang';
+        v: srclang;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

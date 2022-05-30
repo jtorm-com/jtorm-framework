@@ -1,0 +1,16 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+param {
+    ->attr {
+        n: 'name';
+        v: name;
+    }
+
+    ->attr {
+        n: 'value';
+        v: value;
+    }
+
+    ->get {
+        t: '@h/global.tss';
+    }
+}

@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+ins {
+    ->attr {
+        n: 'datetime';
+        v: datetime;
+    }
+
+    ->get {
+        t: '@h/typo/citable.tss';
+    }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/remove-method",
+  "description": "jTorm Remove Method",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/remove-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/remove-method"
+  },
+  "dependencies": {}
+}
