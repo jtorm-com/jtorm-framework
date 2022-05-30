@@ -4,6 +4,7 @@
 module.exports = {
     jTormInsertMethod: {
         // DI
+        errorHandler: null,
         handler: null,
         handlerWrapper: null,
 
@@ -34,15 +35,12 @@ module.exports = {
             if (v.d.h) {
                 if (v.d.p)
                     v.d.h = v.d.p + v.d.h;
+
                 if (v.d.s)
                     v.d.h += v.d.s;
 
                 await this.process(v.h, v.d.h, null, v.d.m, v);
-
-                v.d.m = 'r';
-            }
-
-            if (v.d.d === null)
+            } else if (v.d.d === null)
                 c = 0;
             else if (
                 (v.d.d === undefined || v.d.d)
@@ -62,10 +60,8 @@ module.exports = {
                     await this.process(v.h, h, null, v.d.m, v);
 
                     c = 0;
-                } else {
-                    console.error(v.h.html());
-                    throw new Error('Invalid select ' + v.t.s);
-                }
+                } else
+                    this.errorHandler.handle(v.t.s + ' not found', v);
             }
 
             v.cid = null;
