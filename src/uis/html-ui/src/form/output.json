@@ -1,0 +1,11 @@
+{
+  "for": {
+    "@description": "Specifies the relationship between the result of the calculation, and the elements used in the calculation"
+  },
+  "form": {
+    "@description": "Specifies one or more forms the output element belongs to"
+  },
+  "name": {
+    "@description": "Specifies a name for the output element"
+  }
+}

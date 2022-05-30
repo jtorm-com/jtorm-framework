@@ -1,0 +1,51 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+img {
+    ->attr {
+        n: 'alt';
+        v: alt;
+    }
+
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
+    }
+
+    ->if(d: ismap)->attr {
+        n: 'ismap';
+        v: true;
+    }
+
+    ->attr {
+        n: 'longdesc';
+        v: longdesc;
+    }
+
+    ->attr {
+        n: 'sizes';
+        v: sizes;
+    }
+
+    ->attr {
+        n: 'src';
+        v: src;
+    }
+
+    ->attr {
+        n: 'srcset';
+        v: srcset;
+    }
+
+    ->attr {
+        n: 'usemap';
+        v: usemap;
+    }
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
+    }
+
+    ->get {
+        t: '@h/media/playable.tss';
+    }
+}

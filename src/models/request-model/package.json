@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/request-model",
+  "description": "jTorm Request Model",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/request-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/models/request-model"
+  },
+  "dependencies": {}
+}

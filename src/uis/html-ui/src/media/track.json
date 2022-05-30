@@ -1,0 +1,17 @@
+{
+  "default": {
+    "@description": "Specifies that the track is to be enabled if the user's preferences do not indicate that another track would be more appropriate"
+  },
+  "kind": {
+    "@description": "Specifies the kind of text track"
+  },
+  "label": {
+    "@description": "Specifies the title of the text track"
+  },
+  "src": {
+    "@description": "Required. Specifies the URL of the track file"
+  },
+  "srclang": {
+    "@description": "Specifies the language of the track text data (required if kind=subtitles)"
+  }
+}

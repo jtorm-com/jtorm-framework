@@ -1,0 +1,42 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@e.nav';
+    t: '0';
+
+    nav {
+        ->attrs {
+            n: 'id,aria-label';
+            v: 'breadcrumbs,Breadcrumbs';
+        }
+
+        ->append->ui {
+            c: 'contents.default';
+
+            .contents {
+                ->text(html: 'You are here')->append->ui {
+                    c: '@e.span';
+                    t: '0';
+
+                    span->append {
+                        h: html + ': ';
+                    }
+                }
+
+                ->append(d: hasPart)->ui {
+                    c: '@t.ol';
+                    t: '0';
+
+                    ol->each(m: 'append')->ui {
+                        c: '@t.li';
+                        t: '0';
+
+                        li->append(d: @c)->ui {
+                            c: @type + '.link';
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

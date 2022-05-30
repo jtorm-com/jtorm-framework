@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/layer-model",
+  "description": "jTorm Layer Model",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/layer-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/models/layer-model"
+  },
+  "dependencies": {}
+}

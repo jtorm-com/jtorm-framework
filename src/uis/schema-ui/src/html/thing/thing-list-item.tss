@@ -1,0 +1,21 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body > section->attr {
+  n: 'class';
+  v: 'list-item';
+  m: 'a';
+}
+body > section > .body->append(d: disambiguatingDescription)->ui {
+  c: 'Text';
+  span {
+    ->attr {
+      n: 'class';
+      v: 'schema-disambiguatingDescription';
+      m: 'a';
+    }
+    ->swap {
+      s: 'div';
+      a: 1;
+      ui: '@e.div';
+    }
+  }
+}

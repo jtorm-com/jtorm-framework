@@ -1,0 +1,11 @@
+{
+  "disabled": {
+    "@description": "Specifies that a group of related form elements should be disabled"
+  },
+  "form": {
+    "@description": "Specifies one or more forms the fieldset belongs to"
+  },
+  "name": {
+    "@description": "Specifies a name for the fieldset"
+  }
+}

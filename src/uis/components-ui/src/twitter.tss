@@ -1,0 +1,75 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+head {
+  ->append(d: twitter) {
+    ->if {
+      d: card;
+      v: '^(summary|summary_large_image|app|player)$';
+      ->append(d: card)->ui {
+        t:0;
+        c: 'doc.meta';
+        meta->attrs {
+          n: 'property,content';
+          v: 'twitter:card,card';
+        }
+      }
+    }
+    ->if(d:site)->append->ui {
+      c: 'doc.meta';
+      t:0;
+      meta->attrs {
+        n: 'property,content';
+        v: 'twitter:site,site';
+      }
+    }
+    ->if(d:creator)->append->ui {
+      c: 'doc.meta';
+      t:0;
+      meta->attrs {
+        n: 'property,content';
+        v: 'twitter:creator,creator';
+      }
+    }
+    ->if(d:title)->append->ui {
+      c: 'doc.meta';
+      t:0;
+      meta->attrs {
+        n: 'property,content';
+        v: 'twitter:title,title';
+      }
+    }
+    ->if(d:description)->append->ui {
+      c: 'doc.meta';
+      t:0;
+      meta->attrs {
+        n: 'property,content';
+        v: 'twitter:description,description';
+      }
+    }
+    ->if(d:image.url) {
+      ->append->ui {
+        c: 'doc.meta';
+        t:0;
+        meta->attrs {
+          n: 'property,content';
+          v: 'twitter:image,image.url';
+        }
+      }
+      ->if(d:image.width)->append->ui {
+        c: 'doc.meta';
+        t:0;
+        meta->attrs {
+          n: 'property,content';
+          v: 'twitter:image:width,image.width';
+        }
+      }
+      ->if(d:image.height)->append->ui {
+        c: 'doc.meta';
+        t:0;
+        meta->attrs {
+          n: 'property,content';
+          v: 'twitter:image:height,image.height';
+        }
+      }
+    }
+  }
+}

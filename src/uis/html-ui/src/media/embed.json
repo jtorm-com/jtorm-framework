@@ -1,0 +1,14 @@
+{
+  "height": {
+    "@description": "Specifies the height of the embedded content"
+  },
+  "src": {
+    "@description": "Specifies the address of the external file to embed"
+  },
+  "type": {
+    "@description": "Specifies the media type of the embedded content"
+  },
+  "width": {
+    "@description": "Specifies the width of the embedded content"
+  }
+}

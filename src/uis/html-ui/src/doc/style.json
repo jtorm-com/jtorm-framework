@@ -1,0 +1,8 @@
+{
+  "media": {
+    "@description": "Specifies what media/device the media resource is optimized for"
+  },
+  "type": {
+    "@description": "Specifies the media type, default text/css"
+  }
+}

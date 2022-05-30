@@ -1,0 +1,16 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+footer->append(d: sameAs)->ui {
+    c: 'URL.multi';
+
+    a {
+        ->attr {
+            n: 'target';
+            v: '_blank';
+        }
+
+        ->text(html: 'Additional Information')->inner {
+            h: html;
+        }
+    }
+}

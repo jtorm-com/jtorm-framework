@@ -1,0 +1,15 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+body {
+  ->append(d: hasPart.WPHeader)->ui {
+    c: 'WPHeader';
+  }
+  ->append->ui {
+    c: 'BreadcrumbList';
+  }
+  ->append(d: hasPart.WPFooter)->ui {
+    c: 'WPFooter';
+  }
+  ->append->ui {
+    c: 'loading';
+  }
+}

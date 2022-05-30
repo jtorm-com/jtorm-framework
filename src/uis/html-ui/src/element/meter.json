@@ -1,0 +1,23 @@
+{
+  "form": {
+    "@description": "Specifies one or more forms the <meter> element belongs to"
+  },
+  "high": {
+    "@description": "Specifies the range that is considered to be a high value"
+  },
+  "low": {
+    "@description": "Specifies the range that is considered to be a low value"
+  },
+  "max": {
+    "@description": "Specifies the maximum value of the range"
+  },
+  "min": {
+    "@description": "Specifies the minimum value of the range"
+  },
+  "optimum": {
+    "@description": "Specifies what value is the optimal value for the gauge"
+  },
+  "value": {
+    "@description": "Required. Specifies the current value of the gauge"
+  }
+}

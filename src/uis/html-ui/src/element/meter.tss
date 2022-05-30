@@ -1,0 +1,41 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+meter {
+    ->attr {
+        n: 'value';
+        v: value;
+    }
+
+    ->attr {
+        n: 'form';
+        v: form;
+    }
+
+    ->if(d: high, v: '^[0-9]+(.[0-9])?$')->attr {
+        n: 'high';
+        v: high;
+    }
+
+    ->if(d: low, v: '^[0-9]+(.[0-9])?$')->attr {
+        n: 'low';
+        v: low;
+    }
+
+    ->if(d: max, v: '^[0-9]+(.[0-9])?$')->attr {
+        n: 'max';
+        v: max;
+    }
+
+    ->if(d: min, v: '^[0-9]+(.[0-9])?$')->attr {
+        n: 'min';
+        v: min;
+    }
+
+    ->if(d: optimum, v: '^[0-9]+(.[0-9])?$')->attr {
+        n: 'optimum';
+        v: optimum;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

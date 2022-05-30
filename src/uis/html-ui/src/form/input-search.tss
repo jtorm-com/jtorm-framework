@@ -1,0 +1,26 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+    ->attr {
+        n: 'type';
+        v: 'search';
+    }
+
+    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+        n: 'autocomplete';
+        v: autocomplete;
+    }
+
+    ->attr {
+        n: 'list';
+        v: list;
+    }
+
+    ->attr {
+        n: 'pattern';
+        v: pattern;
+    }
+
+    ->get {
+        t: '@h/form/input.tss';
+    }
+}

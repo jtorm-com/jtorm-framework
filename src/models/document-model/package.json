@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/document-model",
+  "description": "jTorm Document Model",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/document-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/models/document-model"
+  },
+  "dependencies": {}
+}

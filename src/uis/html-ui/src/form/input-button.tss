@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+    ->attr {
+        n: 'type';
+        v: 'button';
+    }
+
+    ->get {
+        t: '@h/form/form-element.tss';
+    }
+}

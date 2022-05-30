@@ -1,0 +1,24 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->append(d: EntryPoint)->ui {
+    c: 'EntryPoint.action';
+}
+
+->if(to: 'array')->append->ui {
+    c: '@e.div';
+
+    div {
+        ->attr {
+            n: 'class';
+            v: 'schema-EntryPoint-group';
+        }
+
+        ->each {
+            m: 'append';
+
+            body->append->ui {
+                c: 'EntryPoint.default';
+            }
+        }
+    }
+}

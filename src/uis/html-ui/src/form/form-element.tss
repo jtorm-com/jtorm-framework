@@ -1,0 +1,29 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->if(d: autofocus)->attr {
+    n: 'autofocus';
+    v: true;
+}
+
+->if(d: disabled)->attr {
+    n: 'disabled';
+    v: true;
+}
+
+->attr {
+    n: 'form';
+    v: form;
+}
+
+->attr {
+    n: 'name';
+    v: name;
+}
+
+->attr {
+    n: 'value';
+    v: value;
+}
+
+->get {
+    t: '@h/global.tss';
+}

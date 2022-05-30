@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/ui-cache-plugin",
+  "description": "jTorm UI Cache Plugin",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/ui-cache-plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/plugins/ui-cache-plugin"
+  },
+  "dependencies": {}
+}

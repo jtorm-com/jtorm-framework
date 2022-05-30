@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+    ->attr {
+        n: 'type';
+        v: 'datetime-local';
+    }
+
+    ->get {
+        t: '@h/form/input-range-attrs.tss';
+    }
+}

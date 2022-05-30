@@ -1,0 +1,30 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+body > section {
+    ->attr {
+        n: 'class';
+        v: 'schema-Thing';
+    }
+
+    ->append->ui {
+        c: 'contents.default';
+
+        .contents {
+            ->append->ui {
+                c: 'Thing.header';
+            }
+
+            ->append(d: image)->ui {
+                c: 'ImageObject';
+            }
+
+            ->append->ui {
+                c: 'Thing.body';
+            }
+
+            ->append->ui {
+                c: 'Thing.footer';
+            }
+        }
+    }
+}

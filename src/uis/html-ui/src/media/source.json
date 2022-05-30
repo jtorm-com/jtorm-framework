@@ -1,0 +1,17 @@
+{
+  "src": {
+    "@description": "Required when <source> is used in <audio> and <video>. Specifies the URL of the media file"
+  },
+  "srcset": {
+    "@description": "Required when <source> is used in <picture>. Specifies the URL of the image to use in different situations"
+  },
+  "media": {
+    "@description": "Accepts any valid media query that would normally be defined in a CSS"
+  },
+  "sizes": {
+    "@description": "Specifies image sizes for different page layouts"
+  },
+  "type": {
+    "@description": "Specifies the MIME-type of the resource"
+  }
+}

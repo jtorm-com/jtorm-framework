@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/html-model",
+  "description": "jTorm HTML Model",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/html-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/models/html-model"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,21 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+svg {
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
+    }
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
+    }
+
+    ->attr {
+        n: 'xmlns';
+        v: 'http://www.w3.org/2000/svg';
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

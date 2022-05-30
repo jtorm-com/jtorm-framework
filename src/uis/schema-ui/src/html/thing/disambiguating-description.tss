@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: 'Text';
+
+    span->attr {
+        n: 'class';
+        v: 'schema-disambiguatingDescription';
+        m: 'a';
+    }
+}

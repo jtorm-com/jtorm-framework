@@ -1,0 +1,35 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->data(method: 'get', action: '/search')->ui {
+  c: 'form.form';
+  form {
+    ->attrs {
+      n: 'id,class';
+      v: 'search-mini,search mini';
+    }
+    ->data(autocomplete: 'off')->text(label: 'Search'/*, placeholder: 'What are you looking for?'*/)->append->ui {
+      c: 'form.inputText';
+      f: 'h';
+    }
+    ->data(type: 'submit')->append->ui {
+      c: 'button.secondaryButton';
+      button {
+        ->append->ui {
+          c: 'icon.search';
+        }
+        ->append->ui {
+          c: '@e.span';
+          t: '0';
+          span {
+            ->attr {
+              n: 'class';
+              v: 'mdc-button__label';
+            }
+            ->text(label: 'Search')->inner {
+              h: label;
+            }
+          }
+        }
+      }
+    }
+  }
+}

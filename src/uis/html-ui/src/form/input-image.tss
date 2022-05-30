@@ -1,0 +1,35 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+    ->attr {
+        n: 'type';
+        v: 'image';
+    }
+
+    ->attr {
+        n: 'alt';
+        v: alt;
+    }
+
+    ->if(d: height, v: '^[0-9]+$')->attr {
+        n: 'height';
+        v: height;
+    }
+
+    ->attr {
+        n: 'src';
+        v: src;
+    }
+
+    ->if(d: width, v: '^[0-9]+$')->attr {
+        n: 'width';
+        v: width;
+    }
+
+    ->get {
+        t: '@h/form/form-submit.tss';
+    }
+
+    ->get {
+        t: '@h/form/form-element.tss';
+    }
+}

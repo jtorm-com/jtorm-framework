@@ -1,0 +1,39 @@
+{
+  "alt": {
+    "@description": "Specifies an alternate text for an image"
+  },
+  "crossorigin": {
+    "@description": "Allow images from third-party sites that allow cross-origin access to be used with canvas",
+    "@options": [
+      {"value": "anonymous", "description": ""},
+      {"value": "use-credentials", "description": ""}
+    ]
+  },
+  "height": {
+    "@description": "Specifies the height of an image"
+  },
+  "width": {
+    "@description": "Sets the width of the video player in pixels"
+  },
+  "ismap": {
+    "@description": "Specifies an image as a server-side image-map"
+  },
+  "longdesc": {
+    "@description": "Specifies a URL to a detailed description of an image"
+  },
+  "sizes": {
+    "@description": "Specifies image sizes for different page layouts"
+  },
+  "src": {
+    "@description": "Specifies the URL of an image"
+  },
+  "srcset": {
+    "@description": "Specifies the URL of the image to use in different situations"
+  },
+  "usemap": {
+    "@description": "Specifies an image as a client-side image-map"
+  },
+  "width": {
+    "@description": "Sets the width of the video player in pixels"
+  }
+}

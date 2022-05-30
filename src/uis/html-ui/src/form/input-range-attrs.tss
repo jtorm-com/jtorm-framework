@@ -1,0 +1,31 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+input {
+    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+        n: 'autocomplete';
+        v: autocomplete;
+    }
+
+    ->attr {
+        n: 'list';
+        v: list;
+    }
+
+    ->attr {
+        n: 'max';
+        v: max;
+    }
+
+    ->attr {
+        n: 'min';
+        v: min;
+    }
+
+    ->attr {
+        n: 'step';
+        v: step;
+    }
+
+    ->get {
+        t: '@h/form/input.tss';
+    }
+}

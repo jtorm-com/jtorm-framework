@@ -1,0 +1,31 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+meta {
+    ->attr {
+        n: 'charset';
+        v: charset;
+    }
+
+    ->if(d: httpEquiv, v: '^(content-type|default-style|refresh|X-UA-Compatible)$')->attr {
+        n: 'http-equiv';
+        v: httpEquiv;
+    }
+
+    ->attr {
+        n: 'name';
+        v: name;
+    }
+
+    ->attr {
+        n: 'property';
+        v: property;
+    }
+
+    ->attr {
+        n: 'content';
+        v: content;
+    }
+
+    ->get {
+        t: '@h/global.tss';
+    }
+}

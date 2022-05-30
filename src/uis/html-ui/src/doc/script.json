@@ -1,0 +1,17 @@
+{
+  "async": {
+    "@description": "Specifies that the script is executed asynchronously (only for external scripts)"
+  },
+  "charset": {
+    "@description": "Specifies the character encoding used in an external script file"
+  },
+  "defer": {
+    "@description": "Specifies that the script is executed when the page has finished parsing (only for external scripts)"
+  },
+  "src": {
+    "@description": "Specifies the URL of an external script file"
+  },
+  "type": {
+    "@description": "Specifies the media type of the script, default application/javascript"
+  }
+}

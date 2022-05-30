@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/data-parser",
+  "description": "jTorm Data Parser",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/data-parser.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/parsers/data-parser"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+button {
+    ->attr {
+        n: 'type';
+        v: 'submit';
+    }
+
+    ->get {
+        t: '@h/form/button.tss';
+    }
+}

@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+// todo https://support.google.com/webmasters/answer/79812?hl=en
+  ->append(d: @config.google)->ui {
+    c: 'doc.meta';
+    t: '0';
+    meta->attrs {
+      n: 'name,content';
+      v: 'google-site-verification,verification';
+    }
+  }
+  

@@ -1,0 +1,32 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+source {
+    ->attr {
+        n: 'src';
+        v: src;
+    }
+
+    ->attr {
+        n: 'srcset';
+        v: srcset;
+    }
+
+    ->attr {
+        n: 'media';
+        v: media;
+    }
+
+    ->attr {
+        n: 'sizes';
+        v: sizes;
+    }
+
+    ->attr {
+        n: 'type';
+        v: type;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

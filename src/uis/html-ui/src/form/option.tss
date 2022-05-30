@@ -1,0 +1,26 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+option {
+    ->if(d: disabled)->attr {
+        n: 'disabled';
+        v: true;
+    }
+
+    ->attr {
+        n: 'label';
+        v: label;
+    }
+
+    ->if(d: selected)->attr {
+        n: 'selected';
+        v: true;
+    }
+
+    ->attr {
+        n: 'value';
+        v: value;
+    }
+
+    ->get {
+        t: '@h/replacable.tss';
+    }
+}

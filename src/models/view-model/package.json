@@ -1,0 +1,14 @@
+{
+  "name": "@jtorm/view-model",
+  "description": "jTorm View Model",
+  "version": "0.0.2",
+  "license": "MIT",
+  "keywords": [],
+  "main": "src/view-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/models/view-model"
+  },
+  "dependencies": {}
+}

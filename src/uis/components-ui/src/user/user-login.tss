@@ -1,0 +1,29 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+->data(method: 'post', action: '/user/login')->ui {
+  c: 'form.form';
+  form {
+    ->attrs {
+      n: 'id,class';
+      v: 'user-register,user register';
+    }
+    ->append->ui {
+      c: 'form.fieldset';
+      fieldset {
+        ->append->data(name: 'email', required: 'required')->ui {
+          c: 'form.inputEmail';
+        }
+        ->text(label: 'Password')->data(name: 'password', required: 'required')->append->ui {
+          c: 'form.inputPassword';
+        }
+      }
+    }
+    ->append->ui {
+      c: 'grid.twoColumns';
+      .last {
+        ->data(type: 'submit')->text(html: 'Login')->append->ui {
+          c: 'button.primaryButton';
+        }
+      }
+    }
+  }
+}
