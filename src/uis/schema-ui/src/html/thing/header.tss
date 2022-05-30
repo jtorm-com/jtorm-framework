@@ -28,18 +28,7 @@
                     }
 
                     ->else->append->ui {
-                        c: '@e.a';
-                        t: '0';
-
-                        a->append(d: name)->ui {
-                            c: 'Text.multi';
-
-                            span->attr {
-                                n: 'class';
-                                v: 'schema-name';
-                                m: 'a';
-                            }
-                        }
+                        c: 'Thing.link';
                     }
                 }
             }

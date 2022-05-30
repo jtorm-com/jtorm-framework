@@ -5,13 +5,18 @@
     t: '0';
 
     a {
-        ->attrs {
-            n: 'href,class';
-            v: 'url.URL,schema-URL';
+        ->attr {
+            n: 'href';
+            v: url.URL;
+        }
+
+        ->attr {
+            n: 'class';
+            v: 'schema-URL';
         }
 
         ->append(d: name)->ui {
-            c: 'Text';
+            c: 'Text.multi';
         }
     }
 }
