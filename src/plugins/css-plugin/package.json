@@ -1,6 +1,6 @@
 {
   "name": "@jtorm/css-plugin",
-  "description": "jTorm css Plugin",
+  "description": "jTorm CSS Plugin",
   "version": "0.0.2",
   "license": "MIT",
   "publishConfig": {

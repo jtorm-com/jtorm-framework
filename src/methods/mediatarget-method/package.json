@@ -1,6 +1,6 @@
 {
   "name": "@jtorm/mediatarget-method",
-  "description": "jTorm mediatarget Method",
+  "description": "jTorm Mediatarget Method",
   "version": "0.0.2",
   "license": "MIT",
   "publishConfig": {
@@ -14,6 +14,6 @@
     "directory": "src/methods/mediatarget-method"
   },
   "dependencies": {
-    "@jtorm/mediaquery-method": ">=0.0.1"
+    "@jtorm/mediaquery-method": ">=0.0.2"
   }
 }

@@ -1,6 +1,5 @@
 # jTorm If Method
 
-Todo klopt niks meer van die parameters
 ## Config
 
 | Option | Type     | Required | Description |
