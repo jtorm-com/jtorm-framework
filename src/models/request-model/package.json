@@ -3,6 +3,9 @@
   "description": "jTorm Request Model",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/request-model.js",
   "repository": {

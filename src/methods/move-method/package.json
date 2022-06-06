@@ -3,6 +3,9 @@
   "description": "jTorm Move Method",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/move-method.js",
   "repository": {

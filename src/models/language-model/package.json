@@ -3,6 +3,9 @@
   "description": "jTorm Language Model",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/language-model.js",
   "repository": {

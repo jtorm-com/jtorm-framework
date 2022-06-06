@@ -3,6 +3,9 @@
   "description": "jTorm Error Handler",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/error-handler.js",
   "repository": {

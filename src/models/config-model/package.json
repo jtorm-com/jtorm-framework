@@ -3,6 +3,9 @@
   "description": "jTorm Config Model",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/config-model.js",
   "repository": {

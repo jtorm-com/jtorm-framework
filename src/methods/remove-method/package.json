@@ -3,6 +3,9 @@
   "description": "jTorm Remove Method",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/remove-method.js",
   "repository": {

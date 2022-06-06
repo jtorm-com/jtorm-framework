@@ -3,6 +3,9 @@
   "description": "jTorm mediatarget Method",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/mediatarget-method.js",
   "repository": {

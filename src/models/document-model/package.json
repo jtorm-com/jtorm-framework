@@ -3,6 +3,9 @@
   "description": "jTorm Document Model",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/document-model.js",
   "repository": {

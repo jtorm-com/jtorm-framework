@@ -3,6 +3,9 @@
   "description": "jTorm Time Method",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/time-method.js",
   "repository": {

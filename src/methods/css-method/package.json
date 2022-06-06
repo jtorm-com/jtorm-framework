@@ -3,6 +3,9 @@
   "description": "jTorm CSS Method",
   "version": "0.0.2",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/css-method.js",
   "repository": {
