@@ -3,7 +3,7 @@
   "dependencies": {},
   "description": "jTorm - Javascript Template ORM Engine and UI framework",
   "devDependencies": {},
-  "homepage": "https://jtorm.com",
+  "homepage": "https://www.jtorm.com",
   "keywords": [
     "javascript template engine",
     "javascript ui framework",
@@ -11,5 +11,5 @@
   ],
   "license": "MIT",
   "scripts": {},
-  "version": "0.0.2"
+  "version": "0.0.3"
 }

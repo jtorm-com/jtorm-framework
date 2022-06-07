@@ -1,8 +1,11 @@
 {
   "name": "@jtorm/js-plugin",
-  "description": "jTorm js Plugin",
-  "version": "0.0.2",
+  "description": "jTorm JS Plugin",
+  "version": "0.0.3",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/js-plugin.js",
   "repository": {

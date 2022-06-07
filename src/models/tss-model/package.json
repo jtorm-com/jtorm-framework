@@ -1,8 +1,11 @@
 {
   "name": "@jtorm/tss-model",
   "description": "jTorm TSS Model",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/tss-model.js",
   "repository": {

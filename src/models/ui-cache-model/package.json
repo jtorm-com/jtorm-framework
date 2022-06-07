@@ -1,17 +1,17 @@
 {
-  "name": "@jtorm/error-handler",
-  "description": "jTorm Error Handler",
+  "name": "@jtorm/ui-cache-model",
+  "description": "jTorm UI Cache Model",
   "version": "0.0.3",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
   "keywords": [],
-  "main": "src/error-handler.js",
+  "main": "src/ui-cache-model.js",
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
-    "directory": "src/handlers/error-handler"
+    "directory": "src/models/ui-cache-model"
   },
   "dependencies": {}
 }

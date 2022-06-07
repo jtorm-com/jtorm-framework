@@ -1,8 +1,11 @@
 {
   "name": "@jtorm/css-plugin",
-  "description": "jTorm css Plugin",
-  "version": "0.0.2",
+  "description": "jTorm CSS Plugin",
+  "version": "0.0.3",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/css-plugin.js",
   "repository": {

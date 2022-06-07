@@ -11,8 +11,6 @@ module.exports = {
                 if (
                     !v[k]
                     || k === '_'
-                    // || k === 'tss'
-                    // || k === 'model'
                     || k === 'm'
                 ) continue;
 
