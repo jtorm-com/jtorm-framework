@@ -1,8 +1,11 @@
 {
   "name": "@jtorm/get-method",
   "description": "jTorm Get Method",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/get-method.js",
   "repository": {

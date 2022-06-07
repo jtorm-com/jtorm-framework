@@ -1,8 +1,11 @@
 {
   "name": "@jtorm/handler",
   "description": "jTorm Handler",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/handler.js",
   "repository": {

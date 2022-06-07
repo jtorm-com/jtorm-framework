@@ -1,8 +1,11 @@
 {
   "name": "@jtorm/if-method",
   "description": "jTorm If Method",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/if-method.js",
   "repository": {

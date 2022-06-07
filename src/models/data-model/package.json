@@ -1,8 +1,11 @@
 {
   "name": "@jtorm/data-model",
   "description": "jTorm Data Model",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "main": "src/data-model.js",
   "repository": {

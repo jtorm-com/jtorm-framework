@@ -11,8 +11,8 @@ module.exports = {
         data: {},
         default: 'en',
 
-        init: function(j) {
-            this.current = this.getCurrent(j);
+        init: function() {
+            this.current = this.getCurrent();
         },
 
         getCurrent: function() {
@@ -43,7 +43,7 @@ module.exports = {
         },
 
         get: function (s) {
-            let l = this.current;
+            const l = this.current;
 
             return (
                 this.data[l] !== undefined
