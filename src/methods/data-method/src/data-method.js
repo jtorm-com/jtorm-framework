@@ -4,7 +4,7 @@
 module.exports = {
     jTormDataMethod: {
         // DI
-        dataParser: null,
+        // dataParser: null,
 
         alias: 'd',
         params: [],

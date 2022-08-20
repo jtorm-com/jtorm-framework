@@ -4,8 +4,8 @@
 module.exports = {
     jTormIfMethod: {
         // DI
-        dataParser: null,
-        handler: null,
+        // dataParser: null,
+        // handler: null,
 
         or: '||',
         and: '&&',

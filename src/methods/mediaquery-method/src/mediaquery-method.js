@@ -4,7 +4,7 @@
 module.exports = {
     jTormMediaqueryMethod: {
         // DI
-        windowModel: null,
+        // windowModel: null,
 
         alias: 'mq',
         m: null,

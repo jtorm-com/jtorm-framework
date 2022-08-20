@@ -4,9 +4,9 @@
 module.exports = {
     jTormHandlerWrapper: {
         // DI
-        event: null,
-        handler: null,
-        viewModel: null,
+        // event: null,
+        // handler: null,
+        // viewModel: null,
 
         handle: async function (h, t, m, v) {
             if (t.s)

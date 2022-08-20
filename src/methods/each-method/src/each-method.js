@@ -4,10 +4,10 @@
 module.exports = {
     jTormEachMethod: {
         // DI
-        handler: null,
-        handlerWrapper: null,
-        methods: null,
-        viewModel: null,
+        // handler: null,
+        // handlerWrapper: null,
+        // methods: null,
+        // viewModel: null,
 
         alias: 'e',
         params: [

@@ -4,7 +4,7 @@
 module.exports = {
     jTormSessionMethod: {
         // DI
-        sessionModel: null,
+        // sessionModel: null,
 
         alias: 'ses',
         params: ['k', 'v', 'a'],

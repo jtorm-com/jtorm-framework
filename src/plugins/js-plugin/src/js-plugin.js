@@ -4,7 +4,7 @@
 module.exports = {
     jTormJsPlugin: {
         // DI
-        uiMethod: null,
+        // uiMethod: null,
 
         cache: {},
         collection: [],

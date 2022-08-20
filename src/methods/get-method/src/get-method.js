@@ -4,7 +4,7 @@
 module.exports = {
     jTormGetMethod: {
         // DI
-        models: null,
+        // models: null,
 
         params: ['h', 't', 'd'],
 

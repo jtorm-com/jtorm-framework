@@ -4,7 +4,7 @@
 module.exports = {
     jTormCssMethod: {
         // DI
-        cssPlugin: null,
+        // cssPlugin: null,
 
         params: ['href'],
 

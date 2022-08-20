@@ -4,9 +4,9 @@
 module.exports = {
     jTormLayerPlugin: {
         // DI
-        handler: null,
-        layerModel: null,
-        viewModel: null,
+        // handler: null,
+        // layerModel: null,
+        // viewModel: null,
 
         currentCid: [],
         event: {

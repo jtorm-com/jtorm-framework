@@ -4,8 +4,8 @@
 module.exports = {
     jTormLanguageModel: {
         // DI
-        configModel: null,
-        sessionModel: null,
+        // configModel: null,
+        // sessionModel: null,
 
         current: null,
         data: {},

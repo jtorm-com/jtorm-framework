@@ -4,7 +4,7 @@
 module.exports = {
     jTormLayerMethod: {
         // DI
-        layerModel: null,
+        // layerModel: null,
 
         alias: 'l',
         params: [

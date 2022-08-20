@@ -3,7 +3,7 @@
 module.exports = {
     jTormDebugPlugin: {
         // DI
-        util: null,
+        // util: null,
 
         event: {
             before: {

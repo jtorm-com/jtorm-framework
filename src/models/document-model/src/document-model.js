@@ -4,8 +4,8 @@
 module.exports = {
     jTormDocumentModel: {
         // DI
-        errorHandler: null,
-        windowModel: null,
+        // errorHandler: null,
+        // windowModel: null,
 
         charset: 'utf-8',
 

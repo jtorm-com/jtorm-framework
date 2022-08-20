@@ -4,7 +4,7 @@
 module.exports = {
     jTormLayerModel: {
         // DI
-        saveModel: null,
+        // saveModel: null,
 
         cid: null,
         event: {

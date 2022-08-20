@@ -4,7 +4,7 @@
 module.exports = {
     jTormJsMethod: {
         // DI
-        jsPlugin: null,
+        // jsPlugin: null,
 
         params: ['src'],
 

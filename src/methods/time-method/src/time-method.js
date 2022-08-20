@@ -4,7 +4,7 @@
 module.exports = {
     jTormTimeMethod: {
         // DI
-        languageModel: null,
+        // languageModel: null,
 
         labels: {
             future: [

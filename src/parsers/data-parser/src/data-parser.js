@@ -4,7 +4,7 @@
 module.exports = {
     jTormDataParser: {
         // DI
-        tssParser: null,
+        // tssParser: null,
 
         append: '+',
         current: '@c',

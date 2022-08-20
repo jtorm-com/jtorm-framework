@@ -4,7 +4,7 @@
 module.exports = {
     jTormConfigMethod: {
         // DI
-        configModel: null,
+        // configModel: null,
 
         alias: 'c',
         params: ['k', 'v', 'a'],

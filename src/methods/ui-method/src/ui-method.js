@@ -4,10 +4,10 @@
 module.exports = {
     jTormUiMethod: {
         // DI
-        errorHandler: null,
-        mediatargetMethod: null,
-        methods: null,
-        viewModel: null,
+        // errorHandler: null,
+        // mediatargetMethod: null,
+        // methods: null,
+        // viewModel: null,
 
         cache: {},
         default: 'default',

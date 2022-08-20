@@ -264,8 +264,8 @@ module.exports = {
             this.c.methodSeparator = config.methodSeparator ? config.methodSeparator : '->';
             this.c.quotes = config.quotes ? config.quotes : ['"', "'", '`'];
 
-            let q = this.c.quotes.join('');
-            let r = '(?=(?:[^' + q + ']|[' + q + '][^' + q + ']*[' + q + '])*$)';
+            const q = this.c.quotes.join(''),
+                r = '(?=(?:[^' + q + ']|[' + q + '][^' + q + ']*[' + q + '])*$)';
 
             this.regexes = {
                 clean: /\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm,
