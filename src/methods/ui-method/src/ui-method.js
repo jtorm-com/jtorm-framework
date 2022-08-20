@@ -30,6 +30,7 @@ module.exports = {
 
             for (k in this.uis) {
                 ui = this.uis[k];
+
                 this.regexp[ui.alias] = {
                     alias: new RegExp("^" + ui.alias + "\/", ''),
                     mapper: {}
@@ -137,6 +138,7 @@ module.exports = {
 
             if (!s.cache[c])
                 s.cache[c] = {};
+
             s.cache[c][f] = r;
 
             return r;
@@ -199,9 +201,8 @@ module.exports = {
         },
 
         add: async function (di, v) {
-            let i, sV;
-
             if (di && di.m) {
+                let i, sV;
                 for (i in di.m) {
                     sV = this.viewModel.copy(v);
                     sV.d = di.m[i];
@@ -233,11 +234,13 @@ module.exports = {
                 } else
                     f[k].push(t[k][i]);
             }
+
             f[k] = s.quotes(f[k]);
         },
 
         findUIComponent(f, c, d) {
-            let s = this, ui, k, k2, k3, tmp, r2, r;
+            const s = this;
+            let ui, k, k2, k3, tmp, r2, r;
 
             if (f === 'self')
                 ui = s.ui;
@@ -260,12 +263,13 @@ module.exports = {
                             else {
                                 if (!r2.t)
                                     r2.t = [];
-                                for (k3 in r[tmp[k2]].t) {
+
+                                for (k3 in r[tmp[k2]].t)
                                     r2.t.push(r[tmp[k2]].t[k3]);
-                                }
                             }
                         }
                     }
+
                     r = r2;
                 } else if (/\|/.test(c[k])) {
                     tmp = c[k].split('|');
@@ -276,15 +280,15 @@ module.exports = {
                             break;
                         }
                     }
-                } else {
-                    if (r[c[k]]) {
+                } else if (r) {
+                    if (r[c[k]])
                         r = r[c[k]];
-                    } else if (d && r[s.default]) {
+                    else if (d && r[s.default])
                         r = r[s.default];
-                    } else {
+                    else
                         return 0;
-                    }
-                }
+                } else
+                    return 0;
             }
 
             if (r[s.default])
@@ -298,18 +302,19 @@ module.exports = {
 
         parseAlias: function (ui, v) {
             if (ui.mapperAlias) {
-                let s = this, k;
-                for (k in ui.mapperAlias) {
-                    if (s.regexp[ui.alias].mapper[k].test(v))
-                        return v.replace(s.regexp[ui.alias].mapper[k], ui.mapperAlias[k] + '$1');
-                }
+                for (let k in ui.mapperAlias)
+                    if (this.regexp[ui.alias].mapper[k].test(v))
+                        return v.replace(this.regexp[ui.alias].mapper[k], ui.mapperAlias[k] + '$1');
+
                 return 0;
             }
+
             return v;
         },
 
         parseUrl: function (url) {
-            let s = this, r, k, ui;
+            const s = this;
+            let r, k, ui;
 
             for (k in s.uis) {
                 ui = s.uis[k];
@@ -328,6 +333,7 @@ module.exports = {
                     break;
                 }
             }
+
             return url;
         },
 
@@ -340,10 +346,10 @@ module.exports = {
 
         parseComponent: function (c) {
             if (/@/.test(c)) {
-                let s = this, f, r;
+                let f, r;
 
-                for (f in s.uis) {
-                    r = s.parseAlias(s.uis[f], c);
+                for (f in this.uis) {
+                    r = this.parseAlias(this.uis[f], c);
 
                     if (r) {
                         c = r;
