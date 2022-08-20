@@ -1,75 +1,35 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-head {
-  ->append(d: twitter) {
-    ->if {
-      d: card;
-      v: '^(summary|summary_large_image|app|player)$';
-      ->append(d: card)->ui {
-        t:0;
+
+->if(d: card)->data(property: 'twitter:card', content: card)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: site)->data(property: 'twitter:site', content: site)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: creator)->data(property: 'twitter:creator', content: creator)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: title)->data(property: 'twitter:title', content: title)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: description)->data(property: 'twitter:description', content: description)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: image.url) {
+    ->data(property: 'twitter:image', content: image.url)->append->ui {
         c: 'doc.meta';
-        meta->attrs {
-          n: 'property,content';
-          v: 'twitter:card,card';
-        }
-      }
     }
-    ->if(d:site)->append->ui {
-      c: 'doc.meta';
-      t:0;
-      meta->attrs {
-        n: 'property,content';
-        v: 'twitter:site,site';
-      }
-    }
-    ->if(d:creator)->append->ui {
-      c: 'doc.meta';
-      t:0;
-      meta->attrs {
-        n: 'property,content';
-        v: 'twitter:creator,creator';
-      }
-    }
-    ->if(d:title)->append->ui {
-      c: 'doc.meta';
-      t:0;
-      meta->attrs {
-        n: 'property,content';
-        v: 'twitter:title,title';
-      }
-    }
-    ->if(d:description)->append->ui {
-      c: 'doc.meta';
-      t:0;
-      meta->attrs {
-        n: 'property,content';
-        v: 'twitter:description,description';
-      }
-    }
-    ->if(d:image.url) {
-      ->append->ui {
+
+    ->if(d: image.width)->data(property: 'twitter:image:width', content: image.width)->append->ui {
         c: 'doc.meta';
-        t:0;
-        meta->attrs {
-          n: 'property,content';
-          v: 'twitter:image,image.url';
-        }
-      }
-      ->if(d:image.width)->append->ui {
-        c: 'doc.meta';
-        t:0;
-        meta->attrs {
-          n: 'property,content';
-          v: 'twitter:image:width,image.width';
-        }
-      }
-      ->if(d:image.height)->append->ui {
-        c: 'doc.meta';
-        t:0;
-        meta->attrs {
-          n: 'property,content';
-          v: 'twitter:image:height,image.height';
-        }
-      }
     }
-  }
+
+    ->if(d: image.height)->data(property: 'twitter:image:height', content: image.height)->append->ui {
+        c: 'doc.meta';
+    }
 }

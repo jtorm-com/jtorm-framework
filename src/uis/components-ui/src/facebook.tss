@@ -1,37 +1,18 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-head {
-  ->append(d: fb) {
-    ->if(d: profile_id)->append->ui {
-      c: 'doc.meta';
-      t: '0';
-      meta->attrs {
-        n: 'property,content';
-        v: 'fb:profile_id,profile_id';
-      }
-    }
-    ->if(d: page_id)->append->ui {
-      c: 'doc.meta';
-      t: '0';
-      meta->attrs {
-        n: 'property,content';
-        v: 'fb:page_id,page_id';
-      }
-    }
-    ->if(d: app_id)->append->ui {
-      c: 'doc.meta';
-      t: '0';
-      meta->attrs {
-        n: 'property,content';
-        v: 'fb:app_id,app_id';
-      }
-    }
-    ->if(d: admins)->append->ui {
-      c: 'doc.meta';
-      t: '0';
-      meta->attrs {
-        n: 'property,content';
-        v: 'fb:admins,admins';
-      }
-    }
-  }
+
+->if(d: profile_id)->data(property: 'fb:profile_id', content: profile_id)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: page_id)->data(property: 'fb:page_id', content: page_id)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: app_id)->data(property: 'fb:app_id', content: app_id)->append->ui {
+    c: 'doc.meta';
+}
+
+// todo loop multiple if there are
+->if(d: admins)->data(property: 'fb:admins', content: admins)->append->ui {
+    c: 'doc.meta';
 }

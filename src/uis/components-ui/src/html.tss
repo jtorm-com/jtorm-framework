@@ -8,3 +8,21 @@ html->attr {
     n: 'lang';
     v: mainEntity.@c.inLanguage.Text;
 }
+
+head {
+    ->append(d: @facebook)->get {
+        t: '@c/facebook.tss';
+    }
+
+    ->append(d: @twitter)->get {
+        t: '@c/twitter.tss';
+    }
+
+    ->append(d: @google)->get {
+        t: '@c/google.tss';
+    }
+
+    ->append(d: @config.og)->get {
+        t: '@c/og.tss';
+    }
+}
