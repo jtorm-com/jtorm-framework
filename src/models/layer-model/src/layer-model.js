@@ -21,7 +21,7 @@ module.exports = {
 
         init: async function () {
             if (this.saveModel) {
-                let cache = this.saveModel.get();
+                const cache = this.saveModel.get();
                 if (cache) {
                     this.event = cache.event;
                     this.layers = cache.layers;
@@ -61,7 +61,7 @@ module.exports = {
                         : this.cid;
 
             if (!i)
-                throw new Error('Cache ID not set');
+                throw new Error('ID not set');
 
             if (!v.d.z)
                 v.d.z = 0;
