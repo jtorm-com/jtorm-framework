@@ -30,23 +30,20 @@ module.exports = {
         },
 
         get: function (v, e, t) {
-            let o = [];
+            const o = [],
+                i = v.cid ? v.cid : 'global';
 
-            if (
-                v.cid
-                && this.event[e][t].indexOf(v.cid) !== -1
-            ) {
-                let r = this.layers[v.cid]
-                        ? this.layers[v.cid]
-                        : null,
-                    k;
+            if (this.event[e][t].indexOf(i) !== -1) {
+                const r = this.layers[i]
+                        ? this.layers[i]
+                        : null;
 
                 if (r) {
                     r.sort(function (a, b) {
                         return a.z - b.z;
                     });
 
-                    for (k in r)
+                    for (let k in r)
                         o.push(r[k].t);
                 }
             }
@@ -55,28 +52,31 @@ module.exports = {
         },
 
         set: function (v) {
-            if (!v.cid && !v.d.cid && !this.cid)
-                throw new Error('Cache ID not set');
+            const i = v.d.i
+                ? v.d.i
+                : v.d.cid
+                    ? v.d.cid
+                    : v.cid
+                        ? v.cid
+                        : this.cid;
 
-            if (v.d.cid)
-                this.cid = v.d.cid;
-            else if (v.cid)
-                this.cid = v.cid;
+            if (!i)
+                throw new Error('Cache ID not set');
 
             if (!v.d.z)
                 v.d.z = 0;
 
-            if (!this.layers[this.cid])
-                this.layers[this.cid] = [];
+            if (!this.layers[i])
+                this.layers[i] = [];
 
             for (let k in v.t.c)
-                this.layers[this.cid].push({
+                this.layers[i].push({
                     c: parseInt(v.d.c),
                     z: parseInt(v.d.z),
                     t: v.t.c[k]
                 });
 
-            this.event[v.d.e][v.d.t].push(this.cid);
+            this.event[v.d.e][v.d.t].push(i);
 
             this.updated = 1;
         },
