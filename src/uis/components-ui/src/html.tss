@@ -10,19 +10,19 @@ html->attr {
 }
 
 head {
-    ->append(d: @facebook)->get {
+    ->data(@facebook)->get {
         t: '@c/facebook.tss';
     }
 
-    ->append(d: @twitter)->get {
+    ->data(@twitter)->get {
         t: '@c/twitter.tss';
     }
 
-    ->append(d: @google)->get {
+    ->data(@google)->get {
         t: '@c/google.tss';
     }
 
-    ->append(d: @config.og)->get {
+    ->data(@config.og)->get {
         t: '@c/og.tss';
     }
 }
