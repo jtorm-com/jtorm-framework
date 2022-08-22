@@ -1,9 +1,9 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-div {
+section {
     ->attrs {
-        n: 'id,class,style';
-        v: 'loading,loading,display: none';
+        n: 'id,class,style,data-nosnippet';
+        v: 'loading,loading,display: none,1';
         m: 'p';
     }
 

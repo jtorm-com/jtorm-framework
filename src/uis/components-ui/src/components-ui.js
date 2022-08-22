@@ -38,7 +38,7 @@ module.exports = {
             loading: {
                 default: {
                     ui: {
-                        c: '@e.div',
+                        c: '@e.section',
                         t: 0
                     },
                     t: ['@c/loading/loading-default.tss']
