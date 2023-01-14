@@ -1,12 +1,10 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 module.exports = {
     jTormSchemaUi: {
-        id: "jtorm-schema-ui",
+        id: "jtorm/schema-ui-0.0.3/src",
         alias: "@s",
         framework: "schema",
-        url: [
-            // 'https://gitlab.com/jtorm/jtorm-framework/src/uis/schema-ui/src'
-        ],
+        url: "https://cdn.jtorm.com/",
         mapper: {
             Text: {
                 default: {
@@ -289,22 +287,15 @@ module.exports = {
                     },
                     t: ['@s/html/thing/thing-default.tss']
                 },
-                /* dit was eerst omdat dan een description wordt toegevoegd, maar dit moet expliciet in ui worden gezet naar list vind ik
-                default: {
-                  ui: {
-                    c: 'Thing.listItem'
-                  },
-                  t: ['@s/html/thing/thing-item.tss']
-                },*/
                 listItem: {
                     ui: {
-                        c: 'Thing.item'
+                        c: 'Thing.default'
                     },
-                    /*t: ['@s/html/thing/thing-list-item.tss']*/
+                    t: ['@s/html/thing/thing-list-item.tss']
                 },
                 gridItem: {
                     ui: {
-                        c: 'Thing.item'
+                        c: 'Thing.default'
                     },
                     t: ['@s/html/thing/thing-grid-item.tss']
                 },

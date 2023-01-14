@@ -30,5 +30,20 @@
         ->append(d: potentialAction)->ui {
             c: 'Action.linkMulti';
         }
+
+        ->append(d: sameAs)->ui {
+            c: 'URL.multi';
+
+            a {
+                ->attr {
+                    n: 'target';
+                    v: '_blank';
+                }
+
+                ->text(html: 'Additional Information')->inner {
+                    h: html;
+                }
+            }
+        }
     }
 }

@@ -1,12 +1,10 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 module.exports = {
     jTormComponentsUI: {
-        id: "jtorm-components-ui",
+        id: "jtorm/components-ui-0.0.3/src",
         alias: "@c",
         framework: "c",
-        url: [
-            // 'https://gitlab.com/jtorm/jtorm-framework/src/uis/components-ui/src'
-        ],
+        url: "https://cdn.jtorm.com/",
         mapper: {
             init: {
                 default: {

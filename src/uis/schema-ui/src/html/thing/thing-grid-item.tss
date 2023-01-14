@@ -1,6 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 section->attr {
-  n: 'class';
-  v: 'grid-item';
-  m: 'a';
+    n: 'class';
+    v: 'grid-item';
+    m: 'a';
 }

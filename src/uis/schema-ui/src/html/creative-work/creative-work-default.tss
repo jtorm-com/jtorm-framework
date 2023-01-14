@@ -37,23 +37,28 @@ body > .schema-Thing > .contents > .footer {
                     }
                 }
 
-                /*->append->data(method: 'POST')->ui {
-                c: 'form.form';
-                form {
-                ->append->ui {
-                c: 'form.fieldset';
-                fieldset {
+/*
+                ->append->data(method: 'POST')->ui {
+                    c: 'form.form';
 
+                    form {
+                        ->append->ui {
+                            c: 'form.fieldset';
+
+                            fieldset {
+
+                            }
+                        }
+                    }
                 }
-                }
-                }
-                }*/
+*/
                 ->each {
-                d: comment;
-                m: 'append';
-                body->append(d: Comment)->ui {
-                c: 'Comment';
-                }
+                    d: comment;
+                    m: 'append';
+
+                    body->append(d: Comment)->ui {
+                        c: 'Comment';
+                    }
                 }
             }
         }
