@@ -20,8 +20,8 @@ module.exports = {
         validate: function (v) {
             return (
                 (
-                    v._.isArray(v.d.d)
-                    || v._.isArray(v.m)
+                    v.d.d
+                    || v.m
                 )
                 && v.t.c.length
             );
@@ -33,6 +33,9 @@ module.exports = {
             if (!v.d.d)
                 v.d.d = v.m;
 
+            if (typeof v.d.d !== 'object')
+                v.d.d = [v.d.d];
+
             if (v.d.e) {
                 e = v.h.selectAll(v.d.e);
                 v.c = 1;
@@ -40,6 +43,7 @@ module.exports = {
 
             for (k in v.d.d) {
                 d = {};
+
                 if (v.d.a)
                     d[v.d.a] = v.d.d[k];
                 else
