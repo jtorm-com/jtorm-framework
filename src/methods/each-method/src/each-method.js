@@ -49,6 +49,9 @@ module.exports = {
                 else
                     d = v.d.d[k];
 
+                if (typeof d !== 'object')
+                    d = [d];
+
                 d.isLoop = 1;
                 d.index = k;
 
