@@ -1,0 +1,169 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: 'contents.default';
+
+    .contents {
+        ->ui {
+            c: '@e.header';
+            t: '0';
+
+            header->attr {
+                n: 'class';
+                v: 'header';
+                m: 'a';
+            }
+
+            header {
+                ->if(d: name)
+                ->ui {
+                    c: '@t.h1';
+                    t: '0';
+
+                    h1
+                    ->data(href: url, html: name)
+                    ->ui {
+                        c: '@e.a';
+                    }
+                }
+
+                ->data(Text: alternateName)
+                ->append
+                ->ui {
+                    c: '@t.h2';
+                    t: '0';
+
+                    h2
+                    ->ui {
+                        c: 'Text';
+
+                        span->attr {
+                            n: 'class';
+                            v: 'alternate-name';
+                            m: 'a';
+                        }
+                    }
+                }
+            }
+        }
+
+        ->append->ui {
+            c: '@e.div';
+            t: '0';
+
+            div->attr {
+                n: 'class';
+                v: 'image';
+            }
+
+            .image {
+                ->if(d: image)
+                ->if(d: image, to: 'array') {
+                    ->each(d: image, m: 'append', a: 'image')
+                    ->get {
+                        t: '@s/thing/thing-image.tss';
+                    }
+
+                    ->else
+                    ->get {
+                        t: '@s/thing/thing-image.tss';
+                    }
+                }
+            }
+        }
+
+        ->append->ui {
+            c: '@e.section';
+            t: '0';
+
+            section->attr {
+                n: 'class';
+                v: 'body';
+            }
+
+            .body
+            ->if(d: disambiguatingDescription && description) {
+                ->ui {
+                    c: '@e.details';
+                    t: '0';
+
+                    details {
+                        ->attr {
+                            n: 'open';
+                            v: true;
+                        }
+
+                        ->data(html: disambiguatingDescription, class: 'disambiguating-description')
+                        ->ui {
+                            c: '@e.summary';
+                        }
+
+                        ->data(html: description, class: 'description')
+                        ->append->ui {
+                            c: '@e.div';
+                        }
+                    }
+                }
+
+                ->else {
+                    ->if(d: disambiguatingDescription)
+                    ->data(html: disambiguatingDescription, class: 'disambiguating-description')
+                    ->ui {
+                        c: '@e.div';
+                    }
+
+                    ->if(d: description)
+                    ->data(html: description, class: 'description')
+                    ->ui {
+                        c: '@e.div';
+                    }
+                }
+            }
+        }
+
+        ->append->ui {
+            c: '@e.footer';
+            t: '0';
+
+            footer->attr {
+                n: 'class';
+                v: 'footer';
+                m: 'a';
+            }
+
+            footer {
+                ->data(Thing: subjectOf)->ui {
+                    c: '@e.div';
+
+                    div {
+                        ->attr {
+                            n: 'class';
+                            v: 'subject-of';
+                        }
+
+                        ->ui {
+                            c: 'Thing.link';
+                        }
+                    }
+                }
+
+                ->data(action: potentialAction)->append->ui {
+                    c: 'Action.link';
+                }
+
+                ->data(URL: sameAs)->append->ui {
+                    c: '@e.div';
+
+                    div->attr {
+                        n: 'class';
+                        v: 'same-as';
+                    }
+
+                    .same-as->append->ui {
+                        c: 'URL';
+                    }
+                }
+            }
+        }
+    }
+}

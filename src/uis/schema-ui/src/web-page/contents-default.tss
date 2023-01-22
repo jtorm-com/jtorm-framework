@@ -1,24 +1,28 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-main {
-    ->attr {
-        n: 'id';
-        v: 'body';
-    }
+->ui {
+    c: '@e.main'
 
-    #body->append->ui {
-        c: '@e.div';
-        t: '0';
+    main {
+        ->attr {
+            n: 'id';
+            v: 'body';
+        }
 
-        div {
-            ->attrs {
-                n: 'id';
-                v: 'contents';
-            }
+        #body->append->ui {
+            c: '@e.div';
+            t: '0';
 
-            #contents->append->ui {
-                c: @type + '.default';
-                m: '1';
+            div {
+                ->attrs {
+                    n: 'id';
+                    v: 'contents';
+                }
+
+                #contents->append->ui {
+                    c: @type + '.default';
+                    m: '1';
+                }
             }
         }
     }

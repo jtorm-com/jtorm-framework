@@ -1,26 +1,22 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->if(to: 'array') {
-    ->each {
-        m: 'append';
+->if(d: ImageObject, to: 'array') {
+    ->each(d: ImageObject, m: 'append')
+    ->if(d: size.additionalProperty.value) {
+        ->data(
+            srcset: contentUrl,
+            media: size.additionalProperty.value,
+            width: width.value,
+            height: height.value
+        )
+        ->ui {
+            c: '@m.source';
+        }
 
-        ->if(d: ImageObject) {
-            ->if(d: ImageObject.representativeOfPage.Boolean) {
-                ->append(d: ImageObject)->ui {
-                    c: 'ImageObject.figure';
-                }
-
-                ->else {
-                    ->data(
-                        srcset: ImageObject.contentUrl.URL,
-                        media: ImageObject.size.QuantitativeValue.additionalProperty.PropertyValue.value.Text,
-                        width: ImageObject.width.QuantitativeValue.value.Number,
-                        height: ImageObject.height.QuantitativeValue.value.Number
-                    )->append()->ui {
-                        c: '@m.source';
-                    }
-                }
-            }
+        ->else
+        ->if(d: representativeOfPage)
+        ->get {
+            t: '@s/image-object/figure-default.tss';
         }
     }
 
@@ -29,15 +25,9 @@
         m: 'prepend';
     }
 
-    ->else {
-        ->if(d: ImageObject) {
-            ->append(d: ImageObject)->ui {
-                c: 'ImageObject.figure';
-            }
-
-            ->else->data(contentUrl.URL: URL)->append->ui {
-                c: 'ImageObject.figure';
-            }
-        }
+    ->else
+    ->append(d: ImageObject)
+    ->get {
+        t: '@s/image-object/figure-default.tss';
     }
 }

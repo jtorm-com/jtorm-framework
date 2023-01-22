@@ -1,14 +1,19 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-body > section {
-    ->attr {
-        n: 'class';
-        v: 'schema-WebPageElement';
-        m: 'a';
-    }
 
-    ->attr {
-        n: 'class';
-        v: 'schema-CreativeWork ';
-        m: 'r';
+->ui {
+    c: 'CreativeWork'
+
+    section {
+        ->attr {
+            n: 'class';
+            v: 'schema-WebPageElement';
+            m: 'a';
+        }
+
+        ->attr {
+            n: 'class';
+            v: 'schema-CreativeWork ';
+            m: 'r';
+        }
     }
 }

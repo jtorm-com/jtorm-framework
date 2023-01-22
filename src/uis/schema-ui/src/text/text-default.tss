@@ -1,17 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
+->each(d: Text, m: 'append', a: 'html')
 ->ui {
     c: '@e.span';
-    t: '0';
-
-    span {
-        ->attr {
-            n: 'class';
-            v: 'schema-Text';
-        }
-
-        ->inner {
-            h: Text;
-        }
-    }
 }

@@ -1,15 +1,19 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-section {
-  ->swap {
-    s: 'aside';
-    ui: '@e.aside';
-    a: 1;
-    aside {
-      ->attr {
-        n: 'class';
-        v: 'schema-WPSideBar';
-        m: 'a';
-      }
+
+->ui {
+    c: 'WebPageElement';
+
+    section {
+        ->swap {
+            s: 'aside';
+            ui: '@e.aside';
+            a: '1';
+
+            aside->attr {
+                n: 'class';
+                v: 'schema-WPSideBar';
+                m: 'a';
+            }
+        }
     }
-  }
 }

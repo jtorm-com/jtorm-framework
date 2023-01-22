@@ -4,12 +4,34 @@
     c: '@m.figure';
     t: '0';
 
-    figure {
-        ->append->ui {
-            c: 'ImageObject.picture';
+    figure->ui {
+        c: '@e.a';
+        t: '0';
+
+        a {
+            ->attr {
+                n: 'href';
+                v: contentUrl;
+            }
+
+            ->ui {
+                c: '@m.picture';
+                t: '0';
+
+                picture
+                ->data(
+                    alt: name,
+                    src: contentUrl,
+                    width: width.QuantitativeValue.value,
+                    height: height.QuantitativeValue.value
+                 )
+                ->ui {
+                    c: '@m.img';
+                }
+            }
         }
 
-        ->if(d: caption.Text)->data(html: caption.Text)->append->ui {
+        ->data(html: caption)->append->ui {
             c: '@m.figcaption';
         }
     }

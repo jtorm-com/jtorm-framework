@@ -1,0 +1,14 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(d: image, to: 'object') {
+    ->data(ImageObject: image)
+    ->ui {
+        c: 'ImageObject';
+    }
+
+    ->else
+    ->data(src: image, alt: name)
+    ->ui {
+        c: '@m.img';
+    }
+}

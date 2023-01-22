@@ -29,11 +29,10 @@ module.exports = {
 
         handle: async function (v) {
             let r = '', d, k, h, sv, i = 0, e;
-
             if (!v.d.d)
                 v.d.d = v.m;
 
-            if (typeof v.d.d !== 'object')
+            if (!Array.isArray(v.d.d))
                 v.d.d = [v.d.d];
 
             if (v.d.e) {

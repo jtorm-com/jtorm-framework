@@ -1,5 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
+->each(d: action, m: 'append', a: 'action')
 ->ui {
     c: '@e.div';
     t: '0';
@@ -11,7 +12,7 @@
         }
 
         ->append(d: target)->ui {
-            c: 'EntryPoint.default';
+            c: 'EntryPoint';
         }
     }
 }
