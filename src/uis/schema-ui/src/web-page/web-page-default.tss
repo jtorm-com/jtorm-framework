@@ -1,5 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-
+/*
 ->get {
   t: '@c/html.tss';
 }
@@ -43,3 +43,4 @@ body {
         m: '1';
     }
 }
+*/
