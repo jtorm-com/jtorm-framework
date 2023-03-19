@@ -9,7 +9,7 @@ head {
         c: 'head.default';
     }
 
-    ->append(cid: 'head-id', cs: identifier.Text)->ui {
+    ->append(cid: 'head-id', cs: identifier + '-' + inLanguage)->ui {
         c: 'head.id';
     }
 }
@@ -29,7 +29,7 @@ body {
         m: '1';
     }
 
-    ->append(d: mainEntity.@c, cid: 'mainEntity', cs: identifier.Text)->ui {
+    ->append(d: mainEntity.@c, cid: 'mainEntity', cs: identifier + '-' + inLanguage)->ui {
         c: 'WebPage.contentsDefault';
     }
 
