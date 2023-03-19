@@ -1,5 +1,19 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
+->data(name: 'viewport', content: @meta.viewport||'width=device-width, initial-scale=1')->append->ui {
+    c: 'doc.meta';
+}
+
+/* For performance, this should be added in the response headers
+->data(charset: @meta.charset||'UTF-8')->append->ui {
+    c: 'doc.meta';
+}
+
+->data(httpEquiv: 'X-UA-Compatible', content: @meta.XUACompatible||'IE=Edge')->append->ui {
+    c: 'doc.meta';
+}
+*/
+
 ->each {
     m: 'append';
     d: @config.appleTouchIcon;
@@ -23,19 +37,7 @@
     }
 }
 
-->data(charset: @meta.charset||'UTF-8')->append->ui {
-    c: 'doc.meta';
-}
-
 ->if(d: rating)->data(name: 'rating', content: rating)->append->ui {
-    c: 'doc.meta';
-}
-
-->data(httpEquiv: 'X-UA-Compatible', content: @meta.XUACompatible||'IE=Edge')->append->ui {
-    c: 'doc.meta';
-}
-
-->data(name: 'viewport', content: @meta.viewport||'width=device-width, initial-scale=1')->append->ui {
     c: 'doc.meta';
 }
 
