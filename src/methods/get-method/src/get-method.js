@@ -68,7 +68,7 @@ module.exports = {
                         v.c.s = v.t.s;
 
                     for (k in r)
-                        nT.c.unshift(r[k]);
+                        nT.c.push(r[k]);
                 }
 
                 for (k in v.t.c)
