@@ -14,7 +14,7 @@
 }
 */
 
-->each {
+->if(d: @config.appleTouchIcon)->each {
     m: 'append';
     d: @config.appleTouchIcon;
 
