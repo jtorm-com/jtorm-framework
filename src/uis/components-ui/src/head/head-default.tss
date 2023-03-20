@@ -1,20 +1,27 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->data(name: 'viewport', content: @meta.viewport||'width=device-width, initial-scale=1')->append->ui {
+->data(name: 'viewport', content: @meta.viewport||'width=device-width, initial-scale=1')
+->append
+->ui {
     c: 'doc.meta';
 }
 
 /* For performance, this should be added in the response headers
-->data(charset: @meta.charset||'UTF-8')->append->ui {
+->data(charset: @meta.charset||'UTF-8')
+->append
+->ui {
     c: 'doc.meta';
 }
 
-->data(httpEquiv: 'X-UA-Compatible', content: @meta.XUACompatible||'IE=Edge')->append->ui {
+->data(httpEquiv: 'X-UA-Compatible', content: @meta.XUACompatible||'IE=Edge')
+->append
+->ui {
     c: 'doc.meta';
 }
 */
 
-->if(d: @config.appleTouchIcon)->each {
+->if(d: @config.appleTouchIcon)
+->each {
     m: 'append';
     d: @config.appleTouchIcon;
 
@@ -28,7 +35,8 @@
     }
 }
 
-->append(d: @config.favicon)->ui {
+->append(d: @config.favicon)
+->ui {
     c: 'doc.link';
 
     link->attr {
@@ -37,22 +45,28 @@
     }
 }
 
-->if(d: rating)->data(name: 'rating', content: rating)->append->ui {
+->if(d: rating)->data(name: 'rating', content: rating)
+->append
+->ui {
     c: 'doc.meta';
 }
 
-->append(d: @config.facebook)->get {
+->append(d: @config.facebook)
+->get {
     t: '@c/facebook.tss';
 }
 
-->append(d: @config.twitter)->get {
+->append(d: @config.twitter)
+->get {
     t: '@c/twitter.tss';
 }
 
-->append(d: @config.google)->get {
+->append(d: @config.google)
+->get {
     t: '@c/google.tss';
 }
 
-->append(d: @config.og)->get {
+->append(d: @config.og)
+->get {
     t: '@c/og.tss';
 }
