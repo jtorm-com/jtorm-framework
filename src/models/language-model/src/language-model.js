@@ -7,15 +7,15 @@ module.exports = {
         // configModel: null,
         // sessionModel: null,
 
-        current: null,
+        // language: null,
         data: {},
-        default: 'en',
+        default: 'en-US',
 
         init: function() {
-            this.current = this.getCurrent();
+            this.setLanguage(this.initLanguage());
         },
 
-        getCurrent: function() {
+        initLanguage: function() {
             const s = this;
             let l = s.sessionModel.get('language');
 
@@ -38,23 +38,27 @@ module.exports = {
             return l;
         },
 
+        setLanguage: function(i18n) {
+            this.language = i18n;
+        },
+
         getDate(d) {
             return d.toUTCString();
         },
 
         get: function (s) {
-            const l = this.current;
+            const l = this.language;
 
             return (
-                this.data[l] !== undefined
-                && this.data[l][s] !== undefined
+                this.data[l]
+                && this.data[l][s]
             )
                 ? this.data[l][s]
                 : s;
         },
 
         set: function (l, k, v) {
-            if (this.data[l] === undefined)
+            if (!this.data[l])
                 this.data[l] = {};
 
             this.data[l][k] = v;
