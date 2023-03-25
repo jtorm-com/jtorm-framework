@@ -8,6 +8,7 @@ module.exports = {
         // sessionModel: null,
 
         // language: null,
+        // fallback: null
         data: {},
         default: 'en-US',
 
@@ -26,8 +27,7 @@ module.exports = {
                 l = s.default;
 
             if (!s.data[l]) {
-                if (/^[a-z][a-z]-[A-Z][A-Z]/.test(l))
-                    l = l.split('-')[0];
+                l = s.getFallback();
 
                 if (!s.data[l])
                     l = s.default;
@@ -38,8 +38,15 @@ module.exports = {
             return l;
         },
 
-        setLanguage: function(i18n) {
-            this.language = i18n;
+        getFallback: function (l) {
+            return (/^[a-z][a-z]-[A-Z][A-Z]/.test(l))
+                ? l.split('-')[0]
+                : l;
+        },
+
+        setLanguage: function(l) {
+            this.language = l;
+            this.fallback = this.getFallback(l);
         },
 
         getDate(d) {
@@ -47,7 +54,10 @@ module.exports = {
         },
 
         get: function (s) {
-            const l = this.language;
+            let l = this.language;
+
+            if (!this.data[l] || !this.data[l][s])
+                l = s.fallback;
 
             return (
                 this.data[l]
