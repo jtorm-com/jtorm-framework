@@ -5,7 +5,8 @@ button {
         h: html;
     }
 
-    ->if(d: type, v: '^(button|reset|submit)$')->attr {
+    ->if(d: type, v: '^(button|reset|submit)$')
+    ->attr {
         n: 'type';
         v: type;
     }

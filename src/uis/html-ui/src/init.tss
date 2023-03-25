@@ -1,5 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-// todo
-head {
-}
+head
+    ->css {
+        href: 'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css';
+    }

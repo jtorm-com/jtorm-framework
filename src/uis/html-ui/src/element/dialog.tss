@@ -1,7 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 dialog {
-    ->if(d: open)->attr {
+    ->if(d: open)
+    ->attr {
         n: 'open';
         v: true;
     }

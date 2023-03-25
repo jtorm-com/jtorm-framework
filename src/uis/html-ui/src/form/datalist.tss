@@ -1,21 +1,22 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 datalist {
-    ->if(d: items)->each {
+    ->if(d: items)
+    ->each {
         d: items;
         m: 'append';
 
         ->ui {
             c: 'form.option';
 
-            option->attr {
-                n: 'value';
-                v: value;
-            }
-
-            option->inner{
-                h: label;
-            }
+            option
+                ->attr(
+                    n: 'value';
+                    v: value;
+                )
+                ->inner {
+                    h: label;
+                }
         }
     }
 

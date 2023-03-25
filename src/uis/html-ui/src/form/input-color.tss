@@ -11,7 +11,8 @@ input {
         v: list;
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+    ->if(d: autocomplete, v: '^(on|off)$')
+    ->attr {
         n: 'autocomplete';
         v: autocomplete;
     }

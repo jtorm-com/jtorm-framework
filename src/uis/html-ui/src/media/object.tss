@@ -11,7 +11,8 @@ object {
         v: form;
     }
 
-    ->if(d: height, v: '^[0-9]+$')->attr {
+    ->if(d: height, v: '^[0-9]+$')
+    ->attr {
         n: 'height';
         v: height;
     }
@@ -31,7 +32,8 @@ object {
         v: usemap;
     }
 
-    ->if(d: width, v: '^[0-9]+$')->attr {
+    ->if(d: width, v: '^[0-9]+$')
+    ->attr {
         n: 'width';
         v: width;
     }

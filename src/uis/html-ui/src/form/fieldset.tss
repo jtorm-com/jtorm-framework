@@ -1,7 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 fieldset {
-    ->if(d: disabled)->attr {
+    ->if(d: disabled)
+    ->attr {
         n: 'disabled';
         v: true;
     }

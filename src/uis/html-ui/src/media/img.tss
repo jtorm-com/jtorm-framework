@@ -6,12 +6,14 @@ img {
         v: alt;
     }
 
-    ->if(d: height, v: '^[0-9]+$')->attr {
+    ->if(d: height, v: '^[0-9]+$')
+    ->attr {
         n: 'height';
         v: height;
     }
 
-    ->if(d: ismap)->attr {
+    ->if(d: ismap)
+    ->attr {
         n: 'ismap';
         v: true;
     }
@@ -41,7 +43,8 @@ img {
         v: usemap;
     }
 
-    ->if(d: width, v: '^[0-9]+$')->attr {
+    ->if(d: width, v: '^[0-9]+$')
+    ->attr {
         n: 'width';
         v: width;
     }

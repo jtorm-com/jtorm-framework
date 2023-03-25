@@ -1,11 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->if(d: autofocus)->attr {
+->if(d: autofocus)
+->attr {
     n: 'autofocus';
     v: true;
 }
 
-->if(d: disabled)->attr {
+->if(d: disabled)
+->attr {
     n: 'disabled';
     v: true;
 }

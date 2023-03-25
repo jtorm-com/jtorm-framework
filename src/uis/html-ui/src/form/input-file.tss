@@ -11,7 +11,8 @@ input {
         v: accept;
     }
 
-    ->if(d: multiple)->attr {
+    ->if(d: multiple)
+    ->attr {
         n: 'multiple';
         v: true;
     }

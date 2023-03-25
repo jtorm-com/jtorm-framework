@@ -6,7 +6,8 @@ track {
         v: default;
     }
 
-    ->if(d: kind, v: '^(captions|chapters|descriptions|metadata|subtitles)$')->attr {
+    ->if(d: kind, v: '^(captions|chapters|descriptions|metadata|subtitles)$')
+    ->attr {
         n: 'kind';
         v: kind;
     }
