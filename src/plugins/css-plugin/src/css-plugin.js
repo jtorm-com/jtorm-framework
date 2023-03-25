@@ -3,7 +3,11 @@
 
 module.exports = {
     jTormCssPlugin: {
+        // DI
+        // uiMethod: null,
+
         cache: {},
+        collection: [],
         event: {
             after: {
                 view: {
@@ -12,25 +16,32 @@ module.exports = {
             }
         },
 
-        process: async function(j, v, href) {
-//      if(!this.after.view.cache[href]) {
-            await v.h.set('head', function (el) {
-                let po = v.h.d.createElement('link');
-                po.type = 'text/css';
-                po.rel = 'stylesheet';
-                po.href = j.context.methods.ui.parseUrl(href);
+        process: async function(v, css) {
+            if(!this.cache[css.href]) {
+                const s = v.t.s;
+                v.t.s = 'head';
 
-                el.appendChild(po);
-            });
-//        this.cache[href] = true;
-//      }
+                await v.h.set(v, el => {
+                    const po = v.h.d.createElement('link');
+                    po.type = 'text/css';
+                    po.rel = 'stylesheet';
+                    po.href = this.uiMethod.parseUrl(css.href);
+
+                    el.appendChild(po);
+
+                    v.t.s = s;
+
+                    this.cache[css.href] = true;
+                });
+            }
         },
 
         afterView: async function(v) {
-            for (let href in this.cache)
-                await this.process(v, href);
+            for (let css of this.collection)
+                await this.process(v, css);
 
             this.cache = {};
+            this.collection = [];
 
             return v.h;
         }

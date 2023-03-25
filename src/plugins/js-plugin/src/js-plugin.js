@@ -17,24 +17,30 @@ module.exports = {
         },
 
         process: async function(v, js) {
-//      if (!this.after.cache[js.src]) {
-            let po = v.h.d.createElement('script');
-            po.type = 'text/javascript';
-//        po.defer = true;// before render we should do things like client resolution
-//        po.async = true;// not working
-//        po.setAttribute('async', "");
-            po.src = this.uiMethod.parseUrl(js.src);
-//        console.log(po.outerHTML);
-            await v.h.set('head', function (e) {
-                e.appendChild(po);
-            });
-//        this.after.cache[js.src] = true;
-//      }
+            if (!this.cache[js.src]) {
+                const s = v.t.s;
+                v.t.s = 'head';
+
+                await v.h.set(v, e => {
+                    const po = v.h.d.createElement('script');
+                    po.type = 'text/javascript';
+                    po.defer = true;
+                    // po.async = true;// does not work
+                    po.setAttribute('async', '');
+                    po.src = this.uiMethod.parseUrl(js.src);
+
+                    e.appendChild(po);
+
+                    v.t.s = s;
+
+                    this.cache[js.src] = true;
+                });
+            }
         },
 
         afterView:  async function(v) {
             for (let js of this.collection)
-                await this.process(j, v, js);
+                await this.process(v, js);
 
             this.cache = {};
             this.collection = [];

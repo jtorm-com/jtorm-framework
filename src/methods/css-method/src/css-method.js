@@ -13,10 +13,12 @@ module.exports = {
         },
 
         handle: function (v) {
-            const s = this.cssPlugin.after.view;
+            const s = this.cssPlugin;
 
-            if (v.c.c || !s.cache[v.t.p.href])
+            if (v.c.c || !s.cache[v.t.p.href]) {
                 s.cache[v.d.href] = 0;
+                s.collection.push({href: v.d.href});
+            }
 
             v.io = {c: 1};
         }
