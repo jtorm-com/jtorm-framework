@@ -39,7 +39,7 @@ module.exports = {
             if (v._.isEmpty(tD))
                 v.io = {c: 0};
             else
-                v.io = {d: tD, c: 1};
+                v.io = {d: {...v.m, ...tD}, c: 1};
         },
 
         set: function (d, ks, v) {
