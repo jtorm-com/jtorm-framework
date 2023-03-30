@@ -6,7 +6,7 @@ module.exports = {
         // DI
         // cssPlugin: null,
 
-        params: ['href'],
+        params: ['href', 'rel', 'crossorigin', 'defer'],
 
         validate: function (v) {
             return !!v.d.href;
@@ -17,7 +17,7 @@ module.exports = {
 
             if (v.c.c || !s.cache[v.t.p.href]) {
                 s.cache[v.d.href] = 0;
-                s.collection.push({href: v.d.href});
+                s.collection.push(v.d);
             }
 
             v.io = {c: 1};
