@@ -7,20 +7,24 @@ module.exports = {
         // configModel: null,
 
         alias: 'c',
-        params: ['k', 'v', 'a'],
+        params: ['d', 'v'],
 
         validate: function (v) {
-            return !!v.d.k;
+            return v.d.d !== undefined;
         },
 
         handle: async function (v) {
-            let k = this.configModel.get(v.d.k);
+            const r = this.configModel.get(v.d.d);
 
-            if (k && (v.t.p.v === undefined || k === v.d.v)) {
+            if (r && (v.t.p.v === undefined || r === v.d.v)) {
+                const d = {};
+
                 if (v.d.a)
-                    oD[v.d.a] = k;
+                    d[v.d.a] = r;
+                else
+                    d[v.d.d] = r;
 
-                v.io = {c: 1};
+                v.io = {c: 1, d: d};
             } else
                 v.io = {};
         }
