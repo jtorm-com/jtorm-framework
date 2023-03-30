@@ -26,7 +26,7 @@ module.exports = {
                 },
 
                 html: function() {
-                    return this.d.documentElement.outerHTML;
+                    return '<!DOCTYPE html>' + this.d.documentElement.outerHTML;
                 },
 
                 select: function(s) {
