@@ -22,16 +22,14 @@ module.exports = {
             let r, p, k, k2, nD, nT;
 
             if (v.d.d) {
-                nD = v._.cloneDeep(v.m);
+                nD = {...v.m};
 
                 if (v._.isString(v.d.d))
                     v.d.d = [v.d.d];
 
                 for (k in v.d.d) {
                     r = await this.get(v, 'data', v.d.d[k]);
-
-                    for (k2 in r)
-                        nD[k] = r[k];
+                    nD = {...nD, ...r};
                 }
             }
 
