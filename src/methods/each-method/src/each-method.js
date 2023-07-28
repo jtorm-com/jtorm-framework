@@ -44,6 +44,9 @@ module.exports = {
             }
 
             for (k in v.d.d) {
+                if (['isLoop', 'index'].indexOf(k) !== -1)
+                    continue;
+
                 d = {};
 
                 if (v.d.a)
