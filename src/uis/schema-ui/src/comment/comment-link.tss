@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: 'CreativeWork.link';
+
+    a->attr {
+      n: 'class';
+      v: 'schema-Comment';
+      m: 'a';
+    }
+}

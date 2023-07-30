@@ -4,7 +4,7 @@
 module.exports = {
     jTormUiCachePlugin: {
         // DI
-        uiCacheModel: null,
+        // uiCacheModel: null,
 
         event: {
             before: {

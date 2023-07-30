@@ -22,7 +22,7 @@ Names and values separator, defaults to a comma (,).
 ## Example
 
 ```js
-div->attr {
+div->attrs {
   n: 'class,id';
   v: 'row,row-1';
   m: 'a';

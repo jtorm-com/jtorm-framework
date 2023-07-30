@@ -1,4 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 input {
     ->attr {
         n: 'type';
@@ -10,7 +11,8 @@ input {
         v: accept;
     }
 
-    ->if(d: multiple)->attr {
+    ->if(d: multiple)
+    ->attr {
         n: 'multiple';
         v: true;
     }

@@ -1,0 +1,22 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->each(
+    d: action,
+    a: 'action'
+)
+->ui {
+    c: '@e.div';
+    t: '0';
+
+    div {
+        ->attr {
+            n: 'class';
+            v: 'action';
+        }
+
+        ->append(d: target)
+        ->ui {
+            c: 'EntryPoint';
+        }
+    }
+}

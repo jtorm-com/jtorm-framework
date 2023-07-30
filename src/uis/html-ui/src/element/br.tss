@@ -1,4 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-br->get {
-    t: '@h/global.tss';
-}
+
+br
+    ->get {
+        t: '@h/global.tss';
+    }

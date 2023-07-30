@@ -4,8 +4,8 @@
 module.exports = {
     jTormTextMethod: {
         // DI
-        dataParser: null,
-        languageModel: null,
+        // dataParser: null,
+        // languageModel: null,
 
         alias: 't',
         params: [],

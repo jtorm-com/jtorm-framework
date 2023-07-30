@@ -4,7 +4,7 @@
 module.exports = {
     jTormDataModel: {
         // DI
-        requestModel: null,
+        // requestModel: null,
 
         cache: {},
 

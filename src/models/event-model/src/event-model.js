@@ -4,7 +4,7 @@
 module.exports = {
     jTormEventModel: {
         // DI
-        plugins: null,
+        // plugins: null,
 
         event: {
             before: {

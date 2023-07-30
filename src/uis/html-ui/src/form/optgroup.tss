@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 optgroup {
-    ->if(d: disabled)->attr {
+    ->if(d: disabled)
+    ->attr {
         n: 'disabled';
         v: true;
     }

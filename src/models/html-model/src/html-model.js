@@ -4,7 +4,7 @@
 module.exports = {
     jTormHtmlModel: {
         // DI
-        requestModel: null,
+        // requestModel: null,
 
         cache: {},
 

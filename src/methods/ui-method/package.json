@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/ui-method",
   "description": "jTorm UI Method",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -14,6 +14,6 @@
     "directory": "src/methods/ui-method"
   },
   "dependencies": {
-    "@jtorm/mediatarget-method": ">=0.0.3"
+    "@jtorm/mediatarget-method": ">=0.0.4"
   }
 }

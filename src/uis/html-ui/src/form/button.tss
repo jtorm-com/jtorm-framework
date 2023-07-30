@@ -1,10 +1,12 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 button {
     ->inner {
         h: html;
     }
 
-    ->if(d: type, v: '^(button|reset|submit)$')->attr {
+    ->if(d: type, v: '^(button|reset|submit)$')
+    ->attr {
         n: 'type';
         v: type;
     }

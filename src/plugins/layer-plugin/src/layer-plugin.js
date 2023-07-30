@@ -4,9 +4,9 @@
 module.exports = {
     jTormLayerPlugin: {
         // DI
-        handler: null,
-        layerModel: null,
-        viewModel: null,
+        // handler: null,
+        // layerModel: null,
+        // viewModel: null,
 
         currentCid: [],
         event: {
@@ -26,9 +26,7 @@ module.exports = {
         },
 
         handle: async function(v, e, t) {
-            const m = this.layerModel,
-                  c = m.get(v, e, t);
-
+            const c = this.layerModel.get(v, e, t);
             if (c && c.length)
                 await this.handler.handle(null, null, null, 0, this.viewModel.copy(v, null, c));
         },

@@ -1,0 +1,52 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->get(d: @id)
+->ui {
+    c: '@m.figure';
+    t: '0';
+
+    figure
+        ->ui {
+            c: '@e.a';
+            t: '0';
+
+            a {
+                ->attr {
+                    n: 'href';
+                    v: contentUrl;
+                }
+
+                ->ui {
+                    c: '@m.picture';
+                    t: '0';
+
+                    picture
+                        ->get(d: width.@id, a: 'width')
+                        ->get(d: height.@id, a: 'height')
+                        ->data(
+                            alt: name,
+                            src: contentUrl,
+                            width: width.value,
+                            height: height.value
+                        )
+                        ->ui {
+                            c: '@m.img';
+
+                            img {
+                                ->if(d: representativeOfPage)
+                                ->attr {
+                                    n: 'class';
+                                    v: 'representativeOfPage';
+                                }
+                            }
+                        }
+                }
+            }
+
+            ->data(html: caption)
+            ->append
+            ->ui {
+                c: '@m.figcaption';
+            }
+        }
+}

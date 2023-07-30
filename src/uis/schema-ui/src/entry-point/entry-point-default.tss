@@ -1,0 +1,26 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->ui {
+        c: '@e.div';
+
+        div {
+            ->attr {
+                n: 'class';
+                v: 'entry-point-group';
+            }
+
+            ->each
+            ->append
+            ->ui {
+                c: 'EntryPoint';
+            }
+        }
+    }
+
+    ->else
+    ->append
+    ->ui {
+        c: 'EntryPoint.action';
+    }
+}

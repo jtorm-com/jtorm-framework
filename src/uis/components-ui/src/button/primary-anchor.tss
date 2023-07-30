@@ -1,8 +1,12 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-a {
-  ->attr {
-    n: 'class';
-    v: 'primary';
-    m: 'a';
-  }
+
+->ui {
+    c: '@e.a';
+
+    a
+        ->attr {
+            n: 'class';
+            v: 'primary-button';
+            m: 'a';
+        }
 }

@@ -4,7 +4,7 @@
 module.exports = {
     jTormWrapMethod: {
         // DI
-        handlerWrapper: null,
+        // handlerWrapper: null,
 
         alias: 'w',
         params: ['s', 'h', 'd'],

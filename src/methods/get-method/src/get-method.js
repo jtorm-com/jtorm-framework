@@ -4,9 +4,9 @@
 module.exports = {
     jTormGetMethod: {
         // DI
-        models: null,
+        // models: null,
 
-        params: ['h', 't', 'd'],
+        params: ['h', 't', 'd', 'a'],
 
         validate: function (v) {
             return !!(v.d.h || v.d.t || v.d.d);
@@ -19,20 +19,17 @@ module.exports = {
         },
 
         async handle(v) {
-            let r, p, k, k2, nD, nT;
+            let r, k, nD, nT;
 
             if (v.d.d) {
-                nD = v._.cloneDeep(v.m);
+                nD = {...v.m};
 
-                if (v._.isString(v.d.d))
-                    v.d.d = [v.d.d];
+                r = await this.get(v, 'data', v.d.d);
 
-                for (k in v.d.d) {
-                    r = await this.get(v, 'data', v.d.d[k]);
-
-                    for (k2 in r)
-                        nD[k] = r[k];
-                }
+                if (v.d.a)
+                    v._.set(nD, v.d.a, r);
+                else
+                    nD = {...nD, ...r};
             }
 
             if (v.d.h) {
@@ -41,10 +38,8 @@ module.exports = {
                 if (v._.isString(v.d.h))
                     v.d.h = [v.d.h];
 
-                for (k in v.d.h) {
-                    p = await this.get(v, 'html', v.d.h[k]);
-                    r += p;
-                }
+                for (k in v.d.h)
+                    r += await this.get(v, 'html', v.d.h[k]);
 
                 await v.h.set(v, function (el) {
                     el.innerHTML = r;
@@ -68,7 +63,7 @@ module.exports = {
                         v.c.s = v.t.s;
 
                     for (k in r)
-                        nT.c.unshift(r[k]);
+                        nT.c.push(r[k]);
                 }
 
                 for (k in v.t.c)

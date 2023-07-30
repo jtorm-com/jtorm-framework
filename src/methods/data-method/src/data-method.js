@@ -4,7 +4,7 @@
 module.exports = {
     jTormDataMethod: {
         // DI
-        dataParser: null,
+        // dataParser: null,
 
         alias: 'd',
         params: [],
@@ -15,7 +15,8 @@ module.exports = {
         },
 
         data: async function (v) {
-            let tT, ks, k, k2, p, t = v.t, tD = {};
+            let tT, ks, k, k2, p;
+            const t = v.t, tD = {};
 
             for (k in t.p) {
                 if (t.p[k].indexOf(this.or) !== -1)
@@ -29,11 +30,16 @@ module.exports = {
                         break;
                 }
 
-                ks = k.split('.');
-                this.set(tD, ks, p);
+                if (p !== null) {
+                    ks = k.split('.');
+                    this.set(tD, ks, p);
+                }
             }
 
-            v.io = {d: tD, c: 1};
+            if (v._.isEmpty(tD))
+                v.io = {c: 0};
+            else
+                v.io = {d: {...v.m, ...tD}, c: 1};
         },
 
         set: function (d, ks, v) {

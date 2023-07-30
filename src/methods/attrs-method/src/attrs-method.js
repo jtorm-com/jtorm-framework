@@ -4,10 +4,10 @@
 module.exports = {
     jTormAttrsMethod: {
         // DI
-        attrMethod: null,
-        dataParser: null,
-        tssParser: null,
-        viewModel: null,
+        // attrMethod: null,
+        // dataParser: null,
+        // tssParser: null,
+        // viewModel: null,
 
         alias: 'as',
         separator: ',',

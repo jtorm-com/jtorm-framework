@@ -1,0 +1,14 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(d: verification)->data(name: 'google-site-verification', content: verification)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: googlebot)->data(name: 'googlebot', content: googlebot)->append->ui {
+    c: 'doc.meta';
+}
+
+// todo loop multiple if there are
+->if(d: google)->data(name: 'google', content: google)->append->ui {
+    c: 'doc.meta';
+}

@@ -4,7 +4,7 @@
 module.exports = {
     jTormSwapMethod: {
         // DI
-        handler: null,
+        // handler: null,
 
         alias: 's',
         params: ['s', 'a', 'ui', 'h'],
