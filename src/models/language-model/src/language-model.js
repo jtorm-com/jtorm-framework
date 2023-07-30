@@ -4,18 +4,19 @@
 module.exports = {
     jTormLanguageModel: {
         // DI
-        configModel: null,
-        sessionModel: null,
+        // configModel: null,
+        // sessionModel: null,
 
-        current: null,
+        // language: null,
+        // fallback: null
         data: {},
-        default: 'en',
+        default: 'en-US',
 
         init: function() {
-            this.current = this.getCurrent();
+            this.setLanguage(this.initLanguage());
         },
 
-        getCurrent: function() {
+        initLanguage: function() {
             const s = this;
             let l = s.sessionModel.get('language');
 
@@ -26,8 +27,7 @@ module.exports = {
                 l = s.default;
 
             if (!s.data[l]) {
-                if (/^[a-z][a-z]-[A-Z][A-Z]/.test(l))
-                    l = l.split('-')[0];
+                l = s.getFallback();
 
                 if (!s.data[l])
                     l = s.default;
@@ -38,23 +38,37 @@ module.exports = {
             return l;
         },
 
+        getFallback: function (l) {
+            return (/^[a-z][a-z]-[A-Z][A-Z]/.test(l))
+                ? l.split('-')[0]
+                : l;
+        },
+
+        setLanguage: function(l) {
+            this.language = l;
+            this.fallback = this.getFallback(l);
+        },
+
         getDate(d) {
             return d.toUTCString();
         },
 
         get: function (s) {
-            const l = this.current;
+            let l = this.language;
+
+            if (!this.data[l] || !this.data[l][s])
+                l = s.fallback;
 
             return (
-                this.data[l] !== undefined
-                && this.data[l][s] !== undefined
+                this.data[l]
+                && this.data[l][s]
             )
                 ? this.data[l][s]
                 : s;
         },
 
         set: function (l, k, v) {
-            if (this.data[l] === undefined)
+            if (!this.data[l])
                 this.data[l] = {};
 
             this.data[l][k] = v;

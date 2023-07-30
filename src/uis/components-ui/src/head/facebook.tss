@@ -1,0 +1,18 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(d: profile_id)->data(property: 'fb:profile_id', content: profile_id)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: page_id)->data(property: 'fb:page_id', content: page_id)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: app_id)->data(property: 'fb:app_id', content: app_id)->append->ui {
+    c: 'doc.meta';
+}
+
+// todo loop multiple if there are
+->if(d: admins)->data(property: 'fb:admins', content: admins)->append->ui {
+    c: 'doc.meta';
+}

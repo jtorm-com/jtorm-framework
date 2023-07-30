@@ -1,4 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-samp->get {
-    t: '@h/replacable.tss';
-}
+
+samp
+    ->get {
+        t: '@h/replacable.tss';
+    }

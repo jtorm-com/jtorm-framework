@@ -1,0 +1,33 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@e.main';
+
+    main {
+        ->attr {
+            n: 'id';
+            v: 'body';
+        }
+
+        #body
+            ->append
+            ->ui {
+                c: '@e.div';
+                t: '0';
+
+                div {
+                    ->attr {
+                        n: 'id';
+                        v: 'contents';
+                    }
+
+                    #contents
+                        ->append
+                        ->ui {
+                            c: @type + '.default';
+                            m: '1';
+                        }
+                }
+            }
+    }
+}

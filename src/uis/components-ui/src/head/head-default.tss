@@ -1,10 +1,32 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
+->data(name: 'viewport', content: @meta.viewport||'width=device-width, initial-scale=1')
+->append
+->ui {
+    c: 'doc.meta';
+}
+
+/* For performance, this should be added in the response headers
+->data(charset: @meta.charset||'UTF-8')
+->append
+->ui {
+    c: 'doc.meta';
+}
+
+->data(httpEquiv: 'X-UA-Compatible', content: @meta.XUACompatible||'IE=Edge')
+->append
+->ui {
+    c: 'doc.meta';
+}
+*/
+
+->if(d: @config.appleTouchIcon)
 ->each {
-    m: 'append';
     d: @config.appleTouchIcon;
+
     ->append->ui {
         c: 'doc.link';
+
         link->attr {
             n: 'rel';
             v: 'apple-touch-icon';
@@ -12,26 +34,39 @@
     }
 }
 
-->append(d: @config.favicon)->ui {
+->append(d: @config.favicon)
+->ui {
     c: 'doc.link';
+
     link->attr {
         n: 'rel';
         v: 'icon';
     }
 }
 
-->data(charset: @meta.charset||'UTF-8')->append->ui {
+->if(d: rating)->data(name: 'rating', content: rating)
+->append
+->ui {
     c: 'doc.meta';
 }
 
-->data(httpEquiv: 'X-UA-Compatible', content: @meta.XUACompatible||'IE=Edge')->append->ui {
-    c: 'doc.meta';
+// todo add social media page dependend info
+->append(d: @config.facebook)
+->get {
+    t: '@c/head/facebook.tss';
 }
 
-->data(name: 'viewport', content: @meta.viewport||'width=device-width, initial-scale=1')->append->ui {
-    c: 'doc.meta';
+->append(d: @config.twitter)
+->get {
+    t: '@c/head/twitter.tss';
 }
 
-->if(d: @config.google)->get {
-    t: '@c/google.tss';
+->append(d: @config.google)
+->get {
+    t: '@c/head/google.tss';
+}
+
+->append(d: @config.og)
+->get {
+    t: '@c/head/og.tss';
 }

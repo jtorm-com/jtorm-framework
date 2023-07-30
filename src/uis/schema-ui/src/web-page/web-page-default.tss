@@ -1,0 +1,95 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->title {
+    t: name;
+}
+
+html {
+    ->config(
+        d: 'dir',
+        a: 'dir'
+    )
+    ->attr {
+        n: 'dir';
+        v: dir;
+    }
+
+    ->attr {
+        n: 'lang';
+        v: inLanguage;
+    }
+}
+
+head {
+    ->append(
+        cid: 'head-default',
+        cs: 'global' + '-' + inLanguage
+    )
+    ->ui {
+        c: 'head.default';
+    }
+
+    ->append(
+        cid: 'head-id',
+        cs: identifier + '-' + inLanguage
+    )
+    ->ui {
+        c: 'head.id';
+    }
+}
+
+body {
+    ->each {
+        d: hasPart;
+
+        // sort order is important this way, but takes less code
+        ->if(
+            d: @type,
+            v: '^WPHeader|SiteNavigationElement|BreadcrumbList$'
+        )
+        ->get(d: @id)
+        ->append(
+            cid: @type,
+            cs: 'global' + '-' + inLanguage
+        )
+        ->ui {
+            c: @type;
+        }
+    }
+
+    ->append(
+        d: mainEntity,
+        cid: 'mainEntity',
+        cs: identifier + '-' + inLanguage
+    )
+    ->get(d: @id)
+    ->ui {
+        c: 'WebPage.contentsDefault';
+    }
+
+    ->each {
+        d: hasPart;
+
+        ->if(
+            d: @type,
+            v: '^WPFooter'
+        )
+        ->get(d: @id)
+        ->append(
+            cid: @type,
+            cs: 'global' + '-' + inLanguage
+        )
+        ->ui {
+            c: @type;
+        }
+    }
+
+    ->append(
+        cid: 'loading',
+        cs: 'global' + '-' + inLanguage
+    )
+    ->ui {
+        c: 'loading.default';
+        m: '1';
+    }
+}

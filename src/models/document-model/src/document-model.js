@@ -4,8 +4,8 @@
 module.exports = {
     jTormDocumentModel: {
         // DI
-        errorHandler: null,
-        windowModel: null,
+        // errorHandler: null,
+        // windowModel: null,
 
         charset: 'utf-8',
 
@@ -26,7 +26,7 @@ module.exports = {
                 },
 
                 html: function() {
-                    return this.d.documentElement.outerHTML;
+                    return '<!DOCTYPE html>' + this.d.documentElement.outerHTML;
                 },
 
                 select: function(s) {
@@ -58,11 +58,13 @@ module.exports = {
                 },
 
                 set: async function(v, fn) {
-                    let s = this.getSelector(v.t.s, v.c.s),
-                        c = this.select(s);
+                    const
+                        s = this.getSelector(v.t.s, v.c.s),
+                        c = this.selectAll(s);
 
-                    if (c)
-                        await fn(c);
+                    if (c.length)
+                        for (let i = 0; i < c.length; i++)
+                            await fn(c[i]);
                     else
                         this.errorHandler.handle(s + ' not found', v);
                 }

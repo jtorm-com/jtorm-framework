@@ -1,15 +1,18 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 ->attr {
     n: 'formaction';
     v: formaction;
 }
 
-->if(d: formenctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$')->attr {
+->if(d: formenctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$')
+->attr {
     n: 'formenctype';
     v: formenctype;
 }
 
-->if(d: formmethod, v: '^(get|post)$')->attr {
+->if(d: formmethod, v: '^(get|post)$')
+->attr {
     n: 'formmethod';
     v: formmethod;
 }
@@ -19,7 +22,8 @@
     v: formtarget;
 }
 
-->if(d: formnovalidate)->attr {
+->if(d: formnovalidate)
+->attr {
     n: 'formnovalidate';
     v: true;
 }

@@ -4,9 +4,9 @@
 module.exports = {
     jTormViewModel: {
         // DI
-        _: null,
-        documentModel: null,
-        tssParser: null,
+        // _: null,
+        // documentModel: null,
+        // tssParser: null,
 
         copyAttrs: ['_', 't', 'params', 'io', 'c'],
         data: {

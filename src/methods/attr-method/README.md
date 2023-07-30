@@ -19,7 +19,7 @@ Value or method is required. To remove an attribute no value is needed.
 ## Example
 
 ```js
-div->att {
+div->attr {
   n: 'class';
   v: 'row';
   m: 'a';

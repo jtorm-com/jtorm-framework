@@ -1,11 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 input {
     ->attr {
         n: 'type';
         v: 'range';
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+    ->if(d: autocomplete, v: '^(on|off)$')
+    ->attr {
         n: 'autocomplete';
         v: autocomplete;
     }

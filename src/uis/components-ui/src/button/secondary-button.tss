@@ -1,8 +1,12 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-button {
-  ->attr {
-    n: 'class';
-    v: 'secondary';
-    m: 'a';
-  }
+
+->ui {
+    c: 'form.button';
+
+    button
+        ->attr {
+            n: 'class';
+            v: 'secondary-button';
+            m: 'a';
+        }
 }

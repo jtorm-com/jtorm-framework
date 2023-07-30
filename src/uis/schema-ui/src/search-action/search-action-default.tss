@@ -1,0 +1,55 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->text(placeholder: 'Search')
+->if(
+    d: target,
+    to: 'string'
+) {
+    ->data(
+        target: url,
+        method: 'get'
+    )
+    ->ui {
+        c: '@f.form';
+
+        form {
+            ->attr {
+                n: 'class';
+                v: 'search-action';
+                m: 'a';
+            }
+
+            ->data(
+                name: 'query',
+                value: query,
+                required: '1',
+                placeholder: placeholder + '...'
+            )
+            ->append
+            ->ui {
+                c: '@f.inputSearch';
+            }
+
+            ->data(
+                html: placeholder,
+                type: 'submit'
+            )
+            ->append
+            ->ui {
+                c: 'button.primaryButton';
+            }
+        }
+    }
+
+    ->else {
+        ->ui {
+            c: 'Action';
+
+            .action->attr {
+                n: 'class';
+                v: 'search-action';
+                m: 'a';
+            }
+        }
+    }
+}

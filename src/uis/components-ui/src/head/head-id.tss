@@ -1,21 +1,37 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->data(name: 'description', content: disambiguatingDescription.Text)->append->ui {
+->if(d: disambiguatingDescription)
+->data(
+    name: 'description',
+    content: disambiguatingDescription
+)
+->append
+->ui {
     c: 'doc.meta';
 }
 
-->data(rel: 'canonical', href: url.URL)->append->ui {
+->if(d: url)
+->data(
+    rel: 'canonical',
+    href: url
+)
+->append
+->ui {
     c: 'doc.link';
 }
 
-->data(h: url.URL)->append->ui {
+->data(h: url)
+->append
+->ui {
     c: 'doc.link';
     t: '0';
+
     link {
         ->attrs {
             n: 'rel,type';
             v: 'alternate,application/ld+json';
         }
+
         ->attr {
             n: 'href';
             v: h;
@@ -24,24 +40,34 @@
     }
 }
 
-->if(d: workTranslation)->each {
-    m: 'append';
+->if(d: workTranslation)
+->each {
     d: workTranslation;
+
+    ->data(
+        rel: 'alternate',
+        hreflang: inLanguage,
+        href: url
+    )
     ->ui {
         c: 'doc.link';
-        link {
-            ->attrs {
-                n: 'rel,hreflang,href';
-                v: 'alternate,@c.inLanguage.Language.alternateName.Text,@c.url.URL';
-            }
-        }
     }
 }
 
-->data(name: 'robots', content: @meta.robots||'index, follow')->append->ui {
+->data(
+    name: 'robots',
+    content: @meta.robots||'index, follow'
+)
+->append
+->ui {
     c: 'doc.meta';
 }
 
-->data(name: 'referrer', content: @meta.referrer||'origin')->append->ui {
+->data(
+    name: 'referrer',
+    content: @meta.referrer||'origin'
+)
+->append
+->ui {
     c: 'doc.meta';
 }

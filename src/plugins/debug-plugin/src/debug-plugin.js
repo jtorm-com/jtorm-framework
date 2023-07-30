@@ -1,9 +1,10 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+'use strict';
 
 module.exports = {
     jTormDebugPlugin: {
         // DI
-        util: null,
+        // util: null,
 
         event: {
             before: {

@@ -4,10 +4,10 @@
 module.exports = {
     jTormHandler: {
         // DI
-        dataParser: null,
-        eventModel: null,
-        methods: null,
-        viewModel: null,
+        // dataParser: null,
+        // eventModel: null,
+        // methods: null,
+        // viewModel: null,
 
         handle: async function (h, t, m, c, v) {
             let e = this.eventModel,

@@ -1,11 +1,14 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 th {
-    ->if(d: colspan, v: '^[0-9]+$')->attr {
+    ->if(d: colspan, v: '^[0-9]+$')
+    ->attr {
         n: 'colspan';
         v: colspan;
     }
 
-    ->if(d: rowspan, v: '^[0-9]+$')->attr {
+    ->if(d: rowspan, v: '^[0-9]+$')
+    ->attr {
         n: 'rowspan';
         v: rowspan;
     }

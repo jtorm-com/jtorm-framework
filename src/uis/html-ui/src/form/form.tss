@@ -1,4 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 form {
     ->attr {
         n: 'accept-charset';
@@ -10,17 +11,20 @@ form {
         v: action;
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+    ->if(d: autocomplete, v: '^(on|off)$')
+    ->attr {
         n: 'autocomplete';
         v: autocomplete;
     }
 
-    ->if(d: enctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$')->attr {
+    ->if(d: enctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$')
+    ->attr {
         n: 'enctype';
         v: enctype;
     }
 
-    ->if(d: method, v: '^(get|post)$')->attr {
+    ->if(d: method, v: '^(get|post)$')
+    ->attr {
         n: 'method';
         v: method;
     }
@@ -30,7 +34,8 @@ form {
         v: name;
     }
 
-    ->if(d: novalidate)->attr {
+    ->if(d: novalidate)
+    ->attr {
         n: 'novalidate';
         v: true;
     }

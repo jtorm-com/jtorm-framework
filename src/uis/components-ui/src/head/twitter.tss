@@ -1,0 +1,35 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(d: card)->data(property: 'twitter:card', content: card)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: site)->data(property: 'twitter:site', content: site)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: creator)->data(property: 'twitter:creator', content: creator)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: title)->data(property: 'twitter:title', content: title)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: description)->data(property: 'twitter:description', content: description)->append->ui {
+    c: 'doc.meta';
+}
+
+->if(d: image.url) {
+    ->data(property: 'twitter:image', content: image.url)->append->ui {
+        c: 'doc.meta';
+    }
+
+    ->if(d: image.width)->data(property: 'twitter:image:width', content: image.width)->append->ui {
+        c: 'doc.meta';
+    }
+
+    ->if(d: image.height)->data(property: 'twitter:image:height', content: image.height)->append->ui {
+        c: 'doc.meta';
+    }
+}

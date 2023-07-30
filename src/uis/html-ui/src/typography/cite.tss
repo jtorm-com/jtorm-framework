@@ -1,4 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-cite->get {
-    t: '@h/replacable.tss';
-}
+
+cite
+    ->get {
+        t: '@h/replacable.tss';
+    }

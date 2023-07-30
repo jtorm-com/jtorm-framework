@@ -1,18 +1,12 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 module.exports = {
     jTormComponentsUI: {
-        id: "jtorm-components-ui",
+        id: "jtorm/components-ui-0.0.4/src",
         alias: "@c",
         framework: "c",
-        url: [
-            // 'https://gitlab.com/jtorm/jtorm-framework/src/uis/components-ui/src'
-        ],
+        url: "https://cdn.jtorm.com/",
         mapper: {
-            init: {
-                default: {
-                    t: ['@c/init.tss']
-                }
-            },
             contents: {
                 default: {
                     t: ['@c/contents/contents-default.tss']
@@ -37,10 +31,6 @@ module.exports = {
             },
             loading: {
                 default: {
-                    ui: {
-                        c: '@e.div',
-                        t: 0
-                    },
                     t: ['@c/loading/loading-default.tss']
                 }
             },
@@ -86,15 +76,9 @@ module.exports = {
             },
             button: {
                 primaryButton: {
-                    ui: {
-                        c: 'form.button'
-                    },
                     t: ['@c/button/primary-button.tss']
                 },
                 secondaryButton: {
-                    ui: {
-                        c: 'form.button'
-                    },
                     t: ['@c/button/secondary-button.tss']
                 },
                 primaryAnchor: {

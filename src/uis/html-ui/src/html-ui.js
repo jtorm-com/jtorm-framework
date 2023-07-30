@@ -1,7 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 module.exports = {
     jTormHtmlUi: {
-        id: "jtorm-html-ui",
+        id: "jtorm/html-ui-0.0.4/src",
         alias: "@h",
         framework: "h",
         mapperAlias: {
@@ -12,15 +13,8 @@ module.exports = {
             tb: 'table',
             m: 'media'
         },
-        url: [
-            // 'https://gitlab.com/jtorm/jtorm-framework/src/uis/html-ui/src'
-        ],
+        url: "https://cdn.jtorm.com/",
         mapper: {
-            init: {
-                default: {
-                    t: ['@h/init.tss']
-                }
-            },
             doc: {
                 base: {
                     t: ['@h/@d/base.tss'],

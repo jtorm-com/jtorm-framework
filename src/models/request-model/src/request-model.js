@@ -4,9 +4,9 @@
 module.exports = {
     jTormRequestModel: {
         // DI
-        axios: null,
-        uiMethod: null,
-        windowModel: null,
+        // axios: null,
+        // uiMethod: null,
+        // windowModel: null,
 
         url: null,
 

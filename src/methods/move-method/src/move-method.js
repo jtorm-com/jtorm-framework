@@ -4,8 +4,8 @@
 module.exports = {
     jTormMoveMethod: {
         // DI
-        methods: null,
-        viewModel: null,
+        // methods: null,
+        // viewModel: null,
 
         alias: 'm',
         params: ['l', 'm'],

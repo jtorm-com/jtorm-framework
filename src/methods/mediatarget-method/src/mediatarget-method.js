@@ -4,7 +4,7 @@
 module.exports = {
     jTormMediatargetMethod: {
         // DI
-        mediaqueryMethod: null,
+        // mediaqueryMethod: null,
 
         alias: 'mt',
         current: [],

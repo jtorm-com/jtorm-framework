@@ -1,4 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-thead->get {
-    t: '@h/replacable.tss';
-}
+
+thead
+    ->get {
+        t: '@h/replacable.tss';
+    }

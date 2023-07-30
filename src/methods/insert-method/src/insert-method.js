@@ -4,9 +4,9 @@
 module.exports = {
     jTormInsertMethod: {
         // DI
-        errorHandler: null,
-        handlerWrapper: null,
-        viewModel: null,
+        // errorHandler: null,
+        // handlerWrapper: null,
+        // viewModel: null,
 
         alias: 'i',
         params: [

@@ -1,11 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 input {
     ->attr {
         n: 'type';
         v: 'text';
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')->attr {
+    ->if(d: autocomplete, v: '^(on|off)$')
+    ->attr {
         n: 'autocomplete';
         v: autocomplete;
     }
@@ -34,27 +36,32 @@ input {
         v: pattern;
     }
 
-    ->if(d: size, v: '^[0-9]+$')->attr {
+    ->if(d: size, v: '^[0-9]+$')
+    ->attr {
         n: 'size';
         v: size;
     }
 
-    ->if(d: readonly)->attr {
+    ->if(d: readonly)
+    ->attr {
         n: 'readonly';
         v: true;
     }
 
-    ->if(d: minlength, v: '^[0-9]+$')->attr {
+    ->if(d: minlength, v: '^[0-9]+$')
+    ->attr {
         n: 'minlength';
         v: true;
     }
 
-    ->if(d: maxlength, v: '^[0-9]+$')->attr {
+    ->if(d: maxlength, v: '^[0-9]+$')
+    ->attr {
         n: 'maxlength';
         v: true;
     }
 
-    ->if(d: required)->attr {
+    ->if(d: required)
+    ->attr {
         n: 'required';
         v: true;
     }

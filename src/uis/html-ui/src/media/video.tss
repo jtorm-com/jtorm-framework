@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 video {
-    ->if(d: height, v: '^[0-9]+$')->attr {
+    ->if(d: height, v: '^[0-9]+$')
+    ->attr {
         n: 'height';
         v: height;
     }
@@ -10,7 +12,8 @@ video {
         v: poster;
     }
 
-    ->if(d: width, v: '^[0-9]+$')->attr {
+    ->if(d: width, v: '^[0-9]+$')
+    ->attr {
         n: 'width';
         v: width;
     }

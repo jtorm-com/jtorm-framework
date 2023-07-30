@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
+
 script {
-    ->if(d: async)->attr {
+    ->if(d: async)
+    ->attr {
         n: 'async';
         v: true;
     }
@@ -10,7 +12,8 @@ script {
         v: charset;
     }
 
-    ->if(d: defer)->attr {
+    ->if(d: defer)
+    ->attr {
         n: 'defer';
         v: true;
     }

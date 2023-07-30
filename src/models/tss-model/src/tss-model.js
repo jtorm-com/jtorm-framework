@@ -4,8 +4,8 @@
 module.exports = {
     jTormTssModel: {
         // DI
-        requestModel: null,
-        tssParser: null,
+        // requestModel: null,
+        // tssParser: null,
 
         cache: {},
 

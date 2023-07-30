@@ -1,0 +1,59 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: 'WebPageElement';
+
+    section->swap {
+        s: 'footer';
+        ui: '@e.footer';
+        a: 1;
+
+        body > footer {
+            ->attrs {
+                n: 'class,id';
+                v: 'schema-WPFooter,footer';
+                m: 'a';
+            }
+
+            ->attr {
+                n: 'class';
+                v: 'schema-WebPageElement ';
+                m: 'r';
+            }
+        }
+
+        #footer > .contents > header->swap {
+            s: 'section';
+            ui: '@e.section';
+            a: 1;
+        }
+
+        #footer > .contents > footer->swap {
+            s: 'section';
+            ui: '@e.section';
+            a: 1;
+
+            #footer > .contents > .footer->append->ui {// todo debug this ?
+                c: 'grid.oneColumn';
+
+                .cell {
+                    ->attr {
+                        n: 'class';
+                        v: 'copyright';
+                        m: 'a';
+                    }
+
+                    ->append->ui {
+                        c: '@t.small';
+
+                        small {
+                            ->append {
+                                h: copyrightYear.Number + ' ' + copyrightNotice.Text;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
