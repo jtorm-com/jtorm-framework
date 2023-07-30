@@ -47,6 +47,7 @@ module.exports = {
                         '@s/web-page/web-page-default.tss'
                     ]
                 },
+                // todo
                 boxed: {
                     ui: {
                         c: 'WebPage.default',
@@ -56,11 +57,12 @@ module.exports = {
                         '@s/web-page/web-page-boxed.tss'
                     ]
                 },
-                contentsDefault: {
+                contents: {
                     t: [
                         '@s/web-page/contents-default.tss'
                     ]
                 },
+                // todo
                 contentsBoxed: {
                     ui: {
                         c: 'WebPage.contentsDefault'
@@ -130,6 +132,13 @@ module.exports = {
                     ]
                 }
             },
+            WebSite: {
+                default: {
+                    t: [
+                        '@s/web-site/web-site-default.tss'
+                    ]
+                }
+            },
             /*
       AboutPage
       CheckoutPage
@@ -146,6 +155,9 @@ module.exports = {
             WebPageElement: {
                 default: {
                     t: ['@s/web-page-element/web-page-element-default.tss']
+                },
+                contents: {
+                    t: ['@s/web-page-element/web-page-element-contents.tss']
                 }
             },
             WPSideBar: {
@@ -210,6 +222,9 @@ module.exports = {
                 default: {
                     t: ['@s/thing/thing-default.tss']
                 },
+                contents: {
+                    t: ['@s/thing/thing-contents.tss']
+                },
                 link: {
                     t: ['@s/thing/thing-link.tss']
                 }
@@ -229,9 +244,12 @@ module.exports = {
             CreativeWork: {
                 default: {
                     t: [
-                        '@s/creative-work/creative-work-item.tss',
+                        // '@s/creative-work/creative-work-item.tss',
                         '@s/creative-work/creative-work-default.tss'
                     ]
+                },
+                contents: {
+                    t: ['@s/creative-work/creative-work-contents.tss']
                 },
                 listItem: {
                     ui: {
@@ -318,6 +336,11 @@ module.exports = {
                 },
                 link: {
                     t: ['@s/action/action-link.tss']
+                }
+            },
+            SearchAction: {
+                default: {
+                    t: ['@s/search-action/search-action-default.tss']
                 }
             },
             ConsumeAction: {

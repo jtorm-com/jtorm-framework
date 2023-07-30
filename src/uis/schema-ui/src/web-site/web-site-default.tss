@@ -7,10 +7,10 @@
     section
         ->attr(
             n: 'class',
-            v: 'thing'
+            v: 'web-site'
         )
         ->append
         ->ui {
-            c: 'Thing.contents';
+            c: 'CreativeWork.contents';
         }
 }

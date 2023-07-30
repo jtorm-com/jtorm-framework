@@ -1,5 +1,11 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->append(d: target)->ui {
+->append(d: target)
+->ui {
     c: 'EntryPoint';
+
+    ->attr {
+        n: 'class';
+        v: 'action';
+    }
 }

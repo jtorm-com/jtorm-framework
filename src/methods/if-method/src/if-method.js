@@ -16,15 +16,25 @@ module.exports = {
         },
 
         handle: async function (v) {
-            let r, e, t = [], k, to = 1, o = this.or, a = this.and, d = this.dataParser;
+            const
+                d = this.dataParser,
+                o = this.or,
+                a = this.and;
+
+            let
+                r,
+                e,
+                t,
+                k,
+                to = 1;
 
             if (v.d.d === undefined)
                 v.d.d = v.m;
 
             if (v.d.to) {
-                if (v.d.to === 'array') {
+                if (v.d.to === 'array')
                     to = Array.isArray(v.d.d);
-                } else if (typeof v.d.d !== v.d.to)
+                else if (typeof v.d.d !== v.d.to)
                     to = 0;
             }
 
@@ -40,6 +50,7 @@ module.exports = {
                 } else if (v.t.p.d.indexOf(a) !== -1) {
                     t = v.t.p.d.split(a);
                     v.d.d = 1;
+
                     for (k in t) {
                         if (!d.parse(v.m, t[k].trim())) {
                             v.d.d = 0;
@@ -47,8 +58,6 @@ module.exports = {
                         }
                     }
                 }
-
-                t = [];
             }
 
             if (v.d.v !== undefined) {
@@ -61,6 +70,7 @@ module.exports = {
             if (v.d.el)
                 e = v.h.select(v.d.el);
 
+            t = [];
             if (
                 to
                 && (

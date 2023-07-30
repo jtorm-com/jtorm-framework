@@ -1,28 +1,37 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-section {
-    ->attrs {
-        n: 'id,class,style,data-nosnippet';
-        v: 'loading,loading,display: none,1';
-        m: 'p';
-    }
+->data(id: 'loading')
+->ui {
+    c: '@e.div';
 
-    .loading->append->ui {
-        c: '@e.div';
-        t: '0';
+    div {
+        ->attr {
+            n: 'data-nosnippet';
+            v: '1';
+            m: 'a';
+        }
 
-        div {
-            ->append->ui {
-                c: '@e.span';
-                t: '0';
-            }
+        ->append
+        ->ui {
+            c: '@e.div';
+            t: '0';
 
-            ->append->ui {
-                c: '@t.small';
-                t: '0';
+            div {
+                ->append->ui {
+                    c: '@e.span';
+                    t: '0';
+                }
 
-                small->text(label: 'Loading')->inner {
-                    h: label;
+                ->append
+                ->ui {
+                    c: '@t.small';
+                    t: '0';
+
+                    small
+                        ->text(label: 'Loading')
+                        ->inner {
+                            h: label;
+                        }
                 }
             }
         }

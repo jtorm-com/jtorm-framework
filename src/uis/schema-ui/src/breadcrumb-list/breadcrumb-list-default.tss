@@ -10,11 +10,14 @@
             v: 'breadcrumbs,Breadcrumbs';
         }
 
-        ->append->ui {
+        ->append
+        ->ui {
             c: 'contents.default';
 
             .contents {
-                ->text(html: 'You are here')->append->ui {
+                ->text(html: 'You are here')
+                ->append
+                ->ui {
                     c: '@e.span';
                     t: '0';
 
@@ -23,18 +26,23 @@
                     }
                 }
 
-                ->append(d: hasPart)->ui {
+                ->append(d: hasPart)
+                ->ui {
                     c: '@t.ol';
                     t: '0';
 
-                    ol->each(m: 'append')->ui {
-                        c: '@t.li';
-                        t: '0';
+                    ol
+                        ->each
+                        ->ui {
+                            c: '@t.li';
+                            t: '0';
 
-                        li->append(d: @c)->ui {
-                            c: @type + '.link';
+                            li
+                                ->append(d: @c)
+                                ->ui {
+                                    c: @type + '.link';
+                                }
                         }
-                    }
                 }
             }
         }

@@ -1,8 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->if(d: ImageObject, to: 'array') {
-    ->each(d: ImageObject, m: 'append')
+->if(to: 'array') {
+    ->each
+    ->get(d: @id)
+    ->get(d: size.@id, a: 'size')
+    ->get(d: size.additionalProperty.@id, a: 'size.additionalProperty')
     ->if(d: size.additionalProperty.value) {
+        ->get(d: width.@id, a: 'width')
+        ->get(d: height.@id, a: 'height')
         ->data(
             srcset: contentUrl,
             media: size.additionalProperty.value,
@@ -14,19 +19,22 @@
         }
 
         ->else
-        ->if(d: representativeOfPage)
         ->get {
             t: '@s/image-object/figure-default.tss';
         }
     }
 
-    source->move {
-        l: 'picture';
-        m: 'prepend';
+    ->if {
+        el: 'source';
+
+        source
+            ->move {
+                l: 'picture';
+                m: 'prepend';
+            }
     }
 
     ->else
-    ->append(d: ImageObject)
     ->get {
         t: '@s/image-object/figure-default.tss';
     }

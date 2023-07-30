@@ -13,22 +13,28 @@
             c: 'contents.default';
 
             .contents {
-                ->append(d: potentialAction)->ui {
+                ->append(d: potentialAction)
+                ->ui {
                     c: 'Action.linkMulti';
                 }
 
-                ->append(d: hasPart)->ui {
+                ->append(d: hasPart)
+                ->ui {
                     c: '@t.ol';
                     t: '0';
 
-                    ol->each(m: 'append')->ui {
-                        c: '@t.li';
-                        t: '0';
+                    ol
+                        ->each
+                        ->ui {
+                            c: '@t.li';
+                            t: '0';
 
-                        li->append(d: @c)->ui {
-                            c: @type + '.link';
+                            li
+                                ->append(d: @c)
+                                ->ui {
+                                    c: @type + '.link';
+                                }
                         }
-                    }
                 }
             }
         }

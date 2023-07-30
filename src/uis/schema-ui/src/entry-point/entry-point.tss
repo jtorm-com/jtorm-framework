@@ -7,11 +7,11 @@
     a {
         ->attrs {
             n: 'class,href';
-            v: 'schema-EntryPoint,urlTemplate';
+            v: 'entry-point,urlTemplate';
         }
 
         ->append {
-            h: application.SoftwareApplication.name;
+            h: application.name;
         }
     }
 }

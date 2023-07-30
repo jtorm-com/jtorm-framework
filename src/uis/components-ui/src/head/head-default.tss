@@ -22,7 +22,6 @@
 
 ->if(d: @config.appleTouchIcon)
 ->each {
-    m: 'append';
     d: @config.appleTouchIcon;
 
     ->append->ui {
@@ -51,22 +50,23 @@
     c: 'doc.meta';
 }
 
+// todo add social media page dependend info
 ->append(d: @config.facebook)
 ->get {
-    t: '@c/facebook.tss';
+    t: '@c/head/facebook.tss';
 }
 
 ->append(d: @config.twitter)
 ->get {
-    t: '@c/twitter.tss';
+    t: '@c/head/twitter.tss';
 }
 
 ->append(d: @config.google)
 ->get {
-    t: '@c/google.tss';
+    t: '@c/head/google.tss';
 }
 
 ->append(d: @config.og)
 ->get {
-    t: '@c/og.tss';
+    t: '@c/head/og.tss';
 }

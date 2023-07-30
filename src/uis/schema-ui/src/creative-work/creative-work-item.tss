@@ -1,19 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-body > section {
-    ->attr {
-      n: 'class';
-      v: 'schema-CreativeWork';
-      m: 'a';
-    }
 
-    ->attr {
-        n: 'class';
-        v: 'schema-Thing ';
-        m: 'r';
-    }
-}
-
+/*
 body > section > .contents > .header {
   ->append(d: aggregateRating)->ui {
     c: 'AggregateRating';
@@ -77,3 +65,4 @@ body > section > .contents > .body {
     c: 'CreativeWork.linkMulti';
   }
 }
+*/

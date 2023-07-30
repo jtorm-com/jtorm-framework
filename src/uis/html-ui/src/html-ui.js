@@ -15,11 +15,6 @@ module.exports = {
         },
         url: "https://cdn.jtorm.com/",
         mapper: {
-            init: {
-                default: {
-                    t: ['@h/init.tss']
-                }
-            },
             doc: {
                 base: {
                     t: ['@h/@d/base.tss'],

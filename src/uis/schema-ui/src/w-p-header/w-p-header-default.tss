@@ -1,37 +1,36 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 ->ui {
-    c: 'WebPageElement';
+    c: '@e.header';
+    t: '0';
 
-    section->swap {
-        s: 'header';
-        ui: '@e.header';
-        a: '1';
+    header
+        ->attr(
+            n: 'class',
+            v: 'w-p-header'
+        )
+        ->append
+        ->ui {
+            c: 'WebPageElement.contents';
 
-        body > header {
-            ->attrs {
-                n: 'class,id';
-                v: 'schema-WPHeader,header';
-                m: 'a';
-            }
+            body > .contents > .header
+                ->swap {
+                    s: 'section';
+                    ui: '@e.section';
+                    a: '1';
+                }
 
-            ->attr {
-                n: 'class';
-                v: 'schema-WebPageElement ';
-                m: 'r';
-            }
+            body > .contents > .image
+                ->move {
+                    l: 'body > .contents > .header';
+                    m: 'prepend';
+                }
+
+            body > .contents > .footer
+                ->swap {
+                    s: 'section';
+                    ui: '@e.section';
+                    a: '1';
+                }
         }
-
-        #header > .contents > header->swap {
-            s: 'section';
-            ui: '@e.section';
-            a: 1;
-        }
-
-        #header > .contents > footer->swap {
-            s: 'section';
-            ui: '@e.section';
-            a: 1;
-        }
-    }
 }

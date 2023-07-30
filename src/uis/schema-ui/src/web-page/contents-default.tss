@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 ->ui {
-    c: '@e.main'
+    c: '@e.main';
 
     main {
         ->attr {
@@ -9,21 +9,25 @@
             v: 'body';
         }
 
-        #body->append->ui {
-            c: '@e.div';
-            t: '0';
+        #body
+            ->append
+            ->ui {
+                c: '@e.div';
+                t: '0';
 
-            div {
-                ->attrs {
-                    n: 'id';
-                    v: 'contents';
-                }
+                div {
+                    ->attr {
+                        n: 'id';
+                        v: 'contents';
+                    }
 
-                #contents->append->ui {
-                    c: @type + '.default';
-                    m: '1';
+                    #contents
+                        ->append
+                        ->ui {
+                            c: @type + '.default';
+                            m: '1';
+                        }
                 }
             }
-        }
     }
 }

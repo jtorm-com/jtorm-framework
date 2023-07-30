@@ -1,5 +1,5 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 ->ui {
-    c: 'ImageObject';
+    c: 'CreativeWork.contents';
 }

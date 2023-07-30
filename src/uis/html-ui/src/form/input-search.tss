@@ -6,7 +6,10 @@ input {
         v: 'search';
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')
+    ->if(
+        d: autocomplete,
+        v: '^(on|off)$'
+    )
     ->attr {
         n: 'autocomplete';
         v: autocomplete;

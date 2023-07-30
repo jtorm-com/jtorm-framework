@@ -8,23 +8,26 @@
             c: '@e.header';
             t: '0';
 
-            header->attr {
-                n: 'class';
-                v: 'header';
-                m: 'a';
-            }
-
             header {
+                ->attr {
+                    n: 'class';
+                    v: 'header';
+                    m: 'a';
+                }
+
                 ->if(d: name)
                 ->ui {
                     c: '@t.h1';
                     t: '0';
 
                     h1
-                    ->data(href: url, html: name)
-                    ->ui {
-                        c: '@e.a';
-                    }
+                        ->data(
+                            href: url,
+                            html: name
+                        )
+                        ->ui {
+                            c: '@e.a';
+                        }
                 }
 
                 ->data(Text: alternateName)
@@ -34,45 +37,52 @@
                     t: '0';
 
                     h2
-                    ->ui {
-                        c: 'Text';
+                        ->ui {
+                            c: 'Text';
 
-                        span->attr {
-                            n: 'class';
-                            v: 'alternate-name';
-                            m: 'a';
+                            span->attr {
+                                n: 'class';
+                                v: 'alternate-name';
+                                m: 'a';
+                            }
                         }
-                    }
                 }
             }
         }
 
-        ->append->ui {
+        ->if(d: image)
+        ->append
+        ->ui {
             c: '@e.div';
             t: '0';
 
-            div->attr {
-                n: 'class';
-                v: 'image';
-            }
+            div
+                ->attr {
+                    n: 'class';
+                    v: 'image';
+                }
 
             .image {
-                ->if(d: image)
-                ->if(d: image, to: 'array') {
-                    ->each(d: image, m: 'append', a: 'image')
-                    ->get {
-                        t: '@s/thing/thing-image.tss';
+                ->if(
+                    d: image,
+                    to: 'array'
+                ) {
+                    ->each(d: image)
+                    ->ui {
+                        c: 'ImageObject';
                     }
 
                     ->else
-                    ->get {
-                        t: '@s/thing/thing-image.tss';
+                    ->append(d: image)
+                    ->ui {
+                        c: 'ImageObject';
                     }
                 }
             }
         }
 
-        ->append->ui {
+        ->append
+        ->ui {
             c: '@e.section';
             t: '0';
 
@@ -82,57 +92,72 @@
             }
 
             .body
-            ->if(d: disambiguatingDescription && description) {
-                ->ui {
-                    c: '@e.details';
-                    t: '0';
+                ->if(d: disambiguatingDescription && description) {
+                    ->ui {
+                        c: '@e.details';
+                        t: '0';
 
-                    details {
-                        ->attr {
-                            n: 'open';
-                            v: true;
+                        details {
+                            ->attr {
+                                n: 'open';
+                                v: true;
+                            }
+
+                            ->data(
+                                html: disambiguatingDescription,
+                                class: 'disambiguating-description'
+                            )
+                            ->ui {
+                                c: '@e.summary';
+                            }
+
+                            ->data(
+                                html: description,
+                                class: 'description'
+                            )
+                            ->append
+                            ->ui {
+                                c: '@e.div';
+                            }
                         }
+                    }
 
-                        ->data(html: disambiguatingDescription, class: 'disambiguating-description')
+                    ->else {
+                        ->if(d: disambiguatingDescription)
+                        ->data(
+                            html: disambiguatingDescription,
+                            class: 'disambiguating-description'
+                        )
                         ->ui {
-                            c: '@e.summary';
+                            c: '@e.div';
                         }
 
-                        ->data(html: description, class: 'description')
-                        ->append->ui {
+                        ->if(d: description)
+                        ->data(
+                            html: description,
+                            class: 'description'
+                        )
+                        ->ui {
                             c: '@e.div';
                         }
                     }
                 }
-
-                ->else {
-                    ->if(d: disambiguatingDescription)
-                    ->data(html: disambiguatingDescription, class: 'disambiguating-description')
-                    ->ui {
-                        c: '@e.div';
-                    }
-
-                    ->if(d: description)
-                    ->data(html: description, class: 'description')
-                    ->ui {
-                        c: '@e.div';
-                    }
-                }
-            }
         }
 
-        ->append->ui {
+        ->append
+        ->ui {
             c: '@e.footer';
             t: '0';
 
-            footer->attr {
-                n: 'class';
-                v: 'footer';
-                m: 'a';
-            }
-
             footer {
-                ->data(Thing: subjectOf)->ui {
+                ->attr {
+                    n: 'class';
+                    v: 'footer';
+                    m: 'a';
+                }
+
+                ->data(Thing: subjectOf)
+                ->ui {
                     c: '@e.div';
 
                     div {
@@ -147,21 +172,34 @@
                     }
                 }
 
-                ->data(action: potentialAction)->append->ui {
-                    c: 'Action.link';
+                ->if(d: potentialAction)
+                ->append
+                ->each(d: potentialAction)
+                ->get(d: @id)
+                 {
+                    body
+                        ->append
+                        ->ui {
+                            c: 'SearchAction';
+                        }
                 }
 
-                ->data(URL: sameAs)->append->ui {
+                ->data(URL: sameAs)
+                ->append
+                ->ui {
                     c: '@e.div';
 
-                    div->attr {
-                        n: 'class';
-                        v: 'same-as';
-                    }
+                    div
+                        ->attr {
+                            n: 'class';
+                            v: 'same-as';
+                        }
 
-                    .same-as->append->ui {
-                        c: 'URL';
-                    }
+                    .same-as
+                        ->append
+                        ->ui {
+                            c: 'URL';
+                        }
                 }
             }
         }

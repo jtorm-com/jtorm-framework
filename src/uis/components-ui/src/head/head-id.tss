@@ -1,13 +1,20 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->data(name: 'description', content: disambiguatingDescription.Text)
+->if(d: disambiguatingDescription)
+->data(
+    name: 'description',
+    content: disambiguatingDescription
+)
 ->append
 ->ui {
     c: 'doc.meta';
 }
 
 ->if(d: url)
-->data(rel: 'canonical', href: url)
+->data(
+    rel: 'canonical',
+    href: url
+)
 ->append
 ->ui {
     c: 'doc.link';
@@ -35,22 +42,31 @@
 
 ->if(d: workTranslation)
 ->each {
-    m: 'append';
     d: workTranslation;
 
-    ->data(rel: 'alternate', hreflang: inLanguage, href: url)
+    ->data(
+        rel: 'alternate',
+        hreflang: inLanguage,
+        href: url
+    )
     ->ui {
         c: 'doc.link';
     }
 }
 
-->data(name: 'robots', content: @meta.robots||'index, follow')
+->data(
+    name: 'robots',
+    content: @meta.robots||'index, follow'
+)
 ->append
 ->ui {
     c: 'doc.meta';
 }
 
-->data(name: 'referrer', content: @meta.referrer||'origin')
+->data(
+    name: 'referrer',
+    content: @meta.referrer||'origin'
+)
 ->append
 ->ui {
     c: 'doc.meta';

@@ -1,5 +1,0 @@
-/*! (c) jTorm and other contributors | www.jtorm.com/license */
-
-->each(d: url, m: 'append', a: 'Comment')->ui {
-    c: 'Comment.link';
-}

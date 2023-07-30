@@ -7,11 +7,6 @@ module.exports = {
         framework: "c",
         url: "https://cdn.jtorm.com/",
         mapper: {
-            init: {
-                default: {
-                    t: ['@c/init.tss']
-                }
-            },
             contents: {
                 default: {
                     t: ['@c/contents/contents-default.tss']
@@ -36,10 +31,6 @@ module.exports = {
             },
             loading: {
                 default: {
-                    ui: {
-                        c: '@e.section',
-                        t: 0
-                    },
                     t: ['@c/loading/loading-default.tss']
                 }
             },
@@ -85,15 +76,9 @@ module.exports = {
             },
             button: {
                 primaryButton: {
-                    ui: {
-                        c: 'form.button'
-                    },
                     t: ['@c/button/primary-button.tss']
                 },
                 secondaryButton: {
-                    ui: {
-                        c: 'form.button'
-                    },
                     t: ['@c/button/secondary-button.tss']
                 },
                 primaryAnchor: {

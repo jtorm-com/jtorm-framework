@@ -4,7 +4,6 @@ datalist {
     ->if(d: items)
     ->each {
         d: items;
-        m: 'append';
 
         ->ui {
             c: 'form.option';

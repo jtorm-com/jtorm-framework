@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 input {
-    ->if(d: type, v: '^(button|checkbox|color|date|datetime-local|email|file|hidden|image|month|number|password|radio|range|reset|search|submit|tel|text|time|url|week)$')
+    //->if(d: type, v: '^(button|checkbox|color|date|datetime-local|email|file|hidden|image|month|number|password|radio|range|reset|search|submit|tel|text|time|url|week)$')
     ->attr {
         n: 'type';
         v: type;
@@ -17,7 +17,10 @@ input {
         v: pattern;
     }
 
-    ->if(d: size, v: '^[0-9]+$')
+    ->if(
+        d: size,
+        v: '^[0-9]+$'
+    )
     ->attr {
         n: 'size';
         v: size;
@@ -29,13 +32,18 @@ input {
         v: true;
     }
 
-    ->if(d: minlength, v: '^[0-9]+$')
+    ->if(
+        d: minlength,
+        v: '^[0-9]+$')
     ->attr {
         n: 'minlength';
         v: true;
     }
 
-    ->if(d: maxlength, v: '^[0-9]+$')
+    ->if(
+        d: maxlength,
+        v: '^[0-9]+$'
+    )
     ->attr {
         n: 'maxlength';
         v: true;
