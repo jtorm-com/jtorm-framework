@@ -175,13 +175,13 @@
                 ->if(d: potentialAction)
                 ->append
                 ->each(d: potentialAction)
-                ->get(d: @id)
-                 {
-                    body
+                ->get(d: @id) {
+                    body {
                         ->append
                         ->ui {
-                            c: 'SearchAction';
+                            c: @type;
                         }
+                    }
                 }
 
                 ->data(URL: sameAs)
