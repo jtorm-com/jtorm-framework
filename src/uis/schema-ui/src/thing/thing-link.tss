@@ -6,7 +6,7 @@
     c: '@e.a';
 
     a
-        ->data(Text: name)
+        ->data(Text: alternateName)
         ->ui {
             c: 'Text';
         }
