@@ -2,6 +2,7 @@
 
 ->ui {
     c: '@e.nav';
+    t: '0';
 
     nav {
         ->attrs {
@@ -9,30 +10,40 @@
             v: 'primary-navigation,Primary';
         }
 
-        ->append->ui {
+        ->append
+        ->ui {
             c: 'contents.default';
 
             .contents {
-                ->append(d: potentialAction)
-                ->ui {
-                    c: 'Action.linkMulti';
+                ->append
+                ->each(d: potentialAction)
+                ->get(d: @id) {
+                    body
+                        ->append
+                        ->ui {
+                            c: 'Action.default';
+                        }
                 }
 
-                ->append(d: hasPart)
+                ->append
                 ->ui {
                     c: '@t.ol';
                     t: '0';
 
                     ol
-                        ->each
-                        ->ui {
-                            c: '@t.li';
-                            t: '0';
-
-                            li
-                                ->append(d: @c)
+                        ->each(d: hasPart)
+                        ->get(d: @id) {
+                            body
+                                ->append
                                 ->ui {
-                                    c: @type + '.link';
+                                    c: '@t.li';
+                                    t: '0';
+
+                                    li
+                                        ->append
+                                        ->ui {
+                                            c: @type + '.link';
+                                        }
                                 }
                         }
                 }

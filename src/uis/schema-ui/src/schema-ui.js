@@ -42,6 +42,11 @@ module.exports = {
                 }
             },
             WebPage: {
+                link: {
+                    ui: {
+                        c: 'Thing.link'
+                    }
+                },
                 default: {
                     t: [
                         '@s/web-page/web-page-default.tss'
@@ -133,6 +138,11 @@ module.exports = {
                 }
             },
             WebSite: {
+                link: {
+                    ui: {
+                        c: 'Thing.link'
+                    }
+                },
                 default: {
                     t: [
                         '@s/web-site/web-site-default.tss'
