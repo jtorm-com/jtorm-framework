@@ -14,18 +14,22 @@ module.exports = {
                 this.cache = this.saveModel.get();
         },
 
-        get: async function (v, id, c) {
+        get: async function (v, l, id, c) {
             if (this.cache[id] && this.cache[id][c])
                 return this.cache[id][c];
 
             return null;
         },
 
-        set: function (v, id, c, d) {
-            if (!this.cache[id]) this.cache[id] = {};
+        set: function (v, l, id, c, d) {
+            if (!this.cache[l])
+                this.cache[l] = {};
 
-            if (this.cache[id][c] === undefined) {
-                this.cache[id][c] = d;
+            if (!this.cache[l][id])
+                this.cache[l][id] = {};
+
+            if (this.cache[l][id][c] === undefined) {
+                this.cache[l][id][c] = d;
                 this.updated = 1;
             }
         },
