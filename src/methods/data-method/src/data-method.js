@@ -43,7 +43,7 @@ module.exports = {
         },
 
         set: function (d, ks, v) {
-            let k = ks.shift();
+            const k = ks.shift();
 
             if (ks.length > 0) {
                 if (d[k] === undefined)
