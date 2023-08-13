@@ -1,7 +1,7 @@
 # jTorm Config Method
 
 Access config variables from the context. Functions like an `if` method, except without an `else` function.
-`jTorm.context.config = {createDoc: 1}`
+The config value will be added to the data model.
 
 
 ## Install
@@ -13,10 +13,11 @@ npm install @jtorm/config-method
 
 ## Properties
 
-| Option | Type     | Required | Description |
-|--------|----------|----------|-------------|
-| `n`    | `string` | `true`   | Config name |
+| Option | Type     | Required | Description                   |
+|--------|----------|----------|-------------------------------|
+| `n`    | `string` | `true`   | Config name                   |
 | `v`    | `any`    | `false`  | Config value to match it with |
+| `a`    | `any`    | `false`  | Set to data as key name       |
 
 
 ## Example

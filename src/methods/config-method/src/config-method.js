@@ -7,16 +7,21 @@ module.exports = {
         // configModel: null,
 
         alias: 'c',
-        params: ['d', 'v'],
+        params: ['d', 'v', 'a'],
 
         validate: function (v) {
             return v.d.d !== undefined;
         },
 
         handle: async function (v) {
-            const r = this.configModel.get(v.d.d);
+            const r = this.configModel.get(v.d.d), d = {};
 
-            if (r && (v.t.p.v === undefined || r === v.d.v)) {
+            if (
+                (r === undefined && v.t.p.v !== undefined)
+                || (r !== undefined && v.d.v !== undefined && r !== v.d.v)
+            )
+                v.io = {};
+            else {
                 const d = {};
 
                 if (v.d.a)
@@ -24,9 +29,8 @@ module.exports = {
                 else
                     d[v.d.d] = r;
 
-                v.io = {c: 1, d: d};
-            } else
-                v.io = {};
+                v.io = {c: 1, d: {...v.m, ...d}};
+            }
         }
     }
 };
