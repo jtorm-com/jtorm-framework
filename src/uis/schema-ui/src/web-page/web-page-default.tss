@@ -22,16 +22,18 @@ html {
 
 head {
     ->append(
-        cid: 'head-default',
-        cs: 'global' + '-' + inLanguage
+        l: inLanguage,
+        cid: 'head',
+        cs: 'default'
     )
     ->ui {
         c: 'head.default';
     }
 
     ->append(
-        cid: 'head-id',
-        cs: identifier + '-' + inLanguage
+        l: inLanguage,
+        cid: 'head',
+        cs: identifier
     )
     ->ui {
         c: 'head.id';
@@ -49,8 +51,9 @@ body {
         )
         ->get(d: @id)
         ->append(
+            l: inLanguage,
             cid: @type,
-            cs: 'global' + '-' + inLanguage
+            cs: identifier
         )
         ->ui {
             c: @type;
@@ -59,12 +62,13 @@ body {
 
     ->append(
         d: mainEntity,
+        l: inLanguage,
         cid: 'mainEntity',
-        cs: identifier + '-' + inLanguage
+        cs: identifier
     )
     ->get(d: @id)
     ->ui {
-        c: 'WebPage.contentsDefault';
+        c: 'WebPage.contents';
     }
 
     ->each {
@@ -76,8 +80,9 @@ body {
         )
         ->get(d: @id)
         ->append(
+            l: inLanguage,
             cid: @type,
-            cs: 'global' + '-' + inLanguage
+            cs: identifier
         )
         ->ui {
             c: @type;
@@ -85,8 +90,9 @@ body {
     }
 
     ->append(
+        l: inLanguage,
         cid: 'loading',
-        cs: 'global' + '-' + inLanguage
+        cs: 'default'
     )
     ->ui {
         c: 'loading.default';

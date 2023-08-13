@@ -24,12 +24,12 @@ module.exports = {
 
         beforeIteration: async function (v) {
             if (v.cid)
-                v.r = await this.uiCacheModel.get(v, v.cid, v.cs ? v.cs : 'global');
+                v.r = await this.uiCacheModel.get(v, v.l, v.cid, v.cs ? v.cs : 'default');
         },
 
         afterIteration: function (v) {
             if (v.cid)
-                this.uiCacheModel.set(v, v.cid, v.cs ? v.cs : 'global', v.h.body());
+                this.uiCacheModel.set(v, v.l, v.cid, v.cs ? v.cs : 'default', v.h.body());
         },
 
         afterView: function (v) {

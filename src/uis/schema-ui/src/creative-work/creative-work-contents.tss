@@ -15,8 +15,9 @@
         ->get(d: @id) {
             body
                 ->append(
+                    l: inLanguage,
                     cid: @type,
-                    cs: 'global' + '-' + inLanguage
+                    cs: identifier
                 )
                 ->ui {
                     c: @type;

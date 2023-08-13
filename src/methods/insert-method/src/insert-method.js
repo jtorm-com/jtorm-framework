@@ -15,6 +15,7 @@ module.exports = {
             's',// html suffix
             'd',// data
             'm',// method
+            'l',// cache language
             'cid',// cache id
             'cs'// cache scope
         ],
@@ -31,6 +32,7 @@ module.exports = {
 
             v.cid = v.d.cid;
             v.cs = v.d.cs;
+            v.l = v.d.l;
 
             if (v.d.h) {
                 if (v.d.p)
@@ -64,8 +66,7 @@ module.exports = {
                     this.errorHandler.handle(v.t.s + ' not found', v);
             }
 
-            v.cid = null;
-            v.cs = null;
+            v.cid = v.cs = v.l = null;
 
             v.io = {c: c};
         },
