@@ -58,9 +58,6 @@ module.exports = {
             if (Number.isNaN(v.d.t))
                 this.errorHandler.handle('t is NaN', v);
 
-            if (v.d.f && !this.uis[v.d.f])
-                return 0;
-
             v.d.c = this.parseComponent(v.d.c, v.d.f);
 
             return !!v.d.c;
