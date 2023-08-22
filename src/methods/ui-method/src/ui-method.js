@@ -152,9 +152,11 @@ module.exports = {
 
             if (!v.d.t)
                 delete tR.t;
+
             if (!v.d.h)
                 delete tR.h;
-            if (tR.h)
+
+            if (tR.h && !v._.isArray(tR.h))
                 tR.h = [tR.h];
 
             f = {};
