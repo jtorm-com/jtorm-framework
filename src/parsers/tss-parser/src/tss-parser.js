@@ -82,12 +82,12 @@ module.exports = {
           for (i = 0; i <= ps.length; i++)
             r += s.c.closing;
 
-          s.tss = s.tss.substring(0, p.from) + r + s.tss.substr(p.close + 1);
+          s.tss = s.tss.substring(0, p.from) + r + s.tss.substring(p.close + 1);
 
           return 1;
         } else if (t === '' && /\(.+\)/s.test(sl)) {
           r = s.parseShorthandProperties(ps[1]);
-          s.tss = s.tss.substring(0, p.from) + s.c.methodSeparator + r.s + s.c.opening + r.p + s.tss.substr(p.open + 1);
+          s.tss = s.tss.substring(0, p.from) + s.c.methodSeparator + r.s + s.c.opening + r.p + s.tss.substring(p.open + 1);
           return 1;
         }
       }
@@ -126,14 +126,14 @@ module.exports = {
     parseShorthandProperties: function (p) {
       let
         m = this.regexes['propertyShorthandOpening'].exec(p),
-        s = p.substr(0, m.index);
+        s = p.substring(0, m.index);
 
-      p = p.substr(m.index + 1);
+      p = p.substring(m.index + 1);
 
       do {
         m = this.regexes['propertyShorthandSeparator'].exec(p);
         if (m)
-          p = p.substring(0, m.index) + this.c.propertyEnd + p.substr(m.index + 1);
+          p = p.substring(0, m.index) + this.c.propertyEnd + p.substring(m.index + 1);
       } while (m);
 
       m = this.regexes['propertyShorthandClosing'].exec(p);
@@ -274,6 +274,7 @@ module.exports = {
 
       this.regexes = {
         clean: /\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm,
+        cleanWhiteSpace: /\s+(?=(?:[^\'"]*[\'"][^\'"]*[\'"])*[^\'"]*$)/gm,
         propertySeparator: new RegExp(this.c.propertySeparator + r, 'm'),
         propertyEnd: new RegExp(this.c.propertyEnd + r, 'm'),
         propertyShorthandOpening: new RegExp('\\' + this.c.propertyShorthandOpening + r, 'm'),
@@ -284,11 +285,17 @@ module.exports = {
     },
 
     handle: function (tss) {
-      const s = this, r = s.regexes.clean;
+      const s = this, r = s.regexes.clean, c = s.regexes.cleanWhiteSpace;
 
       s.tree = [];
+
       r.lastIndex = 0;
-      s.tss = tss.replace(r, '$1');
+      tss = tss.replace(r, '$1');
+
+      c.lastIndex = 0;
+      tss = tss.replace(c, '');
+
+      s.tss = tss;
 
       do {
         s.pairs = [];
