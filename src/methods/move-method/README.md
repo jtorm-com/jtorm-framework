@@ -2,16 +2,17 @@
 
 ## Install
 ```js
-npm install jtorm-com/jtorm-move-method
+npm install @jtorm/move-method
 ```
 
 
 ## Properties
 
-| Option | Type       | Required | Description         |
-|--------|------------|----------|---------------------|
-| `l`    | `selector` | `true`   | To location         |
-| `m`    | `method`   | `true`   | Append, prepend, replace, etc. |
+| Option | Type       | Required | Description                         |
+|--------|------------|----------|-------------------------------------|
+| `l`    | `selector` | `true`   | To location                         |
+| `m`    | `method`   | `true`   | Append, prepend, replace, etc.      |
+| `k`    | `keep`     | `false`  | Keep element in place / create copy |
 
 
 ## Example
@@ -25,7 +26,8 @@ To `<h1><span>Heading</span></h1>`
 
 ```js
 h1->move {
-  l: "body";
-  m: "replace";
+  l: 'body';
+  m: 'replace';
+  k: '0';
 }
 ```
