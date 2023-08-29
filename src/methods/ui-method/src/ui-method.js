@@ -58,7 +58,7 @@ module.exports = {
             if (Number.isNaN(v.d.t))
                 this.errorHandler.handle('t is NaN', v);
 
-            v.d.c = this.parseComponent(v.d.c, v.d.f);
+            v.d.c = this.parseComponent(v.d.c);
 
             return !!v.d.c;
         },
@@ -74,9 +74,9 @@ module.exports = {
                 k;
 
             if (!f)
-                f = 'self';
+                f = s.framework;
 
-            r = await s.getComponent(c, f, !v.d.m);
+            r = await s.getComponent(c, f);
             if (!r)
                 s.errorHandler.handle('Invalid UI Component', v);
 
@@ -111,24 +111,18 @@ module.exports = {
 
         getComponent: async function (c, f, d) {
             const s = this;
-            let r, i;
 
             if (s.cache[c] && s.cache[c][f] !== undefined)
                 return s.cache[c][f];
 
-            r = await s.findUIComponent(f, c, d);
+            let i, r = await s.findUIComponent(f, c);
 
             if (!r) {
-                if (f === 'self')
-                    r = await s.findUIComponent(s.framework, c, d);
-
-                if (!r) {
-                    for (i in s.uis) {
-                        if (s.uis[i]) {
-                            r = await s.findUIComponent(i, c, d);
-                            if (r)
-                                break;
-                        }
+                for (i in s.uis) {
+                    if (s.uis[i] && s.uis[i].framework !== f) {
+                        r = await s.findUIComponent(s.uis[i].framework, c);
+                        if (r)
+                            break;
                     }
                 }
             }
@@ -181,9 +175,8 @@ module.exports = {
 
                 if (tR.di) {
                     r = await s.add(tR.di.m, v);
-                    if (!r) {
+                    if (!r)
                         return null;
-                    }
                 }
             } else if (tR.pT) {
                 if (!Array.isArray(tR.pT.c))
@@ -212,7 +205,7 @@ module.exports = {
                 }
             }
 
-            return true;
+            return 1;
         },
 
         addLoop: async function (t, k, f, s, v) {
@@ -237,78 +230,49 @@ module.exports = {
             f[k] = s.quotes(f[k]);
         },
 
-        findUIComponent(f, c, d) {
-            const s = this;
-            let ui, k, k2, k3, tmp, r2, r;
+        findUIComponent(f, c) {
+            const
+                s = this,
+                uis = s.uis.filter(ui => ui.framework === f || ui.alias === f);
 
-            if (f === 'self')
-                ui = s.ui;
-            else if (s.uis[f])
-                ui = s.uis[f];
-            else
+            if (!uis.length)
                 return 0;
 
+            const ui = uis[0];
+
+            let k, r, p;
+
             r = ui.mapper;
-            c = c.split('.');
 
-            for (k in c) {
-                if (/&/.test(c[k])) {
-                    tmp = c[k].split('&');
-                    r2 = 0;
-                    for (k2 in tmp) {
-                        if (r[tmp[k2]]) {
-                            if (!r2)
-                                r2 = this.viewModel._.cloneDeep(r[tmp[k2]]);
-                            else {
-                                if (!r2.t)
-                                    r2.t = [];
+            if (!r)
+                return 0;
 
-                                for (k3 in r[tmp[k2]].t)
-                                    r2.t.push(r[tmp[k2]].t[k3]);
-                            }
-                        }
-                    }
+            p = c.split('.');
 
-                    r = r2;
-                } else if (/\|/.test(c[k])) {
-                    tmp = c[k].split('|');
-                    for (k2 in tmp) {
-                        if (r[tmp[k2]]) {
-                            r = this.viewModel._.cloneDeep(r[tmp[k2]]);
-
-                            break;
-                        }
-                    }
-                } else if (r) {
-                    if (r[c[k]])
-                        r = r[c[k]];
-                    else if (d && r[s.default])
-                        r = r[s.default];
-                    else
-                        return 0;
-                } else
+            for (k in p) {
+                if (r[p[k]])
+                    r = r[p[k]];
+                else
                     return 0;
             }
 
             if (r[s.default])
                 r = r[s.default];
 
-            if (f === 'self' && r.ui && !r.ui.f)
-                r.ui.f = s.framework;
-
             return {c: r, ui: ui, f: f};
         },
 
         parseAlias: function (ui, v) {
             if (ui.mapperAlias) {
-                for (let k in ui.mapperAlias)
+                for (let k in ui.mapperAlias) {
                     if (this.regexp[ui.alias].mapper[k].test(v))
                         return v.replace(this.regexp[ui.alias].mapper[k], ui.mapperAlias[k] + '$1');
+                }
 
                 return 0;
             }
 
-            return v;
+            return 0;
         },
 
         parseUrl: function (url) {

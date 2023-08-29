@@ -2,10 +2,12 @@
 
 Registry and handling different UI frameworks.
 
+
 ## Install
 ```js
 npm install @jtorm/ui-method
 ```
+
 
 ## Properties
 
@@ -18,16 +20,7 @@ npm install @jtorm/ui-method
 | `m`    | `boolean` | `false`  | Use mediatarget check if suffixes exists registered by it e.g. defaultDesktopL, defaultTabletS etc
 
 
-### Component Options
-
-In `jTormUiMethod.ui` you can define your own UI, when no framework is defined it first looks at this. If found, it will set the framework to the default `jTormUiMethod.framework` of the found component if ui exists (best practice).
-
-| Option | Description                                                          |
-|--------|----------------------------------------------------------------------|
-| `&`    | Combines tss e.g. button.unelevated-anchor&dense-anchor              |
-| `|`    | Look for one within framework button.unelevated-anchor|dense-anchor  |
-
-
 ## Notes
 
-Use mediatarget is not allowed for the fallback to default. You have to define it e.g. WPHeader > WPHeader.default
+Use mediatarget is not allowed for the fallback to default.
+You have to explicit define it e.g. WPHeader > WPHeader.default
