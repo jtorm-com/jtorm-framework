@@ -274,7 +274,7 @@ module.exports = {
 
       this.regexes = {
         clean: /\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm,
-        cleanWhiteSpace: /\s+(?=(?:[^\'"]*[\'"][^\'"]*[\'"])*[^\'"]*$)/gm,
+        cleanWhiteSpace: /\s+(?=(?:[^'"]*['"][^'"]*['"])*[^'"]*$)/gm,
         propertySeparator: new RegExp(this.c.propertySeparator + r, 'm'),
         propertyEnd: new RegExp(this.c.propertyEnd + r, 'm'),
         propertyShorthandOpening: new RegExp('\\' + this.c.propertyShorthandOpening + r, 'm'),
@@ -293,7 +293,7 @@ module.exports = {
       tss = tss.replace(r, '$1');
 
       c.lastIndex = 0;
-      tss = tss.replace(c, '');
+      tss = tss.replace(c, ' ');
 
       s.tss = tss;
 
