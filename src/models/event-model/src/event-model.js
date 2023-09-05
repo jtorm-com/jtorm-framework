@@ -18,6 +18,7 @@ module.exports = {
                 view: []
             }
         },
+
         handlerName: {
             before: {
                 iteration: 'beforeIteration',
@@ -40,10 +41,9 @@ module.exports = {
 
             for (k in e) {
                 for (k2 in e[k]) {
-                    for (k3 in p) {
+                    for (k3 in p)
                         if (p[k3].event[k] && p[k3].event[k][k2])
                             e[k][k2].push(p[k3]);
-                    }
 
                     e[k][k2].sort(function (a, b) {
                         return a.weight - b.weight;
