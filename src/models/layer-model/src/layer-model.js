@@ -30,12 +30,16 @@ module.exports = {
         },
 
         get: function (v, e, t) {
-            const o = [],
-                i = v.cid ? v.cid : 'global';
+            e = this.event[e][t]
 
-            if (this.event[e][t].indexOf(i) !== -1) {
-                const r = this.layers[i]
-                        ? this.layers[i]
+            const
+                l = this.layers,
+                o = [];
+
+            for (let i in e) {
+                const
+                    r = l[e[i]]
+                        ? l[e[i]]
                         : null;
 
                 if (r) {
@@ -71,12 +75,12 @@ module.exports = {
 
             for (let k in v.t.c)
                 this.layers[i].push({
-                    c: parseInt(v.d.c),
                     z: parseInt(v.d.z),
                     t: v.t.c[k]
                 });
 
-            this.event[v.d.e][v.d.t].push(i);
+            if (this.event[v.d.e][v.d.t].indexOf(i) === -1)
+                this.event[v.d.e][v.d.t].push(i);
 
             this.updated = 1;
         },
