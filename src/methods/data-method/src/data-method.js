@@ -19,9 +19,9 @@ module.exports = {
             const t = v.t, tD = {};
 
             for (k in t.p) {
-                if (t.p[k].indexOf(this.or) !== -1)
-                    tT = t.p[k].split(this.or);
-                else
+                if (t.p[k].indexOf(this.or) !== -1) {
+                    tT = t.p[k].split(this.or).map(s => s.trim());
+                } else
                     tT = [t.p[k]];
 
                 for (k2 in tT) {
