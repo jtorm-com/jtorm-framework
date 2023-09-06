@@ -9,7 +9,7 @@ module.exports = {
             'e'// element
         ],
 
-        validate: function () {
+        validate: function (v) {
             return !!v.d.e;
         },
 
