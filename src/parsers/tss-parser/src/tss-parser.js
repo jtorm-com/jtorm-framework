@@ -266,10 +266,10 @@ module.exports = {
       this.c.propertyShorthandClosing = config.propertyShorthandClosing ? config.propertyShorthandClosing : ")";
       this.c.propertyShorthandSeparator = config.propertyShorthandSeparator ? config.propertyShorthandSeparator : ",";
       this.c.methodSeparator = config.methodSeparator ? config.methodSeparator : '->';
-      this.c.quotes = config.quotes ? config.quotes : ['"', "'", '`'];
+      this.c.quotes = config.quotes ? config.quotes : "'";
 
       const
-        q = this.c.quotes.join(''),
+        q = this.c.quotes,
         r = '(?=(?:[^' + q + ']|[' + q + '][^' + q + ']*[' + q + '])*$)';
 
       this.regexes = {
@@ -280,7 +280,7 @@ module.exports = {
         propertyShorthandOpening: new RegExp('\\' + this.c.propertyShorthandOpening + r, 'm'),
         propertyShorthandClosing: new RegExp('\\' + this.c.propertyShorthandClosing + r, 'm'),
         propertyShorthandSeparator: new RegExp(this.c.propertyShorthandSeparator + r, 'm'),
-        quotes: new RegExp('(' + this.c.quotes.join('|') + ')+', 'gm')
+        quotes: new RegExp('(' + q + ')+', 'gm')
       };
     },
 

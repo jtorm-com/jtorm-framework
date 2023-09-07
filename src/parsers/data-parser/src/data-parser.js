@@ -11,12 +11,10 @@ module.exports = {
         objectSeparator: '.',
 
         init: function () {
-            let c = this.tssParser.c.quotes, q;
+            const q = this.tssParser.c.quotes;
 
-            this.dataRegex = new RegExp('(' + c.join('|') + ')+', 'gm');
-
-            q = c.join('');
             this.appendRegex = new RegExp('(\\' + this.append + ')(?=(?:[^' + q + ']|[' + q + '][^' + q + ']*[' + q + '])*$)', '');
+            this.dataRegex = new RegExp('(' + q + ')+', 'gm');
         },
 
         handle: function (v, params) {
