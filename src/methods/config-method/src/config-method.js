@@ -14,7 +14,7 @@ module.exports = {
         },
 
         handle: async function (v) {
-            const r = this.configModel.get(v.d.d), d = {};
+            const r = this.configModel.get(v.d.d);
 
             if (
                 (r === undefined && v.t.p.v !== undefined)
