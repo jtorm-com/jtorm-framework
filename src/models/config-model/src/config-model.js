@@ -25,9 +25,14 @@ module.exports = {
 
             Object.defineProperty(d ? d : this.d, k, {
                 enumerable: 1,
-                configurable: 0,
+                configurable: 1,
                 writable: 0
             });
+        },
+
+        del: function (k) {
+            if (this.d[k])
+                delete this.d[k];
         }
     }
 };
