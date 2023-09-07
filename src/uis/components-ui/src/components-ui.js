@@ -4,9 +4,14 @@ module.exports = {
     jTormComponentsUI: {
         id: "jtorm/components-ui-0.0.4/src",
         alias: "@c",
-        framework: "c",
+        framework: "components",
         url: "https://cdn.jtorm.com/",
         mapper: {
+            hero: {
+                default: {
+                    t: ['@c/hero/hero-default.tss']
+                }
+            },
             contents: {
                 default: {
                     t: ['@c/contents/contents-default.tss']
@@ -82,15 +87,9 @@ module.exports = {
                     t: ['@c/button/secondary-button.tss']
                 },
                 primaryAnchor: {
-                    ui: {
-                        c: '@e.a'
-                    },
                     t: ['@c/button/primary-anchor.tss']
                 },
                 secondaryAnchor: {
-                    ui: {
-                        c: '@e.a'
-                    },
                     t: ['@c/button/secondary-anchor.tss']
                 }
             },

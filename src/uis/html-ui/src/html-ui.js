@@ -4,7 +4,7 @@ module.exports = {
     jTormHtmlUi: {
         id: "jtorm/html-ui-0.0.4/src",
         alias: "@h",
-        framework: "h",
+        framework: "html",
         mapperAlias: {
             d: 'doc',
             e: 'element',
