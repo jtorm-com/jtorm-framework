@@ -30,7 +30,7 @@ module.exports = {
 
         handle: async function (v) {
             const s = this;
-            let r = '', d, k, h, sv, i = 0, e;
+            let r = '', d, k, h, sv, i = 0, e, h3;
 
             if (!v.d.d)
                 v.d.d = v.m;
@@ -60,14 +60,18 @@ module.exports = {
                 d.isLoop = 1;
                 d.index = k;
 
-                if (v.t.p.e) {
-                    if (e.length && e[i])
+                if (v.t.p.e && e.length) {
+                    if (e[i])
                         h = e[i].outerHTML;
                     else
                         h = e[0].outerHTML;
 
                     h = await s.handler.handle('<body>' + h + '</body>', v.t.c, d, 1);
-                    e[i].parentNode.replaceChild(h.select(v.t.s), e[i]);
+
+                    if (e[i])
+                        e[i].parentNode.replaceChild(h.select(v.d.e ?? v.t.s), e[i]);
+
+                    r += h.body();
                 } else {
                     h = await s.handlerWrapper.handle("", v.t, d, v);
                     r += h;
@@ -77,15 +81,15 @@ module.exports = {
 
                 i++;
             }
-
-            if (!v.t.p.e) {
+console.log(r);
+            // if (!v.t.p.e) {
                 if (!v.d.m) v.d.m = s.defaultMethod;
 
                 sv = s.viewModel.copy(v);
                 sv.t = {s: v.t.s, m: v.d.m, c: []};
                 sv.d = {h: r};
                 await s.methods[v.d.m].handle(sv);
-            }
+            // }
 
             v.io = {};
         }
