@@ -328,9 +328,14 @@ module.exports = {
                     t: ['@s/article/article-link.tss']
                 }
             },
+
+            // schema-ui.js
             Thing: {
                 default: {
-                    t: ['@s/thing/thing-default.tss']
+                    t: [
+                        '@s/thing/thing-default.tss',
+                        '@s/thing/thing-update-1.0.1.tss'
+                    ]
                 },
                 contents: {
                     t: ['@s/thing/thing-contents.tss']
@@ -339,6 +344,7 @@ module.exports = {
                     t: ['@s/thing/thing-link.tss']
                 }
             },
+
             ImageObject: {
                 default: {
                     t: ['@s/image-object/image-object-default.tss']

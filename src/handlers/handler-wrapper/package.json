@@ -13,5 +13,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/handlers/handler-wrapper"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/handler-wrapper": "^0.0.5"
+  }
 }

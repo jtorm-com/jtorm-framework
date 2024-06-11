@@ -13,7 +13,7 @@ module.exports = {
             tb: 'table',
             m: 'media'
         },
-        url: "https://cdn.jtorm.com/",
+        url: "http://localhost:4001/",
         mapper: {
             doc: {
                 base: {

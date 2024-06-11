@@ -19,18 +19,8 @@ module.exports = {
         layers: {},
         updated: 0,
 
-        init: async function () {
-            if (this.saveModel) {
-                const cache = this.saveModel.get();
-                if (cache) {
-                    this.event = cache.event;
-                    this.layers = cache.layers;
-                }
-            }
-        },
-
         get: function (v, e, t) {
-            e = this.event[e][t]
+            e = this.event[e][t];
 
             const
                 l = this.layers,
@@ -85,10 +75,22 @@ module.exports = {
             this.updated = 1;
         },
 
+        initCache: async function () {
+            const cache = await this.saveModel.get();
+            if (cache) {
+                this.event = cache.event;
+                this.layers = cache.layers;
+            }
+        },
+
         save: async function () {
             if (this.saveModel && this.updated)
                 this.saveModel.set(this.layers, this.event);
 
+            this.event.before.iteration = [];
+            this.event.after.iteration = [];
+            this.event.after.view = [];
+            this.layers = {};
             this.updated = 0;
         }
     }

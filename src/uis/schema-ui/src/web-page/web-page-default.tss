@@ -47,7 +47,7 @@ body {
         // sort order is important this way, but takes less code
         ->if(
             d: @type,
-            v: '^WPHeader|SiteNavigationElement|BreadcrumbList$'
+            v: '^WPHeader|SiteNavigationElement'
         )
         ->get(d: @id)
         ->append(
@@ -58,6 +58,28 @@ body {
         ->ui {
             c: @type;
         }
+    }
+
+    ->if(d: breadcrumb)
+    ->get(d: breadcrumb.@id)
+    ->append(
+        l: inLanguage,
+        cid: 'BreadcrumbList',
+        cs: breadcrumb.identifier
+    )
+    ->ui {
+        c: 'BreadcrumbList';
+    }
+
+    ->append(
+        d: mainEntityOfPage,
+        l: inLanguage,
+        cid: 'mainEntityOfPage',
+        cs: identifier
+    )
+    ->get(d: @id)
+    ->ui {
+        c: 'WebPage.contents';
     }
 
     ->append(

@@ -1,0 +1,63 @@
+/* TSS */
+head {
+    ->append(
+        l: inLanguage,
+        cid: 'head',// Cache id
+        cs: 'default'// Cache scope
+    )
+    ->ui {
+        c: 'head.default';
+    }
+
+    ->append(
+        l: inLanguage,
+        cid: 'head',// Cache id
+        cs: identifier// Cache scope as variable
+    )
+    ->ui {
+        c: 'head.id';
+    }
+}
+
+
+
+
+body
+    ->append
+    ->ui {
+        c: '@f.inputEmail';
+    }
+
+
+
+
+
+
+ul
+    ->each {
+        d: items;
+        e: 'li';
+
+        li
+            ->inner {
+                h: name;
+            }
+    }
+
+
+
+/*! thing-update-1.0.1.tss */
+
+section
+    ->attr {
+        n: 'class',
+        v: 'thing-v1-0-1',
+        m: 'a'// = append
+    }
+
+footer .version
+    ->replace {
+        h: 'v1.0.1';
+    }
+
+

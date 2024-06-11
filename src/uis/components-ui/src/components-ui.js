@@ -5,7 +5,7 @@ module.exports = {
         id: "jtorm/components-ui-0.0.4/src",
         alias: "@c",
         framework: "components",
-        url: "https://cdn.jtorm.com/",
+        url: "http://localhost:4001/",
         mapper: {
             hero: {
                 default: {
