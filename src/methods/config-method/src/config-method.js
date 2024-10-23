@@ -4,30 +4,35 @@
 module.exports = {
     jTormConfigMethod: {
         // DI
-        // configModel: null,
+        // configModel
 
         alias: 'c',
-        params: ['d', 'v', 'a'],
+        params: [
+            'k',// Key
+            'v',// Value
+            'a'// As
+        ],
 
         validate: function (v) {
-            return v.d.d !== undefined;
+            return v.d.k !== undefined;
         },
 
         handle: async function (v) {
-            const r = this.configModel.get(v.d.d);
+            const r = this.configModel.get(v.d.k);
 
             if (
                 (r === undefined && v.t.p.v !== undefined)
                 || (r !== undefined && v.d.v !== undefined && r !== v.d.v)
             )
-                v.io = {};
-            else {
+                v.io = {}
+            ; else {
                 const d = {};
 
                 if (v.d.a)
-                    d[v.d.a] = r;
-                else
-                    d[v.d.d] = r;
+                    d[v.d.a] = r
+                ; else
+                    d[v.d.k] = r
+                ;
 
                 v.io = {c: 1, d: {...v.m, ...d}};
             }

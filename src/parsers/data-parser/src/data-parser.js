@@ -4,7 +4,7 @@
 module.exports = {
     jTormDataParser: {
         // DI
-        // tssParser: null,
+        // tssParser
 
         append: '+',
         current: '@c',
@@ -17,18 +17,18 @@ module.exports = {
             this.dataRegex = new RegExp('(' + q + ')+', 'gm');
         },
 
-        handle: function (v, params) {
+        handle: function (v) {
             let tD = {}, p, k;
 
-            for (p of params) {
+            for (p in v.t.p) {
                 if (v.t.p[p]) {
-                    if (v._.isString(v.t.p[p])) {
-                        tD[p] = this.parse(v.m, v.t.p[p]);
-                    } else if (v._.isArray(v.t.p[p])) {
+                    if (v._.isString(v.t.p[p]))
+                        tD[p] = this.parse(v.m, v.t.p[p])
+                    ; else if (v._.isArray(v.t.p[p])) {
                         tD[p] = [];
-                        for (k in v.t.p[p]) {
-                            tD[p].push(this.parse(v.m, v.t.p[p][k]));
-                        }
+                        for (k in v.t.p[p])
+                            tD[p].push(this.parse(v.m, v.t.p[p][k]))
+                        ;
                     }
                 }
             }
@@ -38,7 +38,8 @@ module.exports = {
 
         parse: function (d, k) {
             if (!k)
-                return null;
+                return null
+            ;
 
             const s = this;
             let m, q, i = 0, tmp = d, p, ps;
@@ -55,7 +56,8 @@ module.exports = {
                         q = s.parse(d, p);
 
                         if (q)
-                            tmp += s.parse(d, p);
+                            tmp += s.parse(d, p)
+                        ;
                     }
                 }
 
@@ -63,33 +65,37 @@ module.exports = {
             }
 
             if (k.match(s.dataRegex))
-                return k.replace(s.dataRegex, '');
-            else if (k === 'true')
-                return true;
-            else if (k === 'false')
-                return false;
-            else if (!isNaN(parseFloat(k)) && isFinite(k)) {
+                return k.replace(s.dataRegex, '')
+            ; else if (k === 'true')
+                return true
+            ; else if (k === 'false')
+                return false
+            ; else if (!isNaN(parseFloat(k)) && isFinite(k)) {
                 i = 1;
                 if (k % 1 === 0)
-                    k = parseInt(k);
-                else
-                    k = parseFloat(k);
+                    k = parseInt(k)
+                ; else
+                    k = parseFloat(k)
+                ;
             } else if (!d)
-                return null;
+                return null
+            ;
 
             ps = i
                 ? [k]
-                : k.split(s.objectSeparator);
+                : k.split(s.objectSeparator)
+            ;
 
             for (p of ps) {
                 if (p === s.current)
-                    tmp = tmp[Object.keys(tmp)[0]];
-                else {
+                    tmp = tmp[Object.keys(tmp)[0]]
+                ; else {
                     if (!tmp || tmp[p] === undefined) {
                         if (i)
-                            return k;
-                        else
-                            return null;
+                            return k
+                        ;
+
+                        return this.tssParser.quotes(k);
                     }
 
                     tmp = tmp[p];

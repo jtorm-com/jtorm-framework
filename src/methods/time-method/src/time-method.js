@@ -4,7 +4,7 @@
 module.exports = {
     jTormTimeMethod: {
         // DI
-        // languageModel: null,
+        // languageModel
 
         labels: {
             future: [
@@ -46,7 +46,11 @@ module.exports = {
                 '%d centuries ago'
             ]
         },
-        params: ['as', 'dT', 'd'],
+        params: [
+            'as',
+            'dT',// DateTime
+            'd'// Date
+        ],
         secs: [
             [],
             [1],
@@ -93,7 +97,8 @@ module.exports = {
             nD[v.d.as] = l.get(r[0]);
 
             if (r[1])
-                nD[v.d.as] = nD[v.d.as].replace('%d', r[1]);
+                nD[v.d.as] = nD[v.d.as].replace('%d', r[1])
+            ;
 
             nD.l = l.getDate(nD.d);
             nD.title = nD.l;
@@ -102,24 +107,20 @@ module.exports = {
         },
 
         time: function (t) {
-            switch (typeof t) {
-                case 'number':
-                    break;
-                case 'string':
-                    t = +new Date(t);
-                    break;
-                case 'object':
-                    if (t.constructor === Date) t = t.getTime();
-                    break;
-                default:
-                    t = +new Date();
-            }
+            if (typeof t === 'string')
+                t = +new Date(t)
+            ; else if (typeof t === 'object' && t.constructor === Date)
+                t = t.getTime()
+            ; else
+                t = +new Date()
+            ;
 
             let secs = (+new Date() - t) / 1000,
                 c = 'past',
                 i = 1,
                 s = this,
-                r;
+                r
+            ;
 
             if (secs < 0) {
                 secs = Math.abs(secs);
@@ -127,16 +128,18 @@ module.exports = {
             }
 
             if ((secs > 0 && secs < 1) || (secs > -1 && secs < 0))
-                return [s.labels[c][0]];
+                return [s.labels[c][0]]
+            ;
 
             while (r = s.secs[i]) {
                 if (secs < r[0]) {
                     if (!r[1])
-                        return [s.labels[c][i]];
-                    else {
+                        return [s.labels[c][i]]
+                    ; else {
                         t = Math.floor(secs / r[1]);
                         if (t === 1)
-                            return [s.labels[c][i - 1]];
+                            return [s.labels[c][i - 1]]
+                        ;
 
                         return [s.labels[c][i], t];
                     }

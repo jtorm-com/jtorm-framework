@@ -4,7 +4,14 @@
 module.exports = {
     jTormAttrMethod: {
         alias: 'a',
-        params: ['n', 'v', 'm', 'ns', 'a', 'p'],
+        params: [
+            'n',// Name
+            'v',// Value
+            'm',// Method
+            'ns',// No space
+            'a',// Append
+            'p'// Prepend
+        ],
 
         validate: function (v) {
             return !!(v.d.n && (v.d.v || v.d.m === 'r'));
@@ -18,23 +25,33 @@ module.exports = {
                     let tV = s.get(e, v.d.n);
 
                     if (v.d.a)
-                        v.d.v += v.d.a;
+                        v.d.v += v.d.a
+                    ;
 
                     if (v.d.p)
-                        v.d.v = v.d.p + v.d.v;
+                        v.d.v = v.d.p + v.d.v
+                    ;
 
                     if (v.d.m === 'p')
-                        s.set(e, v.d.n, v.d.v + (v.d.ns ? tV : (tV ? ' ' + tV : '')));
-                    else if (v.d.m === 'a')
-                        s.set(e, v.d.n, (v.d.ns ? tV : (tV ? tV + ' ' : '')) + v.d.v);
-                    else if (v.d.m === 'r') {
-                        if (tV) tV = tV.replace(new RegExp('\\b' + v.d.v + '\\b', 'gm'), "");
-                        if (tV) s.set(e, v.d.n, tV);
-                        else s.del(e, v.d.n);
+                        s.set(e, v.d.n, v.d.v + (v.d.ns ? tV : (tV ? ' ' + tV : '')))
+                    ; else if (v.d.m === 'a')
+                        s.set(e, v.d.n, (v.d.ns ? tV : (tV ? tV + ' ' : '')) + v.d.v)
+                    ; else if (v.d.m === 'r') {
+                        if (tV)
+                            tV = tV.replace(new RegExp('\\b' + v.d.v + '\\b', 'gm'), "")
+                        ;
+
+                        if (tV)
+                            s.set(e, v.d.n, tV)
+                        ; else
+                            s.del(e, v.d.n)
+                        ;
                     } else
-                        s.set(e, v.d.n, v.d.v);
+                        s.set(e, v.d.n, v.d.v)
+                    ;
                 } else if (v.d.m === 'r')
-                    s.del(e, v.d.n);
+                    s.del(e, v.d.n)
+                ;
             });
 
             v.io = {c: 1};
@@ -46,7 +63,8 @@ module.exports = {
 
         set: function (e, n, v) {
             if (v === true)
-                v = '';
+                v = ''
+            ;
 
             e.setAttribute(n, v);
         },

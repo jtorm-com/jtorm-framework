@@ -4,9 +4,9 @@
 module.exports = {
     jTormViewModel: {
         // DI
-        // _: null,
-        // documentModel: null,
-        // tssParser: null,
+        // _
+        // documentModel
+        // tssParser
 
         copyAttrs: ['_', 't', 'params', 'io', 'c'],
         data: {
@@ -36,19 +36,22 @@ module.exports = {
             });
 
             if (this._.isObject(c))
-                v.c = c;
-            else
-                v.c.c = c;
+                v.c = c
+            ; else
+                v.c.c = c
+            ;
 
             v.m = m;
 
             if (this._.isString(t))
-                t = await this.tssParser.handle(t);
+                t = await this.tssParser.handle(t)
+            ;
 
             v.tss = t;
 
             if (this._.isString(h))
-                h = this.documentModel.create(h, v, b);
+                h = this.documentModel.create(h, v, b)
+            ;
 
             v.h = h;
 
@@ -59,18 +62,19 @@ module.exports = {
             let sv = {}, k;
 
             if (!a)
-                a = this.copyAttrs;
+                a = this.copyAttrs
+            ;
 
             for (k in v) {
                 if (k === 'h')
-                    sv[k] = h ? h : v[k];
-                else if (k === 'tss')
-                    sv[k] = t ? t : v[k];
-                else if (k === 'm')
-                    sv[k] = d ? d : v[k];
-                else if (a.indexOf(k) !== -1)
-                    sv[k] = v[k];
-                else
+                    sv[k] = h ? h : v[k]
+                ; else if (k === 'tss')
+                    sv[k] = t ? t : v[k]
+                ; else if (k === 'm')
+                    sv[k] = d ? d : v[k]
+                ; else if (a.indexOf(k) !== -1)
+                    sv[k] = v[k]
+                ; else
                     sv[k] = this._.cloneDeep(v[k]);
             }
 

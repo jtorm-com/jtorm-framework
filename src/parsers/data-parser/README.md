@@ -15,38 +15,25 @@ Warning, changing the defaults will break UI libraries if not handled correctly.
 ### Access current key in object or array
 
 In some cases it can be desirable to just map the current key from an object or array.
-`jTormDataParser.current = '@c';// Default '@c'`
+`jTormDataParser.current = '@c';`
 
 
 ### Append
 
 Select a key with for example a part of it variable and a part static text.
-`jTormDataParser.append = '+';// Default '+'`
+`jTormDataParser.append = '+';`
 
 
 ### Object Separator
 
 Target a specific key in an object or array.
-`jTormDataParser.objectSeparator = '.';// Default '.'`
+`jTormDataParser.objectSeparator = '.';`
 
 
 ### Example
 
 ```js
-...
-var html = '<div id="content"></div>';
-var data = {
-  mainEntity: {
-    CreativeWork: {
-      '@type': 'CreativeWork',
-      publisher: {
-        Person: {
-          '@type': 'Person',
-          name: {Text: "John Doe"}
-        }
-      }
-    }
-  }
-};
-var tss = '#content->append( d: mainEntity.@c )->ui { c: @type + '.default'; }';// load UI component CreativeWork.default
+body->append->ui {
+    c: typeVar + '.default';
+}
 ```

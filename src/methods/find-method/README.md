@@ -1,22 +1,25 @@
 # jTorm Find Method
 
-Find an element based on a selector with variables in it for example.
+Find an element.
+
+## Install
+
+```js
+npm install @jtorm/find-method
+```
 
 
-## Config
+## Properties
 
-| Option | Type   | Required | Description |
-|--------|--------|----------|-------------|
-| `e`    | `string` | `true`   | Element     |
+| Option | Type     | Required | Description |
+|--------|----------|----------|-------------|
+| `e`    | `string` | `true`   | Element.    |
 
 
 ## Example
 
-Below an example when data component exists, use that, else use a default component (list.default).
-
 ```js
-->config(n: current_url)
-->find(e: 'a[href="' + current_url + '"]')
+->find(e: 'a[href="' + currentUrl + '"]')
 ->attr {
     n: 'class';
     v: 'active';

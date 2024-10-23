@@ -11,6 +11,11 @@ npm install @jtorm/text-method
 ```
 
 
+## Properties
+
+Any `key: value` pair.
+
+
 ## Example
 
 Alias = `t`

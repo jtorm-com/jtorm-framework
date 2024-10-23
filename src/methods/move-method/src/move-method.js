@@ -4,14 +4,14 @@
 module.exports = {
     jTormMoveMethod: {
         // DI
-        // methods: null,
-        // viewModel: null,
+        // methods[]
+        // viewModel
 
         alias: 'm',
         params: [
-            'l',// location
-            'm',// method
-            'k'// keep element / create copy
+            'l',// Location
+            'm',// Method
+            'k'// Keep element / create copy
         ],
 
         validate: function (v) {
@@ -28,7 +28,8 @@ module.exports = {
                 sv.t = {s: v.d.l, m: v.d.m, c: [], p: {}};
 
                 if (!parseInt(v.d.k))
-                    e.parentElement.removeChild(e);
+                    e.parentElement.removeChild(e)
+                ;
 
                 await s.methods[v.d.m].handle(sv);
             });

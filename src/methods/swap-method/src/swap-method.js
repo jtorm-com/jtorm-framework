@@ -7,7 +7,12 @@ module.exports = {
         // handler: null,
 
         alias: 's',
-        params: ['s', 'a', 'ui', 'h'],
+        params: [
+            's',// Selector
+            'a',// Attributes
+            'ui',// UI
+            'h'// HTML
+        ],
 
         validate: function (v) {
             return !!v.d.s;
@@ -23,7 +28,8 @@ module.exports = {
 
             await v.h.set(v, function (el) {
                 if (typeof w === 'string')
-                    w = v.h.d.createElement(w);
+                    w = v.h.d.createElement(w)
+                ;
 
                 w.innerHTML = el.innerHTML;
 
@@ -32,7 +38,8 @@ module.exports = {
 
                     for (i = a.length - 1; i >= 0; i--)
                         if (!w.getAttribute(a[i].name))
-                            w.setAttribute(a[i].name, a[i].value);
+                            w.setAttribute(a[i].name, a[i].value)
+                    ;
                 }
 
                 el.parentNode.replaceChild(w, el);

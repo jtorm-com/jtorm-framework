@@ -4,9 +4,9 @@
 module.exports = {
     jTormHandlerWrapper: {
         // DI
-        // eventModel: null,
-        // handler: null,
-        // viewModel: null,
+        // eventModel
+        // handler
+        // viewModel
 
         handle: async function (h, t, m, v) {
             const
@@ -20,7 +20,8 @@ module.exports = {
             await e.handle(v, 'before', 'iteration');
 
             for (let k in t2)
-                t2[k].s = 'body';
+                t2[k].s = 'body'
+            ;
 
             const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, v.c, 1);
 
@@ -32,7 +33,8 @@ module.exports = {
             };
 
             if (!v.r)
-                v.r = await s.handler.handle(null, null, null, null, v2);
+                v.r = await s.handler.handle(null, null, null, null, v2)
+            ;
 
             v2.cid = v.cid;
             v2.cs = v.cs;

@@ -4,7 +4,8 @@
 module.exports = {
     jTormCssPlugin: {
         // DI
-        // uiMethod: null,
+        // cssMethod
+        // uiMethod
 
         cache: {},
         collection: [],
@@ -22,11 +23,20 @@ module.exports = {
                 v.t.s = 'head';
 
                 await v.h.set(v, el => {
-                    const po = v.h.d.createElement('link');
-                    po.href = this.uiMethod.parseUrl(css.href);
+                    const
+                        po = v.h.d.createElement('link'),
+                        p = this.cssMethod.params
+                    ;
 
-                    if (css.crossorigin)
-                        po.setAttribute('crossorigin', css.crossorigin);
+                    for (let k in p)
+                        if (
+                            css[p[k]]
+                            && ['defer', 'href'].indexOf(p[k]) === -1
+                        )
+                            po.setAttribute(p[k], css[p[k]])
+                    ;
+
+                    po.href = this.uiMethod.parseUrl(css.href);
 
                     if (css.defer) {
                         po.rel = 'preload';
@@ -34,7 +44,8 @@ module.exports = {
                         po.setAttribute('as', 'style');
                         po.setAttribute('onload', "this.onload=null;this.rel='stylesheet'");
                     } else
-                        po.rel = css.rel ? css.rel : 'stylesheet';
+                        po.rel = css.rel ? css.rel : 'stylesheet'
+                    ;
 
                     el.appendChild(po);
 
@@ -47,7 +58,8 @@ module.exports = {
 
         afterView: async function(v) {
             for (let css of this.collection)
-                await this.process(v, css);
+                await this.process(v, css)
+            ;
 
             this.cache = {};
             this.collection = [];

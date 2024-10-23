@@ -4,7 +4,7 @@
 module.exports = {
     jTormLayerModel: {
         // DI
-        // saveModel: null,
+        // saveModel: null
 
         cid: null,
         event: {
@@ -24,13 +24,15 @@ module.exports = {
 
             const
                 l = this.layers,
-                o = [];
+                o = []
+            ;
 
             for (let i in e) {
                 const
                     r = l[e[i]]
                         ? l[e[i]]
-                        : null;
+                        : null
+                ;
 
                 if (r) {
                     r.sort(function (a, b) {
@@ -38,7 +40,8 @@ module.exports = {
                     });
 
                     for (let k in r)
-                        o.push(r[k].t);
+                        o.push(r[k].t)
+                    ;
                 }
             }
 
@@ -52,25 +55,31 @@ module.exports = {
                     ? v.d.cid
                     : v.cid
                         ? v.cid
-                        : this.cid;
+                        : this.cid
+            ;
 
             if (!i)
-                throw new Error('ID not set');
+                throw new Error('ID not set')
+            ;
 
             if (!v.d.z)
-                v.d.z = 0;
+                v.d.z = 0
+            ;
 
             if (!this.layers[i])
-                this.layers[i] = [];
+                this.layers[i] = []
+            ;
 
             for (let k in v.t.c)
                 this.layers[i].push({
                     z: parseInt(v.d.z),
                     t: v.t.c[k]
-                });
+                })
+            ;
 
             if (this.event[v.d.e][v.d.t].indexOf(i) === -1)
-                this.event[v.d.e][v.d.t].push(i);
+                this.event[v.d.e][v.d.t].push(i)
+            ;
 
             this.updated = 1;
         },
@@ -85,7 +94,8 @@ module.exports = {
 
         save: async function () {
             if (this.saveModel && this.updated)
-                this.saveModel.set(this.layers, this.event);
+                this.saveModel.set(this.layers, this.event)
+            ;
 
             this.event.before.iteration = [];
             this.event.after.iteration = [];

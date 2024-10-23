@@ -1,8 +1,8 @@
 {
   "name": "@jtorm/layer-plugin",
   "description": "jTorm Layer Plugin",
-  "version": "0.0.4",
-  "license": "MIT",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
   },

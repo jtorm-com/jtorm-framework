@@ -4,11 +4,17 @@
 module.exports = {
     jTormDocumentModel: {
         // DI
-        // errorHandler: null,
-        // windowModel: null,
+        // errorHandler
+        // windowModel
 
         charset: 'utf-8',
 
+        /**
+         * @constructor
+         * @param {string} h - HTML.
+         * @param {object} v - ViewModel.
+         * @param {boolean} b - Is HTML only body content.
+         */
         create: function(h, v, b) {
             const r = {
                 d: v.c.c
@@ -37,9 +43,10 @@ module.exports = {
                     return this.d.querySelectorAll(s);
                 },
 
-                getSelector: function(s, m) {
+                getSelector: (s, m) => {
                     if (!m)
-                        return s;
+                        return s
+                    ;
 
                     if (s) {
                         s = s.replace(/(?=[()\[\]])/g, '\\');
@@ -47,11 +54,13 @@ module.exports = {
                         let r = new RegExp(s, "m");
 
                         if (m && r.test(m))
-                            s = s.replace(m, '');
+                            s = s.replace(m, '')
+                        ;
 
                         return s
                             ? s
-                            : m;
+                            : m
+                        ;
                     }
 
                     return m;
@@ -60,21 +69,26 @@ module.exports = {
                 set: async function(v, fn) {
                     const
                         s = this.getSelector(v.t.s, v.c.s),
-                        c = this.selectAll(s);
+                        c = this.selectAll(s)
+                    ;
 
                     if (c.length)
                         for (let i = 0; i < c.length; i++)
-                            await fn(c[i]);
+                            await fn(c[i])
+                    ;
                     else
-                        this.errorHandler.handle(s + ' not found', v);
+                        this.errorHandler.handle(s + ' not found', v)
+                    ;
                 }
             };
 
             if (b)
-                h = "<body>" + h + "</body>";
+                h = "<body>" + h + "</body>"
+            ;
 
             if (h)
-                r.d.documentElement.innerHTML = h;
+                r.d.documentElement.innerHTML = h
+            ;
 
             return r;
         }

@@ -6,7 +6,7 @@ module.exports = {
         // DI
 
         params: [
-            'e'// element
+            'e'// Element
         ],
 
         validate: function (v) {

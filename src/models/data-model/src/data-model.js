@@ -4,19 +4,19 @@
 module.exports = {
     jTormDataModel: {
         // DI
-        // requestModel: null,
+        // requestModel
 
         cache: {},
 
-        get: async function (v, url) {
-            if (!this.cache[url])
-                await this.set(v, url);
+        get: async function (v) {
+            if (!this.cache[v])
+                await this.set(v);
 
-            return this.cache[url];
+            return this.cache[v];
         },
 
-        set: async function (v, url) {
-            this.cache[url] = await this.requestModel.request(url, "application/json");
+        set: async function (v) {
+            this.cache[v] = await this.requestModel.request(v, "application/json");
         }
     }
 };

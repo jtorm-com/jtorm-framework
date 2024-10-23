@@ -1,8 +1,8 @@
 {
   "name": "@jtorm/view-model",
   "description": "jTorm View Model",
-  "version": "0.0.4",
-  "license": "MIT",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -14,6 +14,8 @@
     "directory": "src/models/view-model"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "@jtorm/data-parser": "^1.0.0",
+    "@jtorm/document-model": "^1.0.0"
   }
 }

@@ -11,7 +11,7 @@ module.exports = {
         },
 
         handle: async function (v) {
-            await v.h.set(v, function (e) {
+            await v.h.set(v, e => {
                 e.parentElement.removeChild(e);
             }, v);
 

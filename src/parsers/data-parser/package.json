@@ -1,8 +1,8 @@
 {
   "name": "@jtorm/data-parser",
   "description": "jTorm Data Parser",
-  "version": "0.0.5",
-  "license": "MIT",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -13,5 +13,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/parsers/data-parser"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/tss-parser": "^1.0.0"
+  }
 }

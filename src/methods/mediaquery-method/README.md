@@ -13,7 +13,7 @@ npm install @jtorm/mediaquery-method
 
 | Option | Type     | Required | Description |
 |--------|----------|----------|-------------|
-| `q`    | `string` | `true`   | Mediaquery |
+| `q`    | `string` | `true`   | Mediaquery. |
 
 
 ## Example

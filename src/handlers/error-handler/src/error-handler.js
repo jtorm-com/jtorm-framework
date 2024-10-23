@@ -4,7 +4,7 @@
 module.exports = {
     jTormErrorHandler: {
         // DI
-        // util: null,
+        // util
 
         handle: function (e, v) {
             for (let k in v) {

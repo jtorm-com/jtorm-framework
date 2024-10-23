@@ -4,7 +4,7 @@
 module.exports = {
     jTormEventModel: {
         // DI
-        // plugins: null,
+        // plugins[]
 
         event: {
             before: {
@@ -37,15 +37,17 @@ module.exports = {
                 k2,
                 k3,
                 e = this.event,
-                p = this.plugins;
+                p = this.plugins
+            ;
 
             for (k in e) {
                 for (k2 in e[k]) {
                     for (k3 in p)
                         if (p[k3].event[k] && p[k3].event[k][k2])
-                            e[k][k2].push(p[k3]);
+                            e[k][k2].push(p[k3])
+                    ;
 
-                    e[k][k2].sort(function (a, b) {
+                    e[k][k2].sort((a, b) => {
                         return a.weight - b.weight;
                     });
                 }
@@ -56,7 +58,8 @@ module.exports = {
             let k, c = this.event[e][t];
 
             for (k in c)
-                await c[k][this.handlerName[e][t]](v);
+                await c[k][this.handlerName[e][t]](v)
+            ;
         }
     }
 };
