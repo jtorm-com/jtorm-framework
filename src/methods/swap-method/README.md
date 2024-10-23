@@ -11,13 +11,12 @@ npm install @jtorm/swap-method
 
 ## Properties
 
-| Option | Type       | Required | Description         |
-|--------|------------|----------|---------------------|
-| `s`    | `string`   | `true`   | CSS Selector of target element added through `ui`, or `h`, or as a fallback it will create an element based on the selector |
-| `ui`   | `string`   | `false`  | UI component        |
-| `h`    | `string`   | `false`  | HTML                |
-| `a`    | `boolean`  | `false`  | Keep attributes     |
-
+| Option | Type       | Required | Description                                                                                                                  |
+|--------|------------|----------|------------------------------------------------------------------------------------------------------------------------------|
+| `s`    | `string`   | `true`   | CSS Selector of target element added through `ui`, or `h`, or as a fallback it will create an element based on the selector. |
+| `ui`   | `string`   | `false`  | UI component.                                                                                                                |
+| `h`    | `string`   | `false`  | HTML.                                                                                                                        |
+| `a`    | `boolean`  | `false`  | Keep attributes.                                                                                                             |
 
 ## Example
 

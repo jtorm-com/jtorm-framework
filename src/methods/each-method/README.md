@@ -3,18 +3,23 @@
 ## Install
 
 ```js
-npm install jtorm-com/jtorm-each-method
+npm install @jtorm/each-method
 ```
 
-## Config
+## Properties
 
-| Option | Type     | Required | Description                                |
-|--------|----------|----------|--------------------------------------------|
-| `d`    | `string` | `true`   | Data collection                            |
-| `a`    | `string` | `true`   | As current item reference within the loop  |
-| `m`    | `string` | method   | E.g. append, prepend, replace, etc.        |
-| `e`    | `false`  | method   | Element                                    |
+| Option | Type     | Required | Description                                     |
+|--------|----------|----------|-------------------------------------------------|
+| `d`    | `string` | `true`   | Data collection.                                |
+| `a`    | `string` | `true`   | As current item reference within the loop.      |
+| `m`    | `string` | `false`  | E.g. append, prepend, replace. Default: append. |
+| `e`    | `string` | `false`  | Set certain elements to the scope to process.   |
 
-To the data in the iteration is added:
-d.isLoop = 1;
-d.index = {key};
+
+## Example
+
+```js
+body->each(d: dataSet, a: row)->append {
+    h: row.html;
+}
+```

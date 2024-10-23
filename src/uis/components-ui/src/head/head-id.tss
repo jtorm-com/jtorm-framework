@@ -41,9 +41,8 @@
 }
 
 ->if(d: workTranslation)
-->each {
-    d: workTranslation;
-
+->each(d: workTranslation)
+->get(d: @id) {
     ->data(
         rel: 'alternate',
         hreflang: inLanguage,

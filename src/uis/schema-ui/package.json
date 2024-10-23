@@ -1,8 +1,8 @@
 {
   "name": "@jtorm/schema-ui",
   "description": "jTorm Schema UI",
-  "version": "0.0.4",
-  "license": "MIT",
+  "version": "0.0.5",
+  "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
   },

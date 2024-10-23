@@ -9,7 +9,7 @@
     "javascript ui framework",
     "web ui framework"
   ],
-  "license": "MIT",
+  "license": "GPL-3.0",
   "scripts": {},
-  "version": "0.0.4"
+  "version": "1.0.0"
 }

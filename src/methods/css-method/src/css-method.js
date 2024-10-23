@@ -4,9 +4,19 @@
 module.exports = {
     jTormCssMethod: {
         // DI
-        // cssPlugin: null,
+        // cssPlugin
 
-        params: ['href', 'rel', 'crossorigin', 'defer'],
+        params: [
+            'crossorigin',
+            'href',
+            'hreflang',
+            'media',
+            'referrerpolicy',
+            'rel',
+            'sizes',
+            'title',
+            'type'
+        ],
 
         validate: function (v) {
             return !!v.d.href;

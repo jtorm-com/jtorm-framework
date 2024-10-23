@@ -6,13 +6,14 @@
 npm install @jtorm/time-method
 ```
 
-## Config
 
-| Option | Type       | Required | Description |
-|--------|------------|----------|-------------|
-| `as`   | `data`     | `true`   | Data key for mapping |
-| `d`    | `Date`     | `true`   | Date |
-| `dT`   | `DateTime` | `true`   | DataTime |
+## Properties
+
+| Option | Type       | Required | Description           |
+|--------|------------|----------|-----------------------|
+| `as`   | `data`     | `true`   | Data key for mapping. |
+| `d`    | `Date`     | `true`   | Date.                 |
+| `dT`   | `DateTime` | `true`   | DataTime.             |
 
 Note: Date OR DateTime is required
 

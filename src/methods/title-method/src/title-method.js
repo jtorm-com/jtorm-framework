@@ -3,7 +3,9 @@
 
 module.exports = {
     jTormTitleMethod: {
-        params: ['t'],
+        params: [
+            't'// Title
+        ],
 
         validate: function (v) {
             return !!v.d.t;

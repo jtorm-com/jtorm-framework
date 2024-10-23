@@ -4,7 +4,7 @@
 module.exports = {
     jTormGetMethod: {
         // DI
-        // models: null,
+        // models[],
 
         params: ['h', 't', 'd', 'a'],
 
@@ -12,8 +12,8 @@ module.exports = {
             return !!(v.d.h || v.d.t || v.d.d);
         },
 
-        get: async function(v, t, u) {
-            let r = await this.models[t].get(v, u);
+        get: async function(t, u) {
+            let r = await this.models[t].get(u);
 
             return r.d;
         },
@@ -24,22 +24,17 @@ module.exports = {
             if (v.d.d) {
                 nD = {...v.m};
 
-                r = await this.get(v, 'data', v.d.d);
+                r = await this.get('data', v.d.d);
 
                 if (v.d.a)
-                    v._.set(nD, v.d.a, r);
-                else
-                    nD = {...nD, ...r};
+                    v._.set(nD, v.d.a, r)
+                ; else
+                    nD = {...nD, ...r}
+                ;
             }
 
             if (v.d.h) {
-                r = '';
-
-                if (v._.isString(v.d.h))
-                    v.d.h = [v.d.h];
-
-                for (k in v.d.h)
-                    r += await this.get(v, 'html', v.d.h[k]);
+                r = await this.get('html', v.d.h);
 
                 await v.h.set(v, function (el) {
                     el.innerHTML = r;
@@ -47,27 +42,24 @@ module.exports = {
             }
 
             if (v.d.t) {
-                if (v._.isString(v.d.t))
-                    v.d.t = [v.d.t];
-
                 nT = {
-                    // s: v.t.s,
                     s: false,
                     c: []
                 };
 
-                for (k in v.d.t) {
-                    r = await this.get(v, 'tss', v.d.t[k]);
+                r = await this.get('tss', v.d.t);
 
-                    if (v.t.s)
-                        v.c.s = v.t.s;
+                if (v.t.s)
+                    v.c.s = v.t.s
+                ;
 
-                    for (k in r)
-                        nT.c.push(r[k]);
-                }
+                for (k in r)
+                    nT.c.push(r[k])
+                ;
 
                 for (k in v.t.c)
-                    nT.c.push(v.t.c[k]);
+                    nT.c.push(v.t.c[k])
+                ;
 
                 v.t = nT;
             }

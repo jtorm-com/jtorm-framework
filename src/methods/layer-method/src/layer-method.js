@@ -4,14 +4,14 @@
 module.exports = {
     jTormLayerMethod: {
         // DI
-        // layerModel: null,
+        // layerModel
 
         alias: 'l',
         params: [
             'i',// ID
-            'e',// event when to process e.g. after
-            't',// type when to process e.g. iteration
-            'z'// int:z-index
+            'e',// Event
+            't',// Type
+            'z'// Z-index
         ],
 
         validate: function (v) {

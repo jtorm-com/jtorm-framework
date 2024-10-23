@@ -22,9 +22,11 @@
                     }
 
                     #contents
+                        ->config(d: @type + '.' + identifier + '.template', a: '@template')
+                        ->data(@template: @template || 'default')
                         ->append
                         ->ui {
-                            c: @type + '.default';
+                            c: @type + '.' + @template;
                             m: '1';
                         }
                 }

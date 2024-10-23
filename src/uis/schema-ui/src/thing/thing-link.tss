@@ -1,12 +1,17 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 ->each
-->data(href: url)
+->data(
+    href: url,
+    title: name
+)
 ->ui {
     c: '@e.a';
 
     a
-        ->data(Text: name)
+        ->data(
+            Text: alternateName
+        )
         ->ui {
             c: 'Text';
         }

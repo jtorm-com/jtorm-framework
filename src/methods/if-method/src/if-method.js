@@ -4,12 +4,17 @@
 module.exports = {
     jTormIfMethod: {
         // DI
-        // dataParser: null,
-        // handler: null,
+        // dataParser
+        // handler
 
         or: '||',
         and: '&&',
-        params: ['d', 'v', 'el', 'to'],
+        params: [
+            'd',// Data
+            'v',// Value
+            'el',// Element
+            'to'// To
+        ],
 
         validate: function () {
             return 1;
@@ -19,23 +24,27 @@ module.exports = {
             const
                 d = this.dataParser,
                 o = this.or,
-                a = this.and;
+                a = this.and
+            ;
 
             let
                 r,
                 e,
                 t,
                 k,
-                to = 1;
+                to = 1
+            ;
 
             if (v.d.d === undefined)
-                v.d.d = v.m;
+                v.d.d = v.m
+            ;
 
             if (v.d.to) {
                 if (v.d.to === 'array')
-                    to = Array.isArray(v.d.d);
-                else if (typeof v.d.d !== v.d.to)
-                    to = 0;
+                    to = Array.isArray(v.d.d)
+                ; else if (typeof v.d.d !== v.d.to)
+                    to = 0
+                ;
             }
 
             if (v.d.d === null) {
@@ -62,13 +71,15 @@ module.exports = {
 
             if (v.d.v !== undefined) {
                 if (v._.isBoolean(v.d.v) && v.d.d === v.d.v)
-                    v.d.d = 1;
-                else
-                    r = new RegExp(v.d.v, 'm');
+                    v.d.d = 1
+                ; else
+                    r = new RegExp(v.d.v, 'm')
+                ;
             }
 
             if (v.d.el)
-                e = v.h.select(v.d.el);
+                e = v.h.select(v.d.el)
+            ;
 
             t = [];
             if (
@@ -80,7 +91,8 @@ module.exports = {
             ) {
                 for (k in v.t.c) {
                     if (v.t.c[k].m !== 'else')
-                        t.push(v.t.c[k]);
+                        t.push(v.t.c[k])
+                    ;
                 }
             } else {
                 for (k in v.t.c) {
@@ -92,7 +104,8 @@ module.exports = {
             }
 
             if (t.length)
-                await this.handler.handle(v.h, t, v.m, v.c);
+                await this.handler.handle(v.h, t, v.m, v.c)
+            ;
 
             v.io = {};
         }

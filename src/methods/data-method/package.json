@@ -1,8 +1,8 @@
 {
   "name": "@jtorm/data-method",
   "description": "jTorm Data Method",
-  "version": "0.0.4",
-  "license": "MIT",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -13,5 +13,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/methods/data-method"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/data-parser": "^1.0.0"
+  }
 }

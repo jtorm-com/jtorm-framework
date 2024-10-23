@@ -8,17 +8,17 @@ npm install @jtorm/tss-parser
 
 ## Config
 
-| Option                       | Type     | Default             | Description |
-|------------------------------|----------|---------------------|-------------|
-| `opening`                    | `string` | `'{'`               | Opening tag |
-| `closing`                    | `string` | `'}'`               | Closing tag |
+| Option                       | Type     | Default             | Description                                     |
+|------------------------------|----------|---------------------|-------------------------------------------------|
+| `opening`                    | `string` | `'{'`               | Opening tag                                     |
+| `closing`                    | `string` | `'}'`               | Closing tag                                     |
 | `propertySeparator`          | `string` | `':'`               | Property seperator e.g. key:value/key=value/etc |
-| `propertyEnd`                | `string` | `';'`               | Property ending tag |
-| `propertyShorthandOpening`   | `string` | `'('`               | Property ending tag |
-| `propertyShorthandClosing`   | `string` | `')'`               | Property ending tag |
-| `propertyShorthandSeparator` | `string` | `','`               | Property ending tag |
-| `methodSeparator`            | `string` | `'->'`              | Method seperator |
-| `quotes`                     | `array`  | ``['"', "'", '`']`` | Used quotes in TSS |
+| `propertyEnd`                | `string` | `';'`               | Property ending tag                             |
+| `propertyShorthandOpening`   | `string` | `'('`               | Property ending tag                             |
+| `propertyShorthandClosing`   | `string` | `')'`               | Property ending tag                             |
+| `propertyShorthandSeparator` | `string` | `','`               | Property ending tag                             |
+| `methodSeparator`            | `string` | `'->'`              | Method seperator                                |
+| `quotes`                     | `array`  | ``['"', "'", '`']`` | Used quotes in TSS                              |
 
 
 ## Example

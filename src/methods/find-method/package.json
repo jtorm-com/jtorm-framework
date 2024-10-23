@@ -1,0 +1,17 @@
+{
+  "name": "@jtorm/find-method",
+  "description": "jTorm Find Method",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "main": "src/find-method.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/methods/find-method"
+  },
+  "dependencies": {}
+}
