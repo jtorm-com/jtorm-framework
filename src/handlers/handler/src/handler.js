@@ -4,20 +4,22 @@
 module.exports = {
     jTormHandler: {
         // DI
-        // dataParser: null,
-        // eventModel: null,
-        // methods: null,
-        // viewModel: null,
+        // dataParser
+        // eventModel
+        // methods[]
+        // viewModel
 
         handle: async function (h, t, m, c, v) {
             let e = this.eventModel,
                 ms = this.methods,
                 r,
                 k,
-                k2;
+                k2
+            ;
 
             if (!v)
-                v = await this.viewModel.create(h, t, m, c);
+                v = await this.viewModel.create(h, t, m, c)
+            ;
 
             for (k in v.tss) {
                 v.t = v.tss[k];
@@ -26,8 +28,8 @@ module.exports = {
                     r = 0;
 
                     if (v.t.m && ms[v.t.m])
-                        r = ms[v.t.m];
-                    else {
+                        r = ms[v.t.m]
+                    ; else {
                         for (k2 in ms) {
                             if (ms[k2].alias === v.t.m) {
                                 r = ms[k2];
@@ -38,18 +40,20 @@ module.exports = {
 
                     if (r) {
                         if (v._.isFunction(r.data))
-                            await r.data(v);
-                        else
-                            this.dataParser.handle(v, r.params);
+                            await r.data(v)
+                        ; else
+                            this.dataParser.handle(v, r.params)
+                        ;
 
                         v.io.v = await r.validate(v);
 
                         await e.handle(v, 'before', 'method');
 
                         if (v.io.v && v._.isFunction(r.handle))
-                            await r.handle(v);
-                        else
-                            v.io.r = 0;
+                            await r.handle(v)
+                        ; else
+                            v.io.r = 0
+                        ;
 
                         await e.handle(v, 'after', 'method');
                     } else {
@@ -59,7 +63,8 @@ module.exports = {
                 } while (v.io.r);
 
                 if (v.io.c && v.t.c.length)
-                    await this.handle(v.h, v.t.c, v.io.d ? v.io.d : v.m, v.c);
+                    await this.handle(v.h, v.t.c, v.io.d ? v.io.d : v.m, v.c)
+                ;
 
                 v.io.d = null;
             }

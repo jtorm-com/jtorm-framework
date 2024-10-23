@@ -1,8 +1,8 @@
 {
   "name": "@jtorm/js-method",
   "description": "jTorm JS Method",
-  "version": "0.0.4",
-  "license": "MIT",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -13,5 +13,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/methods/js-method"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/js-plugin": "^1.0.0"
+  }
 }

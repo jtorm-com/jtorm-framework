@@ -4,18 +4,18 @@
 module.exports = {
     jTormEachMethod: {
         // DI
-        // handler: null,
-        // handlerWrapper: null,
-        // methods: null,
-        // viewModel: null,
+        // handler
+        // handlerWrapper
+        // methods[]
+        // viewModel
 
         defaultMethod: 'append',
         alias: 'e',
         params: [
+            'a',// As reference
             'd',// Data
-            'm',// Method
             'e',// Element
-            'a'// As reference
+            'm' // Method
         ],
 
         validate: function (v) {
@@ -33,10 +33,12 @@ module.exports = {
             let r = '', d, k, h, sv, i = 0, e;
 
             if (!v.d.d)
-                v.d.d = v.m;
+                v.d.d = v.m
+            ;
 
             if (!Array.isArray(v.d.d))
-                v.d.d = [v.d.d];
+                v.d.d = [v.d.d]
+            ;
 
             if (v.d.e) {
                 e = v.h.selectAll(v.d.e);
@@ -45,29 +47,38 @@ module.exports = {
 
             for (k in v.d.d) {
                 if (['isLoop', 'index'].indexOf(k) !== -1)
-                    continue;
+                    continue
+                ;
 
                 d = {};
 
                 if (v.d.a)
-                    d[v.d.a] = v.d.d[k];
-                else
-                    d = v.d.d[k];
+                    d[v.d.a] = v.d.d[k]
+                ; else
+                    d = v.d.d[k]
+                ;
 
                 if (typeof d !== 'object')
-                    d = [d];
+                    d = [d]
+                ;
 
                 d.isLoop = 1;
                 d.index = k;
 
-                if (v.t.p.e) {
-                    if (e.length && e[i])
-                        h = e[i].outerHTML;
-                    else
-                        h = e[0].outerHTML;
+                if (v.t.p.e && e.length) {
+                    if (e[i])
+                        h = e[i].outerHTML
+                    ; else
+                        h = e[0].outerHTML
+                    ;
 
                     h = await s.handler.handle('<body>' + h + '</body>', v.t.c, d, 1);
-                    e[i].parentNode.replaceChild(h.select(v.t.s), e[i]);
+
+                    if (e[i])
+                        e[i].parentNode.replaceChild(h.select(v.d.e ?? v.t.s), e[i])
+                    ;
+
+                    r += h.body();
                 } else {
                     h = await s.handlerWrapper.handle("", v.t, d, v);
                     r += h;
@@ -78,14 +89,14 @@ module.exports = {
                 i++;
             }
 
-            if (!v.t.p.e) {
-                if (!v.d.m) v.d.m = s.defaultMethod;
+            if (!v.d.m)
+                v.d.m = s.defaultMethod
+            ;
 
-                sv = s.viewModel.copy(v);
-                sv.t = {s: v.t.s, m: v.d.m, c: []};
-                sv.d = {h: r};
-                await s.methods[v.d.m].handle(sv);
-            }
+            sv = s.viewModel.copy(v);
+            sv.t = {s: v.t.s, m: v.d.m, c: []};
+            sv.d = {h: r};
+            await s.methods[v.d.m].handle(sv);
 
             v.io = {};
         }

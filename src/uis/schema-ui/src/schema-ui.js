@@ -41,7 +41,120 @@ module.exports = {
                     t: ['@s/site-navigation-element/site-navigation-element-boxed.tss']
                 }
             },
+            AboutPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/about-page/about-page-default.tss'
+                    ]
+                }
+            },
+            CheckoutPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/checkout-page/checkout-page-default.tss'
+                    ]
+                }
+            },
+            ContactPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/contact-page/contact-page-default.tss'
+                    ]
+                }
+            },
+            FAQPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/faq-page/faq-page-default.tss'
+                    ]
+                }
+            },
+            ItemPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/item-page/item-page-default.tss'
+                    ]
+                }
+            },
+            ProfilePage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/profile-page/profile-page-default.tss'
+                    ]
+                }
+            },
+            QAPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/qa-page/qa-page-default.tss'
+                    ]
+                }
+            },
+            SearchResultsPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/search-results-page/search-results-page-default.tss'
+                    ]
+                }
+            },
+            CollectionPage: {
+                link: {
+                    ui: {
+                        c: 'WebPage.link'
+                    }
+                },
+                default: {
+                    t: [
+                        '@s/collection-page/collection-page-default.tss'
+                    ]
+                }
+            },
             WebPage: {
+                link: {
+                    ui: {
+                        c: 'Thing.link'
+                    }
+                },
                 default: {
                     t: [
                         '@s/web-page/web-page-default.tss'
@@ -65,7 +178,7 @@ module.exports = {
                 // todo
                 contentsBoxed: {
                     ui: {
-                        c: 'WebPage.contentsDefault'
+                        c: 'WebPage.contents'
                     },
                     t: [
                         '@s/web-page/contents-boxed.tss'
@@ -133,25 +246,17 @@ module.exports = {
                 }
             },
             WebSite: {
+                link: {
+                    ui: {
+                        c: 'Thing.link'
+                    }
+                },
                 default: {
                     t: [
                         '@s/web-site/web-site-default.tss'
                     ]
                 }
             },
-            /*
-      AboutPage
-      CheckoutPage
-      CollectionPage
-      ContactPage
-      FAQPage
-      ItemPage
-      MedicalWebPage
-      ProfilePage
-      QAPage
-      RealEstateListing
-      SearchResultsPage
-             */
             WebPageElement: {
                 default: {
                     t: ['@s/web-page-element/web-page-element-default.tss']
@@ -198,10 +303,15 @@ module.exports = {
                         c: 'CreativeWork.default'
                     },
                     t: [
-                        '@s/article/article-item.tss',
-                        '@s/article/article-list-item.tss',
-                        '@s/article/article-default.tss'
+                        // '@s/article/article-item.tss',
+                        // '@s/article/article-list-item.tss',
+                        // '@s/article/article-default.tss'
                     ]
+                },
+                home: {
+                    ui: {
+                        c: 'CreativeWork.default'
+                    }
                 },
                 item: {
                     ui: {
@@ -218,9 +328,14 @@ module.exports = {
                     t: ['@s/article/article-link.tss']
                 }
             },
+
+            // schema-ui.js
             Thing: {
                 default: {
-                    t: ['@s/thing/thing-default.tss']
+                    t: [
+                        '@s/thing/thing-default.tss',
+                        '@s/thing/thing-update-1.0.1.tss'
+                    ]
                 },
                 contents: {
                     t: ['@s/thing/thing-contents.tss']
@@ -229,6 +344,7 @@ module.exports = {
                     t: ['@s/thing/thing-link.tss']
                 }
             },
+
             ImageObject: {
                 default: {
                     t: ['@s/image-object/image-object-default.tss']

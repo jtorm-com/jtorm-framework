@@ -4,7 +4,7 @@
 module.exports = {
     jTormLayerModel: {
         // DI
-        // saveModel: null,
+        // saveModel: null
 
         cid: null,
         event: {
@@ -19,24 +19,20 @@ module.exports = {
         layers: {},
         updated: 0,
 
-        init: async function () {
-            if (this.saveModel) {
-                const cache = this.saveModel.get();
-                if (cache) {
-                    this.event = cache.event;
-                    this.layers = cache.layers;
-                }
-            }
-        },
-
         get: function (v, e, t) {
-            const o = [],
-                i = v.cid ? v.cid : 'global';
+            e = this.event[e][t];
 
-            if (this.event[e][t].indexOf(i) !== -1) {
-                const r = this.layers[i]
-                        ? this.layers[i]
-                        : null;
+            const
+                l = this.layers,
+                o = []
+            ;
+
+            for (let i in e) {
+                const
+                    r = l[e[i]]
+                        ? l[e[i]]
+                        : null
+                ;
 
                 if (r) {
                     r.sort(function (a, b) {
@@ -44,7 +40,8 @@ module.exports = {
                     });
 
                     for (let k in r)
-                        o.push(r[k].t);
+                        o.push(r[k].t)
+                    ;
                 }
             }
 
@@ -58,33 +55,52 @@ module.exports = {
                     ? v.d.cid
                     : v.cid
                         ? v.cid
-                        : this.cid;
+                        : this.cid
+            ;
 
             if (!i)
-                throw new Error('ID not set');
+                throw new Error('ID not set')
+            ;
 
             if (!v.d.z)
-                v.d.z = 0;
+                v.d.z = 0
+            ;
 
             if (!this.layers[i])
-                this.layers[i] = [];
+                this.layers[i] = []
+            ;
 
             for (let k in v.t.c)
                 this.layers[i].push({
-                    c: parseInt(v.d.c),
                     z: parseInt(v.d.z),
                     t: v.t.c[k]
-                });
+                })
+            ;
 
-            this.event[v.d.e][v.d.t].push(i);
+            if (this.event[v.d.e][v.d.t].indexOf(i) === -1)
+                this.event[v.d.e][v.d.t].push(i)
+            ;
 
             this.updated = 1;
         },
 
+        initCache: async function () {
+            const cache = await this.saveModel.get();
+            if (cache) {
+                this.event = cache.event;
+                this.layers = cache.layers;
+            }
+        },
+
         save: async function () {
             if (this.saveModel && this.updated)
-                this.saveModel.set(this.layers, this.event);
+                this.saveModel.set(this.layers, this.event)
+            ;
 
+            this.event.before.iteration = [];
+            this.event.after.iteration = [];
+            this.event.after.view = [];
+            this.layers = {};
             this.updated = 0;
         }
     }

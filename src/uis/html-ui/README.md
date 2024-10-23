@@ -3,5 +3,5 @@
 ## Install
 
 ```js
-npm install jtorm-com/jtorm-html-ui
+npm install @jtorm/html-ui
 ```

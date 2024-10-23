@@ -4,10 +4,11 @@
 module.exports = {
     jTormRequestModel: {
         // DI
-        // axios: null,
-        // uiMethod: null,
-        // windowModel: null,
+        // axios,
+        // uiMethod
+        // windowModel
 
+        charset: 'utf-8',
         url: null,
 
         init: function() {
@@ -22,7 +23,8 @@ module.exports = {
             req.url = this.uiMethod.parseUrl(req.url);
 
             if (/^http/.test(req.url) === false)
-                req.url = this.url + req.url;
+                req.url = this.url + req.url
+            ;
 
             xhr = await this.axios.request(req);
 

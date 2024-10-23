@@ -4,7 +4,9 @@
 module.exports = {
     jTormUnwrapMethod: {
         alias: 'u',
-        params: ['s'],
+        params: [
+            's'// Selector
+        ],
 
         validate: function (v) {
             return !!v.d.s;

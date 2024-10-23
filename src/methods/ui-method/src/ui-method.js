@@ -4,10 +4,10 @@
 module.exports = {
     jTormUiMethod: {
         // DI
-        // errorHandler: null,
-        // mediatargetMethod: null,
-        // methods: null,
-        // viewModel: null,
+        // errorHandler
+        // mediatargetMethod
+        // methods[]
+        // viewModel
 
         cache: {},
         default: 'default',
@@ -38,30 +38,32 @@ module.exports = {
 
                 if (ui.mapperAlias)
                     for (k2 in ui.mapperAlias)
-                        this.regexp[ui.alias].mapper[k2] = new RegExp("@" + k2 + '([\.\/])', '');
+                        this.regexp[ui.alias].mapper[k2] = new RegExp("@" + k2 + '([\.\/])', '')
+                ;
             }
         },
 
         validate: function (v) {
             v.d.t = v.d.t === undefined
                 ? 1
-                : parseInt(v.d.t);
+                : parseInt(v.d.t)
+            ;
 
             v.d.m = v.d.m === undefined
                 ? 0
-                : parseInt(v.d.m);
+                : parseInt(v.d.m)
+            ;
 
             v.d.h = v.d.h === undefined
                 ? 1
-                : parseInt(v.d.h);
+                : parseInt(v.d.h)
+            ;
 
             if (Number.isNaN(v.d.t))
-                this.errorHandler.handle('t is NaN', v);
+                this.errorHandler.handle('t is NaN', v)
+            ;
 
-            if (v.d.f && !this.uis[v.d.f])
-                return 0;
-
-            v.d.c = this.parseComponent(v.d.c, v.d.f);
+            v.d.c = this.parseComponent(v.d.c);
 
             return !!v.d.c;
         },
@@ -74,20 +76,23 @@ module.exports = {
                 i,
                 t,
                 n,
-                k;
+                k
+            ;
 
             if (!f)
-                f = 'self';
+                f = s.framework
+            ;
 
-            r = await s.getComponent(c, f, !v.d.m);
+            r = await s.getComponent(c, f);
             if (!r)
-                s.errorHandler.handle('Invalid UI Component', v);
+                s.errorHandler.handle('Invalid UI Component', v)
+            ;
 
             t = await s.processComponent(v, r);
 
             if (!t)
-                v.io = {c: 0, r: 0};
-            else {
+                v.io = {c: 0, r: 0}
+            ; else {
                 if (v.d.m) {
                     r = s.mediatargetMethod;
 
@@ -105,7 +110,8 @@ module.exports = {
                 }
 
                 for (i of s.params)
-                    delete v.d[i];
+                    delete v.d[i]
+                ;
 
                 v.t = t;
                 v.io = {c: 1, r: 1};
@@ -114,30 +120,30 @@ module.exports = {
 
         getComponent: async function (c, f, d) {
             const s = this;
-            let r, i;
 
             if (s.cache[c] && s.cache[c][f] !== undefined)
-                return s.cache[c][f];
+                return s.cache[c][f]
+            ;
 
-            r = await s.findUIComponent(f, c, d);
+            let
+                i,
+                r = await s.findUIComponent(f, c)
+            ;
 
             if (!r) {
-                if (f === 'self')
-                    r = await s.findUIComponent(s.framework, c, d);
-
-                if (!r) {
-                    for (i in s.uis) {
-                        if (s.uis[i]) {
-                            r = await s.findUIComponent(i, c, d);
-                            if (r)
-                                break;
-                        }
+                for (i in s.uis) {
+                    if (s.uis[i] && s.uis[i].framework !== f) {
+                        r = await s.findUIComponent(s.uis[i].framework, c);
+                        if (r)
+                            break
+                        ;
                     }
                 }
             }
 
             if (!s.cache[c])
-                s.cache[c] = {};
+                s.cache[c] = {}
+            ;
 
             s.cache[c][f] = r;
 
@@ -154,11 +160,16 @@ module.exports = {
             nT.p = {};
 
             if (!v.d.t)
-                delete tR.t;
+                delete tR.t
+            ;
+
             if (!v.d.h)
-                delete tR.h;
-            if (tR.h)
-                tR.h = [tR.h];
+                delete tR.h
+            ;
+
+            if (tR.h && !v._.isArray(tR.h))
+                tR.h = [tR.h]
+            ;
 
             f = {};
             await s.addLoop(tR, 'h', f, s, v);
@@ -168,27 +179,38 @@ module.exports = {
             if (tR.ui) {
                 nT.m = 'ui';
                 if (tR.ui.c !== undefined)
-                    nT.p.c = "'" + tR.ui.c + "'";
+                    nT.p.c = "'" + tR.ui.c + "'"
+                ;
+
                 if (tR.ui.f !== undefined)
-                    nT.p.f = "'" + tR.ui.f + "'";
+                    nT.p.f = "'" + tR.ui.f + "'"
+                ;
+
                 if (tR.ui.t !== undefined)
-                    nT.p.t = "'" + tR.ui.t + "'";
+                    nT.p.t = "'" + tR.ui.t + "'"
+                ;
+
                 if (tR.ui.h !== undefined)
-                    nT.p.h = "'" + tR.ui.h + "'";
+                    nT.p.h = "'" + tR.ui.h + "'"
+                ;
+
                 if (tR.ui.m !== undefined)
-                    nT.p.m = "'" + tR.ui.m + "'";
+                    nT.p.m = "'" + tR.ui.m + "'"
+                ;
 
                 nT.c = [{s: nT.s, m: 'get', c: nT.c, p: f}];
 
                 if (tR.di) {
                     r = await s.add(tR.di.m, v);
-                    if (!r) {
-                        return null;
-                    }
+                    if (!r)
+                        return null
+                    ;
                 }
             } else if (tR.pT) {
                 if (!Array.isArray(tR.pT.c))
-                    tR.pT.c = [];
+                    tR.pT.c = []
+                ;
+
                 tR.pT.c.push({s: v.t.s, m: 'get', c: v.t.c, p: f});
 
                 nT.c = [tR.pT];
@@ -213,12 +235,13 @@ module.exports = {
                 }
             }
 
-            return true;
+            return 1;
         },
 
         addLoop: async function (t, k, f, s, v) {
             if (!t[k])
-                return f;
+                return f
+            ;
 
             let r, i;
 
@@ -228,74 +251,52 @@ module.exports = {
                     if (t[k][i].di) {
                         r = await s.add(t[k][i].di, v);
                         if (r)
-                            f[k].push(t[k][i].url);
+                            f[k].push(t[k][i].url)
+                        ;
                     } else
-                        f[k].push(t[k][i].url);
+                        f[k].push(t[k][i].url)
+                    ;
                 } else
-                    f[k].push(t[k][i]);
+                    f[k].push(t[k][i])
+                ;
             }
 
             f[k] = s.quotes(f[k]);
         },
 
-        findUIComponent(f, c, d) {
-            const s = this;
-            let ui, k, k2, k3, tmp, r2, r;
+        findUIComponent(f, c) {
+            const
+                s = this,
+                uis = s.uis.filter(ui => ui.framework === f || ui.alias === f)
+            ;
 
-            if (f === 'self')
-                ui = s.ui;
-            else if (s.uis[f])
-                ui = s.uis[f];
-            else
-                return 0;
+            if (!uis.length)
+                return 0
+            ;
+
+            const ui = uis[0];
+
+            let k, r, p;
 
             r = ui.mapper;
-            c = c.split('.');
 
-            for (k in c) {
-                if (/&/.test(c[k])) {
-                    tmp = c[k].split('&');
-                    r2 = 0;
-                    for (k2 in tmp) {
-                        if (r[tmp[k2]]) {
-                            if (!r2)
-                                r2 = this.viewModel._.cloneDeep(r[tmp[k2]]);
-                            else {
-                                if (!r2.t)
-                                    r2.t = [];
+            if (!r)
+                return 0
+            ;
 
-                                for (k3 in r[tmp[k2]].t)
-                                    r2.t.push(r[tmp[k2]].t[k3]);
-                            }
-                        }
-                    }
+            p = c.split('.');
 
-                    r = r2;
-                } else if (/\|/.test(c[k])) {
-                    tmp = c[k].split('|');
-                    for (k2 in tmp) {
-                        if (r[tmp[k2]]) {
-                            r = this.viewModel._.cloneDeep(r[tmp[k2]]);
-
-                            break;
-                        }
-                    }
-                } else if (r) {
-                    if (r[c[k]])
-                        r = r[c[k]];
-                    else if (d && r[s.default])
-                        r = r[s.default];
-                    else
-                        return 0;
-                } else
-                    return 0;
+            for (k in p) {
+                if (r[p[k]])
+                    r = r[p[k]]
+                ; else
+                    return 0
+                ;
             }
 
             if (r[s.default])
-                r = r[s.default];
-
-            if (f === 'self' && r.ui && !r.ui.f)
-                r.ui.f = s.framework;
+                r = r[s.default]
+            ;
 
             return {c: r, ui: ui, f: f};
         },
@@ -304,12 +305,13 @@ module.exports = {
             if (ui.mapperAlias) {
                 for (let k in ui.mapperAlias)
                     if (this.regexp[ui.alias].mapper[k].test(v))
-                        return v.replace(this.regexp[ui.alias].mapper[k], ui.mapperAlias[k] + '$1');
+                        return v.replace(this.regexp[ui.alias].mapper[k], ui.mapperAlias[k] + '$1')
+                ;
 
                 return 0;
             }
 
-            return v;
+            return 0;
         },
 
         parseUrl: function (url) {
@@ -325,10 +327,12 @@ module.exports = {
                     r = s.parseComponent(url);
 
                     if (r)
-                        url = r;
+                        url = r
+                    ;
 
                     if (ui.url)
-                        url = ui.url + url;
+                        url = ui.url + url
+                    ;
 
                     break;
                 }
@@ -339,7 +343,8 @@ module.exports = {
 
         quotes: function (d) {
             for (let k in d)
-                d[k] = "'" + d[k] + "'";
+                d[k] = "'" + d[k] + "'"
+            ;
 
             return d;
         },

@@ -4,11 +4,11 @@
 module.exports = {
     jTormLanguageModel: {
         // DI
-        // configModel: null,
-        // sessionModel: null,
+        // configModel
 
-        // language: null,
-        // fallback: null
+        // language
+        // fallback
+
         data: {},
         default: 'en-US',
 
@@ -18,21 +18,19 @@ module.exports = {
 
         initLanguage: function() {
             const s = this;
-            let l = s.sessionModel.get('language');
+
+            let l = s.configModel.get('language');
 
             if (!l)
-                l = s.configModel.get('language');
-
-            if (!l)
-                l = s.default;
+                l = s.default
+            ;
 
             if (!s.data[l]) {
-                l = s.getFallback();
+                l = s.getFallback(l);
 
                 if (!s.data[l])
-                    l = s.default;
-
-                s.sessionModel.set('language', l);
+                    l = s.default
+                ;
             }
 
             return l;
@@ -41,7 +39,8 @@ module.exports = {
         getFallback: function (l) {
             return (/^[a-z][a-z]-[A-Z][A-Z]/.test(l))
                 ? l.split('-')[0]
-                : l;
+                : l
+            ;
         },
 
         setLanguage: function(l) {
@@ -57,19 +56,22 @@ module.exports = {
             let l = this.language;
 
             if (!this.data[l] || !this.data[l][s])
-                l = s.fallback;
+                l = s.fallback
+            ;
 
             return (
                 this.data[l]
                 && this.data[l][s]
             )
                 ? this.data[l][s]
-                : s;
+                : s
+            ;
         },
 
         set: function (l, k, v) {
             if (!this.data[l])
-                this.data[l] = {};
+                this.data[l] = {}
+            ;
 
             this.data[l][k] = v;
         }

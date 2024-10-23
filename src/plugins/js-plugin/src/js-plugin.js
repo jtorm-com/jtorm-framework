@@ -23,10 +23,7 @@ module.exports = {
 
                 await v.h.set(v, e => {
                     const po = v.h.d.createElement('script');
-                    po.type = 'text/javascript';
                     po.defer = true;
-                    // po.async = true;// does not work
-                    po.setAttribute('async', '');
                     po.src = this.uiMethod.parseUrl(js.src);
 
                     e.appendChild(po);
@@ -40,7 +37,8 @@ module.exports = {
 
         afterView:  async function(v) {
             for (let js of this.collection)
-                await this.process(v, js);
+                await this.process(v, js)
+            ;
 
             this.cache = {};
             this.collection = [];

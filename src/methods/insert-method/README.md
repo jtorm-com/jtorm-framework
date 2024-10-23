@@ -2,12 +2,11 @@
 
 Insert HTML in the Document Object Model (DOM) tree with help of the [insertAdjacentHTML method](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML).
 The following method aliases are available as well to set in the context methods:
-jTormAppendMethod = append/beforeend
-jTormPrependMethod = prepend/afterbegin
-jTormBeforeMethod = before/beforebegin
-jTormAfterMethod = after/afterend
-jTormReplaceMethod = replace/innerHTML
-
+- jTormAppendMethod = append/beforeend
+- jTormPrependMethod = prepend/afterbegin
+- jTormBeforeMethod = before/beforebegin
+- jTormAfterMethod = after/afterend
+- jTormReplaceMethod = replace/innerHTML
 
 ## Install
 
@@ -16,17 +15,18 @@ npm install @jtorm/insert-method
 ```
 
 
-## Config
+## Properties
 
-| Option | Required | Type    | Description |
-|--------|----------|---------|-------------|
-| `m`    | `true`   | string  | Method: a=append/beforeend, p=prepend/afterbegin, b=before/beforebegin, af=after/afterend, r=replace/innerHTML |
-| `h`    | `false`  | html    | HTML |
-| `d`    | `false`  | data    | When there are child items, alternative data to process can be set here |
-| `p`    | `false`  | data    | Prefix for 'h' |
-| `s`    | `false`  | data    | Suffix for 'h' |
-| `cid`  | `false`  | data    | Cache id |
-| `cs`   | `false`  | data    | Cache scope |
+| Option | Required | Type    | Description                                                              |
+|--------|----------|---------|--------------------------------------------------------------------------|
+| `m`    | `true`   | string  | Method: a=append, p=prepend, b=before, af=after, r=replace.              |
+| `h`    | `false`  | html    | HTML.                                                                    |
+| `d`    | `false`  | data    | When there are child items, alternative data to process can be set here. |
+| `p`    | `false`  | data    | Prefix for 'h'.                                                          |
+| `s`    | `false`  | data    | Suffix for 'h'.                                                          |
+| `l`    | `false`  | data    | Cache language scope.                                                    |
+| `cid`  | `false`  | data    | Cache id.                                                                |
+| `cs`   | `false`  | data    | Cache scope.                                                             |
 
 
 ## Example
@@ -34,7 +34,7 @@ npm install @jtorm/insert-method
 ```js
 body->insert {
     m: 'a';
-    h: '<div><b>append me</b></div>';
+    h: '<section><b>append me</b></section>';
     div {
         ->prepend {
             h: '<header><h3>Header</h3></header>';
@@ -45,20 +45,4 @@ body->insert {
         }
     }
 }
-// Result: <div><header><h3>Header</h3></header><b>append me</b><footer>footer</footer></div>
-```
-
-```js
-body->insert {
-m: 'a';
-h: '<div><b>append me</b></div>';
-
-    div {
-        ->replace {
-            s: 'h3';
-            h: '<header><h3>Header</h3></header>';
-        }
-    }
-}
-// Result: <h3>Header</h3>
 ```

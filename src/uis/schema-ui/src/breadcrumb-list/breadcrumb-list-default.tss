@@ -12,7 +12,7 @@
 
         ->append
         ->ui {
-            c: 'contents.default';
+            c: 'contents';
 
             .contents {
                 ->text(html: 'You are here')
@@ -26,21 +26,25 @@
                     }
                 }
 
-                ->append(d: hasPart)
+                ->append
                 ->ui {
                     c: '@t.ol';
                     t: '0';
 
                     ol
-                        ->each
-                        ->ui {
-                            c: '@t.li';
-                            t: '0';
-
-                            li
-                                ->append(d: @c)
+                        ->each(d: itemListElement)
+                        ->get(d: @id) {
+                            body
+                                ->append
                                 ->ui {
-                                    c: @type + '.link';
+                                    c: '@t.li';
+                                    t: '0';
+
+                                    li
+                                        ->get(d: item.@id)
+                                        ->ui {
+                                            c: 'Thing.link';
+                                        }
                                 }
                         }
                 }

@@ -4,22 +4,23 @@
 module.exports = {
     jTormTssModel: {
         // DI
-        // requestModel: null,
-        // tssParser: null,
+        // requestModel
+        // tssParser
 
         cache: {},
 
-        get: async function (v, url) {
-            if (!this.cache[url])
-                await this.set(v, url);
+        get: async function (v) {
+            if (!this.cache[v])
+                await this.set(v)
+            ;
 
-            return this.cache[url];
+            return this.cache[v];
         },
 
-        set: async function (v, url) {
-            this.cache[url] = await this.requestModel.request(url, "text/plain");
+        set: async function (v) {
+            this.cache[v] = await this.requestModel.request(v, "text/plain");
 
-            this.cache[url].d = await this.tssParser.handle(this.cache[url].d);
+            this.cache[v].d = await this.tssParser.handle(this.cache[v].d);
         }
     }
 }

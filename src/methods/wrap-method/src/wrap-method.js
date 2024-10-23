@@ -4,7 +4,7 @@
 module.exports = {
     jTormWrapMethod: {
         // DI
-        // handlerWrapper: null,
+        // handlerWrapper
 
         alias: 'w',
         params: ['s', 'h', 'd'],
@@ -17,7 +17,8 @@ module.exports = {
             const s = this;
 
             if (v.d.h)
-                await s.process(v.h, v.t.s, v.d.s, v.d.h, v.d, v);
+                await s.process(v.h, v.t.s, v.d.s, v.d.h, v.d, v)
+            ;
 
             if (v.t.c.length > 0) {
                 let h = await s.handlerWrapper.handle(v.h, v.t, v.d, v);

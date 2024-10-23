@@ -4,11 +4,13 @@
 module.exports = {
     jTormMediatargetMethod: {
         // DI
-        // mediaqueryMethod: null,
+        // mediaqueryMethod
 
         alias: 'mt',
         current: [],
-        params: ['t'],
+        params: [
+            't'// Target
+        ],
         target: {
             Mobile: 'only screen and (min-width: 320px) and (max-width: 480px)',
             MobileS: 'only screen and (min-width: 320px) and (max-width: 374px)',
@@ -33,7 +35,8 @@ module.exports = {
                 this.process(v);
 
                 if (v.io.c)
-                    this.current.push(k);
+                    this.current.push(k)
+                ;
             }
         },
 

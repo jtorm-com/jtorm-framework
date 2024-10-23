@@ -10,7 +10,7 @@ npm install @jtorm/mediatarget-method
 
 | Option | Type     | Required | Description |
 |--------|----------|----------|-------------|
-| `t`    | `string` | `true`   | Target      |
+| `t`    | `string` | `true`   | Target.     |
 
 
 ## Example

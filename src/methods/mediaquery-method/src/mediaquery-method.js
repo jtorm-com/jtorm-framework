@@ -4,11 +4,13 @@
 module.exports = {
     jTormMediaqueryMethod: {
         // DI
-        // windowModel: null,
+        // windowModel
 
         alias: 'mq',
         m: null,
-        params: ['q'],
+        params: [
+            'q'// Query
+        ],
 
         init: function() {
             let w = this.windowModel;

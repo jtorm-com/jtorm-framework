@@ -4,19 +4,20 @@
 module.exports = {
     jTormInsertMethod: {
         // DI
-        // errorHandler: null,
-        // handlerWrapper: null,
-        // viewModel: null,
+        // errorHandler
+        // handlerWrapper
+        // viewModel
 
         alias: 'i',
         params: [
-            'h',// html
-            'p',// html prefix
-            's',// html suffix
-            'd',// data
-            'm',// method
-            'cid',// cache id
-            'cs'// cache scope
+            'h',// Html
+            'p',// Html prefix
+            's',// Html suffix
+            'd',// Data
+            'm',// Method
+            'l',// Cache language
+            'cid',// Cache id
+            'cs'// Cache scope
         ],
 
         validate: function (v) {
@@ -31,18 +32,21 @@ module.exports = {
 
             v.cid = v.d.cid;
             v.cs = v.d.cs;
+            v.l = v.d.l;
 
             if (v.d.h) {
                 if (v.d.p)
-                    v.d.h = v.d.p + v.d.h;
+                    v.d.h = v.d.p + v.d.h
+                ;
 
                 if (v.d.s)
-                    v.d.h += v.d.s;
+                    v.d.h += v.d.s
+                ;
 
                 await this.process(v.h, v.d.h, v.d.m, v);
             } else if (v.d.d === null)
-                c = 0;
-            else if (
+                c = 0
+            ; else if (
                 (v.d.d === undefined || v.d.d)
                 && v.t.c.length > 0
             ) {
@@ -61,11 +65,11 @@ module.exports = {
 
                     c = 0;
                 } else
-                    this.errorHandler.handle(v.t.s + ' not found', v);
+                    this.errorHandler.handle(v.t.s + ' not found', v)
+                ;
             }
 
-            v.cid = null;
-            v.cs = null;
+            v.cid = v.cs = v.l = null;
 
             v.io = {c: c};
         },
@@ -76,17 +80,19 @@ module.exports = {
 
                 if (m === 'r') {
                     if (!o)
-                        h2 = await this.viewModel.create(h2);
+                        h2 = await this.viewModel.create(h2)
+                    ;
 
                     e.parentNode.replaceChild(h2.h.select(h2.h.getSelector(v.d.s, v.c.s)), e);
                 } else {
                     const c = o
                         ? h2.select('body').innerHTML
-                        : h2;
+                        : h2
+                    ;
 
                     if (m === 'i')
-                        e.innerHTML = c;
-                    else
+                        e.innerHTML = c
+                    ; else
                         e.insertAdjacentHTML(
                             m === 'b'
                                 ? 'beforebegin'
@@ -98,7 +104,8 @@ module.exports = {
                                             ? 'afterend'
                                             : m,
                             c
-                        );
+                        )
+                    ;
                 }
             });
         }

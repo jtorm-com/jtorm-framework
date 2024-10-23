@@ -4,14 +4,18 @@
 module.exports = {
     jTormAttrsMethod: {
         // DI
-        // attrMethod: null,
-        // dataParser: null,
-        // tssParser: null,
-        // viewModel: null,
+        // attrMethod
+        // dataParser
+        // tssParser
+        // viewModel
 
         alias: 'as',
         separator: ',',
-        params: ['n', 'v', 'm'],
+        params: [
+            'n',// Name
+            'v',// Value
+            'm'// Method
+        ],
 
         parsed: function (v) {
             let t = v._.cloneDeep(v.t),
@@ -48,11 +52,13 @@ module.exports = {
                     m: 'attr'
                 },
                 tD,
-                sv;
+                sv
+            ;
 
             for (k in names) {
                 if (!values[k])
-                    continue;
+                    continue
+                ;
 
                 tD = {
                     n: names[k],
