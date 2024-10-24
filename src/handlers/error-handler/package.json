@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/error-handler",
   "description": "jTorm Error Handler",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
