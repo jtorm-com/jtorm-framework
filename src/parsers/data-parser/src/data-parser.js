@@ -17,17 +17,29 @@ module.exports = {
             this.dataRegex = new RegExp('(' + q + ')+', 'gm');
         },
 
-        handle: function (v) {
-            let tD = {}, p, k;
+        handle: function (v, a) {
+            let p, k, z = 0;
+            const
+                d = {...{}, ...v.t.p},
+                tD = {}
+            ;
 
-            for (p in v.t.p) {
-                if (v.t.p[p]) {
-                    if (v._.isString(v.t.p[p]))
-                        tD[p] = this.parse(v.m, v.t.p[p])
-                    ; else if (v._.isArray(v.t.p[p])) {
+            if (v._.isEmpty(d)) {
+                z = 1;
+                a = Object.values(a);
+                for (k in a)
+                    d[a[k]] = a[k]
+                ;
+            }
+
+            for (p in d) {
+                if (d[p]) {
+                    if (v._.isString(d[p]))
+                        tD[p] = this.parse(v.m, d[p], z)
+                    ; else if (v._.isArray(d[p])) {
                         tD[p] = [];
-                        for (k in v.t.p[p])
-                            tD[p].push(this.parse(v.m, v.t.p[p][k]))
+                        for (k in d[p])
+                            tD[p].push(this.parse(v.m, d[p][k], z))
                         ;
                     }
                 }
@@ -36,7 +48,7 @@ module.exports = {
             v.d = tD;
         },
 
-        parse: function (d, k) {
+        parse: function (d, k, a) {
             if (!k)
                 return null
             ;
@@ -91,6 +103,10 @@ module.exports = {
                     tmp = tmp[Object.keys(tmp)[0]]
                 ; else {
                     if (!tmp || tmp[p] === undefined) {
+                        if (a)
+                            return
+                        ;
+
                         if (i)
                             return k
                         ;
