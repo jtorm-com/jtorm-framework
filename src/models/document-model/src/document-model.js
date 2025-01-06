@@ -87,7 +87,7 @@ module.exports = {
             ;
 
             if (h)
-                r.d.documentElement.innerHTML = h
+                r.d.write(h)
             ;
 
             return r;
