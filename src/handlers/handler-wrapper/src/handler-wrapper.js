@@ -12,36 +12,28 @@ module.exports = {
             const
                 t2 = t.c,
                 s = this,
-                e = s.eventModel;
-
-            if (t.s)
-                v.c.s = t.s;
-
-            await e.handle(v, 'before', 'iteration');
+                e = s.eventModel
+            ;
 
             for (let k in t2)
                 t2[k].s = 'body'
             ;
 
-            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, v.c, 1);
-
-            v2.cid = v.cid;
-            v2.cs = v.cs;
-            v2.c = {
-                s: 'body',
-                c: 1
-            };
-
-            if (!v.r)
-                v.r = await s.handler.handle(null, null, null, null, v2)
+            if (t.s)
+                v.c.s = t.s
             ;
 
-            v2.cid = v.cid;
-            v2.cs = v.cs;
+            await e.handle(v, 'before', 'iteration');
 
-            await e.handle(v2, 'after', 'iteration');
+            if (v.r)// if cache set, then disable saving cache since it already is saved
+                v.cid = 0
+            ; else
+                v.r = await s.handler.handle(v.r ? v.r : h, t2, m, 1)
+            ;
 
-            return v2.h.body();
+            await e.handle(v, 'after', 'iteration');
+
+            return v.r.body();
         }
     }
 };
