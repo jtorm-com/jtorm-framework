@@ -4,7 +4,8 @@
 module.exports = {
     jTormJsPlugin: {
         // DI
-        // uiMethod: null,
+        // jsMethod
+        // uiMethod
 
         cache: {},
         collection: [],
@@ -18,17 +19,23 @@ module.exports = {
 
         process: async function(v, js) {
             if (!this.cache[js.src]) {
-                const s = v.t.s;
-                v.t.s = 'head';
+                await v.h.set({t: {s: 'head'}, c: {s: null}}, e => {
+                    const
+                        po = v.h.d.createElement('script'),
+                        p = this.jsMethod.params
+                    ;
 
-                await v.h.set(v, e => {
-                    const po = v.h.d.createElement('script');
-                    po.defer = true;
+                    for (let k in p)
+                        if (
+                            js[p[k]]
+                            && ['src'].indexOf(p[k]) === -1
+                        )
+                            po.setAttribute(p[k], js[p[k]])
+                    ;
+
                     po.src = this.uiMethod.parseUrl(js.src);
 
                     e.appendChild(po);
-
-                    v.t.s = s;
 
                     this.cache[js.src] = true;
                 });
@@ -38,7 +45,7 @@ module.exports = {
         afterView:  async function(v) {
             for (let js of this.collection)
                 await this.process(v, js)
-            ;
+                ;
 
             this.cache = {};
             this.collection = [];
