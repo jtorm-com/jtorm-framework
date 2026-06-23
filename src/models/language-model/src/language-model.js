@@ -56,7 +56,7 @@ module.exports = {
             let l = this.language;
 
             if (!this.data[l] || !this.data[l][s])
-                l = s.fallback
+                l = this.fallback
             ;
 
             return (
