@@ -68,7 +68,7 @@ module.exports = {
                         q = s.parse(d, p);
 
                         if (q)
-                            tmp += s.parse(d, p)
+                            tmp += q
                         ;
                     }
                 }
