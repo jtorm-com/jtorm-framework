@@ -7,20 +7,17 @@ module.exports = {
         // requestModel
         // tssParser
 
-        cache: {},
+        c: {},
 
         get: async function (v) {
-            if (!this.cache[v])
-                await this.set(v)
-            ;
+            const s = this;
 
-            return this.cache[v];
-        },
+            if (!s.c[v]) {
+                s.c[v] = s.requestModel.get(v).text().then(function (t) { return s.tssParser.handle(t); });
+                s.c[v].catch(function () { delete s.c[v]; });
+            }
 
-        set: async function (v) {
-            this.cache[v] = await this.requestModel.request(v, "text/plain");
-
-            this.cache[v].d = await this.tssParser.handle(this.cache[v].d);
+            return s.c[v];
         }
     }
-}
+};

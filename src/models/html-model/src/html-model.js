@@ -6,18 +6,17 @@ module.exports = {
         // DI
         // requestModel
 
-        cache: {},
+        c: {},
 
         get: async function (v) {
-            if (!this.cache[v])
-                await this.set(v)
-            ;
+            const s = this;
 
-            return this.cache[v];
-        },
+            if (!s.c[v]) {
+                s.c[v] = s.requestModel.get(v).text();
+                s.c[v].catch(function () { delete s.c[v]; });
+            }
 
-        set: async function (v) {
-            this.cache[v] = await this.requestModel.request(v, "text/html");
+            return s.c[v];
         }
     }
 };
