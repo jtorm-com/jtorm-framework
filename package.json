@@ -10,6 +10,8 @@
     "web ui framework"
   ],
   "license": "GPL-3.0",
-  "scripts": {},
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\""
+  },
   "version": "1.0.0"
 }

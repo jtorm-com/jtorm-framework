@@ -8,5 +8,5 @@
 # Generated files
 node_modules/
 
-# Test
-test/
+# Local strategy / research / planning docs (private; repo is public)
+/docs/
