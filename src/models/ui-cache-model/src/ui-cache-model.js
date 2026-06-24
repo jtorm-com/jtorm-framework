@@ -16,8 +16,8 @@ module.exports = {
         },
 
         get: async function (v, l, id, c) {
-            if (this.cache[id] && this.cache[id][c])
-                return this.cache[id][c]
+            if (this.cache[l] && this.cache[l][id] && this.cache[l][id][c] !== undefined)
+                return this.cache[l][id][c]
             ;
 
             return null;

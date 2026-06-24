@@ -3,47 +3,38 @@
 
 module.exports = {
     jTormRequestModel: {
-        // DI
-        // axios,
-        // uiMethod
-        // windowModel
+        // dependency-free isomorphic native-fetch client (Node 18+ / browser global fetch)
 
-        charset: 'utf-8',
-        url: null,
+        base: '',   // optional base-URL prefix for relative URLs (host sets for SSR)
+        timeout: 0, // ms; 0 = no timeout
 
-        init: function() {
-            let l = this.windowModel.location;
-
-            this.url = l.protocol + '//' + l.host + '/';
+        url: function (u) {
+            return /^https?:\/\//.test(u) ? u : this.base + u;
         },
 
-        xhr: async function(req) {
-            let r, xhr;
+        fetch: async function (url) {
+            const o = {};
 
-            req.url = this.uiMethod.parseUrl(req.url);
-
-            if (/^http/.test(req.url) === false)
-                req.url = this.url + req.url
+            if (this.timeout)
+                o.signal = AbortSignal.timeout(this.timeout)
             ;
 
-            xhr = await this.axios.request(req);
+            const r = await fetch(this.url(url), o);
 
-            r = {
-                t: xhr.headers["cache-control"],
-                d: xhr.data
-            };
+            if (!r.ok)
+                throw new Error('HTTP ' + r.status + ' for ' + url)
+            ;
 
             return r;
         },
 
-        request: async function(url, h, m, c) {
-            return await this.xhr({
-                method: m ? m : "GET",
-                url: url,
-                headers: {
-                    "Content-Type": h + '; charset=' + (c ? c : this.charset)
-                }
-            });
+        get: function (url) {
+            const s = this;
+
+            return {
+                json: function () { return s.fetch(url).then(function (r) { return r.json(); }); },
+                text: function () { return s.fetch(url).then(function (r) { return r.text(); }); }
+            };
         }
     }
 };
