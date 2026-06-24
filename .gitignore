@@ -8,5 +8,9 @@
 # Generated files
 node_modules/
 
-# Local strategy / research / planning docs (private; repo is public)
+# Local strategy / research / planning docs + agent guidance (private; repo is public)
 /docs/
+/CLAUDE.md
+
+# Scratch
+/tmp/
