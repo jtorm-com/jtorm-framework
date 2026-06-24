@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormViewModel: {
         // DI
@@ -30,6 +32,16 @@ module.exports = {
             }
         },
 
+        /**
+         * Build the root view object `v` from `this.data`.
+         * @this {{ _: any, documentModel: any, tssParser: any, data: any, copyAttrs: string[] }}
+         * @param {*} h    html string, or an already-built DOM wrapper
+         * @param {*} t    TSS string, or an already-parsed tree
+         * @param {*} m    model / source data
+         * @param {*} c    create-doc flag, or a full context object
+         * @param {*} [b]  base passed to documentModel.create
+         * @returns {Promise<ViewModel>}
+         */
         create: async function(h, t, m, c, b) {
             let v = this._.create(this.data, {
                 _: this._
@@ -58,8 +70,18 @@ module.exports = {
             return v;
         },
 
+        /**
+         * Shallow-copy `v` into a child scope, deep-cloning anything not in `a`.
+         * @this {{ _: any, copyAttrs: string[] }}
+         * @param {*} v           parent view object
+         * @param {*} [h]         override html wrapper
+         * @param {*} [t]         override tss
+         * @param {*} [d]         override model data
+         * @param {string[]} [a]  attrs copied by reference (defaults to copyAttrs)
+         * @returns {Object<string,*>}
+         */
         copy: function(v, h, t, d, a) {
-            let sv = {}, k;
+            let sv = /** @type {Object<string,*>} */ ({}), k;
 
             if (!a)
                 a = this.copyAttrs

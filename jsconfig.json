@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "strict": true,
+    "noEmit": true,
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  },
+  "include": [
+    "types.js",
+    "src/models/view-model/src/view-model.js"
+  ]
+}
