@@ -53,13 +53,12 @@ module.exports = {
 
                         let r = new RegExp(s, "m");
 
-                        if (m && r.test(m))
-                            s = s.replace(m, '')
-                        ;
-
-                        return s
-                            ? s
-                            : m
+                        // m already contains s (e.g. an iteration scope where
+                        // s === m) → use m as-is. Otherwise m is a descendant to
+                        // scope under s (the find case) → combine as `s m`.
+                        return r.test(m)
+                            ? m
+                            : s + ' ' + m
                         ;
                     }
 
