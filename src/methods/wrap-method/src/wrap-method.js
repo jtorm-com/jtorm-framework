@@ -29,14 +29,14 @@ module.exports = {
         },
 
         process: async function (jD, s, w, h, d, v) {
-            await jD.set(s, async function (el) {
+            await jD.set({t: {s: s}, c: v.c}, async function (el) {
                 const tH = el.innerHTML;
                 el.innerHTML = h;
 
-                await jD.set(w, function (el2) {
+                await jD.set({t: {s: w}, c: v.c}, function (el2) {
                     el2.innerHTML = tH;
-                }, v);
-            }, v);
+                });
+            });
         }
     }
 };

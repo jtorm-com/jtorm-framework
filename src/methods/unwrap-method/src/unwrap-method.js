@@ -13,13 +13,13 @@ module.exports = {
         },
 
         handle: async function (v) {
-            await v.h.set(v.d.s, async function (e) {
+            await v.h.set({t: {s: v.d.s}, c: v.c}, async function (e) {
                 const h = e.innerHTML;
 
-                await v.h.set(v.t.s, function (e2) {
+                await v.h.set(v, function (e2) {
                     e2.innerHTML = h;
-                }, v);
-            }, v);
+                });
+            });
 
             v.io = {c: 1};
         }

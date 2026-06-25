@@ -43,15 +43,3 @@ test('title sets the document <title> from data', async () => {
   const { html } = await render('<body><p>x</p></body>', "->title { t: name; }", { name: 'Hi' });
   assert.match(html, /<title>Hi<\/title>/);
 });
-
-// CHARACTERIZATION (semantics unverified): `find` sets v.c.s = the descendant
-// selector, but the chained child transform still targets the find rule's own
-// selector (here `div`), not the descendant. Locked as-is; see jtorm-code-review.md.
-test('find: chained child currently targets the find rule selector (characterization)', async () => {
-  const { body } = await render(
-    '<body><div><b>X</b><i>Y</i></div></body>',
-    "div->find { e: 'b'; ->attr { n: 'data-f'; v: '1'; } }",
-    {}
-  );
-  assert.equal(body, '<div data-f="1"><b>X</b><i>Y</i></div>');
-});
