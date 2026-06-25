@@ -19,10 +19,7 @@ module.exports = {
 
         process: async function(v, css) {
             if(!this.cache[css.href]) {
-                const s = v.t.s;
-                v.t.s = 'head';
-
-                await v.h.set(v, el => {
+                await v.h.set({t: {s: 'head'}, c: {s: null}}, el => {
                     const
                         po = v.h.d.createElement('link'),
                         p = this.cssMethod.params
@@ -37,19 +34,16 @@ module.exports = {
                     ;
 
                     po.href = this.uiMethod.parseUrl(css.href);
+                    po.rel = css.rel ? css.rel : 'stylesheet';
 
+                    // defer: load without blocking via the media=print swap
+                    // (main's "Bugfix defer method"), flip to all on load.
                     if (css.defer) {
-                        po.rel = 'preload';
-                        po.as = 'style';
-                        po.setAttribute('as', 'style');
-                        po.setAttribute('onload', "this.onload=null;this.rel='stylesheet'");
-                    } else
-                        po.rel = css.rel ? css.rel : 'stylesheet'
-                    ;
+                        po.media = 'print';
+                        po.setAttribute('onload', "this.media='all'; this.onload=null;");
+                    }
 
                     el.appendChild(po);
-
-                    v.t.s = s;
 
                     this.cache[css.href] = true;
                 });
