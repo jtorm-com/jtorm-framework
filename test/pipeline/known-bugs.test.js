@@ -26,18 +26,6 @@ test('KNOWN BUG: wrap throws — same set() signature mismatch', async () => {
   );
 });
 
-// if(d: x && y) / if(d: x || y): the &&/|| branch in if-method.js:50-69 only runs
-// when v.d.d === null, but data-parser.parse returns the raw "x && y" string
-// (truthy, never null), so the boolean logic is dead — the condition is always
-// truthy and the chained method ALWAYS applies, regardless of x/y.
-test('KNOWN BUG: if(d: a && b) always applies (boolean AND is dead code)', async () => {
-  const t = "p->if(d: a && b)->attr { n: 'data-a'; v: '1'; }";
-  // b is falsy, so a real AND would no-op; current behavior applies anyway:
-  assert.equal((await render('<body><p>x</p></body>', t, { a: '1', b: '' })).body, '<p data-a="1">x</p>');
-});
-
-test('KNOWN BUG: if(d: a || b) always applies (boolean OR is dead code)', async () => {
-  const t = "p->if(d: a || b)->attr { n: 'data-a'; v: '1'; }";
-  // both falsy, so a real OR would no-op; current behavior applies anyway:
-  assert.equal((await render('<body><p>x</p></body>', t, { a: '', b: '' })).body, '<p data-a="1">x</p>');
-});
+// NOTE: if(d: x && y) / if(d: x || y) were dead (always-applied) before
+// fix/data-parser-unresolved-var — caused by the same v1.0.0 regression. Now fixed;
+// evaluated-boolean coverage lives in data-parser-var-semantics.test.js + if.test.js.
