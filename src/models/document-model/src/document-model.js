@@ -86,9 +86,25 @@ module.exports = {
                 h = "<body>" + h + "</body>"
             ;
 
-            if (h)
-                r.d.documentElement.innerHTML = h
-            ;
+            if (h) {
+                // A full document: setting documentElement.innerHTML drops the
+                // root <html>'s own attributes (lang, class, …). Parse the
+                // string and copy them across (main's "missing attributes on
+                // html tag" fix, made environment-agnostic — bare document.write
+                // is a no-op for this under jsdom).
+                if (this.windowModel.DOMParser && /<html[\s>]/i.test(h)) {
+                    const e = new this.windowModel.DOMParser()
+                        .parseFromString(h, 'text/html').documentElement;
+
+                    for (let i = 0; i < e.attributes.length; i++)
+                        r.d.documentElement.setAttribute(e.attributes[i].name, e.attributes[i].value)
+                    ;
+
+                    r.d.documentElement.innerHTML = e.innerHTML;
+                } else
+                    r.d.documentElement.innerHTML = h
+                ;
+            }
 
             return r;
         }
