@@ -1,6 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/**
+ * @callback jTormTransport
+ * @param {string} url Fully-resolved URL (already passed through url()).
+ * @param {object} [opts] Fetch options (e.g. { signal }).
+ * @returns {Promise<object>} Fetch-shaped, minimal Response-like (.ok/.status/.json()/.text()).
+ */
+
 module.exports = {
     jTormRequestModel: {
         // dependency-free isomorphic native-fetch client (Node 18+ / browser global fetch)
@@ -12,6 +19,14 @@ module.exports = {
             return /^https?:\/\//.test(u) ? u : this.base + u;
         },
 
+        // DI (optional) — swappable HTTP transport; defaults to the global fetch.
+        // Override (host or test) to substitute it: an edge fetch, an axios/ky
+        // adapter, an SSRF-guarded client, or a deterministic test fixture. Must be
+        // the wrapper form (resolves `fetch` at call time), not `transport: fetch`.
+        // Injected transports must honor opts.signal to keep `timeout` semantics.
+        /** @type {jTormTransport} */
+        transport: function (u, o) { return fetch(u, o); },
+
         fetch: async function (url) {
             const o = {};
 
@@ -19,7 +34,7 @@ module.exports = {
                 o.signal = AbortSignal.timeout(this.timeout)
             ;
 
-            const r = await fetch(this.url(url), o);
+            const r = await this.transport(this.url(url), o);
 
             if (!r.ok)
                 throw new Error('HTTP ' + r.status + ' for ' + url)

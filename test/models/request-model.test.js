@@ -28,3 +28,16 @@ test('prepends base for relative URLs, leaves absolute URLs alone', async () => 
     await rm.get('https://x/y').text(); assert.equal(seen, 'https://x/y');
   } finally { rm.base = ''; r(); }
 });
+
+test('uses the injected transport instead of the global fetch', async () => {
+  let viaTransport = 0, viaGlobal = 0;
+  const r = stub(async () => { viaGlobal++; return { ok: true, text: async () => 'GLOBAL' }; });
+  const saved = rm.transport;
+  rm.transport = async () => { viaTransport++; return { ok: true, text: async () => 'TRANSPORT' }; };
+  try {
+    rm.base = '';
+    assert.equal(await rm.get('/x').text(), 'TRANSPORT');
+    assert.equal(viaTransport, 1);
+    assert.equal(viaGlobal, 0);
+  } finally { rm.transport = saved; r(); }
+});
