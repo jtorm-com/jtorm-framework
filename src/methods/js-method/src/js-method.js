@@ -6,7 +6,16 @@ module.exports = {
         // DI
         // jsPlugin
 
-        params: ['src'],
+        params: [
+            'async',
+            'crossorigin',
+            'defer',
+            'integrity',
+            'nomodule',
+            'referrerpolicy',
+            'src',
+            'type'
+        ],
 
         validate: function (v) {
             return !!v.d.src;
@@ -17,7 +26,7 @@ module.exports = {
 
             if (v.c.c || !s.cache[v.t.p.src]) {
                 s.cache[v.t.p.src] = 0;
-                s.collection.push({src: v.d.src});
+                s.collection.push(v.d);
             }
 
             v.io = {c: 1};
