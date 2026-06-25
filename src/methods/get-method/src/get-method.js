@@ -15,7 +15,7 @@ module.exports = {
         get: async function(t, u) {
             let r = await this.models[t].get(u);
 
-            return r.d;
+            return r; // raw model result (data: JSON, html: text, tss: parsed tree)
         },
 
         async handle(v) {
