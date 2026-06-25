@@ -95,7 +95,9 @@ module.exports = {
                             return k
                         ;
 
-                        return this.tssParser.quotes(k);
+                        // unquoted var that does not resolve = undefined var → null.
+                        // (Quoted literals are handled earlier, at the dataRegex match.)
+                        return null;
                     }
 
                     tmp = tmp[p];

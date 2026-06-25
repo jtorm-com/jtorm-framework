@@ -45,14 +45,7 @@ test('parse() coerces bare true/false to a Boolean', () => {
   assert.equal(dp.parse({}, 'false'), false);
 });
 
-// CHARACTERIZATION: an unresolvable path returns the raw string (not null/undefined).
-// This is *why* if(d: x && y) is always-truthy (code-review #26): parse('x && y')
-// returns the string 'x && y', so if-method's null-guarded &&/|| branch never fires.
-test('parse() returns the raw string when a path does not resolve', () => {
-  const dp = makeDataParser();
-  assert.equal(dp.parse({}, 'nope'), 'nope');
-  assert.equal(dp.parse({ a: '1', b: '' }, 'a && b'), 'a && b');
-});
+// Unquoted var semantics (resolve or null) are covered in data-parser-var-semantics.test.js.
 
 // CHARACTERIZATION (review #17): @c -> tmp[Object.keys(tmp)[0]]; if the first key
 // is a sentinel (isLoop/index) it picks that instead.
