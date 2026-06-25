@@ -22,3 +22,15 @@ test('find scoping stays within the matched element, not the whole document', as
     );
     assert.equal(body, '<b>OUT</b><div><b data-f="1">IN</b></div>');
 });
+
+// Real-world form (site-navigation-element): an inline `->find(e: …)->attr`
+// chain with no leading selector (every node parses s=false). The found
+// selector is used directly — this path was already correct and must stay so.
+test('find inline chain (empty selector) scopes to the found element only', async () => {
+    const { body } = await render(
+        '<body><a href="/x">A</a><a href="/y">B</a></body>',
+        `->find(e: 'a[href="/y"]')->attr { n: 'class'; v: 'active'; }`,
+        {}
+    );
+    assert.equal(body, '<a href="/x">A</a><a href="/y" class="active">B</a>');
+});
