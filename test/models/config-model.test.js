@@ -29,3 +29,24 @@ test('config-model.del removes a key', () => {
     jTormConfigModel.del('x');
     assert.equal(jTormConfigModel.get('x'), undefined);
 });
+
+// Pre-existing bug (both branches): the object/nested set() branch referenced an
+// undeclared `k2`, clobbered the outer key `k` in the for-in, and dropped the
+// recursion target — so any nested config threw / mis-keyed. Fixed here.
+test('config-model.set stores a nested object recursively', () => {
+    jTormConfigModel.d = {};
+    jTormConfigModel.set('site', { title: 'X', nav: { home: '/' } });
+    assert.deepEqual(jTormConfigModel.get('site'), { title: 'X', nav: { home: '/' } });
+});
+
+test('config-model.set keeps the top-level key (for-in must not clobber it)', () => {
+    jTormConfigModel.d = {};
+    jTormConfigModel.set('a', { x: '1', y: '2' });
+    assert.deepEqual(Object.keys(jTormConfigModel.get()), ['a']);
+});
+
+test('config-model.set defines keys as non-writable (write-once, preserved)', () => {
+    jTormConfigModel.d = {};
+    jTormConfigModel.set('k', 'v');
+    assert.equal(Object.getOwnPropertyDescriptor(jTormConfigModel.d, 'k').writable, false);
+});
