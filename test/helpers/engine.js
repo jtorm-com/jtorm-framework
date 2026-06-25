@@ -36,6 +36,13 @@ const { jTormAttrsMethod } = require('../../src/methods/attrs-method/src/attrs-m
 const { jTormEachMethod } = require('../../src/methods/each-method/src/each-method.js');
 const { jTormIfMethod } = require('../../src/methods/if-method/src/if-method.js');
 const { jTormInsertMethod } = require('../../src/methods/insert-method/src/insert-method.js');
+const { jTormMoveMethod } = require('../../src/methods/move-method/src/move-method.js');
+const { jTormSwapMethod } = require('../../src/methods/swap-method/src/swap-method.js');
+const { jTormWrapMethod } = require('../../src/methods/wrap-method/src/wrap-method.js');
+const { jTormUnwrapMethod } = require('../../src/methods/unwrap-method/src/unwrap-method.js');
+const { jTormRemoveMethod } = require('../../src/methods/remove-method/src/remove-method.js');
+const { jTormFindMethod } = require('../../src/methods/find-method/src/find-method.js');
+const { jTormTitleMethod } = require('../../src/methods/title-method/src/title-method.js');
 
 // insert aliases — each/insert dispatch insert modes through the methods map
 // (mirrors the engine's jTormInsertAlias).
@@ -52,6 +59,13 @@ const methods = {
     each: jTormEachMethod,
     if: jTormIfMethod,
     insert: jTormInsertMethod,
+    move: jTormMoveMethod,
+    swap: jTormSwapMethod,
+    wrap: jTormWrapMethod,
+    unwrap: jTormUnwrapMethod,
+    remove: jTormRemoveMethod,
+    find: jTormFindMethod,
+    title: jTormTitleMethod,
     append: new InsertAlias('a'),
     prepend: new InsertAlias('p'),
     before: new InsertAlias('b'),
@@ -72,10 +86,10 @@ jTormLanguageModel.configModel = jTormConfigModel;
 jTormAttrsMethod.attrMethod = jTormAttrMethod;
 jTormEventModel.plugins = [];
 jTormHandler.eventModel = jTormHandlerWrapper.eventModel = jTormEventModel;
-jTormHandler.methods = jTormEachMethod.methods = methods;
-jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormViewModel;
-jTormHandlerWrapper.handler = jTormEachMethod.handler = jTormIfMethod.handler = jTormHandler;
-jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormHandlerWrapper;
+jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = methods;
+jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormViewModel;
+jTormHandlerWrapper.handler = jTormEachMethod.handler = jTormIfMethod.handler = jTormSwapMethod.handler = jTormHandler;
+jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormWrapMethod.handlerWrapper = jTormHandlerWrapper;
 
 // --- Init: tss-parser config FIRST (data-parser builds its regexes from the
 // quote chars), then init() each wired unit that has one, then a default language.
