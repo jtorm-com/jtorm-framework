@@ -49,9 +49,14 @@ module.exports = {
 
                 r = await this.get('tss', v.d.t);
 
-                if (v.t.s)
-                    v.c.s = v.t.s
-                ;
+                // Fetched TSS boils with its own selectors (document-global) —
+                // matching the data/html paths. (Was `if (v.t.s) v.c.s = v.t.s`
+                // since the initial dev commit, but dormant: the old getSelector
+                // returned the rule selector and ignored v.c.s. With the #27
+                // string-only getSelector it would instead scope as `<rule>
+                // <fetched>` — the WRONG order, v.t.s is the descendant here —
+                // and break get{t}. Scoping fetched TSS under the get target is
+                // a deliberate future enhancement; see docs/backlog.md.)
 
                 for (k in r)
                     nT.c.push(r[k])
