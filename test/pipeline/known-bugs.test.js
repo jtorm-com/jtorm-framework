@@ -3,22 +3,22 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { render } = require('../helpers/engine.js');
 
-// Characterizations of suspect/known-broken behavior. As items are fixed, their
-// test moves to the relevant positive suite. See jtorm-code-review.md #25-27.
-//
-// RESOLVED:
-//   #25 unwrap/wrap set() signature mismatch — FIXED (test/pipeline/wrap-unwrap.test.js)
-//   #26 data-parser unresolved-var regression (incl. dead if &&/||) — FIXED
-//       (test/parsers/data-parser-var-semantics.test.js)
+// Regression locks for resolved review findings (jtorm-code-review.md #25-27).
+// Each formerly-characterized bug keeps a test here asserting the FIXED
+// behaviour, so the bug cannot silently return. Broader positive coverage for
+// each lives in its feature suite:
+//   #25 unwrap/wrap set() signature   — test/pipeline/wrap-unwrap.test.js
+//   #26 data-parser unresolved var    — test/parsers/data-parser-var-semantics.test.js
+//   #27 find child-scoping            — test/pipeline/find.test.js
 
-// OPEN — #27: `find` sets v.c.s = the descendant selector, but the chained child
-// transform still targets the find rule's own selector (here `div`), not the
-// descendant. Locked as characterization; intended semantics unverified.
-test('KNOWN ISSUE #27: find chained child targets the find rule selector, not the descendant', async () => {
-  const { body } = await render(
-    '<body><div><b>X</b><i>Y</i></div></body>',
-    "div->find { e: 'b'; ->attr { n: 'data-f'; v: '1'; } }",
-    {}
-  );
-  assert.equal(body, '<div data-f="1"><b>X</b><i>Y</i></div>');
+// #27: the chained child of a block-form `find` inherits the rule selector
+// (`div`); it must target the descendant `e` *within* that element, not the
+// rule element itself. (Was: `<div data-f="1">…` — attr on the div.)
+test('#27 regression: find block-form child targets the descendant, not the rule element', async () => {
+    const { body } = await render(
+        '<body><div><b>X</b><i>Y</i></div></body>',
+        "div->find { e: 'b'; ->attr { n: 'data-f'; v: '1'; } }",
+        {}
+    );
+    assert.equal(body, '<div><b data-f="1">X</b><i>Y</i></div>');
 });

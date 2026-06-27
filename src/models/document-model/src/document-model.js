@@ -48,22 +48,20 @@ module.exports = {
                         return s
                     ;
 
-                    if (s) {
-                        s = s.replace(/(?=[()\[\]])/g, '\\');
+                    if (!s)
+                        return m
+                    ;
 
-                        let r = new RegExp(s, "m");
-
-                        if (m && r.test(m))
-                            s = s.replace(m, '')
-                        ;
-
-                        return s
-                            ? s
-                            : m
-                        ;
-                    }
-
-                    return m;
+                    // String-only — selectors are NOT regexes (a `*`/`.`/`+`
+                    // rule must neither throw via new RegExp nor match
+                    // letter-wise, e.g. 'a' ∈ 'span'). If m already expresses
+                    // the scope — iteration where s === m, or m already nested
+                    // under s — use m as-is; otherwise m is a descendant to
+                    // scope under s (the find case) → `s m`.
+                    return (m === s || m.startsWith(s + ' '))
+                        ? m
+                        : s + ' ' + m
+                    ;
                 },
 
                 set: async function(v, fn) {

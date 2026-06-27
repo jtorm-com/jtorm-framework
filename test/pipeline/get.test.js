@@ -45,3 +45,20 @@ test('get { t } prepends the fetched TSS rules and boils them', async () => {
   );
   assert.equal(body, '<div class="a"><span>FETCHED</span></div>');
 });
+
+// TODO (Gate-B): fetched TSS should be scoped UNDER the get target (`.a span`,
+// not bare `span`) so a matching element outside the get element is untouched.
+// Blocked on a core ancestor-scope (prepend) mechanism — the same seam `ui`
+// component injection needs (ui-method builds `{s: target, m: 'get'}`). get{t}
+// currently boils fetched rules document-global. Body is the executable spec;
+// drop `{ todo: true }` when ancestor-scoping lands. See docs/backlog.md.
+test('get { t } scopes fetched rules under the get target (no sibling leak)', { todo: true }, async () => {
+  const { body } = await render(
+    '<body><div class="a"><span>orig</span></div><span>outside</span></body>',
+    ".a->get { t: '/extra.tss'; }",
+    {},
+    'http://localhost/',
+    { '/extra.tss': { text: "span->inner { h: 'FETCHED'; }" } }
+  );
+  assert.equal(body, '<div class="a"><span>FETCHED</span></div><span>outside</span>');
+});
