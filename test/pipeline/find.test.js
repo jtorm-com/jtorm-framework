@@ -27,3 +27,29 @@ test('find inline chain (empty selector) scopes to the found element only', asyn
     );
     assert.equal(body, '<a href="/x">A</a><a href="/y" class="active">B</a>');
 });
+
+// Scope-leak guard: a block-form find must resolve to `<rule> <e>` and stay
+// within the matched element. The old `new RegExp(s).test(m)` containment proxy
+// matched letter-wise — `/a/.test('span')` is true ('a' ∈ 'span') — so it
+// dropped the parent scope and collapsed `a->find{e:'span'}` to bare `span`,
+// tagging every span in the document.
+test('find block-form does not leak to matching descendants outside the rule element', async () => {
+    const { body } = await render(
+        '<body><a href="/x"><span>IN</span></a><span>OUT</span></body>',
+        "a->find { e: 'span'; ->attr { n: 'data-f'; v: '1'; } }",
+        {}
+    );
+    assert.equal(body, '<a href="/x"><span data-f="1">IN</span></a><span>OUT</span>');
+});
+
+// Regex-injection guard: a rule selector with a regex metachar (`*`, here the
+// universal selector) fed to `new RegExp(s)` threw ("nothing to repeat"). The
+// regex-free getSelector must treat selectors as plain strings.
+test('find block-form handles a metachar rule selector without throwing', async () => {
+    const { body } = await render(
+        '<body><p><em>X</em></p></body>',
+        "*->find { e: 'em'; ->attr { n: 'data-f'; v: '1'; } }",
+        {}
+    );
+    assert.equal(body, '<p><em data-f="1">X</em></p>');
+});
