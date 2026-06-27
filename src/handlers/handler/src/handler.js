@@ -24,6 +24,16 @@ module.exports = {
             for (k in v.tss) {
                 v.t = v.tss[k];
 
+                // Scope (v.c.s find-descendant, v.c.a get/ui-ancestor) is lexical to
+                // this rule's subtree. v.c is a shared/by-ref context, so capture and
+                // restore it after the children boil — otherwise a scope set here
+                // leaks to the following sibling rules (e.g. find's `v.c.s` collapsing
+                // a later `i->attr` to `i b → not found`). Capture the object too:
+                // some methods REPLACE v.c (each-method sets `v.c = 1` for its `e:`
+                // path), so reset the captured object's fields and reinstate the ref
+                // rather than writing onto a non-object (strict-mode TypeError).
+                const oc = v.c, cs = v.c.s, ca = v.c.a;
+
                 do {
                     r = 0;
 
@@ -67,6 +77,9 @@ module.exports = {
                 ;
 
                 v.io.d = null;
+                oc.s = cs;
+                oc.a = ca;
+                v.c = oc;
             }
 
             return v.h;

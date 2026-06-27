@@ -22,7 +22,8 @@
  * Render-context flags on `v.c`.
  * @typedef {Object} ViewContext
  * @property {number} c   create-doc flag — truthy → fresh detached doc (SSR); falsy → live doc (client)
- * @property {?string} s  parent selector
+ * @property {?string} s  descendant selector — find appends it (`<rule> <s>`)
+ * @property {?string} [a] ancestor selector — get{t}/ui prepend it (`<a> <rule>`) for component scoping
  */
 
 /**

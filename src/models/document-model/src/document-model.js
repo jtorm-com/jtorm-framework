@@ -66,8 +66,15 @@ module.exports = {
 
                 set: async function(v, fn) {
                     const
-                        s = this.getSelector(v.t.s, v.c.s),
-                        c = this.selectAll(s)
+                        // v.c.a is an ANCESTOR scope (get{t}/ui component scoping); v.c.s
+                        // is the find DESCENDANT, folded into the rule selector by
+                        // getSelector. Under an ancestor we DON'T compose selector strings
+                        // (commas in lists / [brackets] / :is() corrupt that) — we select
+                        // the target(s) and run the rule WITHIN each via native
+                        // querySelectorAll, which parses CSS correctly. Selectorless rule
+                        // (g === false) → the target itself.
+                        g = this.getSelector(v.t.s, v.c.s),
+                        c = v.c.a ? this.scope(v.c.a, g) : this.selectAll(g)
                     ;
 
                     if (c.length)
@@ -75,8 +82,28 @@ module.exports = {
                             await fn(c[i])
                     ;
                     else
-                        this.errorHandler.handle(s + ' not found', v)
+                        this.errorHandler.handle((v.c.a ? v.c.a + ' ' + (g || '') : g) + ' not found', v)
                     ;
+                },
+
+                // Ancestor-scope: rule matches WITHIN each target element, deduped, in
+                // document order. el.querySelectorAll lets the CSS engine parse the rule
+                // (commas, [brackets], quotes, :is()/:has()) — no selector-string surgery.
+                // Cross-browser by design: querySelectorAll (universal), Array indexOf/push,
+                // indexed loops — no Set/for-of/spread. g === false (selectorless) → target.
+                scope: function(a, g) {
+                    const out = [], anc = this.d.querySelectorAll(a);
+
+                    for (let i = 0; i < anc.length; i++) {
+                        const m = g ? anc[i].querySelectorAll(g) : [anc[i]];
+
+                        for (let j = 0; j < m.length; j++)
+                            if (out.indexOf(m[j]) === -1)
+                                out.push(m[j])
+                        ;
+                    }
+
+                    return out;
                 }
             };
 

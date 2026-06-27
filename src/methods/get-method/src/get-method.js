@@ -49,17 +49,19 @@ module.exports = {
 
                 r = await this.get('tss', v.d.t);
 
-                // Fetched TSS boils with its own selectors (document-global),
-                // matching the data/html paths. The dormant `if (v.t.s) v.c.s =
-                // v.t.s` (initial dev commit) tried to scope under the get target
-                // but never worked: the old getSelector ignored v.c.s. The #27
-                // string-only getSelector WOULD honour it — but as `<rule>
-                // <target>` (wrong order: here v.t.s is the descendant and v.c.s
-                // the ancestor, the opposite of find), so it must stay removed.
-                // Proper scoping (`<target> <rule>`, the mechanism `ui` injection
-                // also needs) requires a core ancestor-scope/prepend and is owned
-                // by the Gate-B/schema-ui work — locked by the test.todo in
-                // test/pipeline/get.test.js. See docs/backlog.md.
+                // Ancestor-scope: fetched rules boil UNDER the get target, not
+                // document-global. v.t.s is the get target (the ancestor); set v.c.a
+                // so document-model.set prepends it to every selector in the fetched
+                // subtree — fetched TSS re-selects with its OWN `s` (`span->inner`
+                // parses to nested {s:'span'} nodes), so prefixing the top node alone
+                // can't reach them. This is also the mechanism `ui` component
+                // injection needs (ui-method builds {s: target, m: 'get'}). The
+                // handler restores v.c.a after this subtree so it can't leak to
+                // following sibling rules. Captured before v.t is replaced below.
+                if (v.t.s)
+                    v.c.a = v.t.s
+                ;
+
                 for (k in r)
                     nT.c.push(r[k])
                 ;

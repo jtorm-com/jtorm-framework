@@ -53,3 +53,16 @@ test('find block-form handles a metachar rule selector without throwing', async 
     );
     assert.equal(body, '<p><em data-f="1">X</em></p>');
 });
+
+// No-leak-to-siblings: find's scope (`v.c.s`) is lexical to the find subtree.
+// A following sibling rule must NOT inherit it. Previously `v.c.s='b'` persisted
+// on the shared context, so the sibling `i->attr` resolved to `i b` → threw
+// `i b not found`. The handler now restores the scope after each rule's subtree.
+test('find scope does not leak to a following sibling rule', async () => {
+    const { body } = await render(
+        '<body><div><b>IN</b></div><i>SIB</i></body>',
+        "div->find { e: 'b'; ->attr { n: 'x'; v: '1'; } } i->attr { n: 'y'; v: '2'; }",
+        {}
+    );
+    assert.equal(body, '<div><b x="1">IN</b></div><i y="2">SIB</i>');
+});

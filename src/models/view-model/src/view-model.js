@@ -16,7 +16,8 @@ module.exports = {
             cs: null,// cache scope
             c: {
                 c: 1,// create doc
-                s: null,// parent selector
+                s: null,// parent/descendant selector (find: appended by getSelector)
+                a: null,// ancestor selector (get{t}/ui: prepended by document-model.set)
             },
             h: null,// html
             m: null,// model
