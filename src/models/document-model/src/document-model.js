@@ -66,7 +66,10 @@ module.exports = {
 
                 set: async function(v, fn) {
                     const
-                        s = this.getSelector(v.t.s, v.c.s),
+                        // v.c.a is an ANCESTOR scope prepended to every selector in
+                        // the subtree (get{t}/ui component scoping); v.c.s is the
+                        // find DESCENDANT, appended by getSelector. Opposite roles.
+                        s = (v.c.a ? v.c.a + ' ' : '') + this.getSelector(v.t.s, v.c.s),
                         c = this.selectAll(s)
                     ;
 

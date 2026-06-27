@@ -46,13 +46,14 @@ test('get { t } prepends the fetched TSS rules and boils them', async () => {
   assert.equal(body, '<div class="a"><span>FETCHED</span></div>');
 });
 
-// TODO (Gate-B): fetched TSS should be scoped UNDER the get target (`.a span`,
-// not bare `span`) so a matching element outside the get element is untouched.
-// Blocked on a core ancestor-scope (prepend) mechanism — the same seam `ui`
-// component injection needs (ui-method builds `{s: target, m: 'get'}`). get{t}
-// currently boils fetched rules document-global. Body is the executable spec;
-// drop `{ todo: true }` when ancestor-scoping lands. See docs/backlog.md.
-test('get { t } scopes fetched rules under the get target (no sibling leak)', { todo: true }, async () => {
+// Ancestor-scope (Gate-B): fetched TSS is scoped UNDER the get target (`.a span`,
+// not bare `span`) so a matching element OUTSIDE the get element is untouched.
+// Delivered by the core ancestor-scope (prepend) mechanism `v.c.a` — the same
+// seam `ui` component injection needs (ui-method builds `{s: target, m: 'get'}`).
+// The fetched `span->inner` re-selects with its own `s='span'`, so a top-node
+// prefix can't reach it; `set()` prepends `v.c.a` to EVERY selector in the
+// subtree. See docs/backlog.md / continue.md.
+test('get { t } scopes fetched rules under the get target (no element leak)', async () => {
   const { body } = await render(
     '<body><div class="a"><span>orig</span></div><span>outside</span></body>',
     ".a->get { t: '/extra.tss'; }",
@@ -61,4 +62,22 @@ test('get { t } scopes fetched rules under the get target (no sibling leak)', { 
     { '/extra.tss': { text: "span->inner { h: 'FETCHED'; }" } }
   );
   assert.equal(body, '<div class="a"><span>FETCHED</span></div><span>outside</span>');
+});
+
+// No-leak-to-siblings: the get target ancestor (`v.c.a`) is lexical to the get
+// subtree — a SIBLING rule that follows the get must NOT inherit the `.a` scope.
+// Here the trailing `span->attr` is bare `span` (both spans tagged); if `v.c.a`
+// leaked it would collapse to `.a span` and skip the outside span.
+test('get { t } ancestor scope does not leak to a following sibling rule', async () => {
+  const { body } = await render(
+    '<body><div class="a"><span>orig</span></div><span>outside</span></body>',
+    ".a->get { t: '/extra.tss'; } span->attr { n: 'data-x'; v: '1'; }",
+    {},
+    'http://localhost/',
+    { '/extra.tss': { text: "span->inner { h: 'FETCHED'; }" } }
+  );
+  assert.equal(
+    body,
+    '<div class="a"><span data-x="1">FETCHED</span></div><span data-x="1">outside</span>'
+  );
 });
