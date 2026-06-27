@@ -99,3 +99,38 @@ test('get { t } applies a selectorless fetched rule to the get target', async ()
   );
   assert.equal(body, '<div class="a" data-x="1"><span>orig</span></div>');
 });
+
+// Selector-list scoping: a comma-list get TARGET must scope every branch. `.a, .b`
+// + fetched `span` must become `.a span, .b span` — NOT `.a, .b span` (= `.a` OR
+// `.b span`), which would hit `.a` itself and miss `.a span`. The ancestor is
+// distributed across each branch (cross product).
+test('get { t } distributes the ancestor over a comma-list get target', async () => {
+  const { body } = await render(
+    '<body><div class="a"><span>x</span></div><div class="b"><span>y</span></div><span>out</span></body>',
+    ".a, .b->get { t: '/c.tss'; }",
+    {},
+    'http://localhost/',
+    { '/c.tss': { text: "span->inner { h: 'Z'; }" } }
+  );
+  assert.equal(
+    body,
+    '<div class="a"><span>Z</span></div><div class="b"><span>Z</span></div><span>out</span>'
+  );
+});
+
+// Selector-list scoping: a comma-list FETCHED rule must keep every branch under the
+// target. `span, b` under `.a` must become `.a span, .a b` — NOT `.a span, b`,
+// which leaks bare `b` to the outside `<b>`.
+test('get { t } scopes every branch of a comma-list fetched rule under the target', async () => {
+  const { body } = await render(
+    '<body><div class="a"><span>s</span><b>in</b></div><b>out</b></body>',
+    ".a->get { t: '/c.tss'; }",
+    {},
+    'http://localhost/',
+    { '/c.tss': { text: "span, b->attr { n: 'data-x'; v: '1'; }" } }
+  );
+  assert.equal(
+    body,
+    '<div class="a"><span data-x="1">s</span><b data-x="1">in</b></div><b>out</b>'
+  );
+});

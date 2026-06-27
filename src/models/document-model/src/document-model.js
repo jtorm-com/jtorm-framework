@@ -70,11 +70,16 @@ module.exports = {
                         // subtree (get{t}/ui component scoping); v.c.s is the find
                         // DESCENDANT, appended by getSelector. Opposite roles. getSelector
                         // returns false for a selectorless rule (s:false, e.g. a component's
-                        // bare `->attr`); under an ancestor that collapses to the ancestor
-                        // itself (the get/ui target) so the transform lands on the target,
-                        // not an invalid `.a false`.
+                        // bare `->attr`) → the scope collapses to the ancestor itself (the
+                        // get/ui target). Distribute across BOTH selector lists: `(.a, .b)
+                        // (x, y)` must expand to the cross product `.a x, .a y, .b x, .b y`
+                        // — `.a, .b x` would parse as `.a` OR `.b x`, leaving `.a` unscoped.
                         g = this.getSelector(v.t.s, v.c.s),
-                        s = v.c.a ? (g ? v.c.a + ' ' + g : v.c.a) : g,
+                        s = !v.c.a
+                            ? g
+                            : g
+                                ? v.c.a.split(',').map(a => g.split(',').map(b => a.trim() + ' ' + b.trim()).join(', ')).join(', ')
+                                : v.c.a,
                         c = this.selectAll(s)
                     ;
 
