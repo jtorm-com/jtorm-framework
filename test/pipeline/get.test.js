@@ -134,3 +134,21 @@ test('get { t } scopes every branch of a comma-list fetched rule under the targe
     '<div class="a"><span data-x="1">s</span><b data-x="1">in</b></div><b>out</b>'
   );
 });
+
+// Selector internals: a comma INSIDE a selector (attribute value, :is()/:has()) is
+// not a list separator and must survive scoping. `span[data-x='a,b']` under `.a`
+// must be queried natively (qsa parses CSS), not corrupted to the invalid
+// `.a span[data-x='a, .a b']`.
+test('get { t } preserves commas inside a fetched selector when scoping', async () => {
+  const { body } = await render(
+    '<body><div class="a"><span data-x="a,b">s</span><span>t</span></div></body>',
+    ".a->get { t: '/c.tss'; }",
+    {},
+    'http://localhost/',
+    { '/c.tss': { text: "span[data-x='a,b']->attr { n: 'z'; v: '1'; }" } }
+  );
+  assert.equal(
+    body,
+    '<div class="a"><span data-x="a,b" z="1">s</span><span>t</span></div>'
+  );
+});
