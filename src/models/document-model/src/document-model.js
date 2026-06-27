@@ -66,10 +66,15 @@ module.exports = {
 
                 set: async function(v, fn) {
                     const
-                        // v.c.a is an ANCESTOR scope prepended to every selector in
-                        // the subtree (get{t}/ui component scoping); v.c.s is the
-                        // find DESCENDANT, appended by getSelector. Opposite roles.
-                        s = (v.c.a ? v.c.a + ' ' : '') + this.getSelector(v.t.s, v.c.s),
+                        // v.c.a is an ANCESTOR scope prepended to every selector in the
+                        // subtree (get{t}/ui component scoping); v.c.s is the find
+                        // DESCENDANT, appended by getSelector. Opposite roles. getSelector
+                        // returns false for a selectorless rule (s:false, e.g. a component's
+                        // bare `->attr`); under an ancestor that collapses to the ancestor
+                        // itself (the get/ui target) so the transform lands on the target,
+                        // not an invalid `.a false`.
+                        g = this.getSelector(v.t.s, v.c.s),
+                        s = v.c.a ? (g ? v.c.a + ' ' + g : v.c.a) : g,
                         c = this.selectAll(s)
                     ;
 

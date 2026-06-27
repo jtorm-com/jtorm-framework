@@ -81,3 +81,21 @@ test('get { t } ancestor scope does not leak to a following sibling rule', async
     '<div class="a"><span data-x="1">FETCHED</span></div><span data-x="1">outside</span>'
   );
 });
+
+// Selectorless fetched rule: a fetched transform with NO selector (`{s:false}`)
+// — e.g. ui component TSS like html-ui/global.tss, which starts `->attr {…}` —
+// must apply to the get TARGET itself, not produce an invalid `.a false` selector.
+// `getSelector` returns `false` for a selectorless rule; under an ancestor the
+// scoped selector must collapse to the ancestor (the target). This is the core ui
+// component-injection path (ui builds `{s: target, m: 'get'}`, then the component's
+// selectorless rules land on the target).
+test('get { t } applies a selectorless fetched rule to the get target', async () => {
+  const { body } = await render(
+    '<body><div class="a"><span>orig</span></div></body>',
+    ".a->get { t: '/c.tss'; }",
+    {},
+    'http://localhost/',
+    { '/c.tss': { text: "->attr { n: 'data-x'; v: '1'; }" } }
+  );
+  assert.equal(body, '<div class="a" data-x="1"><span>orig</span></div>');
+});
