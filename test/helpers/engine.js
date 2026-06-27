@@ -13,6 +13,8 @@
 //     though text-method.js:23 dereferences it (latent engine bug — flagged).
 
 const util = require('node:util');
+const fs = require('node:fs');
+const path = require('node:path');
 const _ = require('lodash');
 const { JSDOM } = require('jsdom');
 
@@ -49,6 +51,23 @@ const { jTormUnwrapMethod } = require('../../src/methods/unwrap-method/src/unwra
 const { jTormRemoveMethod } = require('../../src/methods/remove-method/src/remove-method.js');
 const { jTormFindMethod } = require('../../src/methods/find-method/src/find-method.js');
 const { jTormTitleMethod } = require('../../src/methods/title-method/src/title-method.js');
+// Gate-B (schema.org → component) path: the `ui` verb + its mediatarget/mediaquery
+// deps, the data/config methods components bind through, the uis ARRAY (resolves
+// code-review #7), and the ui-cache model+plugin. (layer/css/js/time stay deferred
+// — see wiring.test.js; only `layer` (site-navigation-element) is a known gap.)
+const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
+const { jTormDataMethod } = require('../../src/methods/data-method/src/data-method.js');
+const { jTormConfigMethod } = require('../../src/methods/config-method/src/config-method.js');
+const { jTormMediatargetMethod } = require('../../src/methods/mediatarget-method/src/mediatarget-method.js');
+const { jTormMediaqueryMethod } = require('../../src/methods/mediaquery-method/src/mediaquery-method.js');
+const { jTormUiCacheModel } = require('../../src/models/ui-cache-model/src/ui-cache-model.js');
+const { jTormUiCachePlugin } = require('../../src/plugins/ui-cache-plugin/src/ui-cache-plugin.js');
+// The uis array members — each a published @jtorm/*-ui package with a baked-in
+// `mapper`; the .tss/.html/.json artifacts they reference (`@s/…`, `@h/@e/…`) are
+// fetched at render time and served from src/uis/** by the transport below.
+const { jTormSchemaUi } = require('../../src/uis/schema-ui/src/schema-ui.js');
+const { jTormComponentsUI } = require('../../src/uis/components-ui/src/components-ui.js');
+const { jTormHtmlUi } = require('../../src/uis/html-ui/src/html-ui.js');
 
 // insert aliases — each/insert dispatch insert modes through the methods map
 // (mirrors the engine's jTormInsertAlias).
@@ -73,6 +92,11 @@ const methods = {
     find: jTormFindMethod,
     title: jTormTitleMethod,
     get: jTormGetMethod,
+    ui: jTormUiMethod,
+    data: jTormDataMethod,
+    config: jTormConfigMethod,
+    mediatarget: jTormMediatargetMethod,
+    mediaquery: jTormMediaqueryMethod,
     append: new InsertAlias('a'),
     prepend: new InsertAlias('p'),
     before: new InsertAlias('b'),
@@ -85,29 +109,57 @@ const methods = {
 jTormErrorHandler.util = util;
 jTormViewModel._ = _;
 jTormViewModel.documentModel = jTormDocumentModel;
-jTormDocumentModel.errorHandler = jTormInsertMethod.errorHandler = jTormErrorHandler;
+jTormDocumentModel.errorHandler = jTormInsertMethod.errorHandler = jTormUiMethod.errorHandler = jTormErrorHandler;
 jTormAttrsMethod.tssParser = jTormViewModel.tssParser = jTormDataParser.tssParser = jTormTSSParser;
 jTormHandler.dataParser = jTormAttrsMethod.dataParser = jTormIfMethod.dataParser = jTormTextMethod.dataParser = jTormDataParser;
 jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS this; text-method.js:23 needs it
 jTormLanguageModel.configModel = jTormConfigModel;
 jTormAttrsMethod.attrMethod = jTormAttrMethod;
-jTormEventModel.plugins = [];
+jTormEventModel.plugins = [jTormUiCachePlugin];
 jTormHandler.eventModel = jTormHandlerWrapper.eventModel = jTormEventModel;
-jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = methods;
-jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormViewModel;
+jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = jTormUiMethod.methods = methods;
+jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormUiMethod.viewModel = jTormViewModel;
 jTormHandlerWrapper.handler = jTormEachMethod.handler = jTormIfMethod.handler = jTormSwapMethod.handler = jTormHandler;
 jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormWrapMethod.handlerWrapper = jTormHandlerWrapper;
 // fetch models + get verb DI (request transport seam) — get() resolves data/html/tss via the models
 jTormDataModel.requestModel = jTormHtmlModel.requestModel = jTormTssModel.requestModel = jTormRequestModel;
 jTormTssModel.tssParser = jTormTSSParser;
 jTormGetMethod.models = { data: jTormDataModel, html: jTormHtmlModel, tss: jTormTssModel };
+// Gate-B DI (mirrors nodejs-context/src/context.js `ui` wiring, NOT its axios transport).
+jTormDataMethod.dataParser = jTormDataParser;
+jTormConfigMethod.configModel = jTormConfigModel;
+jTormMediatargetMethod.mediaqueryMethod = jTormMediaqueryMethod;
+// matchMedia shim — dep-free stand-in for the engine's mq-polyfill. Deterministic:
+// evaluates a query's min/max-width against a fixed 1366px desktop viewport (the
+// engine's resizeTo default), so mediatarget.current is stable. Only affects the
+// `m:'1'` responsive component variants (boxed/desktop/…); the v1 slice uses `t:'0'`
+// (mediatarget off), so it never changes that output.
+const matchMedia = (q) => {
+    const W = 1366;
+    let m = true, r;
+    if ((r = /min-width:\s*(\d+)px/.exec(q))) m = m && W >= +r[1];
+    if ((r = /max-width:\s*(\d+)px/.exec(q))) m = m && W <= +r[1];
+    return { matches: m, media: q };
+};
+jTormMediaqueryMethod.windowModel = { matchMedia };
+jTormUiMethod.uis = [jTormSchemaUi, jTormComponentsUI, jTormHtmlUi];
+for (const u of jTormUiMethod.uis) u.url = ''; // transport resolves the `@s/@c/@h` alias directly (parseUrl is css/js-only, never on the get path), so .url is unused — neutralise the baked CDN host
+jTormUiMethod.mediatargetMethod = jTormMediatargetMethod;
+jTormUiMethod.ui = { mapper: null }; // host UI-mapper override slot (no custom mapper in the harness)
+jTormUiMethod.framework = 'schema';
+jTormUiCacheModel.saveModel = null;
+jTormUiCachePlugin.uiCacheModel = jTormUiCacheModel;
 const DEFAULT_TRANSPORT = jTormRequestModel.transport; // restore after any per-render fixture override
 
 // --- Init: tss-parser config FIRST (data-parser builds its regexes from the
 // quote chars), then init() each wired unit that has one, then a default language.
 jTormTSSParser.config({});
 jTormDataParser.init();
-jTormEventModel.init();
+jTormMediaqueryMethod.init();  // resolve matchMedia from windowModel
+jTormMediatargetMethod.init(); // build `current` targets (consumes mediaquery.m)
+jTormUiMethod.init();          // build the per-uis alias regexps from .uis
+jTormUiCacheModel.init();      // saveModel === null → no-op (parity with the engine)
+jTormEventModel.init();        // register uiCachePlugin into the event tree (plugins set above)
 jTormLanguageModel.setLanguage('en');
 
 const WIRED_METHODS = Object.keys(methods);
@@ -122,17 +174,47 @@ function reset() {
     jTormViewModel.data.c.a = null; // get{t}/ui write v.c.a (ancestor scope)
     jTormLanguageModel.data = {};
     jTormDataModel.c = jTormHtmlModel.c = jTormTssModel.c = {}; // fetch-model caches (singletons)
+    jTormUiMethod.cache = {};          // resolved-component cache (singleton)
+    jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache
+    jTormUiCacheModel.updated = 0;
     jTormRequestModel.base = '';
     jTormRequestModel.timeout = 0;
     jTormRequestModel.transport = DEFAULT_TRANSPORT; // drop any per-render fixture override
 }
 
-/** Build a deterministic fetch-shaped transport from a { url: {json?, text?} } fixture map. */
+const UIS_DIR = path.join(__dirname, '..', '..', 'src', 'uis');
+const UIS_PKG = { s: 'schema-ui', c: 'components-ui', h: 'html-ui' };
+// html-ui nests element groups behind sub-aliases (`@e` → element, …). parseUrl would
+// expand these via mapperAlias, but parseUrl is css/js-asset-only and never runs on the
+// get fetch path — so the raw `@h/@e/…` reaches the transport; expand it here.
+const UIS_SUBALIAS = { d: 'doc', e: 'element', f: 'form', t: 'typography', tb: 'table', m: 'media' };
+
+/** Resolve a `@s/@c/@h` component-artifact URL to its real src/uis/** disk path (or null). */
+function uisDiskPath(u) {
+    const m = /^@([a-z]+)\/(.*)$/.exec(u);
+    if (!m || !UIS_PKG[m[1]]) return null;
+    const rest = m[2].replace(/^@([a-z]+)\//, (_s, a) => (UIS_SUBALIAS[a] || a) + '/');
+    return path.join(UIS_DIR, UIS_PKG[m[1]], 'src', rest);
+}
+
+/**
+ * Build a deterministic fetch-shaped transport. Resolution order: an explicit
+ * { url: {json?, text?} } fixture wins (test-supplied data for get{d}, or a synthetic
+ * .tss/.html), else a `@s/@c/@h` component artifact is served from the real src/uis/**
+ * tree, else 404 (a miss → get throws → loud). Strips the wrapping quotes / array
+ * coercion the ui→get path adds (a component `t` URL arrives as `["'@s/…'"]`).
+ */
 function fixtureTransport(fixtures) {
     return async function (u) {
-        const f = fixtures[u];
-        if (!f) return { ok: false, status: 404 };
-        return { ok: true, status: 200, json: async () => f.json, text: async () => f.text };
+        u = String(u).replace(/^['"]|['"]$/g, '');
+        const f = fixtures && fixtures[u];
+        if (f) return { ok: true, status: 200, json: async () => f.json, text: async () => f.text };
+        const p = uisDiskPath(u);
+        if (p && fs.existsSync(p)) {
+            const t = fs.readFileSync(p, 'utf8');
+            return { ok: true, status: 200, text: async () => t, json: async () => JSON.parse(t) };
+        }
+        return { ok: false, status: 404 };
     };
 }
 
@@ -146,7 +228,9 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     const { window } = new JSDOM('', { url });
     jTormDocumentModel.windowModel = window;
     reset();
-    if (fixtures) jTormRequestModel.transport = fixtureTransport(fixtures); // inject after reset
+    // Always install the combined transport: component artifacts are disk-served from
+    // src/uis/** even when a boil supplies no data fixtures (a bare `->ui` still fetches).
+    jTormRequestModel.transport = fixtureTransport(fixtures || {});
 
     const v = await jTormViewModel.create(html, tss, data);
     await jTormEventModel.handle(v, 'before', 'view');
