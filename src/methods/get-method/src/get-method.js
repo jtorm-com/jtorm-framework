@@ -49,15 +49,17 @@ module.exports = {
 
                 r = await this.get('tss', v.d.t);
 
-                // Fetched TSS boils with its own selectors (document-global) —
-                // matching the data/html paths. (Was `if (v.t.s) v.c.s = v.t.s`
-                // since the initial dev commit, but dormant: the old getSelector
-                // returned the rule selector and ignored v.c.s. With the #27
-                // string-only getSelector it would instead scope as `<rule>
-                // <fetched>` — the WRONG order, v.t.s is the descendant here —
-                // and break get{t}. Scoping fetched TSS under the get target is
-                // a deliberate future enhancement; see docs/backlog.md.)
-
+                // Fetched TSS boils with its own selectors (document-global),
+                // matching the data/html paths. The dormant `if (v.t.s) v.c.s =
+                // v.t.s` (initial dev commit) tried to scope under the get target
+                // but never worked: the old getSelector ignored v.c.s. The #27
+                // string-only getSelector WOULD honour it — but as `<rule>
+                // <target>` (wrong order: here v.t.s is the descendant and v.c.s
+                // the ancestor, the opposite of find), so it must stay removed.
+                // Proper scoping (`<target> <rule>`, the mechanism `ui` injection
+                // also needs) requires a core ancestor-scope/prepend and is owned
+                // by the Gate-B/schema-ui work — locked by the test.todo in
+                // test/pipeline/get.test.js. See docs/backlog.md.
                 for (k in r)
                     nT.c.push(r[k])
                 ;
