@@ -197,24 +197,37 @@ function uisDiskPath(u) {
     return path.join(UIS_DIR, UIS_PKG[m[1]], 'src', rest);
 }
 
+/** Resolve one artifact part (quote-stripped) to its served text: explicit fixture
+ *  first, else the real src/uis/** disk file, else null (a miss). */
+function artifactText(fixtures, part) {
+    const f = fixtures && fixtures[part];
+    if (f) return f.text;
+    const p = uisDiskPath(part);
+    return p && fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
+}
+
 /**
- * Build a deterministic fetch-shaped transport. Resolution order: an explicit
- * { url: {json?, text?} } fixture wins (test-supplied data for get{d}, or a synthetic
- * .tss/.html), else a `@s/@c/@h` component artifact is served from the real src/uis/**
- * tree, else 404 (a miss → get throws → loud). Strips the wrapping quotes / array
- * coercion the ui→get path adds (a component `t` URL arrives as `["'@s/…'"]`).
+ * Build a deterministic fetch-shaped transport. A component with MULTIPLE `t`
+ * artifacts (e.g. Thing.default = thing-default + thing-update-1.0.1) reaches the
+ * transport COMMA-JOINED — request-model coerces the URL array (`['@s/a','@s/b']` →
+ * `@s/a,@s/b`). Split it, serve each part (explicit { url: {json?, text?} } fixture
+ * first — test-supplied get{d} data or a synthetic artifact — else the real src/uis/**
+ * file), and concatenate (the get fetches one TSS blob); a single artifact is the
+ * 1-part case. Any missing part → 404 (a miss → get throws → loud). get{d} (json) is
+ * always single-artifact, so json resolves from the first part.
  */
 function fixtureTransport(fixtures) {
     return async function (u) {
-        u = String(u).replace(/^['"]|['"]$/g, '');
-        const f = fixtures && fixtures[u];
-        if (f) return { ok: true, status: 200, json: async () => f.json, text: async () => f.text };
-        const p = uisDiskPath(u);
-        if (p && fs.existsSync(p)) {
-            const t = fs.readFileSync(p, 'utf8');
-            return { ok: true, status: 200, text: async () => t, json: async () => JSON.parse(t) };
-        }
-        return { ok: false, status: 404 };
+        const parts = String(u).split(',').map(s => s.replace(/^['"]|['"]$/g, ''));
+        const texts = parts.map(p => artifactText(fixtures, p));
+        if (texts.some(t => t === null)) return { ok: false, status: 404 };
+        const f0 = fixtures && fixtures[parts[0]];
+        return {
+            ok: true,
+            status: 200,
+            text: async () => texts.join('\n'),
+            json: async () => (f0 ? f0.json : JSON.parse(texts[0]))
+        };
     };
 }
 

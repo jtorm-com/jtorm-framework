@@ -76,6 +76,25 @@ test('ui global `class` attr uses append-mode, merging into the injected element
     assert.equal(body, '<div class="a c1">X</div>');
 });
 
+test('multi-artifact component t (comma-joined URL array) is served as the concatenation', async () => {
+    // A component with >1 `t` file (e.g. Thing.default = thing-default + thing-update)
+    // reaches the transport comma-joined via request-model's array coercion. The harness
+    // splits it, serves each part, and concatenates so the get boils both rule sets.
+    // Reproduced here with a comma inside a single hand-authored `t` value — the same
+    // coerced shape. (Codex review #5 P2.)
+    const { body } = await render(
+        '<body><div class="a"><span>x</span></div></body>',
+        ".a->get { t: '/a.tss,/b.tss'; }",
+        {},
+        'http://localhost/',
+        {
+            '/a.tss': { text: "span->attr { n: 'data-a'; v: '1'; }" },
+            '/b.tss': { text: "span->attr { n: 'data-b'; v: '2'; }" }
+        }
+    );
+    assert.equal(body, '<div class="a"><span data-a="1" data-b="2">x</span></div>');
+});
+
 // --- data-parser: @meta convention + || fallback + concat (the "one @meta/concat" item) ---
 
 test('data-parser resolves @meta.<field> when present', async () => {
