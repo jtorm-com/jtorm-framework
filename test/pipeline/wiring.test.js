@@ -9,8 +9,9 @@ const { WIRED_METHODS } = require('../helpers/engine.js');
 // or explicitly deferred. A newly-added method fails here until it is accounted
 // for — turning silent harness drift into a loud test failure (spec §2/§10).
 const DEFERRED = new Set([
-  // fetch verbs (need the request transport seam) + matchMedia-dependent + plugins
-  'css', 'config', 'data', 'get', 'js', 'layer', 'mediaquery', 'mediatarget', 'time', 'ui'
+  // remaining fetch verb (data) + matchMedia-dependent + plugins. `get` is now WIRED
+  // via the request transport seam (test/pipeline/get.test.js); no longer deferred.
+  'css', 'config', 'data', 'js', 'layer', 'mediaquery', 'mediatarget', 'time', 'ui'
 ]);
 
 test('every src/methods/*-method is wired or explicitly deferred (DI-drift guard)', () => {

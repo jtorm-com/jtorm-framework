@@ -15,7 +15,7 @@ module.exports = {
         get: async function(t, u) {
             let r = await this.models[t].get(u);
 
-            return r.d;
+            return r; // raw model result (data: JSON, html: text, tss: parsed tree)
         },
 
         async handle(v) {
@@ -49,8 +49,17 @@ module.exports = {
 
                 r = await this.get('tss', v.d.t);
 
+                // Ancestor-scope: fetched rules boil UNDER the get target, not
+                // document-global. v.t.s is the get target (the ancestor); set v.c.a
+                // so document-model.set prepends it to every selector in the fetched
+                // subtree — fetched TSS re-selects with its OWN `s` (`span->inner`
+                // parses to nested {s:'span'} nodes), so prefixing the top node alone
+                // can't reach them. This is also the mechanism `ui` component
+                // injection needs (ui-method builds {s: target, m: 'get'}). The
+                // handler restores v.c.a after this subtree so it can't leak to
+                // following sibling rules. Captured before v.t is replaced below.
                 if (v.t.s)
-                    v.c.s = v.t.s
+                    v.c.a = v.t.s
                 ;
 
                 for (k in r)

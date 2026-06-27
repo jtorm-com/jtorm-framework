@@ -15,3 +15,17 @@ test('each with no children is a silent no-op (characterization)', async () => {
   );
   assert.equal(body, '<ul><li>t</li></ul>');
 });
+
+// Regression: a method that REPLACES v.c with a non-object must not make the
+// handler's lexical-scope restore throw. each-method.js:45 sets `v.c = 1` on the
+// `e:` element path (signalling children to boil a fresh doc); the restore resets
+// the captured context object's fields and reinstates the reference, rather than
+// writing `.s`/`.a` onto the number 1 (strict-mode `Cannot create property 's'`).
+test('each(e:) does not break the handler scope restore', async () => {
+  const { body } = await render(
+    '<body><ul><li>seed</li></ul></body>',
+    "ul->each { e: 'li'; d: items; li->inner { h: name; } }",
+    { items: [{ name: 'A' }] }
+  );
+  assert.equal(body, '<ul><li>A</li></ul>');
+});

@@ -29,6 +29,12 @@ const { jTormDocumentModel } = require('../../src/models/document-model/src/docu
 const { jTormEventModel } = require('../../src/models/event-model/src/event-model.js');
 const { jTormLanguageModel } = require('../../src/models/language-model/src/language-model.js');
 const { jTormConfigModel } = require('../../src/models/config-model/src/config-model.js');
+// Fetch models + get verb (request transport seam — get boils via an injected transport)
+const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
+const { jTormDataModel } = require('../../src/models/data-model/src/data-model.js');
+const { jTormHtmlModel } = require('../../src/models/html-model/src/html-model.js');
+const { jTormTssModel } = require('../../src/models/tss-model/src/tss-model.js');
+const { jTormGetMethod } = require('../../src/methods/get-method/src/get-method.js');
 // Methods (v1 subset — text/attr/attrs/each/if/insert; see spec §2)
 const { jTormTextMethod } = require('../../src/methods/text-method/src/text-method.js');
 const { jTormAttrMethod } = require('../../src/methods/attr-method/src/attr-method.js');
@@ -66,6 +72,7 @@ const methods = {
     remove: jTormRemoveMethod,
     find: jTormFindMethod,
     title: jTormTitleMethod,
+    get: jTormGetMethod,
     append: new InsertAlias('a'),
     prepend: new InsertAlias('p'),
     before: new InsertAlias('b'),
@@ -90,6 +97,11 @@ jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = metho
 jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormViewModel;
 jTormHandlerWrapper.handler = jTormEachMethod.handler = jTormIfMethod.handler = jTormSwapMethod.handler = jTormHandler;
 jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormWrapMethod.handlerWrapper = jTormHandlerWrapper;
+// fetch models + get verb DI (request transport seam) — get() resolves data/html/tss via the models
+jTormDataModel.requestModel = jTormHtmlModel.requestModel = jTormTssModel.requestModel = jTormRequestModel;
+jTormTssModel.tssParser = jTormTSSParser;
+jTormGetMethod.models = { data: jTormDataModel, html: jTormHtmlModel, tss: jTormTssModel };
+const DEFAULT_TRANSPORT = jTormRequestModel.transport; // restore after any per-render fixture override
 
 // --- Init: tss-parser config FIRST (data-parser builds its regexes from the
 // quote chars), then init() each wired unit that has one, then a default language.
@@ -107,17 +119,34 @@ function reset() {
     jTormTSSParser.tss = '';
     jTormViewModel.data.c.c = 1; // restore the shared (prototype) context defaults
     jTormViewModel.data.c.s = null; // handler-wrapper writes v.c.s (= shared data.c.s)
+    jTormViewModel.data.c.a = null; // get{t}/ui write v.c.a (ancestor scope)
     jTormLanguageModel.data = {};
+    jTormDataModel.c = jTormHtmlModel.c = jTormTssModel.c = {}; // fetch-model caches (singletons)
+    jTormRequestModel.base = '';
+    jTormRequestModel.timeout = 0;
+    jTormRequestModel.transport = DEFAULT_TRANSPORT; // drop any per-render fixture override
+}
+
+/** Build a deterministic fetch-shaped transport from a { url: {json?, text?} } fixture map. */
+function fixtureTransport(fixtures) {
+    return async function (u) {
+        const f = fixtures[u];
+        if (!f) return { ok: false, status: 404 };
+        return { ok: true, status: 200, json: async () => f.json, text: async () => f.text };
+    };
 }
 
 /**
  * Boil one  html + tss + data  through the real pipeline. Async.
+ * @param {string} [url] document URL (jsdom origin); some flows need an absolute base.
+ * @param {object|null} [fixtures] { url: {json?, text?} } map → injected fetch transport for `get`.
  * @returns {Promise<{html:string, body:string}>} full-doc HTML and <body> innerHTML.
  */
-async function render(html, tss, data, url = 'http://localhost/') {
+async function render(html, tss, data, url = 'http://localhost/', fixtures = null) {
     const { window } = new JSDOM('', { url });
     jTormDocumentModel.windowModel = window;
     reset();
+    if (fixtures) jTormRequestModel.transport = fixtureTransport(fixtures); // inject after reset
 
     const v = await jTormViewModel.create(html, tss, data);
     await jTormEventModel.handle(v, 'before', 'view');
