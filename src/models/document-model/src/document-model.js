@@ -121,6 +121,14 @@ module.exports = {
                     const e = new this.windowModel.DOMParser()
                         .parseFromString(h, 'text/html').documentElement;
 
+                    // Clear stale root attrs first — the live document is reused
+                    // client-side, so a prior render's lang/class must not survive
+                    // into one whose <html> dropped them (innerHTML doesn't reset
+                    // the root element's own attributes).
+                    while (r.d.documentElement.attributes.length)
+                        r.d.documentElement.removeAttribute(r.d.documentElement.attributes[0].name)
+                    ;
+
                     for (let i = 0; i < e.attributes.length; i++)
                         r.d.documentElement.setAttribute(e.attributes[i].name, e.attributes[i].value)
                     ;
