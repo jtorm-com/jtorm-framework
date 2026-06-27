@@ -5,31 +5,33 @@ module.exports = {
     jTormConfigModel: {
         d: {},
 
-        get: k => {
+        get: function(k) {
             return k ? this.d[k] : this.d;
         },
 
-        set: (k, v) => {
+        set: function(k, v, t) {
+            t = t ? t : this.d;
+
             if (typeof v === 'object') {
-                if (this.d[k] === undefined)
-                    this.d[k] = Array.isArray(v) ? [] : {}
+                if (t[k] === undefined)
+                    t[k] = Array.isArray(v) ? [] : {}
                 ;
 
-                for (k in v)
-                    this.set(k2, v[k2], this.d[k])
+                for (let p in v)
+                    this.set(p, v[p], t[k])
                 ;
             } else
-                this.d[k] = v
+                t[k] = v
             ;
 
-            Object.defineProperty(d ? d : this.d, k, {
+            Object.defineProperty(t, k, {
                 enumerable: 1,
                 configurable: 1,
                 writable: 0
             });
         },
 
-        del: k => {
+        del: function(k) {
             if (this.d[k])
                 delete this.d[k]
             ;
