@@ -28,7 +28,10 @@ module.exports = {
             // params) from the model by name — "inspect an out-of-scope model
             // in a loop". z flags the unresolved-omit mode for parse().
             // (Guarded on `a` so a param-less method is a safe no-op.)
-            if (a && v._.isEmpty(d)) {
+            // Leaf-only: a child-bearing node is a structural wrapper (e.g.
+            // `->append->ui`), whose params (h/d/m) must NOT be synthesized from
+            // colliding model keys — that would turn unrelated fields into insert input.
+            if (a && v._.isEmpty(d) && !(v.t.c && v.t.c.length)) {
                 z = 1;
                 a = Object.values(a);
                 for (k in a)

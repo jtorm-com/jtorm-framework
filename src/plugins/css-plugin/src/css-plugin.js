@@ -36,11 +36,18 @@ module.exports = {
                     po.href = this.uiMethod.parseUrl(css.href);
                     po.rel = css.rel ? css.rel : 'stylesheet';
 
-                    // defer: load without blocking via the media=print swap
-                    // (main's "Bugfix defer method"), flip to all on load.
+                    // defer: load without blocking via the media=print swap (main's
+                    // "Bugfix defer method"), then restore the INTENDED media on load —
+                    // not hardcoded 'all', or a deferred media='print'/responsive sheet
+                    // would apply everywhere after load. The real media is passed as DATA
+                    // (data-media), not interpolated into the inline handler, so a media
+                    // string can never break out into the onload JS.
                     if (css.defer) {
+                        if (css.media)
+                            po.setAttribute('data-media', css.media)
+                        ;
                         po.media = 'print';
-                        po.setAttribute('onload', "this.media='all'; this.onload=null;");
+                        po.setAttribute('onload', "this.media=this.getAttribute('data-media')||'all'; this.onload=null;");
                     }
 
                     el.appendChild(po);

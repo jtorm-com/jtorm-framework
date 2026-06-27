@@ -44,3 +44,14 @@ test('handle(): no props and no params is a safe no-op (v.d = {})', () => {
     dp.handle(v); // a undefined — must not throw
     assert.deepEqual(v.d, {});
 });
+
+// Insert-alias guard: a child-bearing structural wrapper (e.g. `->append->ui`,
+// params h/d/m) with empty props must NOT auto-bind those params from the model —
+// otherwise a colliding model key (`h`/`d`) becomes insert input and the wrapper
+// renders the wrong markup or throws. Auto-bind is for leaf data methods only.
+test('handle(): a child-bearing wrapper does not auto-bind params from the model', () => {
+    const dp = makeDataParser();
+    const v = { _, t: { p: {}, c: [{ s: 'span', m: 'text' }] }, m: { h: 'X', d: 'Y' }, d: null };
+    dp.handle(v, ['h', 'd', 'm']);
+    assert.deepEqual(v.d, {});
+});
