@@ -28,7 +28,7 @@
     // todo
 /*
     body > .schema-Thing > .contents > .footer {
-        ->if(d: comment)->config(k: 'comments')->append->ui {
+        ->if(d: comment)->config(d: 'comments')->append->ui {
             c: '@e.section';
 
             section {

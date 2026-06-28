@@ -8,17 +8,17 @@ module.exports = {
 
         alias: 'c',
         params: [
-            'k',// Key
+            'd',// Data (the config key — `d` is the framework-wide data param)
             'v',// Value
             'a'// As
         ],
 
         validate: function (v) {
-            return v.d.k !== undefined;
+            return v.d.d !== undefined;
         },
 
         handle: async function (v) {
-            const r = this.configModel.get(v.d.k);
+            const r = this.configModel.get(v.d.d);
 
             if (
                 (r === undefined && v.t.p.v !== undefined)
@@ -31,7 +31,7 @@ module.exports = {
                 if (v.d.a)
                     d[v.d.a] = r
                 ; else
-                    d[v.d.k] = r
+                    d[v.d.d] = r
                 ;
 
                 v.io = {c: 1, d: {...v.m, ...d}};
