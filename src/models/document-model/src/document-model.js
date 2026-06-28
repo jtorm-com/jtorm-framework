@@ -73,7 +73,16 @@ module.exports = {
                         // the target(s) and run the rule WITHIN each via native
                         // querySelectorAll, which parses CSS correctly. Selectorless rule
                         // (g === false) → the target itself.
-                        g = this.getSelector(v.t.s, v.c.s),
+                        //
+                        // Under an ancestor, scope by the rule's OWN selector and IGNORE
+                        // v.c.s: a fetched component re-selects within its target, so an
+                        // enclosing descendant-scope (a find descendant, or the iteration
+                        // body default v.c.s='body' from handler-wrapper) must not fold in
+                        // — that turned a selectorless component rule into a v.c.s lookup
+                        // under the target (scope('span','body') → "span body not found").
+                        // Without an ancestor, v.c.s folds as before (find; and the
+                        // iteration's own 'body' rules → selectAll, so the body matches).
+                        g = v.c.a ? (v.t.s || false) : this.getSelector(v.t.s, v.c.s),
                         c = v.c.a ? this.scope(v.c.a, g) : this.selectAll(g)
                     ;
 
