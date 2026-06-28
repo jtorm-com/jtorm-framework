@@ -23,10 +23,13 @@ const { render } = require('../helpers/engine.js');
 //   - ImageObject       — the figure→a→picture→img media chain (figure-default.tss)
 //   - BreadcrumbList    — the nav → ol->each{ body->append->ui } nested-iteration shape
 // Each golden is correctness-sanity-checked against schema.org/template intent below.
-// Thing.default (the page-level head/<body>/items component) needs a full-document boil
-// (it targets `head`/`body`/`ul`, absent under a scoped `.a`) + components-ui head and
-// @f.inputEmail — deferred to the all-33-types pass. layer/site-navigation-element still
-// need the `layer` verb (deferred — see test/pipeline/wiring.test.js).
+// PAGE-LEVEL pieces (head.default/head.id, @f.inputEmail, the ul->each items path) are
+// locked at the foot of this file via the harness page mode (full <html> boil). The
+// full Thing.default composition is NOT golden-able as one unit: thing-default.tss is
+// content-level (selectorless `@e.section`, reached via Person→Thing) while
+// thing-update-1.0.1.tss adds page-level head/body/ul/footer rules that can't share a
+// scope with it — deferred to an author/design decision (docs/backlog.md). layer/
+// site-navigation-element still need the `layer` verb (deferred — see wiring.test.js).
 
 // --- ui → single html-ui element injection (the foundational Gate-B boil) ---
 
@@ -308,4 +311,100 @@ test('ui BreadcrumbList renders nav → ol→each → li → Thing.link per item
     assert.equal(body, '<div class="a"><nav id="breadcrumbs" aria-label="Breadcrumbs">'
         + '<div class="contents"><span>You are here: </span>'
         + '<ol><li><a href="https://e.com/" title="Home"></a></li></ol></div></nav></div>');
+});
+
+// --- @f.inputEmail: the nested element chain input-email → input → form-element ---
+//
+// @f.inputEmail injects @h/@f/input.html (`<input>`), then input-email.tss
+// (`input { ->attr{type:email} … ->get '@h/form/input.tss' }`) fixes type=email and
+// chains the shared input.tss, which chains form-element.tss → global.tss. Each .tss
+// re-wraps in `input { … }`, so the inner ->gets boil under ancestor `input` — the
+// "fetched rule re-selects the ancestor tag" path (see get.test.js): a rule selector
+// equal to its ancestor targets the ancestor element itself. Bare = just the type.
+test('ui @f.inputEmail with no data injects a bare type=email input', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputEmail'; }",
+        {}
+    );
+    assert.equal(body, '<div class="a"><input type="email"></div>');
+});
+
+test('ui @f.inputEmail surfaces attrs across the input/form-element chain (ancestor-tag self-scope)', async () => {
+    // pattern is set by input-email.tss AND re-set by input.tss (both `input {…}`);
+    // name/value come from form-element.tss. Before the input-within-input scope fix
+    // the input.tss `pattern` re-set threw "input input not found". Drives one attr
+    // from each level so the whole chain is exercised.
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputEmail'; }",
+        { pattern: '.+@.+', name: 'email', value: 'me@example.com' }
+    );
+    assert.equal(body, '<div class="a"><input type="email" pattern=".+@.+" name="email" value="me@example.com"></div>');
+});
+
+// --- Page-level pieces: components-ui head + the ul->each items path ---
+//
+// These boil a FULL `<html><head></head><body>…</body></html>` document (the harness
+// page mode — documentModel.create's `/<html/` branch builds head+body; render()
+// returns `head`). They are the sub-components Thing.default's thing-update-1.0.1.tss
+// pulls in page-level. Thing.default ITSELF is NOT golden-able as one unit: its base
+// thing-default.tss is content-level (selectorless `@e.section` injection, reached
+// content-scoped via Person→Thing), while thing-update-1.0.1.tss bolts on these
+// page-level `head`/`body`/`ul`/`footer` rules — they throw under any content ancestor
+// AND have no target selectorlessly (`selectAll(null)` → "false not found"). Locking
+// the pieces here proves the page mode + sub-components; the full-page Thing.default
+// composition is deferred to an author/design decision (docs/backlog.md, continue.md).
+
+// head.default (components-ui) — invoked with `head` as the ui target (ancestor=head)
+// so its selectorless `->data→append→ui{doc.meta}` rules land in <head>. With no
+// @config/@meta the appleTouchIcon/favicon/facebook/twitter/google/og branches are all
+// gated off; only the viewport meta (literal fallback) emits.
+test('ui head.default injects the viewport meta into <head> (page mode)', async () => {
+    const { head } = await render(
+        '<html><head></head><body></body></html>',
+        "head->ui { c: 'head.default'; }",
+        {}
+    );
+    assert.equal(head, '<meta name="viewport" content="width=device-width, initial-scale=1">');
+});
+
+// head.id (components-ui) — the per-identity SEO head. Bare: only the robots/referrer
+// metas (literal fallbacks); disambiguatingDescription/url/workTranslation gated off.
+test('ui head.id with no data emits only the robots + referrer metas', async () => {
+    const { head } = await render(
+        '<html><head></head><body></body></html>',
+        "head->ui { c: 'head.id'; }",
+        {}
+    );
+    assert.equal(head, '<meta name="robots" content="index, follow">'
+        + '<meta name="referrer" content="origin">');
+});
+
+test('ui head.id with url + description emits description meta, canonical + jsonld links', async () => {
+    // disambiguatingDescription → description meta; url → canonical link; the `->data(h:
+    // url)→ui{doc.link…}` adds the JSON-LD alternate link (href = url + the `.jsonld`
+    // attr suffix). robots/referrer always trail. Sanity-checked vs head-id.tss intent.
+    const { head } = await render(
+        '<html><head></head><body></body></html>',
+        "head->ui { c: 'head.id'; }",
+        { url: 'https://e.com/p', disambiguatingDescription: 'D' }
+    );
+    assert.equal(head, '<meta name="description" content="D">'
+        + '<link rel="canonical" href="https://e.com/p">'
+        + '<link rel="alternate" type="application/ld+json" href="https://e.com/p.jsonld">'
+        + '<meta name="robots" content="index, follow">'
+        + '<meta name="referrer" content="origin">');
+});
+
+// The items path (thing-update-1.0.1.tss `ul->each{ d:items; e:'li'; li->inner{h:name} }`).
+// each `e:'li'` clones the existing `<li>` template per item (it `selectAll('li')`s the
+// template), boils `li->inner{h:name}` against each, and appends the result into the ul.
+test('ul->each with an <li> template renders one <li> per item from name', async () => {
+    const { body } = await render(
+        '<body><ul><li></li></ul></body>',
+        "ul->each { d: items; e: 'li'; li->inner { h: name; } }",
+        { items: [{ name: 'One' }, { name: 'Two' }] }
+    );
+    assert.equal(body, '<ul><li>One</li><li>Two</li></ul>');
 });

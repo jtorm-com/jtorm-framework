@@ -152,3 +152,27 @@ test('get { t } preserves commas inside a fetched selector when scoping', async 
     '<div class="a"><span data-x="a,b" z="1">s</span><span>t</span></div>'
   );
 });
+
+// Ancestor === fetched-rule selector: a nested element component re-selects its OWN
+// tag. html-ui `input-email.tss` is `input { … ->get '@h/form/input.tss' }`, and the
+// fetched `input.tss` is ALSO `input { … }`. The inner get sets v.c.a='input', so its
+// rules scope `input` UNDER ancestor `input` → the descendant query `input input`
+// (an input INSIDE the input) → nothing → "input input not found" the moment one of
+// those attrs has a value to set. A fetched rule whose selector EQUALS its ancestor
+// targets the ancestor element ITSELF — the DOM-native analog of getSelector's
+// `m===s` guard (and the selectorless `s=false`→target case above). Without it every
+// form component (and any element .tss that ->gets another same-tag element .tss)
+// throws. Reproduces input-email→input.tss with a 2-level get re-selecting `input`.
+test('get { t } applies a fetched rule that re-selects the ancestor tag to the ancestor itself', async () => {
+  const { body } = await render(
+    '<body><div class="a"><input></div></body>',
+    ".a->get { t: '/outer.tss'; }",
+    {},
+    'http://localhost/',
+    {
+      '/outer.tss': { text: "input { ->attr { n: 'data-o'; v: '1'; } ->get { t: '/inner.tss'; } }" },
+      '/inner.tss': { text: "input { ->attr { n: 'data-i'; v: '2'; } }" }
+    }
+  );
+  assert.equal(body, '<div class="a"><input data-o="1" data-i="2"></div>');
+});
