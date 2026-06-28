@@ -73,8 +73,16 @@ module.exports = {
                         // the target(s) and run the rule WITHIN each via native
                         // querySelectorAll, which parses CSS correctly. Selectorless rule
                         // (g === false) → the target itself.
+                        //
+                        // v.c.b is the iteration fragment's BODY DEFAULT (handler-wrapper):
+                        // an unscoped selectorless rule (g falsy, no ancestor) targets the
+                        // fragment <body>. It's a SEPARATE channel from v.c.s, so the
+                        // iteration default neither folds into nor leaks out of find's
+                        // descendant scope (a fetched component's selectorless rule under
+                        // v.c.a stays g===false → the target itself, not a 'body' lookup),
+                        // and a nested component's ancestor (v.c.a) overrides it as usual.
                         g = this.getSelector(v.t.s, v.c.s),
-                        c = v.c.a ? this.scope(v.c.a, g) : this.selectAll(g)
+                        c = v.c.a ? this.scope(v.c.a, g) : this.selectAll(g || v.c.b)
                     ;
 
                     if (c.length)

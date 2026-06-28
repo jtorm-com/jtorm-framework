@@ -13,12 +13,13 @@ const { render } = require('../helpers/engine.js');
 // PR #3). The html-ui leaf chain is: element .tss → `->get{t:'@h/replacable.tss'}`
 // (`->inner{h:html}` + `->get{t:'@h/global.tss'}`, the 14 selectorless global attrs).
 //
-// SCOPE: this first slice locks the NON-iteration ui path (a component whose transform
-// is get{t}+inner+attr only). Components that boil through an each/insert iteration
-// (Text, Thing.*, Article.*, ImageObject, BreadcrumbList, site-navigation-element) are
-// BLOCKED on a pre-existing ancestor-scope core bug surfaced by this harness — locked
-// as {todo} at the foot of this file. (layer/site-navigation-element also need the
-// `layer` verb, deferred — see test/pipeline/wiring.test.js.)
+// SCOPE: this slice locks the NON-iteration ui path (a component whose transform is
+// get{t}+inner+attr only) plus the simplest ITERATION component (`Text`, at the foot of
+// this file) now that ancestor-scope composes with the each/insert path (get-method +
+// handler-wrapper fixes; see each.test.js). The richer iteration components (Thing.*,
+// Article.*, ImageObject, BreadcrumbList) are deferred to the all-33-types golden pass.
+// (layer/site-navigation-element also need the `layer` verb, deferred — see
+// test/pipeline/wiring.test.js.)
 
 // --- ui → single html-ui element injection (the foundational Gate-B boil) ---
 
@@ -124,31 +125,26 @@ test('data-parser + concatenates a literal with a bound field', async () => {
     assert.equal(body, '<div class="a" data-x="pre-Bob"></div>');
 });
 
-// --- BLOCKED: ancestor-scope vs. iteration (pre-existing PR #3 core bug) ---
+// --- ancestor-scope composes with the each/insert iteration path (FIXED) ---
 //
 // The simplest schema leaf, `Text` (text-default.tss: `->each(d:Text,a:'html')
 // ->if(d:html,to:'string') ->ui{c:'@e.span'}`), renders a value as a <span>. It boils
-// through an each iteration: handler-wrapper builds a fresh <body> doc per item and the
-// each result is re-inserted via `append`. The ui ancestor scope v.c.a (= '.a') does
-// NOT compose with that iteration/insert path — set() runs a selectorless rule under
-// v.c.a='.a' against a document where '.a' is absent (or stale), throwing
-// "... not found". This is the get{t}/ui ancestor-scope (PR #3, document-model.set)
-// meeting the each/insert machinery — it breaks EVERY component with each/append/nested
-// -ui (Text, Thing.*, Article.*, CreativeWork.*, ImageObject, BreadcrumbList).
-//
-// Locked {todo} asserting the INTENDED output — flip to a normal test when the core
-// ancestor-scope-vs-iteration fix lands (its own focused PR; see continue.md/backlog).
-test('ui Text leaf renders the value as a <span> (ancestor-scope vs. iteration)', { todo: 'PR #3 ancestor-scope does not compose with the each/insert iteration path' }, async () => {
-    const log = console.log;
-    console.log = () => {}; // mute the error-handler view dump while this still throws
-    try {
-        const { body } = await render(
-            '<body><div class="a"></div></body>',
-            ".a->ui { c: 'Text'; }",
-            { Text: 'hello' }
-        );
-        assert.equal(body, '<div class="a"><span>hello</span></div>');
-    } finally {
-        console.log = log;
-    }
+// through an each iteration: handler-wrapper builds a DETACHED <body> fragment per item
+// (body default on its own channel v.c.b='body', v.c.s left null) and the each result is
+// re-inserted via `append`. Two fixes made this compose with the get{t}/ui ancestor
+// scope (PR #3): (1) handler-wrapper creates the fragment with {c:1} AT create time, so
+// it no longer reuses+wipes the live document the each then appends into ("`.a` not
+// found"); and (2) the body default is v.c.b, not v.c.s, so it never folds into the
+// @e.span get's selectorless replacable `->inner` — which stays scope('span',false) →
+// the span (instead of the old v.c.s='body' leak → "span body not found"), while
+// explicit `body` rules still selectAll. This unblocks every iteration-boiling component
+// (Text, Thing.*, Article.*, CreativeWork.*, ImageObject, BreadcrumbList). The focused
+// unit forms are locked in each.test.js.
+test('ui Text leaf renders the value as a <span> (ancestor-scope composes with iteration)', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'Text'; }",
+        { Text: 'hello' }
+    );
+    assert.equal(body, '<div class="a"><span>hello</span></div>');
 });
