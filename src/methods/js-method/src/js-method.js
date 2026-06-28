@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormJsMethod: {
         // DI
@@ -17,10 +19,15 @@ module.exports = {
             'type'
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return !!v.d.src;
         },
 
+        /**
+         * Collect the `<script>` descriptor (`v.d`) into jsPlugin for injection, deduped by src.
+         * @param {ViewModel} v
+         */
         handle: function (v) {
             const s = this.jsPlugin;
 

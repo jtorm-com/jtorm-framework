@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormAttrsMethod: {
         // DI
@@ -30,6 +32,7 @@ module.exports = {
             return t;
         },
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             let t = this.parsed(v);
             v.d.parsed = t;
@@ -41,6 +44,10 @@ module.exports = {
             );
         },
 
+        /**
+         * Split the comma-lists in `v.d` into one `attr` call per name/value pair across the selected elements.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             let t = v.d.parsed,
                 k,

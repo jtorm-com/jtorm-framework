@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormTextMethod: {
         // DI
@@ -14,6 +16,10 @@ module.exports = {
             return 1;
         },
 
+        /**
+         * Resolve each `v.t.p` value against `v.m` via dataParser, translate it through languageModel, write it back onto `v.m`, and emit the model on `v.io.d`.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             let x, k;
 

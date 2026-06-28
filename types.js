@@ -3,9 +3,17 @@
 
 /**
  * Shared JSDoc typedefs for the jTorm framework (pure JS — no .ts/.d.ts).
- * Pull a typedef into any .js file with an import() JSDoc reference to this
- * module (see view-model.js, which imports ViewModel that way).
- * Validated by jsconfig.json (checkJs:true, strict:true); nothing is emitted.
+ *
+ * Canonical "decoder ring" for the view object `v`: the single source of truth
+ * for the one-letter fields threaded through the handler/method pipeline
+ * (`v.t` node, `v.d` method data, `v.m` model, `v.h` DOM, `v.io` flags,
+ * `v.c` context). Don't duplicate the field map elsewhere — link here.
+ *
+ * Pull a typedef into any .js file with an import() JSDoc reference, e.g.
+ * `@typedef {import('../../../../types.js').ViewModel} ViewModel` — every method
+ * (`handle`/`validate`/`data`) and handler does this so editors resolve `v.*`
+ * on hover. Batch-validated by jsconfig.json (checkJs:true, strict:true) for the
+ * files it `include`s; nothing is emitted.
  * @module types
  */
 

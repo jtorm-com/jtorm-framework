@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormTimeMethod: {
         // DI
@@ -71,10 +73,15 @@ module.exports = {
             [628987200000, 3144936000]
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return v.d.as && (v.d.dT || v.d.d);
         },
 
+        /**
+         * Compute a relative-time label for `v.d.dT`/`v.d.d` and merge the formatted fields onto `v.io.d`.
+         * @param {ViewModel} v
+         */
         handle: function (v) {
             const l = this.languageModel,
                   nD = {};

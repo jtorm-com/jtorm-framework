@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormEachMethod: {
         // DI
@@ -18,6 +20,7 @@ module.exports = {
             'm' // Method
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return (
                 (
@@ -28,6 +31,10 @@ module.exports = {
             );
         },
 
+        /**
+         * Iterate `v.d.d` (or `v.m`), boil `v.t.c` per item, and apply the collected fragment via the chosen insert method (default append).
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             const s = this;
             let r = '', d, k, h, sv, i = 0, e;

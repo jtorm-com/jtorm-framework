@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormDataMethod: {
         // DI
@@ -14,6 +16,10 @@ module.exports = {
             return 1;
         },
 
+        /**
+         * Resolve each declaration (honouring `||` fallbacks) from `v.m` into a nested object and merge it onto `v.io.d`.
+         * @param {ViewModel} v
+         */
         data: async function (v) {
             let tT, ks, k, k2, p;
             const t = v.t, tD = {};

@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormConfigMethod: {
         // DI
@@ -14,10 +16,15 @@ module.exports = {
             'a'// As
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return v.d.d !== undefined || v.d.k !== undefined;
         },
 
+        /**
+         * Look up the config key (`v.d.d`/`v.d.k`) via configModel; gate children when it mismatches, else merge the value onto `v.io.d`.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             // Accept the key under `d` (the convention the components use) OR `k` (the
             // documented form) — dropping either silently fails-open documented gates.

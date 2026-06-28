@@ -1,11 +1,19 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormErrorHandler: {
         // DI
         // util
 
+        /**
+         * Dump every populated `v` field for debugging, then throw `e` — the
+         * upgrade-safe drift detector for zero-match transform verbs.
+         * @param {string} e       error message to throw
+         * @param {ViewModel} v    view object whose fields are logged
+         */
         handle: function (e, v) {
             for (let k in v) {
                 if (

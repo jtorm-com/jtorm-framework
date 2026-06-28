@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormAttrMethod: {
         alias: 'a',
@@ -13,10 +15,15 @@ module.exports = {
             'p'// Prepend
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return !!(v.d.n && (v.d.v || v.d.m === 'r'));
         },
 
+        /**
+         * Set, append, prepend, or remove a single attribute (`v.d.n`) on each selected element via `v.h.set`.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             const s = this;
 

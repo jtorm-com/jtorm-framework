@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormHandler: {
         // DI
@@ -9,6 +11,17 @@ module.exports = {
         // methods[]
         // viewModel
 
+        /**
+         * The method loop: build or receive `v`, resolve each TSS node’s verb,
+         * run its data/validate/handle, then recurse into the node’s children
+         * within the rule’s lexical scope (`v.c.s`/`v.c.a` captured + restored).
+         * @param {*} h            html string or DOM wrapper
+         * @param {*} t            TSS string or parsed tree
+         * @param {*} m            model / source data
+         * @param {*} c            create-doc flag or context object
+         * @param {ViewModel} [v]  pre-built view object (created from h/t/m/c when absent)
+         * @returns {Promise<*>}   the resulting DOM wrapper (`v.h`)
+         */
         handle: async function (h, t, m, c, v) {
             let e = this.eventModel,
                 ms = this.methods,

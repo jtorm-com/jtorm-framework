@@ -24,6 +24,7 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   `module.exports = { jTormX: { ...singleton } }`; methods use `this`. All externals (`_` lodash
   subset, DOM/`windowModel`, the fetch transport) are **dependency-injected** (`// DI`).
 - **Pure JS only — never add `.ts`/`.d.ts`.** Types are JSDoc validated by `jsconfig.json`.
+- **`v` is typed from the `types.js` decoder ring.** `types.js` is the single source of truth for the view object `v` (`v.t/v.d/v.m/v.h/v.io/v.c`); methods (`handle`/`validate`/`data`) and handlers import `ViewModel` from it, annotate `@param {ViewModel} v`, and carry a one-line contract comment atop each verb. JSDoc/editor-hover only — `jsconfig` `include` stays scoped to `types.js` + `view-model.js`, so the per-method `@param`/typedef annotations are intentional and **not** batch-checked: do **not** flag them as dead/unused (wiring them into `tsc` is a tracked follow-up needing `@this`/DI typing).
 - **Published packages** — each `src/**` dir is a published `@jtorm/*` package. **Never delete or
   deprecate exports / remove packages** (external projects depend on them). Greenfield: no
   backward-compat shims; bug-fixes get a **patch** bump to the touched package's `package.json`.

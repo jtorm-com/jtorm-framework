@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormHandlerWrapper: {
         // DI
@@ -8,6 +10,14 @@ module.exports = {
         // handler
         // viewModel
 
+        /**
+         * Boil one iteration body into a detached fragment and return its HTML.
+         * @param {*} h            html string or DOM wrapper
+         * @param {*} t            TSS node whose children form the body
+         * @param {*} m            model / source data for this iteration
+         * @param {ViewModel} v    parent view object (scope/cache carried over)
+         * @returns {Promise<string>}
+         */
         handle: async function (h, t, m, v) {
             const
                 t2 = t.c,

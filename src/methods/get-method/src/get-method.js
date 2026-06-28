@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+
 module.exports = {
     jTormGetMethod: {
         // DI
@@ -8,6 +10,7 @@ module.exports = {
 
         params: ['h', 't', 'd', 'a'],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return !!(v.d.h || v.d.t || v.d.d);
         },
@@ -18,6 +21,10 @@ module.exports = {
             return r; // raw model result (data: JSON, html: text, tss: parsed tree)
         },
 
+        /**
+         * Fetch data/html/tss models (`v.d.d`/`v.d.h`/`v.d.t`) and merge them into the model, the DOM, or the `v.t` subtree (setting ancestor scope `v.c.a`).
+         * @param {ViewModel} v
+         */
         async handle(v) {
             let r, k, nD, nT;
 
