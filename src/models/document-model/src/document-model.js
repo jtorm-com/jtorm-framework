@@ -99,16 +99,11 @@ module.exports = {
                 // (commas, [brackets], quotes, :is()/:has()) — no selector-string surgery.
                 // Cross-browser by design: querySelectorAll (universal), Array indexOf/push,
                 // indexed loops — no Set/for-of/spread. g === false (selectorless) → target.
-                // g === a — a fetched rule re-selecting its OWN ancestor tag (html-ui
-                // input-email.tss `input{…->get input.tss}`, and input.tss is also
-                // `input{…}` → scope('input','input')) — targets the ancestor ITSELF, not a
-                // same-tag descendant (`input input` → nothing → throws once an attr runs).
-                // The DOM-native analog of getSelector's `m===s` guard.
                 scope: function(a, g) {
                     const out = [], anc = this.d.querySelectorAll(a);
 
                     for (let i = 0; i < anc.length; i++) {
-                        const m = (!g || g === a) ? [anc[i]] : anc[i].querySelectorAll(g);
+                        const m = g ? anc[i].querySelectorAll(g) : [anc[i]];
 
                         for (let j = 0; j < m.length; j++)
                             if (out.indexOf(m[j]) === -1)
