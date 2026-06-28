@@ -334,6 +334,20 @@ test('ui @f.inputEmail with no data injects a bare type=email input', async () =
     assert.equal(body, '<div class="a"><input type="email"></div>');
 });
 
+// Known-limitation lock (deferred bug, docs/backlog.md): a DATA-bearing @f.inputEmail
+// throws — `placeholder` reaches input.tss's `->attr{ n:'placeholder'; v:placeholder }`,
+// which boils under the nested-get ancestor `input` → scope('input','input') → an input
+// INSIDE the input → "input input not found". Asserted as a throw (not skipped) so the
+// bare golden above cannot MASK the form-component bug; flip to a positive golden when
+// the nested same-tag element-scope is fixed (a design pass that also reshapes the
+// @e.div/CreativeWork injection goldens — see header + docs/backlog.md).
+test('ui @f.inputEmail with data currently throws (deferred nested same-tag scope bug)', async () => {
+    await assert.rejects(
+        render('<body><div class="a"></div></body>', ".a->ui { c: '@f.inputEmail'; }", { placeholder: 'Email' }),
+        /input input not found/
+    );
+});
+
 // --- Page-level pieces: components-ui head + the ul->each items path ---
 //
 // These boil a FULL `<html><head></head><body>…</body></html>` document (the harness
