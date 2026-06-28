@@ -130,16 +130,16 @@ test('data-parser + concatenates a literal with a bound field', async () => {
 // The simplest schema leaf, `Text` (text-default.tss: `->each(d:Text,a:'html')
 // ->if(d:html,to:'string') ->ui{c:'@e.span'}`), renders a value as a <span>. It boils
 // through an each iteration: handler-wrapper builds a DETACHED <body> fragment per item
-// (scoped via v.c.s='body') and the each result is re-inserted via `append`. Two fixes
-// made this compose with the get{t}/ui ancestor scope (PR #3): (1) handler-wrapper
-// creates the fragment with {c:1} AT create time, so it no longer reuses+wipes the live
-// document the each then appends into ("`.a` not found"); and (2) under an ancestor,
-// document-model.set scopes by the rule's own selector and ignores the enclosing v.c.s
-// — so the @e.span get's selectorless replacable `->inner` resolves to the span
-// (scope('span',false)) instead of leaking the fragment's v.c.s='body' ("span body not
-// found"), while explicit `body` rules elsewhere in the fragment still selectAll. This
-// unblocks every iteration-boiling component (Text, Thing.*, Article.*, CreativeWork.*,
-// ImageObject, BreadcrumbList). The focused unit forms are locked in each.test.js.
+// (body default on its own channel v.c.b='body', v.c.s left null) and the each result is
+// re-inserted via `append`. Two fixes made this compose with the get{t}/ui ancestor
+// scope (PR #3): (1) handler-wrapper creates the fragment with {c:1} AT create time, so
+// it no longer reuses+wipes the live document the each then appends into ("`.a` not
+// found"); and (2) the body default is v.c.b, not v.c.s, so it never folds into the
+// @e.span get's selectorless replacable `->inner` — which stays scope('span',false) →
+// the span (instead of the old v.c.s='body' leak → "span body not found"), while
+// explicit `body` rules still selectAll. This unblocks every iteration-boiling component
+// (Text, Thing.*, Article.*, CreativeWork.*, ImageObject, BreadcrumbList). The focused
+// unit forms are locked in each.test.js.
 test('ui Text leaf renders the value as a <span> (ancestor-scope composes with iteration)', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',

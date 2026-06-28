@@ -35,16 +35,16 @@ test('each(e:) does not break the handler scope restore', async () => {
 // fetches a component tss — parsed standalone, so its rules are genuinely
 // selectorless — whose `each` iterates and, per item, fetches an element whose
 // replacable-style tss does a selectorless `->inner` meant for the fetched <span>.
-// handler-wrapper boils each item in a DETACHED <body> fragment (scoped via
-// v.c.s='body'). Two fixes make this compose with the get/ui ancestor scope (v.c.a,
-// PR #3): (1) the fragment is created with {c:1} AT create time, so it no longer
-// reuses+wipes the live doc the each appends into ("`.a` not found"); (2) under an
-// ancestor, document-model.set scopes by the rule's OWN selector and ignores the
-// enclosing v.c.s — so the per-item get's selectorless `->inner` resolves to its span
-// ancestor (scope('span', false)) instead of leaking the fragment's v.c.s='body'
-// (which gave getSelector(false,'body')='body' → scope('span','body') → "span body
-// not found"). Unblocks every iteration-boiling ui component (Text/Thing.*/Article.*/
-// ...); the ui integration form is locked in test/pipeline/ui.test.js.
+// handler-wrapper boils each item in a DETACHED <body> fragment whose body default
+// lives on its OWN channel (v.c.b='body'), leaving v.c.s null. Two fixes make this
+// compose with the get/ui ancestor scope (v.c.a, PR #3): (1) the fragment is created
+// with {c:1} AT create time, so it no longer reuses+wipes the live doc the each appends
+// into ("`.a` not found"); (2) the body default is v.c.b, not v.c.s — so it never folds
+// into a fetched component's selectorless rule, which stays getSelector(false,null)
+// =false → scope('span', false) → the <span> itself. Routing it through v.c.s='body'
+// instead leaked into the subtree → scope('span','body') → "span body not found".
+// Unblocks every iteration-boiling ui component (Text/Thing.*/Article.*/...); the ui
+// integration form is locked in test/pipeline/ui.test.js.
 test('each iteration composes with a nested get ancestor-scope (selectorless inner)', async () => {
   const { body } = await render(
     '<body><div class="a"></div></body>',
@@ -62,13 +62,13 @@ test('each iteration composes with a nested get ancestor-scope (selectorless inn
 });
 
 // Regression: an EXPLICIT `body` rule inside an iteration must resolve to the
-// fragment's own <body>. The iteration fragment scopes via v.c.s='body' (selectAll),
-// so `body->append` matches the body element itself. Routing the fragment scope
-// through the ancestor channel instead (v.c.a='body') would make this evaluate
-// scope('body','body') — which queries DESCENDANTS of <body> and excludes the body
-// itself → "body body not found". This is exactly BreadcrumbList's
-// `ol->each ... { body->append->ui ... }` (breadcrumb-list-default.tss); locks that
-// the iteration keeps explicit body rules selectable. (get{d} here doesn't set v.c.a.)
+// fragment's own <body> via selectAll, so `body->append` matches the body element
+// itself. Routing the fragment scope through the ancestor channel instead (v.c.a=
+// 'body') would make this evaluate scope('body','body') — which queries DESCENDANTS of
+// <body> and excludes the body itself → "body body not found". This is exactly
+// BreadcrumbList's `ol->each ... { body->append->ui ... }` (breadcrumb-list-default.tss);
+// locks that the iteration keeps explicit body rules selectable. (get{d} here doesn't
+// set v.c.a, and the fragment's body default is v.c.b, not the ancestor channel.)
 test('each iteration keeps an explicit body rule scoped to the fragment body', async () => {
   const { body } = await render(
     '<body><div class="a"></div></body>',

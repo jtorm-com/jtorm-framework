@@ -29,13 +29,15 @@ module.exports = {
             // reads v.c.c to choose fresh-detached vs. the live document, so setting
             // {c:1} only afterwards (the old `v2.c = …`) left the fragment bound to the
             // live document in client/live mode — its <body> reset then WIPED the live
-            // doc (e.g. the ancestor `.a` an each appends into → "not found"). s:'body'
-            // scopes the fragment's rules to its body via selectAll, so an explicit
-            // `body` rule AND the body element itself both match (BreadcrumbList's
-            // `body->append`); a nested get/ui that sets v.c.a re-scopes its own subtree
-            // and does NOT inherit this 'body' (see document-model.set). Mirrors the
-            // each(e:) path, which already creates with c:1.
-            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, {s: 'body', c: 1}, 1);
+            // doc (e.g. the ancestor `.a` an each appends into → "not found"). b:'body'
+            // is the fragment's BODY DEFAULT: an unscoped selectorless rule (e.g. a
+            // fetched element's get{h}) targets the fragment <body>. It's a distinct
+            // channel from v.c.s (kept null here) so the default never folds into / leaks
+            // out of find's descendant scope, while explicit `body` rules and the body
+            // itself still selectAll (BreadcrumbList's `body->append`) and a nested get/ui
+            // that sets v.c.a re-scopes its own subtree (see document-model.set). Mirrors
+            // the each(e:) path, which already creates with c:1.
+            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, {s: null, b: 'body', c: 1}, 1);
 
             v2.cid = v.cid;
             v2.cs = v.cs;

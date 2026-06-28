@@ -24,6 +24,7 @@
  * @property {number} c   create-doc flag — truthy → fresh detached doc (SSR); falsy → live doc (client)
  * @property {?string} s  descendant selector — find appends it (`<rule> <s>`)
  * @property {?string} [a] ancestor selector — get{t}/ui prepend it (`<a> <rule>`) for component scoping
+ * @property {?string} [b] body default — an iteration fragment's selectorless, unscoped rules target it (handler-wrapper)
  */
 
 /**
