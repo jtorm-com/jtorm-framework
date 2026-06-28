@@ -233,9 +233,16 @@ function fixtureTransport(fixtures) {
 
 /**
  * Boil one  html + tss + data  through the real pipeline. Async.
+ *
+ * PAGE-LEVEL boils: pass a full `<html><head>…</head><body>…</body></html>` string —
+ * documentModel.create's `/<html/` branch parses it (head + body present, root attrs
+ * copied) so page-level components (`head { … }`, `body { … }`, `ul { … }`) reach
+ * their document-global targets. `head` is returned alongside `body` for asserting on
+ * injected <head> content (components-ui head.default/head.id → doc.meta/doc.link).
+ *
  * @param {string} [url] document URL (jsdom origin); some flows need an absolute base.
  * @param {object|null} [fixtures] { url: {json?, text?} } map → injected fetch transport for `get`.
- * @returns {Promise<{html:string, body:string}>} full-doc HTML and <body> innerHTML.
+ * @returns {Promise<{html:string, head:string, body:string}>} full-doc HTML, <head> and <body> innerHTML.
  */
 async function render(html, tss, data, url = 'http://localhost/', fixtures = null) {
     const { window } = new JSDOM('', { url });
@@ -251,7 +258,7 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     const v2 = await jTormViewModel.create(doc, null, data, 0);
     await jTormEventModel.handle(v2, 'after', 'view');
 
-    return { html: v2.h.html(), body: v2.h.body() };
+    return { html: v2.h.html(), head: v2.h.head(), body: v2.h.body() };
 }
 
 module.exports = { render, reset, WIRED_METHODS };
