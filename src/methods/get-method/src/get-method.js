@@ -58,9 +58,20 @@ module.exports = {
                 // injection needs (ui-method builds {s: target, m: 'get'}). The
                 // handler restores v.c.a after this subtree so it can't leak to
                 // following sibling rules. Captured before v.t is replaced below.
-                if (v.t.s)
-                    v.c.a = v.t.s
-                ;
+                //
+                // Reset v.c.s too: the fetched rules re-select under THIS ancestor,
+                // so an enclosing descendant-scope must not leak in. Notably the
+                // each/insert iteration path boils each item in a fresh <body> doc
+                // with v.c.s='body' (handler-wrapper); without this reset a
+                // selectorless component rule (e.g. replacable's `->inner`) would
+                // compute getSelector(false,'body')='body' and document-model.set
+                // would scope('span','body') → nothing ("span body not found")
+                // instead of resolving to the ancestor itself. The handler restores
+                // v.c.s after this subtree (same lexical-scope capture as v.c.a).
+                if (v.t.s) {
+                    v.c.a = v.t.s;
+                    v.c.s = null;
+                }
 
                 for (k in r)
                     nT.c.push(r[k])

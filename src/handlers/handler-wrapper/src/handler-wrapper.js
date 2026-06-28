@@ -23,14 +23,20 @@ module.exports = {
                 t2[k].s = 'body'
             ;
 
-            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, v.c, 1);
+            // The iteration body builds a DETACHED fragment that the caller (each's
+            // append / insert / wrap) then re-inserts into the parent doc. Give it a
+            // fresh iteration context AT create time, not after: documentModel.create
+            // reads v.c.c to choose fresh-detached vs. the live document, so setting
+            // {c:1} only afterwards (the old `v2.c = …`) left the fragment bound to
+            // the live document in client/live mode — its `<body>` reset then WIPED
+            // the live doc (e.g. the ancestor `.a` an each appends into → "not
+            // found"). s:'body' scopes the rewritten child rules to the fragment
+            // body; a omitted (the fragment has no outer ancestor). Mirrors the
+            // each(e:) path, which already creates with c:1.
+            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, {s: 'body', c: 1}, 1);
 
             v2.cid = v.cid;
             v2.cs = v.cs;
-            v2.c = {
-                s: 'body',
-                c: 1
-            };
 
             if (!v.r)
                 v.r = await s.handler.handle(null, null, null, null, v2)
