@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { render } = require('../helpers/engine.js');
+const { jTormConfigModel } = require('../../src/models/config-model/src/config-model.js');
 
 // `layer` — the deferred-fragment verb. layer-method stashes its child fragment via
 // layer-model (registering it under event[e][t], e.g. after.view) and halts inline
@@ -12,17 +13,16 @@ const { render } = require('../helpers/engine.js');
 // These goldens lock the layer MECHANISM (deferred after-view replay, the exact
 // site-navigation-element active-link chain, and z-ordering). The FULL
 // site-navigation-element component is NOT golden-able as one unit — it is blocked by
-// deeper, pre-existing issues (documented in docs/backlog.md), NOT by the layer wiring:
+// two deeper, pre-existing issues (documented in docs/backlog.md), NOT by the layer wiring:
 //   - cid coupling: its top-level `->layer` (no explicit `i:`) needs layerModel.cid set
 //     by a host-supplied component cache id; ui-method emits no cid, so a pure boil has
 //     v.cid=null → "ID not set" unless invoked host-style (insert with a cid).
 //   - selectorless scope: invoking it cid-tagged (via an append iteration) drops the
 //     ancestor scope its selectorless `->ui{@e.nav}` injection needs → "false not found"
 //     (the same class as the deferred Thing.default composition).
-//   - component-authoring: `->config(d: 'current_url')` does not bind current_url —
-//     config.validate reads v.d.k, so the `d:` key is a no-op (the working form is
-//     config(k:), as creative-work-contents.tss uses). current_url must reach the layer
-//     via the model data instead (exercised below).
+// (The third issue once listed here — `->config(d: 'current_url')` being a no-op — was a
+// real bug, now FIXED: config-method reads `v.d.d` again, so current_url reaches the layer
+// from the host config store, exercised in golden #2 below.)
 
 // --- the deferred after-view replay marks the matching element ---
 //
@@ -43,20 +43,24 @@ test('layer defers a find→attr to after-view, marking only the matched link', 
 //
 // Mirrors site-navigation-element-default.tss's `->layer { e:'after'; t:'view'; z:'1';
 // ->config(d:'current_url')->find(e:'a[href="'+current_url+'"]')->attr{m:'a'} }`. Proves
-// the chain composes in the deferred replay: config passes the model through (current_url
-// arrives via the data, see the header note on the config(d:) authoring bug), the inline
-// `->find(e:…)->attr` (#27) scopes to the matched anchor, and `m:'a'` APPENDS `active` to
-// the existing class (not replace).
+// the full chain in the deferred replay: `config` looks up current_url in the HOST CONFIG
+// STORE and binds it for the children, the inline `->find(e:…)->attr` (#27) scopes to the
+// matched anchor, and `m:'a'` APPENDS `active` to the existing class (not replace).
 test('layer config→find→attr appends active to the current_url link (m:a append)', async () => {
-    const { body } = await render(
-        '<ul><li><a href="/x">A</a></li><li><a href="/y" class="nav-link">B</a></li></ul>',
-        `->layer { i: 'nav'; e: 'after'; t: 'view'; z: '1'; ` +
-            `->config(d: 'current_url')` +
-            `->find(e: 'a[href="' + current_url + '"]')` +
-            `->attr { n: 'class'; v: 'active'; m: 'a'; } }`,
-        { current_url: '/y' }
-    );
-    assert.equal(body, '<ul><li><a href="/x">A</a></li><li><a href="/y" class="nav-link active">B</a></li></ul>');
+    jTormConfigModel.d = { current_url: '/y' }; // host config drives the active link
+    try {
+        const { body } = await render(
+            '<ul><li><a href="/x">A</a></li><li><a href="/y" class="nav-link">B</a></li></ul>',
+            `->layer { i: 'nav'; e: 'after'; t: 'view'; z: '1'; ` +
+                `->config(d: 'current_url')` +
+                `->find(e: 'a[href="' + current_url + '"]')` +
+                `->attr { n: 'class'; v: 'active'; m: 'a'; } }`,
+            {}
+        );
+        assert.equal(body, '<ul><li><a href="/x">A</a></li><li><a href="/y" class="nav-link active">B</a></li></ul>');
+    } finally {
+        jTormConfigModel.d = {};
+    }
 });
 
 // --- z orders the deferred fragments (layer-model.get sorts by z ascending) ---

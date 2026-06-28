@@ -8,17 +8,21 @@ module.exports = {
 
         alias: 'c',
         params: [
-            'k',// Key
+            'd',// Data — the config key (`d` is the framework-wide data param)
+            'k',// Key — alias for `d`, the form documented in the README (config gates)
             'v',// Value
             'a'// As
         ],
 
         validate: function (v) {
-            return v.d.k !== undefined;
+            return v.d.d !== undefined || v.d.k !== undefined;
         },
 
         handle: async function (v) {
-            const r = this.configModel.get(v.d.k);
+            // Accept the key under `d` (the convention the components use) OR `k` (the
+            // documented form) — dropping either silently fails-open documented gates.
+            const k = v.d.d !== undefined ? v.d.d : v.d.k,
+                r = this.configModel.get(k);
 
             if (
                 (r === undefined && v.t.p.v !== undefined)
@@ -31,7 +35,7 @@ module.exports = {
                 if (v.d.a)
                     d[v.d.a] = r
                 ; else
-                    d[v.d.k] = r
+                    d[k] = r
                 ;
 
                 v.io = {c: 1, d: {...v.m, ...d}};

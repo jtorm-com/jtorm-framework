@@ -12,18 +12,21 @@ npm install @jtorm/config-method
 
 ## Properties
 
-| Option | Type     | Required | Description                    |
-|--------|----------|----------|--------------------------------|
-| `k`    | `string` | `true`   | Config key.                    |
-| `v`    | `any`    | `false`  | Config value to match it with. |
-| `a`    | `any`    | `false`  | Set to data as key name.       |
+| Option | Type     | Required | Description                                              |
+|--------|----------|----------|---------------------------------------------------------|
+| `d`    | `string` | `true`*  | Config key — the framework-wide data param (preferred). |
+| `k`    | `string` | `true`*  | Config key — alias for `d` (the legacy form).           |
+| `v`    | `any`    | `false`  | Config value to match it with.                          |
+| `a`    | `any`    | `false`  | Set to data as key name.                                |
+
+*Provide the key under either `d` (preferred — matches `each`/`if`/`insert`) or `k`. Both are accepted.
 
 
 ## Example
 
 ```js
 body {
-  ->config(k: createDoc, v: 1)->append { h: 'Config createDoc set'; }
-  ->config(k: createDoc, v: 0)->append { h: 'Config createDoc not set'; }
+  ->config(d: createDoc, v: 1)->append { h: 'Config createDoc set'; }
+  ->config(d: createDoc, v: 0)->append { h: 'Config createDoc not set'; }
 }
 ```
