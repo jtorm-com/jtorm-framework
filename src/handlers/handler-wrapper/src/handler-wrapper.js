@@ -19,21 +19,29 @@ module.exports = {
 
             await e.handle(v, 'before', 'iteration');
 
+            // Rewrite each direct child selectorless: under the v.c.a='body' ancestor
+            // (set on the iteration context below) a selectorless rule resolves to the
+            // fragment's own <body> via document-model.scope.
             for (let k in t2)
-                t2[k].s = 'body'
+                t2[k].s = false
             ;
 
             // The iteration body builds a DETACHED fragment that the caller (each's
-            // append / insert / wrap) then re-inserts into the parent doc. Give it a
-            // fresh iteration context AT create time, not after: documentModel.create
-            // reads v.c.c to choose fresh-detached vs. the live document, so setting
-            // {c:1} only afterwards (the old `v2.c = …`) left the fragment bound to
-            // the live document in client/live mode — its `<body>` reset then WIPED
-            // the live doc (e.g. the ancestor `.a` an each appends into → "not
-            // found"). s:'body' scopes the rewritten child rules to the fragment
-            // body; a omitted (the fragment has no outer ancestor). Mirrors the
-            // each(e:) path, which already creates with c:1.
-            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, {s: 'body', c: 1}, 1);
+            // append / insert / wrap) then re-inserts into the parent doc. Scope it via
+            // the ANCESTOR channel (v.c.a), NOT the descendant channel (v.c.s):
+            //  - {c:1} AT create time so documentModel.create makes a fresh detached doc
+            //    (it reads v.c.c); set only afterwards (the old `v2.c = …`) the fragment
+            //    stayed bound to the live document in client/live mode and its <body>
+            //    reset WIPED it — destroying the ancestor an each then appends into
+            //    ("`.a` not found").
+            //  - a:'body' (with the children rewritten selectorless above) scopes the
+            //    fragment's rules to its <body>. A nested get/ui OVERRIDES v.c.a with
+            //    its own target (e.g. 'span'), so its rules scope there and the handler
+            //    restores 'body' after. Using v.c.s here instead would leak 'body' as a
+            //    find-descendant into those nested component subtrees, turning their
+            //    selectorless rules into 'body' lookups under the component ancestor
+            //    ("span body not found"). Mirrors the each(e:) path (creates with c:1).
+            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, {a: 'body', c: 1}, 1);
 
             v2.cid = v.cid;
             v2.cs = v.cs;

@@ -129,16 +129,17 @@ test('data-parser + concatenates a literal with a bound field', async () => {
 //
 // The simplest schema leaf, `Text` (text-default.tss: `->each(d:Text,a:'html')
 // ->if(d:html,to:'string') ->ui{c:'@e.span'}`), renders a value as a <span>. It boils
-// through an each iteration: handler-wrapper builds a fresh <body> fragment per item
-// and the each result is re-inserted via `append`. Two fixes made this compose with
-// the get{t}/ui ancestor scope (PR #3): (1) get-method resets v.c.s when it sets v.c.a,
-// so the iteration's v.c.s='body' can't leak into the @e.span replacable subtree and
-// turn the selectorless `->inner` into a `body` lookup ("span body not found"); and
-// (2) handler-wrapper creates the iteration fragment in a DETACHED doc (c:1 at create
-// time), so it no longer wipes the live document the each then appends into ("`.a` not
-// found"). This unblocks every iteration-boiling component (Text, Thing.*, Article.*,
-// CreativeWork.*, ImageObject, BreadcrumbList). The focused unit form is locked in
-// test/pipeline/each.test.js.
+// through an each iteration: handler-wrapper builds a DETACHED <body> fragment per item
+// and the each result is re-inserted via `append`. Two fixes (both in handler-wrapper)
+// made this compose with the get{t}/ui ancestor scope (PR #3): (1) the fragment is
+// created with {c:1} AT create time, so it no longer reuses+wipes the live document the
+// each then appends into ("`.a` not found"); and (2) the fragment scopes its body via
+// the ANCESTOR channel (v.c.a='body', children rewritten selectorless) — so the @e.span
+// get OVERRIDES v.c.a with its own target and the selectorless replacable `->inner`
+// resolves to the span (scope('span',false)), instead of the old leak through the v.c.s
+// descendant channel ("span body not found"). This unblocks every iteration-boiling
+// component (Text, Thing.*, Article.*, CreativeWork.*, ImageObject, BreadcrumbList).
+// The focused unit form is locked in test/pipeline/each.test.js.
 test('ui Text leaf renders the value as a <span> (ancestor-scope composes with iteration)', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',

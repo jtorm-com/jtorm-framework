@@ -34,16 +34,18 @@ test('each(e:) does not break the handler scope restore', async () => {
 // scope. This mirrors the real component shape (e.g. schema-ui Text): an OUTER get
 // fetches a component tss — parsed standalone, so its rules are genuinely
 // selectorless — whose `each` iterates and, per item, fetches an element whose
-// replacable-style tss does a selectorless `->inner` ancestor-scoped to the fetched
-// <span>. handler-wrapper boils each item in a FRESH <body> doc with v.c.s='body'
-// (the iteration descendant-scope). The per-item get establishes its OWN ancestor
-// scope (v.c.a='span', PR #3); its selectorless `->inner` must resolve to that
-// ancestor (scope('span', false) → the <span>), NOT inherit the stale v.c.s='body'.
-// Pre-fix v.c.s='body' leaked into the fetched subtree → getSelector(false,'body')
-// ='body' → scope('span','body') matched nothing → "span body not found". Breaks
-// every iteration-boiling ui component (Text/Thing.*/Article.*/ImageObject/...); the
-// ui integration form is locked in test/pipeline/ui.test.js. Fix: get-method resets
-// v.c.s when it sets v.c.a; the handler restores it after the get subtree.
+// replacable-style tss does a selectorless `->inner` meant for the fetched <span>.
+// handler-wrapper boils each item in a DETACHED <body> fragment. Two fixes make this
+// compose with the get/ui ancestor scope (v.c.a, PR #3): (1) the fragment is created
+// with {c:1} AT create time, so it no longer reuses+wipes the live doc the each
+// appends into ("`.a` not found"); (2) the fragment scopes its body via the ANCESTOR
+// channel (v.c.a='body', children rewritten selectorless), so the per-item get can
+// OVERRIDE v.c.a with its own target ('span') and the selectorless `->inner` resolves
+// to that span (scope('span', false)). The earlier design leaked the fragment scope
+// through the v.c.s DESCENDANT channel → getSelector(false,'body')='body' →
+// scope('span','body') matched nothing ("span body not found"). Unblocks every
+// iteration-boiling ui component (Text/Thing.*/Article.*/ImageObject/...); the ui
+// integration form is locked in test/pipeline/ui.test.js.
 test('each iteration composes with a nested get ancestor-scope (selectorless inner)', async () => {
   const { body } = await render(
     '<body><div class="a"></div></body>',
