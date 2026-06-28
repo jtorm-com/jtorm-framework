@@ -14,12 +14,19 @@ const { render } = require('../helpers/engine.js');
 // (`->inner{h:html}` + `->get{t:'@h/global.tss'}`, the 14 selectorless global attrs).
 //
 // SCOPE: this slice locks the NON-iteration ui path (a component whose transform is
-// get{t}+inner+attr only) plus the simplest ITERATION component (`Text`, at the foot of
-// this file) now that ancestor-scope composes with the each/insert path (get-method +
-// handler-wrapper fixes; see each.test.js). The richer iteration components (Thing.*,
-// Article.*, ImageObject, BreadcrumbList) are deferred to the all-33-types golden pass.
-// (layer/site-navigation-element also need the `layer` verb, deferred — see
-// test/pipeline/wiring.test.js.)
+// get{t}+inner+attr only), the simplest ITERATION component (`Text`), and the
+// representative inheritance/iteration shapes now that ancestor-scope composes with the
+// each/insert path (get-method + handler-wrapper fixes; see each.test.js):
+//   - Thing.link        — each → data → @e.a leaf with a nested Text span
+//   - CreativeWork.default / .contents + Thing.contents — the section→contents card and
+//     the Article.default → CreativeWork.default → Thing.contents inheritance chain
+//   - ImageObject       — the figure→a→picture→img media chain (figure-default.tss)
+//   - BreadcrumbList    — the nav → ol->each{ body->append->ui } nested-iteration shape
+// Each golden is correctness-sanity-checked against schema.org/template intent below.
+// Thing.default (the page-level head/<body>/items component) needs a full-document boil
+// (it targets `head`/`body`/`ul`, absent under a scoped `.a`) + components-ui head and
+// @f.inputEmail — deferred to the all-33-types pass. layer/site-navigation-element still
+// need the `layer` verb (deferred — see test/pipeline/wiring.test.js).
 
 // --- ui → single html-ui element injection (the foundational Gate-B boil) ---
 
@@ -147,4 +154,158 @@ test('ui Text leaf renders the value as a <span> (ancestor-scope composes with i
         { Text: 'hello' }
     );
     assert.equal(body, '<div class="a"><span>hello</span></div>');
+});
+
+// --- Thing.link: each → data → @e.a leaf wrapping a nested Text span ---
+//
+// thing-link.tss: `->each ->data(href: url, title: name) ->ui{ c:'@e.a';
+// a->data(Text: alternateName)->ui{ c:'Text' } }`. The bare `->each` iterates the model
+// (one object), `data` maps schema fields onto the @e.a link attrs (href←url, and name
+// surfaces as the global `title` attr), then the inline child renders a Text component
+// (a <span>) from alternateName and appends it as the anchor's visible text.
+test('ui Thing.link → <a href title> wrapping a Text <span> from alternateName', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'Thing.link'; }",
+        { name: 'Widget', url: 'https://e.com/w', alternateName: 'W' }
+    );
+    assert.equal(body, '<div class="a"><a href="https://e.com/w" title="Widget"><span>W</span></a></div>');
+});
+
+test('ui Thing.link with no alternateName/url emits a bare titled <a> (conditional span)', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'Thing.link'; }",
+        { name: 'Widget' }
+    );
+    // url absent → no href; alternateName absent → the nested Text yields no span. Only
+    // the global `title` (from name) emits. Proves the leaf's conditional fields.
+    assert.equal(body, '<div class="a"><a title="Widget"></a></div>');
+});
+
+// --- The schema inheritance chain: Article.default → CreativeWork.default → Thing.contents ---
+//
+// CreativeWork.default (creative-work-default.tss) wraps a `<section class="creative-work">`
+// and appends CreativeWork.contents; CreativeWork.contents (creative-work-contents.tss)
+// is `ui{ c:'Thing.contents'; … }` whose extra `.body` rules (associatedMedia/hasPart)
+// are all `->if(d:…)`-guarded, so with minimal `{name}` data it renders exactly
+// Thing.contents — the contents card (header→h1→a, empty body, empty footer).
+const CW_DEFAULT = '<section class="creative-work"><div class="contents">'
+    + '<header class="header"><h1><a>Hello</a></h1></header>'
+    + '<section class="body"></section><footer class="footer"></footer></div></section>';
+const CONTENTS_NAME = '<div class="contents">'
+    + '<header class="header"><h1><a>Hello</a></h1></header>'
+    + '<section class="body"></section><footer class="footer"></footer></div>';
+
+test('ui CreativeWork.default wraps section.creative-work around the contents card', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'CreativeWork.default'; }",
+        { name: 'Hello' }
+    );
+    assert.equal(body, `<div class="a">${CW_DEFAULT}</div>`);
+});
+
+test('ui Article.default delegates to CreativeWork.default (empty own transform)', async () => {
+    // Article.default = { ui:{ c:'CreativeWork.default' }, t:[] } — a pure delegator with
+    // no own TSS (article-specific transforms are not built yet). The empty `t:[]` must
+    // contribute nothing; the output is identical to CreativeWork.default. (Regression
+    // lock for the empty-artifact-array get fix in @jtorm/ui-method — see addLoop.)
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'Article.default'; }",
+        { name: 'Hello' }
+    );
+    assert.equal(body, `<div class="a">${CW_DEFAULT}</div>`);
+});
+
+test('ui CreativeWork.contents renders the Thing.contents card it extends', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'CreativeWork.contents'; }",
+        { name: 'Hello' }
+    );
+    assert.equal(body, `<div class="a">${CONTENTS_NAME}</div>`);
+});
+
+test('ui Thing.contents renders the contents card (header→h1→a from name)', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'Thing.contents'; }",
+        { name: 'Hello' }
+    );
+    assert.equal(body, `<div class="a">${CONTENTS_NAME}</div>`);
+});
+
+test('ui Thing.contents with no data emits the empty card scaffold', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'Thing.contents'; }",
+        {}
+    );
+    // name absent → no h1; image/description/footer fields absent → empty header/body/footer.
+    assert.equal(body, '<div class="a"><div class="contents">'
+        + '<header class="header"></header>'
+        + '<section class="body"></section><footer class="footer"></footer></div></div>');
+});
+
+// --- ImageObject: the figure → a → picture → img media chain (figure-default.tss) ---
+//
+// image-object-default.tss coerces the model to an array, iterates, and — with no
+// responsive `size.additionalProperty.value` — takes the `->else->get{figure-default.tss}`
+// path. figure-default.tss builds figure > a(href: contentUrl) > picture > img(alt: name,
+// src: contentUrl); caption→<figcaption>, representativeOfPage→class are conditional. The
+// per-item `@id` is resolved through a get{d} fixture (JSON-LD IRI dereference).
+test('ui ImageObject renders the figure→a→picture→img media chain', async () => {
+    const img = { '@id': '/img1', contentUrl: 'https://e.com/i.jpg', name: 'A photo' };
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'ImageObject'; }",
+        img,
+        'http://localhost/',
+        { '/img1': { json: img } }
+    );
+    assert.equal(body, '<div class="a"><figure><a href="https://e.com/i.jpg">'
+        + '<picture><img alt="A photo" src="https://e.com/i.jpg"></picture></a></figure></div>');
+});
+
+test('ui ImageObject surfaces caption→figcaption and representativeOfPage→class', async () => {
+    const img = {
+        '@id': '/img2', contentUrl: 'https://e.com/p.jpg', name: 'Alt text',
+        caption: 'A caption', representativeOfPage: true
+    };
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'ImageObject'; }",
+        img,
+        'http://localhost/',
+        { '/img2': { json: img } }
+    );
+    assert.equal(body, '<div class="a"><figure><a href="https://e.com/p.jpg">'
+        + '<picture><img alt="Alt text" src="https://e.com/p.jpg" class="representativeOfPage"></picture></a>'
+        + '<figcaption>A caption</figcaption></figure></div>');
+});
+
+// --- BreadcrumbList: the nav → ol->each{ body->append->ui } nested-iteration shape ---
+//
+// breadcrumb-list-default.tss builds <nav id="breadcrumbs" aria-label="Breadcrumbs">
+// containing a contents div: a "You are here: " <span>, then an <ol> whose
+// `->each(d: itemListElement) ->get(d: @id) { body->append->ui{ @t.li; li->get(d: item.@id)
+// ->ui{ Thing.link } } }` renders one <li> per ListItem, each dereferencing item.@id and
+// rendering it as a Thing.link <a>. Exercises the explicit-`body` iteration fragment
+// (each.test.js) end-to-end through the real component.
+test('ui BreadcrumbList renders nav → ol→each → li → Thing.link per item', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'BreadcrumbList'; }",
+        { itemListElement: [{ '@id': '/li1', item: { '@id': '/it1' } }] },
+        'http://localhost/',
+        {
+            '/li1': { json: { '@id': '/li1', item: { '@id': '/it1' } } },
+            '/it1': { json: { '@id': '/it1', name: 'Home', url: 'https://e.com/' } }
+        }
+    );
+    assert.equal(body, '<div class="a"><nav id="breadcrumbs" aria-label="Breadcrumbs">'
+        + '<div class="contents"><span>You are here: </span>'
+        + '<ol><li><a href="https://e.com/" title="Home"></a></li></ol></div></nav></div>');
 });

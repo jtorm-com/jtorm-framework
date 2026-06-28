@@ -261,6 +261,15 @@ module.exports = {
                 ;
             }
 
+            // An empty artifact list (a pure `ui:{c:Parent}` delegator with `t:[]`, or
+            // one whose every entry was di-gated off) must NOT emit an empty get param:
+            // `f.t = []` reaches get as a truthy `v.d.t`, fetching an empty URL → 404.
+            // Drop the key so the get sees nothing to fetch and the delegation is clean.
+            if (!f[k].length) {
+                delete f[k];
+                return f;
+            }
+
             f[k] = s.quotes(f[k]);
         },
 
