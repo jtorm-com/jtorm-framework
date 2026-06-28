@@ -9,6 +9,21 @@ module.exports = {
         // viewModel
 
         currentCid: [],
+        event: {
+            before: {
+                iteration: {
+                    weight: 0
+                }
+            },
+            after: {
+                iteration: {
+                    weight: 0
+                },
+                view: {
+                    weight: 0
+                }
+            }
+        },
 
         handle: async function(v, e, t) {
             const c = this.layerModel.get(v, e, t);

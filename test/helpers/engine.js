@@ -53,8 +53,8 @@ const { jTormFindMethod } = require('../../src/methods/find-method/src/find-meth
 const { jTormTitleMethod } = require('../../src/methods/title-method/src/title-method.js');
 // Gate-B (schema.org → component) path: the `ui` verb + its mediatarget/mediaquery
 // deps, the data/config methods components bind through, the uis ARRAY (resolves
-// code-review #7), and the ui-cache model+plugin. (layer/css/js/time stay deferred
-// — see wiring.test.js; only `layer` (site-navigation-element) is a known gap.)
+// code-review #7), and the ui-cache model+plugin. (css/js/time stay deferred — see
+// wiring.test.js.)
 const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
 const { jTormDataMethod } = require('../../src/methods/data-method/src/data-method.js');
 const { jTormConfigMethod } = require('../../src/methods/config-method/src/config-method.js');
@@ -62,6 +62,13 @@ const { jTormMediatargetMethod } = require('../../src/methods/mediatarget-method
 const { jTormMediaqueryMethod } = require('../../src/methods/mediaquery-method/src/mediaquery-method.js');
 const { jTormUiCacheModel } = require('../../src/models/ui-cache-model/src/ui-cache-model.js');
 const { jTormUiCachePlugin } = require('../../src/plugins/ui-cache-plugin/src/ui-cache-plugin.js');
+// `layer` — deferred-fragment verb: layer-method stashes a child fragment via
+// layer-model, the layer-plugin replays it at the matching event phase (after.view
+// for site-navigation-element's active-link marking). Listed BEFORE ui-cache in
+// eventModel.plugins so its deferred transforms land before ui-cache snapshots the body.
+const { jTormLayerMethod } = require('../../src/methods/layer-method/src/layer-method.js');
+const { jTormLayerModel } = require('../../src/models/layer-model/src/layer-model.js');
+const { jTormLayerPlugin } = require('../../src/plugins/layer-plugin/src/layer-plugin.js');
 // The uis array members — each a published @jtorm/*-ui package with a baked-in
 // `mapper`; the .tss/.html/.json artifacts they reference (`@s/…`, `@h/@e/…`) are
 // fetched at render time and served from src/uis/** by the transport below.
@@ -97,6 +104,7 @@ const methods = {
     config: jTormConfigMethod,
     mediatarget: jTormMediatargetMethod,
     mediaquery: jTormMediaqueryMethod,
+    layer: jTormLayerMethod,
     append: new InsertAlias('a'),
     prepend: new InsertAlias('p'),
     before: new InsertAlias('b'),
@@ -115,7 +123,7 @@ jTormHandler.dataParser = jTormAttrsMethod.dataParser = jTormIfMethod.dataParser
 jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS this; text-method.js:23 needs it
 jTormLanguageModel.configModel = jTormConfigModel;
 jTormAttrsMethod.attrMethod = jTormAttrMethod;
-jTormEventModel.plugins = [jTormUiCachePlugin];
+jTormEventModel.plugins = [jTormLayerPlugin, jTormUiCachePlugin];
 jTormHandler.eventModel = jTormHandlerWrapper.eventModel = jTormEventModel;
 jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = jTormUiMethod.methods = methods;
 jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormUiMethod.viewModel = jTormViewModel;
@@ -149,6 +157,13 @@ jTormUiMethod.ui = { mapper: null }; // host UI-mapper override slot (no custom 
 jTormUiMethod.framework = 'schema';
 jTormUiCacheModel.saveModel = null;
 jTormUiCachePlugin.uiCacheModel = jTormUiCacheModel;
+// layer DI (mirrors context.js): method + plugin share the layer-model; the plugin
+// replays stashed fragments through the handler against a copied view. saveModel=null
+// → no persistence (parity with ui-cache-model).
+jTormLayerMethod.layerModel = jTormLayerPlugin.layerModel = jTormLayerModel;
+jTormLayerPlugin.viewModel = jTormViewModel;
+jTormLayerPlugin.handler = jTormHandler;
+jTormLayerModel.saveModel = null;
 const DEFAULT_TRANSPORT = jTormRequestModel.transport; // restore after any per-render fixture override
 
 // --- Init: tss-parser config FIRST (data-parser builds its regexes from the
@@ -177,6 +192,11 @@ function reset() {
     jTormUiMethod.cache = {};          // resolved-component cache (singleton)
     jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache
     jTormUiCacheModel.updated = 0;
+    jTormLayerModel.layers = {};       // stashed deferred fragments (per layer id)
+    jTormLayerModel.event = { before: { iteration: [] }, after: { iteration: [], view: [] } }; // registered ids per phase
+    jTormLayerModel.cid = null;
+    jTormLayerModel.updated = 0;
+    jTormLayerPlugin.currentCid = [];
     jTormRequestModel.base = '';
     jTormRequestModel.timeout = 0;
     jTormRequestModel.transport = DEFAULT_TRANSPORT; // drop any per-render fixture override

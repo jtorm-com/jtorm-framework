@@ -47,8 +47,12 @@ module.exports = {
                             e[k][k2].push(p[k3])
                     ;
 
+                    // Order by each plugin's weight FOR THIS phase/type — the weight
+                    // lives at plugin.event[k][k2].weight, not on the plugin itself.
+                    // (Every plugin in this bucket has event[k][k2]: the push above
+                    // guards on it.) Ties keep insertion order (stable sort).
                     e[k][k2].sort((a, b) => {
-                        return a.weight - b.weight;
+                        return a.event[k][k2].weight - b.event[k][k2].weight;
                     });
                 }
             }
