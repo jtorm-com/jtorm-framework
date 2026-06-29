@@ -8,10 +8,21 @@
   },
   "keywords": [],
   "main": "src/types.js",
+  "types": "src/types.d.ts",
+  "files": [
+    "src/types.js",
+    "src/types.d.ts"
+  ],
+  "scripts": {
+    "prepack": "tsc --declaration --emitDeclarationOnly --allowJs --outDir src src/types.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/types"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
 }

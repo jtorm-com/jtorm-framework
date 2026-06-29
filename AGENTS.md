@@ -16,15 +16,23 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   Do **not** use `node --test test/` — it mis-resolves the directory on this Node.
 - `npm run typecheck` → `tsc -p jsconfig.json` (JSDoc types; `checkJs` scoped to `src/types/src/types.js`
   + `view-model.js`). No Biome/ESLint/Knip in this repo.
+- **`@jtorm/types`** has the repo's only build step: a `prepack` runs `tsc --emitDeclarationOnly` to
+  generate its published `.d.ts` from the JSDoc (gitignored artifact; `typescript` is its devDep).
 - Full-pipeline harness: `test/helpers/engine.js` (`render(html,tss,data,url,fixtures)`), goldens in
   `test/pipeline/`. `jsdom`+`lodash` are devDeps; the runtime stays dependency-free.
 
 ## Locked architecture — must hold (flag violations)
-- **Pure CommonJS, dependency-free runtime** (`dependencies: {}`). Every package is
+- **Pure CommonJS, dependency-free runtime** (no **third-party** runtime deps). Every package is
   `module.exports = { jTormX: { ...singleton } }`; methods use `this`. All externals (`_` lodash
-  subset, DOM/`windowModel`, the fetch transport) are **dependency-injected** (`// DI`).
-- **Pure JS only — never add `.ts`/`.d.ts`.** Types are JSDoc validated by `jsconfig.json`.
-- **`v` is typed from the `@jtorm/types` decoder ring.** The published **`@jtorm/types`** package (`src/types/src/types.js`) is the single source of truth for the view object `v` (`v.t/v.d/v.m/v.h/v.io/v.c`); methods (`handle`/`validate`/`data`) and handlers import `ViewModel` from it (`import('@jtorm/types')`, declared as a dependency so it stays resolvable post-publish; resolved in-repo via the `jsconfig` `paths` alias), annotate `@param {ViewModel} v`, and carry a one-line contract comment atop each verb. JSDoc/editor-hover only — `jsconfig` `include` stays scoped to `src/types/src/types.js` + `view-model.js`, so the per-method `@param`/typedef annotations are intentional and **not** batch-checked: do **not** flag them as dead/unused (wiring them into `tsc` is a tracked follow-up needing `@this`/DI typing).
+  subset, DOM/`windowModel`, the fetch transport) are **dependency-injected** (`// DI`). The only
+  declared dependency is first-party **`@jtorm/types`** — a type-only package (JSDoc + a generated
+  `.d.ts`, zero runtime code) that methods/handlers list so its `ViewModel` typedef resolves for
+  TypeScript consumers; it adds nothing to runtime.
+- **Pure JS only — never add *hand-written* `.ts`/`.d.ts`.** Types are JSDoc validated by
+  `jsconfig.json`. Sole exception: **`@jtorm/types`** publishes a `.d.ts` **generated** from its JSDoc
+  at `prepack` (`tsc --emitDeclarationOnly`; gitignored build artifact, never authored by hand) so
+  downstream TypeScript can consume the shared typedefs. Source stays pure JS.
+- **`v` is typed from the `@jtorm/types` decoder ring.** The published **`@jtorm/types`** package (`src/types/src/types.js`) is the single source of truth for the view object `v` (`v.t/v.d/v.m/v.h/v.io/v.c`); methods (`handle`/`validate`/`data`) and handlers import `ViewModel` from it (`import('@jtorm/types')`, declared as a dependency; downstream it resolves through the package's **generated `.d.ts`** `types` entry, in-repo through the `jsconfig` `paths` alias), annotate `@param {ViewModel} v`, and carry a one-line contract comment atop each verb. The per-method `@param`/typedef annotations are editor-hover aids — `jsconfig` `include` stays scoped to `src/types/src/types.js` + `view-model.js`, so they are intentionally **not** batch-checked: do **not** flag them as dead/unused (wiring them into `tsc` is a tracked follow-up needing `@this`/DI typing).
 - **Published packages** — each `src/**` dir is a published `@jtorm/*` package. **Never delete or
   deprecate exports / remove packages** (external projects depend on them). Greenfield: no
   backward-compat shims; bug-fixes get a **patch** bump to the touched package's `package.json`.
