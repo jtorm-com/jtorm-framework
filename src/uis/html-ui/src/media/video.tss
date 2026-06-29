@@ -19,6 +19,6 @@ video {
     }
 
     ->get {
-        t: '@h/playable.tss';
+        t: '@h/media/playable.tss';
     }
 }

@@ -7,7 +7,7 @@ input {
     }
 
     ->get {
-        t: '@h/form-submit.tss';
+        t: '@h/form/form-submit.tss';
     }
 
     ->get {
