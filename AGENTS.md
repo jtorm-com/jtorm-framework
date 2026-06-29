@@ -22,12 +22,13 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   `test/pipeline/`. `jsdom`+`lodash` are devDeps; the runtime stays dependency-free.
 
 ## Locked architecture — must hold (flag violations)
-- **Pure CommonJS, dependency-free runtime** (no **third-party** runtime deps). Every package is
-  `module.exports = { jTormX: { ...singleton } }`; methods use `this`. All externals (`_` lodash
-  subset, DOM/`windowModel`, the fetch transport) are **dependency-injected** (`// DI`). The only
-  declared dependency is first-party **`@jtorm/types`** — a type-only package (JSDoc + a generated
-  `.d.ts`, zero runtime code) that methods/handlers list so its `ViewModel` typedef resolves for
-  TypeScript consumers; it adds nothing to runtime.
+- **Pure CommonJS; dependency-free runtime *code*** — the `src/` tree calls `require()` **nowhere**
+  (zero third-party *or* inter-package imports); every collaborator and external (`_` lodash subset,
+  DOM/`windowModel`, the fetch transport) is **dependency-injected** by the host (`// DI`). Each
+  package is `module.exports = { jTormX: { ...singleton } }`; methods use `this`. (`package.json`
+  `dependencies` declare the `@jtorm/*` wiring — and DI'd libs, e.g. `view-model` → `lodash` — as
+  metadata, not `require()` edges.) **`@jtorm/types`** is a new **type-only** entry there: JSDoc + a
+  generated `.d.ts`, zero runtime code, so its `ViewModel` typedef resolves for TypeScript consumers.
 - **Pure JS only — never add *hand-written* `.ts`/`.d.ts`.** Types are JSDoc validated by
   `jsconfig.json`. Sole exception: **`@jtorm/types`** publishes a `.d.ts` **generated** from its JSDoc
   at `prepack` (`tsc --emitDeclarationOnly`; gitignored build artifact, never authored by hand) so
