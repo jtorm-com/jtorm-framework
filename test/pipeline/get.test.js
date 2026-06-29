@@ -229,3 +229,25 @@ test('get { t } wrap under a get ancestor scopes the new wrapper element', async
   );
   assert.equal(body, '<div class="a"><span><div class="box">orig</div></span></div>');
 });
+
+// Root replacement under a get ancestor fails LOUD, not silent (Codex PR#12 P2). A fetched
+// selectorless rule that structurally REPLACES its own scoped root (->swap runs
+// el.parentNode.replaceChild, detaching the element v.c.a points at) leaves later rules
+// with a stale ancestor ref. scope() skips the detached node, so the trailing ->attr hits
+// zero matches and THROWS (the zero-match drift detector) rather than silently writing to
+// the orphaned node. jTorm does not follow a scope across a root replacement (a separate
+// robustness feature — see backlog); use a selector rule, not a self-replacing root, for
+// post-swap transforms. (Old string-tag v.c.a re-queried and sometimes found the
+// replacement by luck; element-refs make the unsupported pattern loud and predictable.)
+test('get { t } a fetched rule replacing its own ancestor root makes later rules throw loud (not silent)', async () => {
+  await assert.rejects(
+    render(
+      '<body><div class="a">x</div></body>',
+      ".a->get { t: '/swaproot.tss'; }",
+      {},
+      'http://localhost/',
+      { '/swaproot.tss': { text: "->swap { s: 'section'; a: '1'; } ->attr { n: 'data-z'; v: '1'; }" } }
+    ),
+    /not found/
+  );
+});

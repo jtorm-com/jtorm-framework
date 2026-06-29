@@ -54,9 +54,13 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   no same-tag descendant, targets the element itself). A component re-naming its own root should use a
   **selectorless** rule; a same-tag tag-rule resolves to a same-tag descendant when one exists
   (`input.tss` is `input{}` only because it is itself a get-target — the lone such case). The handler
-  restores `v.c.a` per subtree (no sibling leak). Locked by `test/pipeline/{get,ui}.test.js`. Don't
-  reintroduce string-selector composition (comma-list-fragile — PR #3 abandoned it) or document-wide
-  tag scoping (leaks to same-tag siblings — the reverted `g===a` attempt).
+  restores `v.c.a` per subtree (no sibling leak). A fetched rule that structurally REPLACES its own
+  scoped root (`->swap`/`->move` → `replaceChild`) orphans the snapshotted ancestor; `scope` skips the
+  detached node, so later rules throw LOUD (zero-match drift detector) — jTorm does **not** follow a
+  scope across a root replacement (scope-follows-replacement is a separate backlog item). Locked by
+  `test/pipeline/{get,ui}.test.js`. Don't reintroduce string-selector composition (comma-list-fragile
+  — PR #3 abandoned it) or document-wide tag scoping (leaks to same-tag siblings — the reverted
+  `g===a` attempt).
 - **`getSelector` is intentionally string-only** (no regex) — selectors are not regexes.
 
 ## Git / PR workflow

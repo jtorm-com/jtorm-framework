@@ -110,6 +110,16 @@ module.exports = {
                     const out = [];
 
                     for (let i = 0; i < a.length; i++) {
+                        // Skip a DETACHED ancestor: a fetched rule may have structurally
+                        // replaced its own root (->swap/->move → replaceChild/removeChild),
+                        // orphaning the snapshotted element. Don't scope into the dead node
+                        // (a silent drop); drop it so a stale-only ancestor yields zero
+                        // matches → set() throws LOUD (the zero-match drift detector). jTorm
+                        // does not follow a scope across a root replacement (see AGENTS.md).
+                        if (!a[i].isConnected)
+                            continue
+                        ;
+
                         let m = g ? a[i].querySelectorAll(g) : [a[i]];
 
                         if (g && !m.length)
