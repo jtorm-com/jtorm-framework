@@ -25,7 +25,7 @@ textarea {
     ->if(d: maxlength, v: '^[0-9]+$')
     ->attr {
         n: 'maxlength';
-        v: true;
+        v: maxlength;
     }
 
     ->if(d: required)

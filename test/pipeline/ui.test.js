@@ -395,6 +395,17 @@ test('ui @f.inputText threads autocomplete/placeholder + name/value (form-elemen
         + '</div>');
 });
 
+test('ui @f.inputText carries NUMERIC minlength/maxlength values (not boolean empties)', async () => {
+    // input.tss/input-text.tss gate minlength/maxlength on ^[0-9]+$ then must emit the
+    // numeric VALUE (v: minlength/maxlength), not v: true → `minlength=""` (Codex PR #13 P2).
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputText'; }",
+        { minlength: '2', maxlength: '5', name: 'fn' }
+    );
+    assert.equal(body, '<div class="a"><input type="text" minlength="2" maxlength="5" name="fn"></div>');
+});
+
 test('ui @f.inputPassword with no data → type=password + autocomplete=off', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
@@ -476,6 +487,16 @@ test('ui @f.textarea with data: inner html body + rows/placeholder/required + na
     assert.equal(body, '<div class="a">'
         + '<textarea required="" placeholder="Type here" rows="4" name="msg">Hello</textarea>'
         + '</div>');
+});
+
+test('ui @f.textarea carries a NUMERIC maxlength value (not a boolean empty)', async () => {
+    // textarea.tss has the same minlength/maxlength v:true bug for maxlength (Codex PR #13 P2).
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.textarea'; }",
+        { html: 'Hi', maxlength: '140', name: 'msg' }
+    );
+    assert.equal(body, '<div class="a"><textarea maxlength="140" name="msg">Hi</textarea></div>');
 });
 
 test('ui @f.select with no data injects an empty <select>', async () => {
