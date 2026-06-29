@@ -33,7 +33,7 @@ const { render } = require('../helpers/engine.js');
 
 // --- ui → single html-ui element injection (the foundational Gate-B boil) ---
 
-test('ui resolves @e.div: html template + inner{html} + global id attr, scoped to the target', async () => {
+test('ui resolves @e.div: html template + inner{html} + global id attr, nested into the target', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
         ".a->ui { c: '@e.div'; }",
@@ -41,8 +41,12 @@ test('ui resolves @e.div: html template + inner{html} + global id attr, scoped t
     );
     // @e.div → html-ui element.div: <div></div> (get{h}) injected into .a, then div.tss
     // → replacable (inner{h:html}='X') → global (id attr from the model), ancestor-scoped
-    // to the injected <div>. `class`/`id`/… global attrs only emit when the model has them.
-    assert.equal(body, '<div class="a" id="d1">X</div>');
+    // to the injected <div>. The COMPONENT NESTS INTO the target: descendant-first scope
+    // resolves div.tss's `div` to the injected child <div>, not the .a container — so .a
+    // keeps its class and the component's id/content land on the child (consistent with
+    // @t.h1/@e.section/etc., and with the no-data case below). `class`/`id`/… only emit
+    // when the model has them.
+    assert.equal(body, '<div class="a"><div id="d1">X</div></div>');
 });
 
 test('ui resolves @t.h1 via the cross-framework fallback (schema → html typography)', async () => {
@@ -74,17 +78,18 @@ test('ui with no model data injects the bare element template (no global attrs e
     assert.equal(body, '<div class="a"><div></div></div>');
 });
 
-test('ui global `class` attr uses append-mode, merging into the injected element', async () => {
+test('ui global `class` attr uses append-mode on the injected element (not the .a target)', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
         ".a->ui { c: '@e.div'; }",
         { html: 'X', class: 'c1' }
     );
-    // global.tss declares `class` with m:'a' (append): 'c1' appends to the element's
-    // own class. The injected <div> has none, so the result is just "c1" — but note the
-    // OUTER div keeps "a": the selectorless global rules are ancestor-scoped to the
-    // injected <div>, not the .a target (proves get{t} ancestor-scope on the ui path).
-    assert.equal(body, '<div class="a c1">X</div>');
+    // global.tss declares `class` with m:'a' (append): 'c1' appends to the element's own
+    // class. The component NESTS INTO .a (descendant-first scope), so 'c1' lands on the
+    // injected <div> (which had no class → just "c1") and the OUTER .a keeps "a" — the
+    // selectorless global rules are ancestor-scoped to the injected <div>, never the .a
+    // target (proves get{t} ancestor-scope on the ui path).
+    assert.equal(body, '<div class="a"><div class="c1">X</div></div>');
 });
 
 test('multi-artifact component t (comma-joined URL array) is served as the concatenation', async () => {
@@ -313,18 +318,18 @@ test('ui BreadcrumbList renders nav → ol→each → li → Thing.link per item
         + '<ol><li><a href="https://e.com/" title="Home"></a></li></ol></div></nav></div>');
 });
 
-// --- @f.inputEmail: html-ui form input (bare) ---
+// --- @f.inputEmail: html-ui form input ---
 //
 // @f.inputEmail injects @h/@f/input.html (`<input>`), then input-email.tss
-// (`input { ->attr{type:email} … ->get '@h/form/input.tss' }`) fixes type=email. With
-// no data only the type emits. A NON-bare inputEmail (data driving the chained
-// input.tss / form-element.tss attrs) currently THROWS "input input not found":
-// input-email.tss `->get`s input.tss which RE-wraps `input { … }`, and the nested get
-// resets the ancestor scope to the bare tag `input`, so input.tss's rules scope
-// `input` UNDER ancestor `input` → the descendant query `input input` → nothing. The
-// proper fix (preserve the outer ELEMENT scope across nested same-tag gets) also
-// reshapes the @e.div / CreativeWork injection goldens — deferred to its own design
-// pass (docs/backlog.md). Bare is correct and self-contained, so it's locked here.
+// (`input { ->attr{type:email} … ->get '@h/form/input.tss' }`) fixes type=email. With no
+// data only the type emits. input-email.tss `->get`s input.tss, which RE-wraps `input
+// { … }`: the nested get resolves the ancestor to the injected <input> ELEMENT, and
+// document-model.scope is DESCENDANT-FIRST → ELSE SELF, so input.tss's same-tag `input`
+// rule (no descendant input exists) matches the <input> itself, and the selectorless
+// form-element/global rules land on it too. (A component re-naming its own root should
+// use a SELECTORLESS rule — a tag rule like `input{}` works here only because there is no
+// same-tag descendant; were one present, descendant-first would target the descendant.)
+// The bare (type-only) case is self-contained; the data-bearing case follows.
 test('ui @f.inputEmail with no data injects a bare type=email input', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
@@ -334,18 +339,22 @@ test('ui @f.inputEmail with no data injects a bare type=email input', async () =
     assert.equal(body, '<div class="a"><input type="email"></div>');
 });
 
-// Known-limitation lock (deferred bug, docs/backlog.md): a DATA-bearing @f.inputEmail
-// throws — `placeholder` reaches input.tss's `->attr{ n:'placeholder'; v:placeholder }`,
-// which boils under the nested-get ancestor `input` → scope('input','input') → an input
-// INSIDE the input → "input input not found". Asserted as a throw (not skipped) so the
-// bare golden above cannot MASK the form-component bug; flip to a positive golden when
-// the nested same-tag element-scope is fixed (a design pass that also reshapes the
-// @e.div/CreativeWork injection goldens — see header + docs/backlog.md).
-test('ui @f.inputEmail with data currently throws (deferred nested same-tag scope bug)', async () => {
-    await assert.rejects(
-        render('<body><div class="a"></div></body>', ".a->ui { c: '@f.inputEmail'; }", { placeholder: 'Email' }),
-        /input input not found/
+// FIXED — nested same-tag element-scope (fix/nested-element-scope). A DATA-bearing
+// @f.inputEmail renders the input with its data attrs. `placeholder` reaches input.tss's
+// `->attr{ n:'placeholder'; v:placeholder }`, which boils under the RESOLVED <input>
+// ANCESTOR ELEMENT (not the bare tag `input` re-queried document-wide). document-model
+// scopes descendant-first → else self: input.tss's own `input{}` matches the injected
+// <input> itself (no descendant input exists), and the selectorless form-element/global
+// rules land on it too. Was "input input not found" (the nested get clobbered v.c.a with
+// the bare tag → scope('input','input') = an input INSIDE the input → ∅). Design:
+// docs/superpowers/specs/2026-06-29-jtorm-nested-element-scope-fix-design.md.
+test('ui @f.inputEmail with data renders the input with its data attrs (nested same-tag scope)', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputEmail'; }",
+        { placeholder: 'Email' }
     );
+    assert.equal(body, '<div class="a"><input type="email" placeholder="Email"></div>');
 });
 
 // --- Page-level pieces: components-ui head + the ul->each items path ---

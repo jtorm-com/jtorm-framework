@@ -152,3 +152,80 @@ test('get { t } preserves commas inside a fetched selector when scoping', async 
     '<div class="a"><span data-x="a,b" z="1">s</span><span>t</span></div>'
   );
 });
+
+// Nested SAME-TAG get — element-scope (the keystone fix). A fetched rule whose own
+// `->get` re-wraps the SAME tag must keep boiling on the SAME element, not look for that
+// tag INSIDE itself. wrap.tss `input { ->get '/inner.tss' }` + inner.tss `input { attr }`
+// is the html-ui input-email→input shape: the nested get resolves the ancestor to the
+// injected <input> ELEMENT; document-model.scope is descendant-first → else SELF, so
+// inner.tss's `input` (no descendant input exists) matches the <input> itself. Was the
+// deferred "input input not found" — the nested get clobbered v.c.a with the bare tag, so
+// scope('input','input') searched for an input INSIDE the input.
+test('get { t } nested same-tag get keeps the outer element scope (descendant-first, else self)', async () => {
+  const { body } = await render(
+    '<body><div class="a"><input></div></body>',
+    ".a->get { t: '/wrap.tss'; }",
+    {},
+    'http://localhost/',
+    {
+      '/wrap.tss': { text: "input { ->get { t: '/inner.tss'; } }" },
+      '/inner.tss': { text: "input->attr { n: 'data-z'; v: '1'; }" }
+    }
+  );
+  assert.equal(body, '<div class="a"><input data-z="1"></div>');
+});
+
+// ...and it does NOT leak to a same-tag SIBLING outside the get target — the isolation the
+// reverted `g===a` fix LOST (returning the ancestor itself scoped 'input' document-wide →
+// every <input>). The element-ref ancestor confines inner.tss's attrs to the injected
+// <input>; the sibling <input> outside .a is untouched.
+test('get { t } nested same-tag get does not leak to a same-tag sibling outside the target', async () => {
+  const { body } = await render(
+    '<body><div class="a"><input></div><input class="sibling"></body>',
+    ".a->get { t: '/wrap.tss'; }",
+    {},
+    'http://localhost/',
+    {
+      '/wrap.tss': { text: "input { ->get { t: '/inner.tss'; } }" },
+      '/inner.tss': { text: "input->attr { n: 'data-z'; v: '1'; }" }
+    }
+  );
+  assert.equal(body, '<div class="a"><input data-z="1"></div><input class="sibling">');
+});
+
+// Comma-list ancestor × nested same-tag get — the cross-product survives (PR #3's comma
+// correctness, preserved by reusing scope() to resolve the get target rather than
+// composing selector strings). Each branch's <p> is scoped independently; the <p> outside
+// .a/.b is untouched.
+test('get { t } nested same-tag get distributes over a comma-list ancestor (no leak)', async () => {
+  const { body } = await render(
+    '<body><div class="a"><p>x</p></div><div class="b"><p>y</p></div><p>out</p></body>',
+    ".a, .b->get { t: '/outer.tss'; }",
+    {},
+    'http://localhost/',
+    {
+      '/outer.tss': { text: "p->get { t: '/inner.tss'; }" },
+      '/inner.tss': { text: "p->attr { n: 'data-z'; v: '1'; }" }
+    }
+  );
+  assert.equal(
+    body,
+    '<div class="a"><p data-z="1">x</p></div><div class="b"><p data-z="1">y</p></div><p>out</p>'
+  );
+});
+
+// A structural verb (wrap) UNDER a get ancestor scopes via the element-ref ancestor too:
+// wrap's nested set() carries v.c (the element-ref v.c.a), and the new wrapper — inserted
+// INSIDE the target, hence a descendant of the ancestor — resolves. Locks that the
+// element-ref change doesn't regress wrap-under-ancestor (no shipped component exercises it
+// yet, but grid/wrapper + web-page-boxed use wrap).
+test('get { t } wrap under a get ancestor scopes the new wrapper element', async () => {
+  const { body } = await render(
+    '<body><div class="a"><span>orig</span></div></body>',
+    ".a->get { t: '/w.tss'; }",
+    {},
+    'http://localhost/',
+    { '/w.tss': { text: "span->wrap { s: '.box'; h: '<div class=\"box\"></div>'; }" } }
+  );
+  assert.equal(body, '<div class="a"><span><div class="box">orig</div></span></div>');
+});

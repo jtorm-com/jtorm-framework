@@ -48,9 +48,15 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 - **Zero-match contract** — transform verbs (`attr`/`attrs`/`insert`/`text`/`move`/`swap`/`remove`…)
   **throw loud** via `error-handler` on zero matches: that is the upgrade-safe drift detector, not a
   bug. `if`/`->else`/`each` are control flow; optional target = `->if(el: X)->verb`.
-- **`get{t}`/`ui` boil fetched TSS document-global** (not scoped to the get target) — a known,
-  tracked limitation pending a core ancestor-scope mechanism (see `docs/backlog.md`), locked by a
-  `test.todo` in `test/pipeline/get.test.js`. Don't "fix" it ad hoc.
+- **`get{t}`/`ui` scope fetched TSS UNDER the get target** via `v.c.a` (the **resolved ancestor
+  ELEMENT(S)**, not a selector string): `document-model.scope` matches each fetched rule WITHIN the
+  ancestor element(s), **descendant-first → else self** (a selectorless rule, or a same-tag rule with
+  no same-tag descendant, targets the element itself). A component re-naming its own root should use a
+  **selectorless** rule; a same-tag tag-rule resolves to a same-tag descendant when one exists
+  (`input.tss` is `input{}` only because it is itself a get-target — the lone such case). The handler
+  restores `v.c.a` per subtree (no sibling leak). Locked by `test/pipeline/{get,ui}.test.js`. Don't
+  reintroduce string-selector composition (comma-list-fragile — PR #3 abandoned it) or document-wide
+  tag scoping (leaks to same-tag siblings — the reverted `g===a` attempt).
 - **`getSelector` is intentionally string-only** (no regex) — selectors are not regexes.
 
 ## Git / PR workflow
