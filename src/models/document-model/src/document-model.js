@@ -66,13 +66,14 @@ module.exports = {
 
                 set: async function(v, fn) {
                     const
-                        // v.c.a is an ANCESTOR scope (get{t}/ui component scoping); v.c.s
-                        // is the find DESCENDANT, folded into the rule selector by
-                        // getSelector. Under an ancestor we DON'T compose selector strings
-                        // (commas in lists / [brackets] / :is() corrupt that) — we select
-                        // the target(s) and run the rule WITHIN each via native
-                        // querySelectorAll, which parses CSS correctly. Selectorless rule
-                        // (g === false) → the target itself.
+                        // v.c.a is an ANCESTOR scope — the RESOLVED ancestor ELEMENT(S)
+                        // (get{t}/ui set it; scope() matches the rule WITHIN them,
+                        // descendant-first → else self). v.c.s is the find DESCENDANT,
+                        // folded into the rule selector by getSelector. We DON'T compose
+                        // selector strings (commas in lists / [brackets] / :is() corrupt
+                        // that) — scope() runs the rule WITHIN each ancestor element via
+                        // native querySelectorAll/matches. Selectorless rule (g === false)
+                        // under an ancestor → the ancestor element(s) themselves.
                         //
                         // v.c.b is the iteration fragment's BODY DEFAULT (handler-wrapper):
                         // an unscoped selectorless rule (g falsy, no ancestor) targets the
@@ -90,20 +91,40 @@ module.exports = {
                             await fn(c[i])
                     ;
                     else
-                        this.errorHandler.handle((v.c.a ? v.c.a + ' ' + (g || '') : g) + ' not found', v)
+                        this.errorHandler.handle((v.c.a && v.c.a.length ? '<' + v.c.a[0].tagName.toLowerCase() + '> ' + (g || '') : g) + ' not found', v)
                     ;
                 },
 
-                // Ancestor-scope: rule matches WITHIN each target element, deduped, in
-                // document order. el.querySelectorAll lets the CSS engine parse the rule
-                // (commas, [brackets], quotes, :is()/:has()) — no selector-string surgery.
-                // Cross-browser by design: querySelectorAll (universal), Array indexOf/push,
-                // indexed loops — no Set/for-of/spread. g === false (selectorless) → target.
+                // Ancestor-scope: `a` is the RESOLVED ancestor ELEMENT(S) (an array — NOT a
+                // selector string; get-method/ui resolve it). Per ancestor, match `g` WITHIN
+                // it, DESCENDANT-FIRST → ELSE SELF: el.querySelectorAll(g); if none match, the
+                // element ITSELF when el.matches(g) (a component re-naming its own root —
+                // input.tss's `input{}` on the injected <input>). Selectorless (g === false)
+                // → the element itself (short-circuit BEFORE matches, which shares qsa's CSS
+                // parsing). Deduped, document order. qsa/matches let the CSS engine parse the
+                // rule (commas, [brackets], :is()/:has()) — no string surgery; refs (not a
+                // re-queried tag) can't leak to a same-tag sibling outside the ancestor.
+                // Cross-browser: querySelectorAll/matches (universal), Array indexOf/push,
+                // indexed loops — no Set/for-of/spread.
                 scope: function(a, g) {
-                    const out = [], anc = this.d.querySelectorAll(a);
+                    const out = [];
 
-                    for (let i = 0; i < anc.length; i++) {
-                        const m = g ? anc[i].querySelectorAll(g) : [anc[i]];
+                    for (let i = 0; i < a.length; i++) {
+                        // Skip a DETACHED ancestor: a fetched rule may have structurally
+                        // replaced its own root (->swap/->move → replaceChild/removeChild),
+                        // orphaning the snapshotted element. Don't scope into the dead node
+                        // (a silent drop); drop it so a stale-only ancestor yields zero
+                        // matches → set() throws LOUD (the zero-match drift detector). jTorm
+                        // does not follow a scope across a root replacement (see AGENTS.md).
+                        if (!a[i].isConnected)
+                            continue
+                        ;
+
+                        let m = g ? a[i].querySelectorAll(g) : [a[i]];
+
+                        if (g && !m.length)
+                            m = a[i].matches(g) ? [a[i]] : []
+                        ;
 
                         for (let j = 0; j < m.length; j++)
                             if (out.indexOf(m[j]) === -1)

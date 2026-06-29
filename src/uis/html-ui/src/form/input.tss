@@ -1,5 +1,9 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
+// `input {…}` is intentional: this file is ALSO a get-target (input-email.tss etc. ->get it),
+// so under the component's resolved <input> ancestor element these rules match the <input>
+// itself (document-model.scope: descendant-first → else self — no same-tag descendant exists).
+// Do NOT "consistency-fix" it to selectorless — that changes its standalone behaviour. See AGENTS.md.
 input {
     //->if(d: type, v: '^(button|checkbox|color|date|datetime-local|email|file|hidden|image|month|number|password|radio|range|reset|search|submit|tel|text|time|url|week)$')
     ->attr {

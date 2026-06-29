@@ -57,16 +57,24 @@ module.exports = {
                 r = await this.get('tss', v.d.t);
 
                 // Ancestor-scope: fetched rules boil UNDER the get target, not
-                // document-global. v.t.s is the get target (the ancestor); set v.c.a
-                // so document-model.set prepends it to every selector in the fetched
-                // subtree — fetched TSS re-selects with its OWN `s` (`span->inner`
-                // parses to nested {s:'span'} nodes), so prefixing the top node alone
-                // can't reach them. This is also the mechanism `ui` component
-                // injection needs (ui-method builds {s: target, m: 'get'}). The
-                // handler restores v.c.a after this subtree so it can't leak to
-                // following sibling rules. Captured before v.t is replaced below.
+                // document-global. Resolve the get target `v.t.s` to its actual
+                // ELEMENT(S) and store them in v.c.a — NOT the tag string: a string is
+                // re-queried document-wide, so a nested same-tag get then scopes `tag`
+                // under `tag` (an element inside itself → ∅ → "input input not found"),
+                // and it can leak to same-tag siblings. document-model.scope matches each
+                // fetched rule WITHIN these elements (descendant-first → else self), so
+                // input.tss's `input{}` lands on the injected <input> and selectorless
+                // rules on the element itself; `ui` injection rides the same seam
+                // (ui-method builds {s: target, m: 'get'}). Resolve WITHIN the current
+                // ancestor when nested (reuse scope → comma-lists stay correct), else
+                // selectAll — AFTER the v.d.h innerHTML write above so the injected
+                // element exists. v.c.a is an element-ref ARRAY shared by-ref through
+                // view-model.copy: always REPLACED here, never mutated in place; the
+                // handler restores it after this subtree (no sibling leak).
                 if (v.t.s)
-                    v.c.a = v.t.s
+                    v.c.a = v.c.a
+                        ? v.h.scope(v.c.a, v.t.s)
+                        : Array.prototype.slice.call(v.h.selectAll(v.t.s))
                 ;
 
                 for (k in r)
