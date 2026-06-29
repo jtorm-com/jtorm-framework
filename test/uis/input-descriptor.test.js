@@ -27,3 +27,19 @@ test('input.json documents exactly the attributes the input family sets (no stra
     ).sort();
     assert.deepEqual(documented, expected);
 });
+
+// And its `type.@options` enum must list exactly the `type` literals the variants set —
+// input.tss's commented type regex is stale (omits `datetime`, which input-datetime.tss
+// sets and the mapper exposes as inputDatetime), so DERIVE the enum from the variants, not
+// from that regex (Codex PR #13 P2, round 2).
+test('input.json type.@options lists exactly the type values the input variants set', () => {
+    const set = new Set();
+    for (const f of fs.readdirSync(FORM_DIR))
+        if (/^input.*\.tss$/.test(f))
+            for (const m of fs.readFileSync(path.join(FORM_DIR, f), 'utf8').matchAll(/\bn:\s*'type'\s*;\s*v:\s*'([a-z-]+)'/g))
+                set.add(m[1]);
+    const expected = [...set].sort();
+    const json = JSON.parse(fs.readFileSync(path.join(FORM_DIR, 'input.json'), 'utf8'));
+    const documented = (json.type['@options'] || []).map(o => o.value).sort();
+    assert.deepEqual(documented, expected);
+});

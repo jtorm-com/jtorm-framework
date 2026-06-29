@@ -6,6 +6,7 @@
       {"value": "checkbox", "description": ""},
       {"value": "color", "description": ""},
       {"value": "date", "description": ""},
+      {"value": "datetime", "description": ""},
       {"value": "datetime-local", "description": ""},
       {"value": "email", "description": ""},
       {"value": "file", "description": ""},
