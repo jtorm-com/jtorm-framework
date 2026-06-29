@@ -63,11 +63,16 @@
 
 /**
  * A TSS method (verb) contract — `methods/*` export `{ jTorm<Name>: Method }`.
+ * The handler runs `data` (optional hook, replacing the default data-parser pass)
+ * → `validate` → `handle`. `handle` is **optional**: it runs only when it is a
+ * function, so a data-only verb (e.g. `data-method`: `validate` + `data`, no
+ * `handle`) is valid.
  * @typedef {Object} Method
- * @property {string} [alias]                                  alternate name
- * @property {string[]} [params]                               declared parameter names
- * @property {(v: ViewModel) => (boolean|number)} validate     gate run before handle
- * @property {(v: ViewModel) => (void|Promise<void>)} handle   apply the transform
+ * @property {string} [alias]                                                       alternate name
+ * @property {string[]} [params]                                                    declared parameter names
+ * @property {(v: ViewModel) => (boolean|number|Promise<boolean|number>)} validate  gate run before handle
+ * @property {(v: ViewModel) => (void|Promise<void>)} [data]                        optional data hook (replaces the default data-parser pass)
+ * @property {(v: ViewModel) => (void|Promise<void>)} [handle]                      apply the transform (runs only when a function)
  */
 
 module.exports = {};
