@@ -1,39 +1,75 @@
 {
-  "alt": {
-    "@description": "Specifies an alternate text for an image"
-  },
-  "crossorigin": {
-    "@description": "Allow images from third-party sites that allow cross-origin access to be used with canvas",
+  "type": {
+    "@description": "Specifies the type of input to display",
     "@options": [
-      {"value": "anonymous", "description": ""},
-      {"value": "use-credentials", "description": ""}
+      {"value": "button", "description": ""},
+      {"value": "checkbox", "description": ""},
+      {"value": "color", "description": ""},
+      {"value": "date", "description": ""},
+      {"value": "datetime-local", "description": ""},
+      {"value": "email", "description": ""},
+      {"value": "file", "description": ""},
+      {"value": "hidden", "description": ""},
+      {"value": "image", "description": ""},
+      {"value": "month", "description": ""},
+      {"value": "number", "description": ""},
+      {"value": "password", "description": ""},
+      {"value": "radio", "description": ""},
+      {"value": "range", "description": ""},
+      {"value": "reset", "description": ""},
+      {"value": "search", "description": ""},
+      {"value": "submit", "description": ""},
+      {"value": "tel", "description": ""},
+      {"value": "text", "description": ""},
+      {"value": "time", "description": ""},
+      {"value": "url", "description": ""},
+      {"value": "week", "description": ""}
     ]
   },
-  "height": {
-    "@description": "Specifies the height of an image"
+  "autocomplete": {
+    "@description": "Specifies whether the input should have autocomplete enabled",
+    "@options": [
+      {"value": "on", "description": ""},
+      {"value": "off", "description": ""}
+    ]
   },
-  "width": {
-    "@description": "Sets the width of the video player in pixels"
+  "list": {
+    "@description": "Refers to a datalist element that contains pre-defined options for the input"
   },
-  "ismap": {
-    "@description": "Specifies an image as a server-side image-map"
+  "pattern": {
+    "@description": "Specifies a regular expression that the input's value is checked against"
   },
-  "longdesc": {
-    "@description": "Specifies a URL to a detailed description of an image"
+  "placeholder": {
+    "@description": "Specifies a short hint that describes the expected value of the input"
   },
-  "sizes": {
-    "@description": "Specifies image sizes for different page layouts"
+  "required": {
+    "@description": "Specifies that the input must be filled out before submitting the form"
   },
-  "src": {
-    "@description": "Specifies the URL of an image"
+  "readonly": {
+    "@description": "Specifies that the input is read-only"
   },
-  "srcset": {
-    "@description": "Specifies the URL of the image to use in different situations"
+  "size": {
+    "@description": "Specifies the visible width, in characters, of the input"
   },
-  "usemap": {
-    "@description": "Specifies an image as a client-side image-map"
+  "minlength": {
+    "@description": "Specifies the minimum number of characters allowed in the input"
   },
-  "width": {
-    "@description": "Sets the width of the video player in pixels"
+  "maxlength": {
+    "@description": "Specifies the maximum number of characters allowed in the input"
+  },
+  "dirname": {
+    "@description": "Specifies that the text direction will be submitted with the form"
+  },
+  "multiple": {
+    "@description": "Specifies that the user is allowed to enter more than one value (type=email or type=file)"
+  },
+  "min": {
+    "@description": "Specifies the minimum value (numeric and date-time inputs)"
+  },
+  "max": {
+    "@description": "Specifies the maximum value (numeric and date-time inputs)"
+  },
+  "step": {
+    "@description": "Specifies the legal number intervals for the input (numeric and date-time inputs)"
   }
 }

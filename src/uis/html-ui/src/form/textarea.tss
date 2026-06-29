@@ -52,6 +52,6 @@ textarea {
     }
 
     ->get {
-        t: '@h/tags/form-element.tss';
+        t: '@h/form/form-element.tss';
     }
 }
