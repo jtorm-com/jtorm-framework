@@ -33,9 +33,6 @@
       {"value": "off", "description": ""}
     ]
   },
-  "list": {
-    "@description": "Refers to a datalist element that contains pre-defined options for the input"
-  },
   "pattern": {
     "@description": "Specifies a regular expression that the input's value is checked against"
   },
@@ -60,8 +57,8 @@
   "dirname": {
     "@description": "Specifies that the text direction will be submitted with the form"
   },
-  "multiple": {
-    "@description": "Specifies that the user is allowed to enter more than one value (type=email or type=file)"
+  "list": {
+    "@description": "Refers to a datalist element that contains pre-defined options for the input"
   },
   "min": {
     "@description": "Specifies the minimum value (numeric and date-time inputs)"
@@ -71,5 +68,26 @@
   },
   "step": {
     "@description": "Specifies the legal number intervals for the input (numeric and date-time inputs)"
+  },
+  "multiple": {
+    "@description": "Specifies that the user is allowed to enter more than one value (type=email or type=file)"
+  },
+  "accept": {
+    "@description": "Specifies the types of files the server accepts (type=file)"
+  },
+  "checked": {
+    "@description": "Specifies that the input is pre-selected (type=checkbox or type=radio)"
+  },
+  "alt": {
+    "@description": "Specifies an alternate text for the image (type=image)"
+  },
+  "src": {
+    "@description": "Specifies the URL of the image to use as a submit button (type=image)"
+  },
+  "height": {
+    "@description": "Specifies the height, in pixels, of the image (type=image)"
+  },
+  "width": {
+    "@description": "Specifies the width, in pixels, of the image (type=image)"
   }
 }
