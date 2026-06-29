@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormMoveMethod: {
         // DI
@@ -14,10 +16,15 @@ module.exports = {
             'k'// Keep element / create copy
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return (v.t.s && v.d.l && v.d.m);
         },
 
+        /**
+         * Move (or copy, when `v.d.k`) each selected element to `v.d.l` via the chosen method.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             const s = this;
 

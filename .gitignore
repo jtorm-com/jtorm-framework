@@ -7,6 +7,8 @@
 
 # Generated files
 node_modules/
+# @jtorm/types ships a generated declaration (emitted by its `prepack` from the JSDoc); build artifact, not source
+src/types/src/types.d.ts
 
 # Local strategy / research / planning docs + agent guidance (private; repo is public)
 /docs/

@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormMediatargetMethod: {
         // DI
@@ -40,10 +42,15 @@ module.exports = {
             }
         },
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return !!v.d.t;
         },
 
+        /**
+         * Gate children on whether the named breakpoint `v.d.t` is in the currently-active target set.
+         * @param {ViewModel} v
+         */
         handle: function (v) {
             v.io.c = this.current.indexOf(v.d.t) !== -1;
         },

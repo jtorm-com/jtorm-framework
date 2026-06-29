@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormIfMethod: {
         // DI
@@ -20,6 +22,10 @@ module.exports = {
             return 1;
         },
 
+        /**
+         * Evaluate `v.d.d` (with `||`/`&&`, type, regex, or element tests) and boil either the matching children or the `->else` branch.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             const
                 d = this.dataParser,

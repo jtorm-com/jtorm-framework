@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormCssMethod: {
         // DI
@@ -18,10 +20,15 @@ module.exports = {
             'type'
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return !!v.d.href;
         },
 
+        /**
+         * Collect the stylesheet `<link>` descriptor (`v.d`) into cssPlugin for head injection, deduped by href.
+         * @param {ViewModel} v
+         */
         handle: function (v) {
             const s = this.cssPlugin;
 

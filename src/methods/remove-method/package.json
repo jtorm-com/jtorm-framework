@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/remove-method",
   "description": "jTorm Remove Method",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -13,5 +13,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/methods/remove-method"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/types": "^1.0.0"
+  }
 }

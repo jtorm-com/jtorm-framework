@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormWrapMethod: {
         // DI
@@ -9,10 +11,15 @@ module.exports = {
         alias: 'w',
         params: ['s', 'h', 'd'],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return (v.d.s && (v.d.h || v.t.c.length > 0));
         },
 
+        /**
+         * Wrap each element selected by `v.t.s` in the `v.d.s` element, filled from `v.d.h` or boiled children.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             const s = this;
 

@@ -3,9 +3,17 @@
 
 /**
  * Shared JSDoc typedefs for the jTorm framework (pure JS — no .ts/.d.ts).
- * Pull a typedef into any .js file with an import() JSDoc reference to this
- * module (see view-model.js, which imports ViewModel that way).
- * Validated by jsconfig.json (checkJs:true, strict:true); nothing is emitted.
+ *
+ * Canonical "decoder ring" for the view object `v`: the single source of truth
+ * for the one-letter fields threaded through the handler/method pipeline
+ * (`v.t` node, `v.d` method data, `v.m` model, `v.h` DOM, `v.io` flags,
+ * `v.c` context). Don't duplicate the field map elsewhere — link here.
+ *
+ * Pull a typedef into any .js file with an import() JSDoc reference, e.g.
+ * `@typedef {import('@jtorm/types').ViewModel} ViewModel` — every method
+ * (`handle`/`validate`/`data`) and handler does this so editors resolve `v.*`
+ * on hover. Batch-validated by jsconfig.json (checkJs:true, strict:true) for the
+ * files it `include`s; nothing is emitted.
  * @module types
  */
 
@@ -55,11 +63,16 @@
 
 /**
  * A TSS method (verb) contract — `methods/*` export `{ jTorm<Name>: Method }`.
+ * The handler runs `data` (optional hook, replacing the default data-parser pass)
+ * → `validate` → `handle`. `handle` is **optional**: it runs only when it is a
+ * function, so a data-only verb (e.g. `data-method`: `validate` + `data`, no
+ * `handle`) is valid.
  * @typedef {Object} Method
- * @property {string} [alias]                                  alternate name
- * @property {string[]} [params]                               declared parameter names
- * @property {(v: ViewModel) => (boolean|number)} validate     gate run before handle
- * @property {(v: ViewModel) => (void|Promise<void>)} handle   apply the transform
+ * @property {string} [alias]                                                       alternate name
+ * @property {string[]} [params]                                                    declared parameter names
+ * @property {(v: ViewModel) => (boolean|number|Promise<boolean|number>)} validate  gate run before handle
+ * @property {(v: ViewModel) => (void|Promise<void>)} [data]                        optional data hook (replaces the default data-parser pass)
+ * @property {(v: ViewModel) => (void|Promise<void>)} [handle]                      apply the transform (runs only when a function)
  */
 
 module.exports = {};

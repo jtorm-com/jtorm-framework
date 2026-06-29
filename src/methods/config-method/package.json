@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/config-method",
   "description": "jTorm Config Method",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,6 +14,7 @@
     "directory": "src/methods/config-method"
   },
   "dependencies": {
-    "@jtorm/config-model": "^1.0.0"
+    "@jtorm/config-model": "^1.0.0",
+    "@jtorm/types": "^1.0.0"
   }
 }

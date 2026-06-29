@@ -6,10 +6,14 @@
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@jtorm/types": ["src/types/src/types.js"]
+    }
   },
   "include": [
-    "types.js",
+    "src/types/src/types.js",
     "src/models/view-model/src/view-model.js"
   ]
 }

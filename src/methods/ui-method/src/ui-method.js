@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormUiMethod: {
         // DI
@@ -43,6 +45,7 @@ module.exports = {
             }
         },
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             v.d.t = v.d.t === undefined
                 ? 1
@@ -68,6 +71,10 @@ module.exports = {
             return !!v.d.c;
         },
 
+        /**
+         * Resolve the schema.org component `v.d.c` for the chosen framework and rewrite `v.t` into its get/ui subtree (adding mediatarget variants).
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             const s = this;
             let f = v.d.f,

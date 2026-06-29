@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/move-method",
   "description": "jTorm Move Method",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,6 +14,7 @@
     "directory": "src/methods/move-method"
   },
   "dependencies": {
-    "@jtorm/view-model": "^1.0.0"
+    "@jtorm/view-model": "^1.0.0",
+    "@jtorm/types": "^1.0.0"
   }
 }

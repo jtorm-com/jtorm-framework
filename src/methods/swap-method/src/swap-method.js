@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormSwapMethod: {
         // DI
@@ -14,10 +16,15 @@ module.exports = {
             'h'// HTML
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return !!v.d.s;
         },
 
+        /**
+         * Replace each selected element with a new `v.d.s` wrapper (optionally built from `ui`/`h`), carrying over inner HTML and attributes.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             let w = v.d.s ? v.d.s : v.c.s, a = v.d.a, i;
 

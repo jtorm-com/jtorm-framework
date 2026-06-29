@@ -1,6 +1,8 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+
 module.exports = {
     jTormInsertMethod: {
         // DI
@@ -20,6 +22,7 @@ module.exports = {
             'cs'// Cache scope
         ],
 
+        /** @param {ViewModel} v */
         validate: function (v) {
             return (
                 (v.d.h || v.t.c.length)
@@ -27,6 +30,10 @@ module.exports = {
             );
         },
 
+        /**
+         * Insert html (`v.d.h`) or boiled children into the target via the chosen mode; throw via errorHandler when the target element is absent.
+         * @param {ViewModel} v
+         */
         handle: async function (v) {
             let e, h, c = 1;
 

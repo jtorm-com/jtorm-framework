@@ -1,0 +1,71 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
+
+const ROOT = path.resolve(__dirname, '..');
+const PKG_DIR = path.join(ROOT, 'src', 'types');
+const pkg = require('../src/types/package.json');
+
+// @jtorm/types ships its ViewModel typedef as a .d.ts GENERATED from the JSDoc at
+// prepack (source stays pure-JS). These lock the publish contract that makes
+// `import('@jtorm/types').ViewModel` resolvable for downstream TypeScript consumers.
+
+test('@jtorm/types declares the publish wiring for a generated .d.ts', () => {
+  assert.equal(pkg.types, 'src/types.d.ts');
+  assert.ok(Array.isArray(pkg.files) && pkg.files.includes('src/types.d.ts'),
+    'files[] must publish the generated declaration');
+  assert.match(pkg.scripts.prepack, /emitDeclarationOnly/,
+    'prepack must generate the .d.ts from the JSDoc');
+});
+
+test('prepack emits a consumable .d.ts that exports the typedefs', () => {
+  const tsc = require.resolve('typescript/bin/tsc');
+  fs.mkdirSync(path.join(ROOT, 'tmp'), { recursive: true });
+  const out = fs.mkdtempSync(path.join(ROOT, 'tmp', 'dts-'));
+  try {
+    execFileSync(process.execPath, [tsc,
+      '--declaration', '--emitDeclarationOnly', '--allowJs',
+      '--rootDir', path.join(PKG_DIR, 'src'), '--outDir', out,
+      path.join(PKG_DIR, 'src', 'types.js')], { stdio: 'pipe' });
+    const dts = fs.readFileSync(path.join(out, 'types.d.ts'), 'utf8');
+    for (const t of ['ViewModel', 'ViewIO', 'ViewContext', 'TssNode', 'Method'])
+      assert.match(dts, new RegExp('export type ' + t + '\\b'),
+        t + ' must be an exported type so the import specifier resolves downstream');
+  } finally {
+    fs.rmSync(out, { recursive: true, force: true });
+  }
+});
+
+test('published Method type accepts a data-only verb (no handle) and still requires validate', () => {
+  // handler.js runs `data` (optional) -> `validate` (required) -> `handle` (called
+  // only when a function). data-method ships validate + data and NO handle, so the
+  // generated Method type must accept that shape while still requiring validate.
+  const tsc = require.resolve('typescript/bin/tsc');
+  fs.mkdirSync(path.join(ROOT, 'tmp'), { recursive: true });
+  const dir = fs.mkdtempSync(path.join(ROOT, 'tmp', 'method-'));
+  const run = (include) => {
+    fs.writeFileSync(path.join(dir, 'tsconfig.json'), JSON.stringify({
+      compilerOptions: { allowJs: true, checkJs: true, strict: true, noEmit: true,
+        target: 'ES2022', module: 'CommonJS', moduleResolution: 'node', skipLibCheck: true },
+      include: [include]
+    }));
+    try { execFileSync(process.execPath, [tsc, '-p', path.join(dir, 'tsconfig.json')], { stdio: 'pipe' }); return true; }
+    catch { return false; }
+  };
+  try {
+    execFileSync(process.execPath, [tsc, '--declaration', '--emitDeclarationOnly', '--allowJs',
+      '--rootDir', path.join(PKG_DIR, 'src'), '--outDir', dir, path.join(PKG_DIR, 'src', 'types.js')],
+      { stdio: 'pipe' });
+    fs.writeFileSync(path.join(dir, 'ok.js'),
+      "'use strict';\n/** @typedef {import('./types').Method} M */\n/** @type {M} */\nconst m = { alias: 'd', params: [], validate: () => 1, data: async (v) => {} };\nmodule.exports = { m };\n");
+    assert.ok(run('ok.js'), 'a data-only verb (validate + data, no handle) must satisfy Method');
+    fs.writeFileSync(path.join(dir, 'bad.js'),
+      "'use strict';\n/** @typedef {import('./types').Method} M */\n/** @type {M} */\nconst m = { handle: async (v) => {} };\nmodule.exports = { m };\n");
+    assert.ok(!run('bad.js'), 'a verb missing validate must NOT satisfy Method');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

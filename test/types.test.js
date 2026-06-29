@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const types = require('../types.js');
+const types = require('../src/types/src/types.js');
 const { jTormViewModel } = require('../src/models/view-model/src/view-model.js');
 
 test('types.js loads as a comments-only module (exports an object)', () => {
