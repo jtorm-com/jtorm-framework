@@ -10,7 +10,7 @@
  * `v.c` context). Don't duplicate the field map elsewhere — link here.
  *
  * Pull a typedef into any .js file with an import() JSDoc reference, e.g.
- * `@typedef {import('../../../../types.js').ViewModel} ViewModel` — every method
+ * `@typedef {import('@jtorm/types').ViewModel} ViewModel` — every method
  * (`handle`/`validate`/`data`) and handler does this so editors resolve `v.*`
  * on hover. Batch-validated by jsconfig.json (checkJs:true, strict:true) for the
  * files it `include`s; nothing is emitted.

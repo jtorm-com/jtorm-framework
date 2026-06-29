@@ -1,0 +1,17 @@
+{
+  "name": "@jtorm/types",
+  "description": "jTorm Shared Types",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "main": "src/types.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/jtorm/jtorm-framework.git",
+    "directory": "src/types"
+  },
+  "dependencies": {}
+}

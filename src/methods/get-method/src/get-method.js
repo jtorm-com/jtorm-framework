@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
-/** @typedef {import('../../../../types.js').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').ViewModel} ViewModel */
 
 module.exports = {
     jTormGetMethod: {

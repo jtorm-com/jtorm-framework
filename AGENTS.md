@@ -14,8 +14,8 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 ## Build & test
 - `npm test` → `node --test "test/**/*.test.js"` (Node built-in `node:test`, zero deps).
   Do **not** use `node --test test/` — it mis-resolves the directory on this Node.
-- `npm run typecheck` → `tsc -p jsconfig.json` (JSDoc types; `checkJs` scoped to `types.js` +
-  `view-model.js`). No Biome/ESLint/Knip in this repo.
+- `npm run typecheck` → `tsc -p jsconfig.json` (JSDoc types; `checkJs` scoped to `src/types/src/types.js`
+  + `view-model.js`). No Biome/ESLint/Knip in this repo.
 - Full-pipeline harness: `test/helpers/engine.js` (`render(html,tss,data,url,fixtures)`), goldens in
   `test/pipeline/`. `jsdom`+`lodash` are devDeps; the runtime stays dependency-free.
 
@@ -24,7 +24,7 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   `module.exports = { jTormX: { ...singleton } }`; methods use `this`. All externals (`_` lodash
   subset, DOM/`windowModel`, the fetch transport) are **dependency-injected** (`// DI`).
 - **Pure JS only — never add `.ts`/`.d.ts`.** Types are JSDoc validated by `jsconfig.json`.
-- **`v` is typed from the `types.js` decoder ring.** `types.js` is the single source of truth for the view object `v` (`v.t/v.d/v.m/v.h/v.io/v.c`); methods (`handle`/`validate`/`data`) and handlers import `ViewModel` from it, annotate `@param {ViewModel} v`, and carry a one-line contract comment atop each verb. JSDoc/editor-hover only — `jsconfig` `include` stays scoped to `types.js` + `view-model.js`, so the per-method `@param`/typedef annotations are intentional and **not** batch-checked: do **not** flag them as dead/unused (wiring them into `tsc` is a tracked follow-up needing `@this`/DI typing).
+- **`v` is typed from the `@jtorm/types` decoder ring.** The published **`@jtorm/types`** package (`src/types/src/types.js`) is the single source of truth for the view object `v` (`v.t/v.d/v.m/v.h/v.io/v.c`); methods (`handle`/`validate`/`data`) and handlers import `ViewModel` from it (`import('@jtorm/types')`, declared as a dependency so it stays resolvable post-publish; resolved in-repo via the `jsconfig` `paths` alias), annotate `@param {ViewModel} v`, and carry a one-line contract comment atop each verb. JSDoc/editor-hover only — `jsconfig` `include` stays scoped to `src/types/src/types.js` + `view-model.js`, so the per-method `@param`/typedef annotations are intentional and **not** batch-checked: do **not** flag them as dead/unused (wiring them into `tsc` is a tracked follow-up needing `@this`/DI typing).
 - **Published packages** — each `src/**` dir is a published `@jtorm/*` package. **Never delete or
   deprecate exports / remove packages** (external projects depend on them). Greenfield: no
   backward-compat shims; bug-fixes get a **patch** bump to the touched package's `package.json`.

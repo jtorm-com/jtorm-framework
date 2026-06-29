@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/if-method",
   "description": "jTorm If Method",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@jtorm/data-parser": "^1.0.0",
-    "@jtorm/handler": "^1.0.0"
+    "@jtorm/handler": "^1.0.0",
+    "@jtorm/types": "^1.0.0"
   }
 }
