@@ -357,6 +357,179 @@ test('ui @f.inputEmail with data renders the input with its data attrs (nested s
     assert.equal(body, '<div class="a"><input type="email" placeholder="Email"></div>');
 });
 
+// --- Form family: @f.inputText/inputPassword/inputNumber + textarea + select/option ---
+//
+// Every form control injects its element html (input.html `<input>` / textarea.html /
+// select.html) then boils its own `<tag> { … }` rule chain, ->get-ing the shared leaf:
+//   input-* → (input.tss | input-range-attrs.tss) → form-element.tss → global.tss
+//   textarea / select       → form-element.tss → global.tss
+// Each artifact re-wraps the SAME tag (`input{}`/`textarea{}`/`select{}`), so its rules
+// boil under the RESOLVED <tag> ANCESTOR (document-model.scope descendant-first → else
+// self, PR #12) — the control's own injected element. The input-* variants are the
+// keystone: `input-password.tss`/`input-number.tss` ->get `input.tss`, which ALSO wraps
+// `input{}`, so the data attrs land through a DOUBLE same-tag get (two levels), and the
+// variant's literal `type` survives input.tss's data-driven `->attr{ n:'type'; v:type }`
+// (a no-op when the model carries no `type`). The data-bearing @f.inputEmail above first
+// proved one hop; these add the second. Booleans serialize as `attr=""` (jsdom innerHTML).
+// Each golden is correctness-checked against the component .tss.
+
+test('ui @f.inputText with no data injects a bare type=text input', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputText'; }",
+        {}
+    );
+    assert.equal(body, '<div class="a"><input type="text"></div>');
+});
+
+test('ui @f.inputText threads autocomplete/placeholder + name/value (form-element) + id (global)', async () => {
+    // input-text.tss: type=text, autocomplete (on/off-gated), …, placeholder; then ->get
+    // form-element.tss (name/value) → global.tss (id). Attr order = rule order.
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputText'; }",
+        { placeholder: 'Name', value: 'Bob', name: 'fn', required: true, autocomplete: 'on', id: 'x1' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<input type="text" autocomplete="on" required="" placeholder="Name" name="fn" value="Bob" id="x1">'
+        + '</div>');
+});
+
+test('ui @f.inputText carries NUMERIC minlength/maxlength values (not boolean empties)', async () => {
+    // input.tss/input-text.tss gate minlength/maxlength on ^[0-9]+$ then must emit the
+    // numeric VALUE (v: minlength/maxlength), not v: true → `minlength=""` (Codex PR #13 P2).
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputText'; }",
+        { minlength: '2', maxlength: '5', name: 'fn' }
+    );
+    assert.equal(body, '<div class="a"><input type="text" minlength="2" maxlength="5" name="fn"></div>');
+});
+
+test('ui @f.inputPassword with no data → type=password + autocomplete=off', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputPassword'; }",
+        {}
+    );
+    assert.equal(body, '<div class="a"><input type="password" autocomplete="off"></div>');
+});
+
+test('ui @f.inputPassword with data: pattern + placeholder/name survive the input.tss double-get (type stays password)', async () => {
+    // input-password.tss sets the literal type=password, then ->get input.tss. input.tss
+    // RE-wraps `input{}` (second same-tag scope) and its `->attr{type: type}` is a no-op
+    // (no model `type`) so password holds; placeholder/name come from input.tss + form-element.
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputPassword'; }",
+        { placeholder: 'PW', name: 'pw', pattern: '.{8,}' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<input type="password" autocomplete="off" pattern=".{8,}" placeholder="PW" name="pw">'
+        + '</div>');
+});
+
+test('ui @f.inputNumber with no data injects a bare type=number input', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputNumber'; }",
+        {}
+    );
+    assert.equal(body, '<div class="a"><input type="number"></div>');
+});
+
+test('ui @f.inputNumber with data: max/min/step (input-range-attrs) + name/value, type stays number', async () => {
+    // input-number.tss: type=number → ->get input-range-attrs.tss (autocomplete/list/max/
+    // min/step → ->get input.tss → form-element). Two get hops, same-tag throughout.
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputNumber'; }",
+        { min: '0', max: '10', step: '2', value: '5', name: 'qty' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<input type="number" max="10" min="0" step="2" name="qty" value="5">'
+        + '</div>');
+});
+
+test('ui @f.inputEmail with data threads autocomplete/required + name (richer than the bare/placeholder locks above)', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputEmail'; }",
+        { placeholder: 'Email', name: 'em', required: true, autocomplete: 'off' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<input type="email" autocomplete="off" required="" placeholder="Email" name="em">'
+        + '</div>');
+});
+
+// textarea — LOCKS the @h/tags/form-element.tss → @h/form/form-element.tss path fix
+// (@jtorm/html-ui). The `tags/` dir does not exist (form-element.tss lives in form/, where
+// every other control ->get's it), so @f.textarea threw `HTTP 404 for @h/tags/form-element.tss`
+// the moment it boiled with OR without data — RED. After the repoint it boils
+// textarea.tss → form-element.tss → global.tss like the rest.
+test('ui @f.textarea with no data injects an empty <textarea>', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.textarea'; }",
+        {}
+    );
+    assert.equal(body, '<div class="a"><textarea></textarea></div>');
+});
+
+test('ui @f.textarea with data: inner html body + rows/placeholder/required + name (path-fix proof)', async () => {
+    // textarea.tss: ->inner{h:html} (the body), …, required, placeholder, rows (num-gated);
+    // then ->get form-element.tss (name). Was unreachable until the form/ path fix.
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.textarea'; }",
+        { html: 'Hello', name: 'msg', rows: '4', placeholder: 'Type here', required: true }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<textarea required="" placeholder="Type here" rows="4" name="msg">Hello</textarea>'
+        + '</div>');
+});
+
+test('ui @f.textarea carries a NUMERIC maxlength value (not a boolean empty)', async () => {
+    // textarea.tss has the same minlength/maxlength v:true bug for maxlength (Codex PR #13 P2).
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.textarea'; }",
+        { html: 'Hi', maxlength: '140', name: 'msg' }
+    );
+    assert.equal(body, '<div class="a"><textarea maxlength="140" name="msg">Hi</textarea></div>');
+});
+
+test('ui @f.select with no data injects an empty <select>', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.select'; }",
+        {}
+    );
+    assert.equal(body, '<div class="a"><select></select></div>');
+});
+
+test('ui @f.select with data: inner option html + required + name', async () => {
+    // select.tss: ->inner{h:html} (the options markup), multiple/required/size (gated),
+    // then ->get form-element.tss (name). The `html` field carries the option children.
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.select'; }",
+        { html: '<option>A</option>', name: 'sel', required: true }
+    );
+    assert.equal(body, '<div class="a"><select required="" name="sel"><option>A</option></select></div>');
+});
+
+test('ui @f.option with data: selected/value + inner html (replacable leaf)', async () => {
+    // option.tss: disabled/selected (gated), label, value; then ->get replacable.tss
+    // (->inner{h:html} + global.tss). The building block @f.select composes via `html`.
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.option'; }",
+        { html: 'Apple', value: 'a', selected: true }
+    );
+    assert.equal(body, '<div class="a"><option selected="" value="a">Apple</option></div>');
+});
+
 // --- Page-level pieces: components-ui head + the ul->each items path ---
 //
 // These boil a FULL `<html><head></head><body>…</body></html>` document (the harness

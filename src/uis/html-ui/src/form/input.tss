@@ -41,7 +41,7 @@ input {
         v: '^[0-9]+$')
     ->attr {
         n: 'minlength';
-        v: true;
+        v: minlength;
     }
 
     ->if(
@@ -50,7 +50,7 @@ input {
     )
     ->attr {
         n: 'maxlength';
-        v: true;
+        v: maxlength;
     }
 
     ->if(d: required)
