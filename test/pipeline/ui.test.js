@@ -530,6 +530,101 @@ test('ui @f.option with data: selected/value + inner html (replacable leaf)', as
     assert.equal(body, '<div class="a"><option selected="" value="a">Apple</option></div>');
 });
 
+// --- html-ui artifact path drift: repointable ->get typos ---
+//
+// These lock the remaining PR #14 html-ui artifact-path drift sweep. Each component
+// already shipped its target artifact, but the `.tss` pointed at a non-served path
+// (`tags/globals`, root-level form-submit/playable, typo/citable). The assertions
+// exercise the intended fragment too, not merely "does not 404".
+
+test('ui @f.legend gets the shared global attrs from @h/global.tss', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.legend'; }",
+        { class: 'primary', id: 'lg1', title: 'Legend' }
+    );
+    assert.equal(body, '<div class="a"><legend class="primary" id="lg1" title="Legend"></legend></div>');
+});
+
+test('ui @f.inputSubmit gets submit attrs, form attrs, and global attrs', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@f.inputSubmit'; }",
+        {
+            formaction: '/send', formmethod: 'post', formnovalidate: true,
+            name: 'send', value: 'Send', id: 'submit1'
+        }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<input type="submit" formaction="/send" formmethod="post" formnovalidate=""'
+        + ' name="send" value="Send" id="submit1"></div>');
+});
+
+test('ui @m.audio gets playable attrs, inner html, and global attrs', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@m.audio'; }",
+        { controls: true, preload: 'metadata', src: '/sound.mp3', html: '<source src="/sound.ogg">', id: 'aud1' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<audio controls="" preload="metadata" src="/sound.mp3" id="aud1"><source src="/sound.ogg"></audio>'
+        + '</div>');
+});
+
+test('ui @m.video gets video attrs plus playable attrs and inner html', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@m.video'; }",
+        {
+            height: '720', poster: '/poster.jpg', width: '1280',
+            controls: true, src: '/movie.mp4', html: '<source src="/movie.webm">', id: 'vid1'
+        }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<video height="720" poster="/poster.jpg" width="1280" controls="" src="/movie.mp4" id="vid1">'
+        + '<source src="/movie.webm"></video></div>');
+});
+
+test('ui @t.blockquote gets citable attrs, inner html, and global attrs', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@t.blockquote'; }",
+        { cite: 'https://e.com/source', html: 'Quoted', id: 'quote1' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<blockquote cite="https://e.com/source" id="quote1">Quoted</blockquote></div>');
+});
+
+test('ui @t.del keeps datetime and gets citable attrs plus inner html', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@t.del'; }",
+        { datetime: '2026-06-29', cite: 'https://e.com/change', html: 'Old', id: 'del1' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<del datetime="2026-06-29" cite="https://e.com/change" id="del1">Old</del></div>');
+});
+
+test('ui @t.ins keeps datetime and gets citable attrs plus inner html', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@t.ins'; }",
+        { datetime: '2026-06-29', cite: 'https://e.com/change', html: 'New', id: 'ins1' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<ins datetime="2026-06-29" cite="https://e.com/change" id="ins1">New</ins></div>');
+});
+
+test('ui @t.q gets citable attrs, inner html, and global attrs', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: '@t.q'; }",
+        { cite: 'https://e.com/source', html: 'Inline quote', id: 'q1' }
+    );
+    assert.equal(body, '<div class="a">'
+        + '<q cite="https://e.com/source" id="q1">Inline quote</q></div>');
+});
+
 // --- Page-level pieces: components-ui head + the ul->each items path ---
 //
 // These boil a FULL `<html><head></head><body>…</body></html>` document (the harness

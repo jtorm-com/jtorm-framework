@@ -2,5 +2,5 @@
 
 blockquote
     ->get {
-        t: '@h/typo/citable.tss';
+        t: '@h/typography/citable.tss';
     }

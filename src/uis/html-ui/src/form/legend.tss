@@ -2,5 +2,5 @@
 
 legend
     ->get {
-        t: '@h/tags/globals.tss';
+        t: '@h/global.tss';
     }
