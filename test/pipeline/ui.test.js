@@ -236,7 +236,7 @@ test('ui CreativeWork.contents renders the Thing.contents card it extends', asyn
     assert.equal(body, `<div class="a">${CONTENTS_NAME}</div>`);
 });
 
-test('ui ItemList renders ListItem wrappers and reuses CreativeWork.item for item entities', async () => {
+test('ui ItemList renders ListItem wrappers and item entities through Thing.item', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
         ".a->ui { c: 'ItemList'; }",
@@ -281,6 +281,24 @@ test('ui ItemList renders direct entities and keeps empty ListItem wrappers empt
         + '<a href="https://e.com/direct">Direct result</a></h1></header>'
         + '<section class="body"></section><footer class="footer"></footer></div></section></li>'
         + '<li value="2"></li><li value="3"></li></ol></div>');
+});
+
+test('ui ItemList renders mapped types without item variants through Thing.item', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'ItemList'; }",
+        {
+            itemListElement: [{
+                '@type': 'Event',
+                name: 'Launch',
+                url: 'https://e.com/event'
+            }]
+        }
+    );
+    assert.equal(body, '<div class="a"><ol><li><section class="thing">'
+        + '<div class="contents"><header class="header"><h1>'
+        + '<a href="https://e.com/event">Launch</a></h1></header>'
+        + '<section class="body"></section><footer class="footer"></footer></div></section></li></ol></div>');
 });
 
 test('ui CreativeWork.listItem delegates to CreativeWork.item', async () => {

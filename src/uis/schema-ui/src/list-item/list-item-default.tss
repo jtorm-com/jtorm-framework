@@ -13,7 +13,7 @@
         ->if(d: item) {
             ->append(d: item)
             ->ui {
-                c: @type + '.item';
+                c: 'Thing.item';
             }
 
             ->else
@@ -23,7 +23,7 @@
             )
             ->append
             ->ui {
-                c: @type + '.item';
+                c: 'Thing.item';
             }
         }
     }
