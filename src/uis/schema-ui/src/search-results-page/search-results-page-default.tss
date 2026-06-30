@@ -4,10 +4,23 @@
     c: 'WebPage.default';
     m: '1';
 
-    body
-        ->if(d: potentialAction)
+    body->if(
+        d: potentialAction,
+        to: 'array'
+    ) {
+        ->each {
+            d: potentialAction;
+            m: 'prepend';
+
+            ->ui {
+                c: 'SearchAction';
+            }
+        }
+
+        ->else
         ->prepend(d: potentialAction)
         ->ui {
             c: 'SearchAction';
         }
+    }
 }

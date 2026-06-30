@@ -719,14 +719,21 @@ test('ui SearchResultsPage composes WebPage, SearchAction, and mainEntity ItemLi
         {
             '@type': 'SearchResultsPage',
             name: 'Search results',
-            potentialAction: {
+            potentialAction: [{
                 '@type': 'SearchAction',
                 target: {
                     '@type': 'EntryPoint',
                     urlTemplate: '/search?q={query}'
                 },
                 query: 'schema'
-            },
+            }, {
+                '@type': 'SearchAction',
+                target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: '/works?q={query}'
+                },
+                query: 'creative'
+            }],
             mainEntity: {
                 '@id': '/results'
             }
@@ -751,6 +758,9 @@ test('ui SearchResultsPage composes WebPage, SearchAction, and mainEntity ItemLi
     );
     assert.equal(body, '<form action="/search?q={query}" method="get" class="search-action">'
         + '<input type="search" required="" placeholder="Search..." name="query" value="schema">'
+        + '<button type="submit" class="primary-button">Search</button></form>'
+        + '<form action="/works?q={query}" method="get" class="search-action">'
+        + '<input type="search" required="" placeholder="Search..." name="query" value="creative">'
         + '<button type="submit" class="primary-button">Search</button></form>'
         + '<main id="body"><div id="contents"><ol><li value="1"><section class="thing">'
         + '<div class="contents"><header class="header"><h1><a href="https://e.com/schema">Schema result</a></h1></header>'
