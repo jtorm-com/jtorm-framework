@@ -17,6 +17,10 @@
             }
 
             ->else
+            ->if(
+                d: @type,
+                v: '^(?!ListItem$).+'
+            )
             ->append
             ->ui {
                 c: @type + '.item';

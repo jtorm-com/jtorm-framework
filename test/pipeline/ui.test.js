@@ -258,6 +258,31 @@ test('ui ItemList renders ListItem wrappers and reuses CreativeWork.item for ite
         + '<section class="body"></section><footer class="footer"></footer></div></section></li></ol></div>');
 });
 
+test('ui ItemList renders direct entities and keeps empty ListItem wrappers empty', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'ItemList'; }",
+        {
+            itemListElement: [{
+                '@type': 'CreativeWork',
+                name: 'Direct result',
+                url: 'https://e.com/direct'
+            }, {
+                '@type': 'ListItem',
+                position: 2
+            }, {
+                position: 3,
+                name: 'Untyped entry'
+            }]
+        }
+    );
+    assert.equal(body, '<div class="a"><ol><li><section class="thing">'
+        + '<div class="contents"><header class="header"><h1>'
+        + '<a href="https://e.com/direct">Direct result</a></h1></header>'
+        + '<section class="body"></section><footer class="footer"></footer></div></section></li>'
+        + '<li value="2"></li><li value="3"></li></ol></div>');
+});
+
 test('ui CreativeWork.listItem delegates to CreativeWork.item', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
