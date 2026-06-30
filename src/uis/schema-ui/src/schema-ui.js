@@ -337,6 +337,9 @@ module.exports = {
                         '@s/thing/thing-update-1.0.1.tss'
                     ]
                 },
+                item: {
+                    t: ['@s/thing/thing-default.tss']
+                },
                 contents: {
                     t: ['@s/thing/thing-contents.tss']
                 },
@@ -369,12 +372,8 @@ module.exports = {
                 },
                 listItem: {
                     ui: {
-                        c: 'Thing.listItem'
-                    },
-                    t: [
-                        '@s/creative-work/creative-work-item.tss',
-                        '@s/creative-work/creative-work-list-item.tss'
-                    ]
+                        c: 'CreativeWork.item'
+                    }
                 },
                 item: {
                     ui: {
@@ -515,6 +514,11 @@ module.exports = {
                         m: '1'
                     },
                     t: ['@s/breadcrumb-list/breadcrumb-list-boxed.tss']
+                }
+            },
+            ListItem: {
+                default: {
+                    t: ['@s/list-item/list-item-default.tss']
                 }
             },
             ItemList: {

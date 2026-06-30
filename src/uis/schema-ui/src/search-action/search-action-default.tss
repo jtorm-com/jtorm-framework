@@ -1,12 +1,10 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 ->text(placeholder: 'Search')
-->if(
-    d: target,
-    to: 'string'
-) {
+->if(d: target) {
     ->data(
-        target: url,
+        action: target.urlTemplate || target,
+        target: false,
         method: 'get'
     )
     ->ui {

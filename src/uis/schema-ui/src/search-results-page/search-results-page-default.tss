@@ -1,0 +1,13 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: 'WebPage.default';
+    m: '1';
+
+    body
+        ->if(d: potentialAction)
+        ->prepend(d: potentialAction)
+        ->ui {
+            c: 'SearchAction';
+        }
+}

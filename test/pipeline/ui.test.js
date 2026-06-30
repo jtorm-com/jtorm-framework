@@ -236,6 +236,39 @@ test('ui CreativeWork.contents renders the Thing.contents card it extends', asyn
     assert.equal(body, `<div class="a">${CONTENTS_NAME}</div>`);
 });
 
+test('ui ItemList renders ListItem wrappers and reuses CreativeWork.item for item entities', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'ItemList'; }",
+        {
+            itemListElement: [{
+                '@type': 'ListItem',
+                position: 1,
+                item: {
+                    '@type': 'CreativeWork',
+                    name: 'Result one',
+                    url: 'https://e.com/result-one'
+                }
+            }]
+        }
+    );
+    assert.equal(body, '<div class="a"><ol><li value="1"><section class="thing">'
+        + '<div class="contents"><header class="header"><h1>'
+        + '<a href="https://e.com/result-one">Result one</a></h1></header>'
+        + '<section class="body"></section><footer class="footer"></footer></div></section></li></ol></div>');
+});
+
+test('ui CreativeWork.listItem delegates to CreativeWork.item', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'CreativeWork.listItem'; }",
+        { name: 'Compat result', url: 'https://e.com/compat' }
+    );
+    assert.equal(body, '<div class="a"><section class="thing"><div class="contents">'
+        + '<header class="header"><h1><a href="https://e.com/compat">Compat result</a></h1></header>'
+        + '<section class="body"></section><footer class="footer"></footer></div></section></div>');
+});
+
 test('ui Thing.contents renders the contents card (header→h1→a from name)', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
@@ -677,6 +710,52 @@ test('ui head.id with url + description emits description meta, canonical + json
         + '<link rel="alternate" type="application/ld+json" href="https://e.com/p.jsonld">'
         + '<meta name="robots" content="index, follow">'
         + '<meta name="referrer" content="origin">');
+});
+
+test('ui SearchResultsPage composes WebPage, SearchAction, and mainEntity ItemList', async () => {
+    const { body } = await render(
+        '<html><head></head><body></body></html>',
+        "html->ui { c: 'SearchResultsPage'; }",
+        {
+            '@type': 'SearchResultsPage',
+            name: 'Search results',
+            potentialAction: {
+                '@type': 'SearchAction',
+                target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: '/search?q={query}'
+                },
+                query: 'schema'
+            },
+            mainEntity: {
+                '@id': '/results'
+            }
+        },
+        'http://localhost/',
+        {
+            '/results': {
+                json: {
+                    '@type': 'ItemList',
+                    itemListElement: [{
+                        '@type': 'ListItem',
+                        position: 1,
+                        item: {
+                            '@type': 'CreativeWork',
+                            name: 'Schema result',
+                            url: 'https://e.com/schema'
+                        }
+                    }]
+                }
+            }
+        }
+    );
+    assert.equal(body, '<form action="/search?q={query}" method="get" class="search-action">'
+        + '<input type="search" required="" placeholder="Search..." name="query" value="schema">'
+        + '<button type="submit" class="primary-button">Search</button></form>'
+        + '<main id="body"><div id="contents"><ol><li value="1"><section class="thing">'
+        + '<div class="contents"><header class="header"><h1><a href="https://e.com/schema">Schema result</a></h1></header>'
+        + '<section class="body"></section><footer class="footer"></footer></div></section></li></ol></div></main>'
+        + '<div id="loading" data-nosnippet="1"><div><span></span><small>Loading</small></div></div>');
 });
 
 // The items path (thing-update-1.0.1.tss `ul->each{ d:items; e:'li'; li->inner{h:name} }`).
