@@ -737,6 +737,28 @@ test('ui head.id with url + description emits description meta, canonical + json
         + '<meta name="referrer" content="origin">');
 });
 
+test('ui SearchAction preserves target arrays as EntryPoint groups', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'SearchAction'; }",
+        {
+            '@type': 'SearchAction',
+            target: [{
+                '@type': 'EntryPoint',
+                urlTemplate: '/one?q={query}',
+                application: { name: 'One' }
+            }, {
+                '@type': 'EntryPoint',
+                urlTemplate: '/two?q={query}',
+                application: { name: 'Two' }
+            }]
+        }
+    );
+    assert.equal(body, '<div class="a"><div class="entry-point-group search-action">'
+        + '<a class="entry-point" href="/one?q={query}">One</a>'
+        + '<a class="entry-point" href="/two?q={query}">Two</a></div></div>');
+});
+
 test('ui SearchResultsPage composes WebPage, SearchAction, and mainEntity ItemList', async () => {
     const { body } = await render(
         '<html><head></head><body></body></html>',
