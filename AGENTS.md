@@ -37,6 +37,11 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 - **Published packages** — each `src/**` dir is a published `@jtorm/*` package. **Never delete or
   deprecate exports / remove packages** (external projects depend on them). Greenfield: no
   backward-compat shims; bug-fixes get a **patch** bump to the touched package's `package.json`.
+- **`schema-ui` follows schema.org first** — component data contracts should reuse schema.org
+  types/properties and mapper composition before inventing local fields or per-type artifacts.
+  Keep the shipped UI graph small: add a new `.tss` only for a real schema.org type/variant
+  boundary that existing components cannot express; prefer shared `Thing`/`ItemList`/`ListItem`
+  composition and thin type overlays.
 - **Terse style** — single-letter locals, minimal/DRY/SOLID; match surrounding density, don't reformat.
 - **Singletons** — modules are singletons; tests must reset the mutable fields they touch.
 - **Bug fixes are failing-test-first** — prove with a red test, fix, then re-run the full suite.

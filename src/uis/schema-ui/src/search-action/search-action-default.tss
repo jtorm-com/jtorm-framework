@@ -3,52 +3,68 @@
 ->text(placeholder: 'Search')
 ->if(
     d: target,
-    to: 'string'
+    to: 'array'
 ) {
-    ->data(
-        target: url,
-        method: 'get'
-    )
     ->ui {
-        c: '@f.form';
+        c: 'Action';
 
-        form {
+        .entry-point-group {
             ->attr {
                 n: 'class';
                 v: 'search-action';
                 m: 'a';
             }
-
-            ->data(
-                name: 'query',
-                value: query,
-                required: '1',
-                placeholder: placeholder + '...'
-            )
-            ->append
-            ->ui {
-                c: '@f.inputSearch';
-            }
-
-            ->data(
-                html: placeholder,
-                type: 'submit'
-            )
-            ->append
-            ->ui {
-                c: 'button.primaryButton';
-            }
         }
     }
 
-    ->else {
+    ->else
+    ->if(d: target) {
+        ->data(
+            action: target.urlTemplate || target,
+            target: false,
+            method: 'get'
+        )
         ->ui {
-            c: 'Action';
+            c: '@f.form';
 
-            .action->attr {
-                n: 'class';
-                v: 'search-action';
-                m: 'a';
+            form {
+                ->attr {
+                    n: 'class';
+                    v: 'search-action';
+                    m: 'a';
+                }
+
+                ->data(
+                    name: 'query',
+                    value: query,
+                    required: '1',
+                    placeholder: placeholder + '...'
+                )
+                ->append
+                ->ui {
+                    c: '@f.inputSearch';
+                }
+
+                ->data(
+                    html: placeholder,
+                    type: 'submit'
+                )
+                ->append
+                ->ui {
+                    c: 'button.primaryButton';
+                }
+            }
+        }
+
+        ->else {
+            ->ui {
+                c: 'Action';
+
+                .action->attr {
+                    n: 'class';
+                    v: 'search-action';
+                    m: 'a';
+                }
             }
         }
     }

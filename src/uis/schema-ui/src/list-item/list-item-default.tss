@@ -1,0 +1,30 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@t.li';
+    t: '0';
+
+    li {
+        ->attr {
+            n: 'value';
+            v: position;
+        }
+
+        ->if(d: item) {
+            ->append(d: item)
+            ->ui {
+                c: 'Thing.item';
+            }
+
+            ->else
+            ->if(
+                d: @type,
+                v: '^(?!ListItem$).+'
+            )
+            ->append
+            ->ui {
+                c: 'Thing.item';
+            }
+        }
+    }
+}

@@ -32,6 +32,22 @@ function refs(tree) {
     return a;
 }
 
+function mapperRefs(o) {
+    const a = [];
+    if (!o || typeof o !== 'object') return a;
+    for (const [k, v] of Object.entries(o)) {
+        if ((k === 't' || k === 'h') && Array.isArray(v))
+            for (const u of v)
+                if (typeof u === 'string' && /^@[sch]\//.test(u))
+                    a.push(u)
+        ;
+        if (v && typeof v === 'object')
+            a.push(...mapperRefs(v))
+        ;
+    }
+    return a;
+}
+
 function missing(files) {
     const miss = [];
     for (const f of files) {
@@ -41,6 +57,16 @@ function missing(files) {
             if (!p || !fs.existsSync(p))
                 miss.push(`${rel}: ${u} -> ${p ? path.relative(ROOT, p) : 'unserved'}`);
         }
+    }
+    return miss;
+}
+
+function missingMapper(ui, rel) {
+    const miss = [];
+    for (const u of mapperRefs(ui.mapper)) {
+        const p = uisDiskPath(u);
+        if (!p || !fs.existsSync(p))
+            miss.push(`${rel}: ${u} -> ${p ? path.relative(ROOT, p) : 'unserved'}`);
     }
     return miss;
 }
@@ -104,9 +130,23 @@ test('artifact-path scanner sees literals inside nested get children', () => {
     }
 });
 
-// Mapper-side `t`/`h` arrays in `*.js` are intentionally out of scope for this ratchet:
-// two schema-ui mapper entries point at absent files that require authoring decisions,
-// not repoints. Extend this guard to mapper arrays only after those files are designed.
+test('mapper artifact scanner reports drifted t/h literals', () => {
+    const ui = {
+        mapper: {
+            Thing: {
+                default: {
+                    t: ['@s/missing-mapper.tss'],
+                    h: ['@h/missing-template.html']
+                }
+            }
+        }
+    };
+    assert.deepEqual(missingMapper(ui, 'fake-ui.js'), [
+        'fake-ui.js: @s/missing-mapper.tss -> src/uis/schema-ui/src/missing-mapper.tss',
+        'fake-ui.js: @h/missing-template.html -> src/uis/html-ui/src/missing-template.html'
+    ]);
+});
+
 test('every src/uis .tss ->get artifact literal resolves to a served disk file', () => {
     let n = 0;
     const files = walk(UIS_DIR);
@@ -115,4 +155,9 @@ test('every src/uis .tss ->get artifact literal resolves to a served disk file',
     ;
     assert.ok(n > 0, 'expected to scan the shipped UI artifact graph');
     assert.deepEqual(missing(files), []);
+});
+
+test('every schema-ui mapper t/h artifact resolves to a served disk file', () => {
+    const { jTormSchemaUi } = require('../../src/uis/schema-ui/src/schema-ui.js');
+    assert.deepEqual(missingMapper(jTormSchemaUi, 'src/uis/schema-ui/src/schema-ui.js'), []);
 });
