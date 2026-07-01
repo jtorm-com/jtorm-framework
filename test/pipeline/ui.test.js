@@ -755,6 +755,16 @@ test('ui head.id with url + description emits description meta, canonical + json
         + '<meta name="referrer" content="origin">');
 });
 
+test('ui WebPage.default m:1 appends the active desktop mediatarget artifacts', async () => {
+    const { html } = await render(
+        '<html><head></head><body></body></html>',
+        "html->ui { c: 'WebPage.default'; m: '1'; h: '0'; }",
+        { name: 'Home', inLanguage: 'en' }
+    );
+    assert.match(html, /<body class="desktop desktop-m">/);
+    assert.doesNotMatch(html, /\btablet\b|\bmobile\b|\bdesktop-s\b|\bdesktop-l\b/);
+});
+
 test('ui SearchAction preserves target arrays as EntryPoint groups', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
