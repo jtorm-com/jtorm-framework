@@ -51,9 +51,10 @@ const { jTormUnwrapMethod } = require('../../src/methods/unwrap-method/src/unwra
 const { jTormRemoveMethod } = require('../../src/methods/remove-method/src/remove-method.js');
 const { jTormFindMethod } = require('../../src/methods/find-method/src/find-method.js');
 const { jTormTitleMethod } = require('../../src/methods/title-method/src/title-method.js');
+const { jTormTimeMethod } = require('../../src/methods/time-method/src/time-method.js');
 // Gate-B (schema.org → component) path: the `ui` verb + its mediatarget/mediaquery
-// deps, the data/config methods components bind through, the uis ARRAY (resolves
-// code-review #7), and the ui-cache model+plugin. (css/js/time stay deferred — see
+// deps, the data/config/time methods components bind through, the uis ARRAY (resolves
+// code-review #7), and the ui-cache model+plugin. (css/js stay deferred — see
 // wiring.test.js.)
 const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
 const { jTormDataMethod } = require('../../src/methods/data-method/src/data-method.js');
@@ -98,6 +99,7 @@ const methods = {
     remove: jTormRemoveMethod,
     find: jTormFindMethod,
     title: jTormTitleMethod,
+    time: jTormTimeMethod,
     get: jTormGetMethod,
     ui: jTormUiMethod,
     data: jTormDataMethod,
@@ -121,6 +123,7 @@ jTormDocumentModel.errorHandler = jTormInsertMethod.errorHandler = jTormUiMethod
 jTormAttrsMethod.tssParser = jTormViewModel.tssParser = jTormDataParser.tssParser = jTormTSSParser;
 jTormHandler.dataParser = jTormAttrsMethod.dataParser = jTormIfMethod.dataParser = jTormTextMethod.dataParser = jTormDataParser;
 jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS this; text-method.js:23 needs it
+jTormTimeMethod.languageModel = jTormLanguageModel;
 jTormLanguageModel.configModel = jTormConfigModel;
 jTormAttrsMethod.attrMethod = jTormAttrMethod;
 jTormEventModel.plugins = [jTormLayerPlugin, jTormUiCachePlugin];

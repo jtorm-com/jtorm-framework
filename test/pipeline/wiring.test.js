@@ -10,10 +10,10 @@ const { WIRED_METHODS } = require('../helpers/engine.js');
 // for — turning silent harness drift into a loud test failure (spec §2/§10).
 const DEFERRED = new Set([
   // Not needed by the Gate-B schema.org slice (test/pipeline/ui.test.js): css/js are
-  // asset-injection plugins (absent from every uis .tss) and time has no first-slice
-  // component. ui/data/config/mediatarget/mediaquery are WIRED via the uis array;
+  // asset-injection plugins (absent from every active uis .tss). ui/data/config/time/
+  // mediatarget/mediaquery are WIRED via the uis array and direct pipeline goldens;
   // layer is now WIRED too (its method + layer-model + layer-plugin in eventModel.plugins).
-  'css', 'js', 'time'
+  'css', 'js'
 ]);
 
 test('every src/methods/*-method is wired or explicitly deferred (DI-drift guard)', () => {
