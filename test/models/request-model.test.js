@@ -52,6 +52,18 @@ test('blocks absolute HTTP URLs by default before transport', async () => {
   } finally { rm.transport = saved; rm.base = ''; }
 });
 
+test('blocks fetch-normalized absolute HTTP URLs before transport', async () => {
+  let calls = 0;
+  const saved = rm.transport;
+  rm.transport = async () => { calls++; return { ok: true, text: async () => 'x' }; };
+  try {
+    rm.base = '';
+    await assert.rejects(() => rm.get(' http://169.254.169.254/latest').text(), /URL blocked/);
+    await assert.rejects(() => rm.get('h\nttp://169.254.169.254/latest').text(), /URL blocked/);
+    assert.equal(calls, 0);
+  } finally { rm.transport = saved; rm.base = ''; }
+});
+
 test('allows configured base-origin URLs by default', async () => {
   let seen;
   const saved = rm.transport;

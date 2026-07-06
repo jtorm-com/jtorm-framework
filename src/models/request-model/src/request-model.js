@@ -21,7 +21,15 @@ module.exports = {
         timeout: 0, // ms; 0 = no timeout
 
         url: function (u) {
-            return /^https?:\/\//i.test(u) ? u : this.base + u;
+            let r;
+
+            try {
+                r = new URL(u).href;
+            } catch (e) {
+                r = /^https?:\/\//i.test(u) ? u : this.base + u;
+            }
+
+            return r;
         },
 
         /** @type {jTormUrlGuard} */
@@ -29,7 +37,11 @@ module.exports = {
             const b = this.base;
             let r;
 
-            if (/^\/\//.test(u))
+            if (/^[\u0000-\u0020]*\/\//.test(u))
+                return false
+            ;
+
+            if (/[\u0000-\u001F\u007F]/.test(u))
                 return false
             ;
 
