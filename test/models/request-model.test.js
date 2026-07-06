@@ -21,12 +21,11 @@ test('throws on non-ok response', async () => {
 });
 
 test('prepends base for relative URLs, leaves absolute URLs alone', async () => {
-  let seen; const r = stub(async (u) => { seen = u; return { ok: true, text: async () => '' }; });
   try {
     rm.base = 'https://cdn/';
-    await rm.get('a/b').text(); assert.equal(seen, 'https://cdn/a/b');
-    await rm.get('https://x/y').text(); assert.equal(seen, 'https://x/y');
-  } finally { rm.base = ''; r(); }
+    assert.equal(rm.url('a/b'), 'https://cdn/a/b');
+    assert.equal(rm.url('https://x/y'), 'https://x/y');
+  } finally { rm.base = ''; }
 });
 
 test('uses the injected transport instead of the global fetch', async () => {
@@ -40,4 +39,54 @@ test('uses the injected transport instead of the global fetch', async () => {
     assert.equal(viaTransport, 1);
     assert.equal(viaGlobal, 0);
   } finally { rm.transport = saved; r(); }
+});
+
+test('blocks absolute HTTP URLs by default before transport', async () => {
+  let calls = 0;
+  const saved = rm.transport;
+  rm.transport = async () => { calls++; return { ok: true, text: async () => 'x' }; };
+  try {
+    rm.base = '';
+    await assert.rejects(() => rm.get('http://169.254.169.254/latest').text(), /URL blocked/);
+    assert.equal(calls, 0);
+  } finally { rm.transport = saved; rm.base = ''; }
+});
+
+test('allows configured base-origin URLs by default', async () => {
+  let seen;
+  const saved = rm.transport;
+  rm.transport = async (u) => { seen = u; return { ok: true, text: async () => 'x' }; };
+  try {
+    rm.base = 'https://cdn.example/assets/';
+    await rm.get('a.tss').text();
+    assert.equal(seen, 'https://cdn.example/assets/a.tss');
+    await rm.get('https://cdn.example/other.tss').text();
+    assert.equal(seen, 'https://cdn.example/other.tss');
+    await assert.rejects(() => rm.get('https://other.example/x').text(), /URL blocked/);
+  } finally { rm.transport = saved; rm.base = ''; }
+});
+
+test('uses injected URL guard with the resolved URL before transport', async () => {
+  let seen, calls = 0;
+  const savedT = rm.transport, savedA = rm.allow;
+  rm.transport = async () => { calls++; return { ok: true, text: async () => 'x' }; };
+  rm.allow = function (u) { seen = u; return false; };
+  try {
+    rm.base = 'https://cdn.example/';
+    await assert.rejects(() => rm.get('a.tss').text(), /URL blocked/);
+    assert.equal(seen, 'https://cdn.example/a.tss');
+    assert.equal(calls, 0);
+  } finally { rm.transport = savedT; rm.allow = savedA; rm.base = ''; }
+});
+
+test('injected URL guard can opt in an external absolute URL', async () => {
+  let seen;
+  const savedT = rm.transport, savedA = rm.allow;
+  rm.transport = async (u) => { seen = u; return { ok: true, text: async () => 'x' }; };
+  rm.allow = function (u) { return u === 'https://api.example/x'; };
+  try {
+    rm.base = '';
+    assert.equal(await rm.get('https://api.example/x').text(), 'x');
+    assert.equal(seen, 'https://api.example/x');
+  } finally { rm.transport = savedT; rm.allow = savedA; rm.base = ''; }
 });
