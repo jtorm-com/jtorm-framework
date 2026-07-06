@@ -14,6 +14,18 @@ module.exports = {
             'a',// Append
             'p'// Prepend
         ],
+        urlAttrs: {
+            cite: 1,
+            href: 1,
+            longdesc: 1,
+            src: 1,
+            srcset: 1,
+            action: 1,
+            formaction: 1,
+            poster: 1,
+            data: 1,
+            'xlink:href': 1
+        },
 
         /** @param {ViewModel} v */
         validate: function (v) {
@@ -68,15 +80,42 @@ module.exports = {
             return e.getAttribute(n);
         },
 
+        safe: function (e, n, v) {
+            const a = n.trim().toLowerCase();
+
+            if (
+                /^on/.test(a)
+                || (a === 'srcdoc' && (!e.hasAttribute('sandbox') || /\ballow-scripts\b/i.test(e.getAttribute('sandbox'))))
+                || (a === 'sandbox' && e.hasAttribute('srcdoc') && /\ballow-scripts\b/i.test(v))
+                || (
+                    this.urlAttrs[a]
+                    && (a === 'srcset' ? v.split(',') : [v]).some(u => /^(javascript|data|vbscript):/i.test(u.trim().replace(/[\u0000-\u0020\u007f]+/g, '')))
+                )
+            )
+                throw new Error('Unsafe attribute ' + n)
+            ;
+        },
+
         set: function (e, n, v) {
+            n = String(n);
+
             if (v === true)
                 v = ''
+            ; else
+                v = String(v)
             ;
 
+            this.safe(e, n, v);
             e.setAttribute(n, v);
         },
 
         del: function (e, n) {
+            n = String(n);
+
+            if (n.trim().toLowerCase() === 'sandbox' && e.hasAttribute('srcdoc'))
+                throw new Error('Unsafe attribute ' + n)
+            ;
+
             e.removeAttribute(n);
         }
     }

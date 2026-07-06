@@ -21,6 +21,15 @@ npm install @jtorm/attr-method
 | `p`    | `string` | `false`  | Prepend to value.                                       |
 
 
+## Safety
+
+Event-handler attribute names (`on*`) are rejected. `srcdoc` requires a sandbox
+without `allow-scripts`; sandbox cannot be removed or changed to `allow-scripts`
+while `srcdoc` is present. URL-bearing attributes (`cite`, `href`, `longdesc`,
+`src`, `srcset`, `action`, `formaction`, `poster`, `data`, `xlink:href`) reject
+`javascript:`, `data:`, and `vbscript:` schemes.
+
+
 ## Example
 
 ```js
