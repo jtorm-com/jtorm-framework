@@ -7,6 +7,11 @@
  * @param {object} [opts] Fetch options (e.g. { signal }).
  * @returns {Promise<object>} Fetch-shaped, minimal Response-like (.ok/.status/.json()/.text()).
  */
+/**
+ * @callback jTormUrlGuard
+ * @param {string} url Fully-resolved URL (already passed through url()).
+ * @returns {boolean|Promise<boolean>} True when the request may be sent.
+ */
 
 module.exports = {
     jTormRequestModel: {
@@ -16,7 +21,45 @@ module.exports = {
         timeout: 0, // ms; 0 = no timeout
 
         url: function (u) {
-            return /^https?:\/\//.test(u) ? u : this.base + u;
+            let r;
+
+            try {
+                r = new URL(u).href;
+            } catch (e) {
+                r = /^https?:\/\//i.test(u) ? u : this.base + u;
+            }
+
+            return r;
+        },
+
+        /** @type {jTormUrlGuard} */
+        allow: function (u) {
+            const b = this.base;
+            let r;
+
+            if (/^[\u0000-\u0020]*\/\//.test(u))
+                return false
+            ;
+
+            if (/[\u0000-\u001F\u007F]/.test(u))
+                return false
+            ;
+
+            if (!/^[a-z][a-z0-9+.-]*:/i.test(u))
+                return true
+            ;
+
+            if (!/^https?:\/\//i.test(u) || !/^https?:\/\//i.test(b))
+                return false
+            ;
+
+            try {
+                r = new URL(u).origin === new URL(b).origin;
+            } catch (e) {
+                r = false;
+            }
+
+            return r;
         },
 
         // DI (optional) — swappable HTTP transport; defaults to the global fetch.
@@ -28,13 +71,19 @@ module.exports = {
         transport: function (u, o) { return fetch(u, o); },
 
         fetch: async function (url) {
-            const o = {};
+            const o = {},
+                u = this.url(url)
+            ;
 
             if (this.timeout)
                 o.signal = AbortSignal.timeout(this.timeout)
             ;
 
-            const r = await this.transport(this.url(url), o);
+            if (!(await this.allow(u)))
+                throw new Error('URL blocked ' + u)
+            ;
+
+            const r = await this.transport(u, o);
 
             if (!r.ok)
                 throw new Error('HTTP ' + r.status + ' for ' + url)
