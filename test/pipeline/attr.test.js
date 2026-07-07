@@ -69,6 +69,15 @@ test('attr remove mode does not let regex-shaped data consume neighboring tokens
   assert.equal(body, '<p class="keep a---z done">x</p>');
 });
 
+test('attr remove mode trims incidental whitespace around a literal token', async () => {
+  const { body } = await render(
+    '<body><p class="drop keep">x</p></body>',
+    "p->attr { n: 'class'; v: 'drop '; m: 'r'; }",
+    {}
+  );
+  assert.equal(body, '<p class="keep">x</p>');
+});
+
 test('attr rejects srcdoc values without a sandbox', async () => {
   await assert.rejects(
     render(

@@ -20,7 +20,7 @@ npm install @jtorm/attr-method
 | `a`    | `string` | `false`  | Append to value.                                        |
 | `p`    | `string` | `false`  | Prepend to value.                                       |
 
-Remove mode with `v` removes the exact whitespace-delimited attribute token.
+Remove mode with `v` removes the exact whitespace-delimited attribute token after trimming surrounding value whitespace.
 The value is treated as literal text, not regular expression syntax.
 
 
