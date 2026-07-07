@@ -195,7 +195,7 @@ function reset() {
     jTormHtmlModel.c = new Map();
     jTormTssModel.c = new Map();
     jTormUiMethod.cache = {};          // resolved-component cache (singleton)
-    jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache
+    jTormUiCacheModel.c = new Map();   // per-cid rendered-fragment cache (bounded-LRU singleton)
     jTormUiCacheModel.updated = 0;
     jTormLayerModel.layers = {};       // stashed deferred fragments (per layer id)
     jTormLayerModel.event = { before: { iteration: [] }, after: { iteration: [], view: [] } }; // registered ids per phase
