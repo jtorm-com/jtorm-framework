@@ -12,3 +12,9 @@ npm install @jtorm/data-model
 ## How To
 
 get: url
+
+## Caching
+
+Results are cached (as the in-flight promise) keyed by URL. The cache is a
+bounded LRU — at most `max` entries are kept (default `512`, injectable), the
+least-recently-used evicted beyond that. A rejected fetch is not cached.
