@@ -56,8 +56,10 @@ module.exports = {
                     ; else if (v.d.m === 'a')
                         s.set(e, v.d.n, (v.d.ns ? tV : (tV ? tV + ' ' : '')) + v.d.v)
                     ; else if (v.d.m === 'r') {
+                        const r = String(v.d.v).trim();
+
                         if (tV)
-                            tV = tV.replace(new RegExp('\\b' + v.d.v + '\\b', 'gm'), "")
+                            tV = tV.split(/\s+/).filter(t => t !== r).join(' ')
                         ;
 
                         if (tV)

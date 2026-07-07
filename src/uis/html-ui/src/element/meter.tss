@@ -11,31 +11,31 @@ meter {
         v: form;
     }
 
-    ->if(d: high, v: '^[0-9]+(.[0-9])?$')
+    ->if(d: high, v: '^[0-9]+(.[0-9])?$', r: true)
     ->attr {
         n: 'high';
         v: high;
     }
 
-    ->if(d: low, v: '^[0-9]+(.[0-9])?$')
+    ->if(d: low, v: '^[0-9]+(.[0-9])?$', r: true)
     ->attr {
         n: 'low';
         v: low;
     }
 
-    ->if(d: max, v: '^[0-9]+(.[0-9])?$')
+    ->if(d: max, v: '^[0-9]+(.[0-9])?$', r: true)
     ->attr {
         n: 'max';
         v: max;
     }
 
-    ->if(d: min, v: '^[0-9]+(.[0-9])?$')
+    ->if(d: min, v: '^[0-9]+(.[0-9])?$', r: true)
     ->attr {
         n: 'min';
         v: min;
     }
 
-    ->if(d: optimum, v: '^[0-9]+(.[0-9])?$')
+    ->if(d: optimum, v: '^[0-9]+(.[0-9])?$', r: true)
     ->attr {
         n: 'optimum';
         v: optimum;

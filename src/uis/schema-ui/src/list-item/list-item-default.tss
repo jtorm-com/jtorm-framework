@@ -19,7 +19,8 @@
             ->else
             ->if(
                 d: @type,
-                v: '^(?!ListItem$).+'
+                v: '^(?!ListItem$).+',
+                r: true
             )
             ->append
             ->ui {

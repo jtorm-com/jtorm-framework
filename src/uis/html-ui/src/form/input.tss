@@ -23,7 +23,8 @@ input {
 
     ->if(
         d: size,
-        v: '^[0-9]+$'
+        v: '^[0-9]+$',
+        r: true
     )
     ->attr {
         n: 'size';
@@ -38,7 +39,8 @@ input {
 
     ->if(
         d: minlength,
-        v: '^[0-9]+$')
+        v: '^[0-9]+$',
+        r: true)
     ->attr {
         n: 'minlength';
         v: minlength;
@@ -46,7 +48,8 @@ input {
 
     ->if(
         d: maxlength,
-        v: '^[0-9]+$'
+        v: '^[0-9]+$',
+        r: true
     )
     ->attr {
         n: 'maxlength';

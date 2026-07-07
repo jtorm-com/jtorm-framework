@@ -8,7 +8,8 @@ input {
 
     ->if(
         d: autocomplete,
-        v: '^(on|off)$'
+        v: '^(on|off)$',
+        r: true
     )
     ->attr {
         n: 'autocomplete';

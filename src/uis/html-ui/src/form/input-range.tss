@@ -6,7 +6,7 @@ input {
         v: 'range';
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')
+    ->if(d: autocomplete, v: '^(on|off)$', r: true)
     ->attr {
         n: 'autocomplete';
         v: autocomplete;

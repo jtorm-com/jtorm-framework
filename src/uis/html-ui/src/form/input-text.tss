@@ -6,7 +6,7 @@ input {
         v: 'text';
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')
+    ->if(d: autocomplete, v: '^(on|off)$', r: true)
     ->attr {
         n: 'autocomplete';
         v: autocomplete;
@@ -36,7 +36,7 @@ input {
         v: pattern;
     }
 
-    ->if(d: size, v: '^[0-9]+$')
+    ->if(d: size, v: '^[0-9]+$', r: true)
     ->attr {
         n: 'size';
         v: size;
@@ -48,13 +48,13 @@ input {
         v: true;
     }
 
-    ->if(d: minlength, v: '^[0-9]+$')
+    ->if(d: minlength, v: '^[0-9]+$', r: true)
     ->attr {
         n: 'minlength';
         v: minlength;
     }
 
-    ->if(d: maxlength, v: '^[0-9]+$')
+    ->if(d: maxlength, v: '^[0-9]+$', r: true)
     ->attr {
         n: 'maxlength';
         v: maxlength;

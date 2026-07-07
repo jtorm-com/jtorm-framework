@@ -11,19 +11,19 @@ form {
         v: action;
     }
 
-    ->if(d: autocomplete, v: '^(on|off)$')
+    ->if(d: autocomplete, v: '^(on|off)$', r: true)
     ->attr {
         n: 'autocomplete';
         v: autocomplete;
     }
 
-    ->if(d: enctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$')
+    ->if(d: enctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$', r: true)
     ->attr {
         n: 'enctype';
         v: enctype;
     }
 
-    ->if(d: method, v: '^(get|post)$')
+    ->if(d: method, v: '^(get|post)$', r: true)
     ->attr {
         n: 'method';
         v: method;

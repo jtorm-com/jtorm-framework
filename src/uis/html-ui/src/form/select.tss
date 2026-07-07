@@ -17,7 +17,7 @@ select {
         v: true;
     }
 
-    ->if(d: size, v: '^[0-9]+$')
+    ->if(d: size, v: '^[0-9]+$', r: true)
     ->attr {
         n: 'size';
         v: size;

@@ -15,9 +15,14 @@ npm install @jtorm/if-method
 | Option | Type     | Required | Description                                                        |
 |--------|----------|----------|--------------------------------------------------------------------|
 | `d`    | `data`   | `true`   | Data.                                                              |
-| `v`    | `regex`  | `false`  | Test the data within the `if` scope using a regexp or boolean.     |
+| `v`    | `string` or `boolean` | `false`  | Test the data within the `if` scope using a literal value or boolean. |
 | `el`   | `string` | `false`  | Element to check if exists.                                        |
 | `to`   | `string` | `false`  | Type check, check if `array`, `string`, `number`, etc for example. |
+| `r`    | `boolean`| `false`  | Treat a quoted TSS `v` value as a trusted regular expression.      |
+
+String values are literal substring checks. They are not regular expressions.
+Regular expression matching is opt-in via `r: true` and only accepts a single quoted TSS
+literal; model-derived or concatenated regex operands are rejected.
 
 
 ## Example

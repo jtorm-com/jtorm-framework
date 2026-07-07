@@ -6,7 +6,7 @@ link {
         v: 'icon';
     }
 
-    ->if(d: sizes, v: '^([0-9]+x[0-9]+)|(any)$')
+    ->if(d: sizes, v: '^([0-9]+x[0-9]+)|(any)$', r: true)
     ->attr {
         n: 'sizes';
         v: sizes;

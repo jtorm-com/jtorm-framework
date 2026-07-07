@@ -47,7 +47,8 @@ body {
         // sort order is important this way, but takes less code
         ->if(
             d: @type,
-            v: '^WPHeader|SiteNavigationElement'
+            v: '^WPHeader|SiteNavigationElement',
+            r: true
         )
         ->get(d: @id)
         ->append(
@@ -98,7 +99,8 @@ body {
 
         ->if(
             d: @type,
-            v: '^WPFooter'
+            v: '^WPFooter',
+            r: true
         )
         ->get(d: @id)
         ->append(
