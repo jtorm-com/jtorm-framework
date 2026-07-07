@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { render } = require('../helpers/engine.js');
 
-const TSS = "p->if(d: show, v: '^yes$')->attr { n: 'data-ok'; v: show; }";
+const TSS = "p->if(d: show, v: 'yes')->attr { n: 'data-ok'; v: show; }";
 
 test('if gate passes → the chained method applies', async () => {
   const { body } = await render('<body><p>x</p></body>', TSS, { show: 'yes' });
@@ -27,6 +27,47 @@ test('if(to: type) gates on the data type', async () => {
   const t = "p->if(d: list, to: 'array')->attr { n: 'data-a'; v: '1'; }";
   assert.equal((await render('<body><p>x</p></body>', t, { list: [1] })).body, '<p data-a="1">x</p>');
   assert.equal((await render('<body><p>x</p></body>', t, { list: 'no' })).body, '<p>x</p>');
+});
+
+test('if(v:) treats malformed regex data as literal text', async () => {
+  const t = "p->if(d: text, v: token)->attr { n: 'data-a'; v: '1'; }";
+  const { body } = await render('<body><p>x</p></body>', t, { text: 'abc', token: '[' });
+  assert.equal(body, '<p>x</p>');
+});
+
+test('if(v:) does not let regex-shaped data overmatch', async () => {
+  const t = "p->if(d: text, v: token)->attr { n: 'data-a'; v: '1'; }";
+  const { body } = await render('<body><p>x</p></body>', t, { text: 'a---z', token: 'a.*z' });
+  assert.equal(body, '<p>x</p>');
+});
+
+test('if(r:) treats a quoted TSS value as a trusted regex', async () => {
+  const t = "p->if(d: show, v: '^yes$', r: true)->attr { n: 'data-a'; v: '1'; }";
+  assert.equal((await render('<body><p>x</p></body>', t, { show: 'yes' })).body, '<p data-a="1">x</p>');
+  assert.equal((await render('<body><p>x</p></body>', t, { show: 'yesterday' })).body, '<p>x</p>');
+});
+
+test('if(r:) rejects model-derived regex operands', async () => {
+  await assert.rejects(
+    render(
+      '<body><p>x</p></body>',
+      "p->if(d: text, v: token, r: true)->attr { n: 'data-a'; v: '1'; }",
+      { text: 'abc', token: '[' }
+    ),
+    /Unsafe regex/
+  );
+});
+
+test('if(v:) preserves ordinary literal matching', async () => {
+  const t = "p->if(d: text, v: 'yes')->attr { n: 'data-a'; v: '1'; }";
+  const { body } = await render('<body><p>x</p></body>', t, { text: 'say yes' });
+  assert.equal(body, '<p data-a="1">x</p>');
+});
+
+test('if(v:) preserves boolean matching', async () => {
+  const t = "p->if(d: ok, v: true)->attr { n: 'data-a'; v: '1'; }";
+  assert.equal((await render('<body><p>x</p></body>', t, { ok: true })).body, '<p data-a="1">x</p>');
+  assert.equal((await render('<body><p>x</p></body>', t, { ok: false })).body, '<p>x</p>');
 });
 
 test('if(el: X) gates on element existence — the optional-target idiom', async () => {

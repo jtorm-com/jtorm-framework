@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 iframe {
-    ->if(d: height, v: '^[0-9]+$')
+    ->if(d: height, v: '^[0-9]+$', r: true)
     ->attr {
         n: 'height';
         v: height;
@@ -12,7 +12,7 @@ iframe {
         v: name;
     }
 
-    ->if(d: sandbox, v: '^(allow-forms|allow-pointer-lock|allow-popups|allow-same-origin|allow-scripts|allow-top-navigation)$')
+    ->if(d: sandbox, v: '^(allow-forms|allow-pointer-lock|allow-popups|allow-same-origin|allow-scripts|allow-top-navigation)$', r: true)
     ->attr {
         n: 'sandbox';
         v: sandbox;
@@ -28,7 +28,7 @@ iframe {
         v: srcdoc;
     }
 
-    ->if(d: width, v: '^[0-9]+$')
+    ->if(d: width, v: '^[0-9]+$', r: true)
     ->attr {
         n: 'width';
         v: width;

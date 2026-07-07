@@ -57,7 +57,7 @@ module.exports = {
                         s.set(e, v.d.n, (v.d.ns ? tV : (tV ? tV + ' ' : '')) + v.d.v)
                     ; else if (v.d.m === 'r') {
                         if (tV)
-                            tV = tV.replace(new RegExp('\\b' + v.d.v + '\\b', 'gm'), "")
+                            tV = tV.split(/\s+/).filter(t => t !== String(v.d.v)).join(' ')
                         ;
 
                         if (tV)

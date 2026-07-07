@@ -15,7 +15,8 @@ module.exports = {
             'd',// Data
             'v',// Value
             'el',// Element
-            'to'// To
+            'to',// To
+            'r'// RegExp
         ],
 
         validate: function () {
@@ -23,12 +24,13 @@ module.exports = {
         },
 
         /**
-         * Evaluate `v.d.d` (with `||`/`&&`, type, regex, or element tests) and boil either the matching children or the `->else` branch.
+         * Evaluate `v.d.d` (with `||`/`&&`, type, literal/trusted-regex, or element tests) and boil either the matching children or the `->else` branch.
          * @param {ViewModel} v
          */
         handle: async function (v) {
             const
                 d = this.dataParser,
+                q = d.tssParser.c.quotes,
                 o = this.or,
                 a = this.and
             ;
@@ -78,8 +80,16 @@ module.exports = {
             if (v.d.v !== undefined) {
                 if (v._.isBoolean(v.d.v) && v.d.d === v.d.v)
                     v.d.d = 1
+                ; else if (v.d.r) {
+                    if (!v._.isString(v.t.p.v) || v.t.p.v[0] !== q || v.t.p.v[v.t.p.v.length - 1] !== q)
+                        throw new Error('Unsafe regex')
+                    ;
+
+                    r = new RegExp(v.t.p.v.slice(1, -1), 'm')
+                } else if (!v._.isBoolean(v.d.v) && v.d.d && String(v.d.d).indexOf(String(v.d.v)) !== -1)
+                    v.d.d = 1
                 ; else
-                    r = new RegExp(v.d.v, 'm')
+                    v.d.d = 0
                 ;
             }
 

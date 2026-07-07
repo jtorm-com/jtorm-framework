@@ -5,13 +5,13 @@
     v: formaction;
 }
 
-->if(d: formenctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$')
+->if(d: formenctype, v: '^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)$', r: true)
 ->attr {
     n: 'formenctype';
     v: formenctype;
 }
 
-->if(d: formmethod, v: '^(get|post)$')
+->if(d: formmethod, v: '^(get|post)$', r: true)
 ->attr {
     n: 'formmethod';
     v: formmethod;

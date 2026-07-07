@@ -51,6 +51,24 @@ test('attr remove mode strips event-handler attributes from upstream html', asyn
   assert.equal(body, '<img>');
 });
 
+test('attr remove mode treats metacharacter data as a literal token', async () => {
+  const { body } = await render(
+    '<body><p class="* keep">x</p></body>',
+    "p->attr { n: 'class'; v: token; m: 'r'; }",
+    { token: '*' }
+  );
+  assert.equal(body, '<p class="keep">x</p>');
+});
+
+test('attr remove mode does not let regex-shaped data consume neighboring tokens', async () => {
+  const { body } = await render(
+    '<body><p class="keep a.*z a---z done">x</p></body>',
+    "p->attr { n: 'class'; v: token; m: 'r'; }",
+    { token: 'a.*z' }
+  );
+  assert.equal(body, '<p class="keep a---z done">x</p>');
+});
+
 test('attr rejects srcdoc values without a sandbox', async () => {
   await assert.rejects(
     render(

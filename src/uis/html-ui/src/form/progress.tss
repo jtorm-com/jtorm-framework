@@ -1,13 +1,13 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 progress {
-    ->if(d: max, v: '^[0-9]+(.[0-9])?$')
+    ->if(d: max, v: '^[0-9]+(.[0-9])?$', r: true)
     ->attr {
         n: 'max';
         v: max;
     }
 
-    ->if(d: value, v: '^[0-9]+(.[0-9])?$')
+    ->if(d: value, v: '^[0-9]+(.[0-9])?$', r: true)
     ->attr {
         n: 'value';
         v: value;

@@ -5,7 +5,7 @@
     v: href;
 }
 
-->if(d: hreflang, v: '^([a-z][a-z]-?([A-Z][A-Z]|Hans|Hant|x-default)?)$')
+->if(d: hreflang, v: '^([a-z][a-z]-?([A-Z][A-Z]|Hans|Hant|x-default)?)$', r: true)
 ->attr {
     n: 'hreflang';
     v: hreflang;

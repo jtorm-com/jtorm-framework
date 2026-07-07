@@ -4,7 +4,7 @@
 }
 // todo
 body {
-  ->if(d: about.@c.url.URL, v: '\.json$') {
+  ->if(d: about.@c.url.URL, v: '\.json$', r: true) {
     ->get {
       d: about.@c.url.URL;
       ->prepend(d: data.mainEntity.@c)->ui {

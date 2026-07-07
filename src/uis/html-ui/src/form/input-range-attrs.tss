@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 input {
-    ->if(d: autocomplete, v: '^(on|off)$')
+    ->if(d: autocomplete, v: '^(on|off)$', r: true)
     ->attr {
         n: 'autocomplete';
         v: autocomplete;

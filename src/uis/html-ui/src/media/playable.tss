@@ -24,7 +24,7 @@
     v: true;
 }
 
-->if(d: preload, v: '^(auto|metadata|none)$')
+->if(d: preload, v: '^(auto|metadata|none)$', r: true)
 ->attr {
     n: 'preload';
     v: preload;
