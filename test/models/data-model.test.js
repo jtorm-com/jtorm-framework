@@ -38,6 +38,15 @@ test('caches and returns an integer-like key (LRU order must not depend on key t
   assert.equal(await dm.get(42), 'v42'); // integer key must round-trip, not return undefined
 });
 
+test('a repeated array-of-URLs key reuses the cache across distinct array instances', async () => {
+  dm.c = new Map(); dm.max = 512;
+  let fetches = 0;
+  dm.requestModel = { get: () => ({ json: () => { fetches++; return Promise.resolve({ ok: 1 }); } }) };
+  await dm.get(['/a.json']);   // ui-method builds artifact URL lists as arrays (ui-method.js:184)
+  await dm.get(['/a.json']);   // a DIFFERENT array, same content -> must hit, not refetch
+  assert.equal(fetches, 1, 'same-content array key must hit the cache (Map keys arrays by identity)');
+});
+
 test('a degenerate max (0) still returns the fetched value (never evicts the fresh entry)', async () => {
   dm.c = new Map(); dm.max = 0;
   dm.requestModel = { get: (u) => ({ json: () => Promise.resolve('v' + u) }) };

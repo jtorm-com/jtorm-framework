@@ -37,3 +37,12 @@ test('caches and returns an integer-like key (LRU order must not depend on key t
   await hm.get('/b');   // at max
   assert.equal(await hm.get(42), 'v42'); // integer key must round-trip, not return undefined
 });
+
+test('a repeated array-of-URLs key reuses the cache across distinct array instances', async () => {
+  hm.c = new Map(); hm.max = 512;
+  let fetches = 0;
+  hm.requestModel = { get: () => ({ text: () => { fetches++; return Promise.resolve('X'); } }) };
+  await hm.get(['/a.html']);   // ui-method passes a fresh array each render (ui-method.js:177)
+  await hm.get(['/a.html']);   // a DIFFERENT array, same content -> must hit, not refetch
+  assert.equal(fetches, 1, 'same-content array key must hit the cache (Map keys arrays by identity)');
+});

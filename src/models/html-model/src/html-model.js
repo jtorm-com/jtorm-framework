@@ -11,21 +11,22 @@ module.exports = {
 
         get: async function (v) {
             const s = this;
-            let p = s.c.get(v), k;
+            const c = String(v);// Map keys arrays/numbers by identity; coerce to a stable string (mirrors the old object cache) — v (e.g. an array of URLs) stays fresh per render
+            let p = s.c.get(c), k;
 
             if (p !== undefined) {// hit: re-insert to bump recency (Map keeps true insertion order)
-                s.c.delete(v);
-                s.c.set(v, p);
+                s.c.delete(c);
+                s.c.set(c, p);
                 return p;
             }
 
             p = s.requestModel.get(v).text();
-            p.catch(function () { if (s.c.get(v) === p) s.c.delete(v); });// clear only if still this promise
-            s.c.set(v, p);
+            p.catch(function () { if (s.c.get(c) === p) s.c.delete(c); });// clear only if still this promise
+            s.c.set(c, p);
 
             while (s.c.size > s.max) {// evict LRU; never the entry just added (guards max <= 0)
                 k = s.c.keys().next().value;
-                if (k === v) break;
+                if (k === c) break;
                 s.c.delete(k);
             }
 
