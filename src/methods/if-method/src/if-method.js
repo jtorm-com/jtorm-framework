@@ -81,11 +81,11 @@ module.exports = {
                 if (v._.isBoolean(v.d.v) && v.d.d === v.d.v)
                     v.d.d = 1
                 ; else if (v.d.r) {
-                    if (!v._.isString(v.t.p.v) || v.t.p.v[0] !== q || v.t.p.v[v.t.p.v.length - 1] !== q)
+                    if (!v._.isString(v.t.p.v) || v.t.p.v !== q + v.d.v + q)
                         throw new Error('Unsafe regex')
                     ;
 
-                    r = new RegExp(v.t.p.v.slice(1, -1), 'm')
+                    r = new RegExp(v.d.v, 'm')
                 } else if (!v._.isBoolean(v.d.v) && v.d.d && String(v.d.d).indexOf(String(v.d.v)) !== -1)
                     v.d.d = 1
                 ; else

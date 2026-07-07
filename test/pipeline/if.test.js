@@ -58,6 +58,17 @@ test('if(r:) rejects model-derived regex operands', async () => {
   );
 });
 
+test('if(r:) rejects concatenated regex operands', async () => {
+  await assert.rejects(
+    render(
+      '<body><p>x</p></body>',
+      "p->if(d: text, v: '^' + token + '$', r: true)->attr { n: 'data-a'; v: '1'; }",
+      { text: 'abc', token: 'abc' }
+    ),
+    /Unsafe regex/
+  );
+});
+
 test('if(v:) preserves ordinary literal matching', async () => {
   const t = "p->if(d: text, v: 'yes')->attr { n: 'data-a'; v: '1'; }";
   const { body } = await render('<body><p>x</p></body>', t, { text: 'say yes' });

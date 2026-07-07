@@ -21,8 +21,8 @@ npm install @jtorm/if-method
 | `r`    | `boolean`| `false`  | Treat a quoted TSS `v` value as a trusted regular expression.      |
 
 String values are literal substring checks. They are not regular expressions.
-Regular expression matching is opt-in via `r: true` and only accepts quoted TSS
-literals; model-derived regex operands are rejected.
+Regular expression matching is opt-in via `r: true` and only accepts a single quoted TSS
+literal; model-derived or concatenated regex operands are rejected.
 
 
 ## Example
