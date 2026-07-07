@@ -6,10 +6,11 @@ module.exports = {
         // DI
         // saveModel
 
-        c: new Map(),// composite-key -> {l,id,c,d}; LRU-bounded rendered-fragment cache
+        cache: {},// exported nested store {l:{id:{c:d}}} the host persists via saveModel — the source of truth
+        order: new Map(),// LRU recency tracker parallel to `cache`: composite-key -> {l,id,c}; drives eviction
         max: 512,// DI: LRU cap on cached fragments; least-recently-used evicted beyond this
         updated: 0,
-        sep: String.fromCharCode(0),// NUL key separator (built at runtime, never a raw NUL in source); can't occur in a language/id/variant, so distinct (l,id,c) never collide
+        sep: String.fromCharCode(0),// NUL order-key separator (runtime-built, never a raw NUL in source); can't occur in a language/id/variant, so distinct (l,id,c) never collide
 
         key: function (l, id, c) {
             return l + this.sep + id + this.sep + c;
@@ -18,10 +19,11 @@ module.exports = {
         init: async function () {
             let o, l, id, c;
 
-            this.c = new Map();
+            this.cache = {};
+            this.order = new Map();
             this.updated = 0;// a reloaded cache is clean — never carry a stale dirty flag into the next save()
 
-            if (this.saveModel && (o = this.saveModel.get())) {// flatten the persisted nested {l:{id:{c:d}}} into the LRU Map (bounded to max)
+            if (this.saveModel && (o = this.saveModel.get())) {// reload the persisted nested cache, rebuilding recency and bounding to max
                 for (l in o)
                     for (id in o[l])
                         for (c in o[l][id])
@@ -31,51 +33,59 @@ module.exports = {
         },
 
         get: async function (v, l, id, c) {
-            const s = this, k = s.key(l, id, c), e = s.c.get(k);
+            const s = this;
 
-            if (e !== undefined) {// hit: re-insert to bump recency (Map keeps insertion order)
-                s.c.delete(k);
-                s.c.set(k, e);
-                return e.d;
+            if (s.cache[l] && s.cache[l][id] && s.cache[l][id][c] !== undefined) {// hit: bump recency (Map keeps insertion order)
+                const k = s.key(l, id, c);
+                s.order.delete(k);
+                s.order.set(k, {l: l, id: id, c: c});
+                return s.cache[l][id][c];
             }
 
             return null;
         },
 
         set: function (v, l, id, c, d) {
-            if (!this.c.has(this.key(l, id, c))) {// write-once per key (mirrors the old `=== undefined` guard)
+            if (!this.cache[l] || !this.cache[l][id] || this.cache[l][id][c] === undefined) {// write-once per (l,id,c)
                 this.put(l, id, c, d);
                 this.updated = 1;
             }
         },
 
-        put: function (l, id, c, d) {// insert + LRU-evict; shared by set() and init()
+        put: function (l, id, c, d) {// write the nested entry, track recency, LRU-evict; shared by set() and init()
             const s = this, k = s.key(l, id, c);
-            let e;
+            let e, o;
 
-            s.c.set(k, {l: l, id: id, c: c, d: d});
+            if (!s.cache[l]) s.cache[l] = {};
+            if (!s.cache[l][id]) s.cache[l][id] = {};
+            s.cache[l][id][c] = d;
 
-            while (s.c.size > s.max) {// evict LRU; never the entry just added (guards max <= 0)
-                e = s.c.keys().next().value;
+            s.order.delete(k);
+            s.order.set(k, {l: l, id: id, c: c});
+
+            while (s.order.size > s.max) {// evict LRU; never the entry just added (guards max <= 0)
+                e = s.order.keys().next().value;
                 if (e === k) break;
-                s.c.delete(e);
+                o = s.order.get(e);
+                s.order.delete(e);
+                s.prune(o.l, o.id, o.c);
             }
         },
 
+        prune: function (l, id, c) {// drop cache[l][id][c] and any parent object it leaves empty
+            const s = this;
+
+            if (!s.cache[l] || !s.cache[l][id]) return;
+
+            delete s.cache[l][id][c];
+            if (Object.keys(s.cache[l][id]).length === 0) delete s.cache[l][id];
+            if (Object.keys(s.cache[l]).length === 0) delete s.cache[l];
+        },
+
         save: async function () {
-            let o, e;
-
-            if (this.saveModel && this.updated) {// rebuild the nested {l:{id:{c:d}}} shape the host persists (each entry carries its l/id/c)
-                o = {};
-
-                for (e of this.c.values()) {
-                    if (!o[e.l]) o[e.l] = {};
-                    if (!o[e.l][e.id]) o[e.l][e.id] = {};
-                    o[e.l][e.id][e.c] = e.d;
-                }
-
-                this.saveModel.set(o);
-            }
+            if (this.saveModel && this.updated)// persist the nested cache unchanged (shape identical to the pre-LRU model)
+                this.saveModel.set(this.cache)
+            ;
 
             this.updated = 0;
         }
