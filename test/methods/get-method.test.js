@@ -17,7 +17,7 @@ test('get-method fetches multi-t artifacts through the real tss/request path in 
 
   try {
     gm.models = { tss: tm };
-    tm.c = {};
+    tm.c = new Map();
     tm.tssParser = makeTssParser();
     tm.requestModel = rm;
     rm.base = '';
@@ -37,7 +37,7 @@ test('get-method fetches multi-t artifacts through the real tss/request path in 
     assert.deepEqual(u, ['/a.tss', '/b.tss']);
   } finally {
     gm.models = m;
-    tm.c = {};
+    tm.c = new Map();
     rm.transport = r;
     rm.base = '';
     rm.timeout = 0;

@@ -191,7 +191,9 @@ function reset() {
     jTormViewModel.data.c.s = null; // handler-wrapper writes v.c.s (= shared data.c.s)
     jTormViewModel.data.c.a = null; // get{t}/ui write v.c.a (ancestor scope)
     jTormLanguageModel.data = {};
-    jTormDataModel.c = jTormHtmlModel.c = jTormTssModel.c = {}; // fetch-model caches (singletons)
+    jTormDataModel.c = new Map(); // fetch-model caches (bounded-LRU singletons)
+    jTormHtmlModel.c = new Map();
+    jTormTssModel.c = new Map();
     jTormUiMethod.cache = {};          // resolved-component cache (singleton)
     jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache
     jTormUiCacheModel.updated = 0;
