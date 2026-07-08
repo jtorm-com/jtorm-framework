@@ -1,6 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 template
+    // inert fragment — content is markup (populates .content); raw slot, not replacable.
     ->get {
-        t: '@h/replacable.tss';
+        t: '@h/rawcontent.tss';
     }

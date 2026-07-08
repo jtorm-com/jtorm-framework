@@ -1,0 +1,18 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+// RAW content slot — the counterpart to replacable.tss (the ESCAPED/safe slot).
+// For elements whose content is markup/code by NATURE and cannot be escaped as text:
+//   - HTML raw-text elements (style/script/iframe, noscript) whose text content
+//     serializes VERBATIM — textContent does NOT escape it on SSR, so the safe t:
+//     slot gives a false guarantee here;
+//   - <template> — an inert markup container (escaping would defeat its purpose);
+//   - elements that compose child markup (audio/video <source>/<track>).
+// This uses insert's raw h: path: content is NOT escaped and MUST be author-trusted
+// (or run through a host sanitize() seam — backlogged). Greppable: `->get @h/rawcontent`.
+->inner {
+    h: html;
+}
+
+->get {
+    t: '@h/global.tss';
+}

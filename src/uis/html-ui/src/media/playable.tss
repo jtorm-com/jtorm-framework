@@ -35,6 +35,8 @@
     v: src;
 }
 
+// RAW content: audio/video compose child <source>/<track> markup — the raw slot
+// (NOT replacable's escaped t:). Carries the shared global attrs too.
 ->get {
-    t: '@h/replacable.tss';
+    t: '@h/rawcontent.tss';
 }

@@ -1,7 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 ->inner {
-    h: html;
+    t: html;
 }
 
 ->get {

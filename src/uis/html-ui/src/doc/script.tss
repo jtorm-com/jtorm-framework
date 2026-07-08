@@ -28,7 +28,8 @@ script {
         v: type;
     }
 
+    // raw-text element — content (JS) serializes verbatim; raw slot, not replacable.
     ->get {
-        t: '@h/replacable.tss';
+        t: '@h/rawcontent.tss';
     }
 }

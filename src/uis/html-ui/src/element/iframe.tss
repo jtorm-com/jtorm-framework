@@ -34,7 +34,8 @@ iframe {
         v: width;
     }
 
+    // raw-text element — fallback content serializes verbatim; raw slot, not replacable.
     ->get {
-        t: '@h/replacable.tss';
+        t: '@h/rawcontent.tss';
     }
 }

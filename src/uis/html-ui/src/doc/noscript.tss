@@ -1,6 +1,7 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
 noscript
+    // raw-text (scripting-on) — fallback markup renders raw; raw slot, not replacable.
     ->get {
-        t: '@h/replacable.tss';
+        t: '@h/rawcontent.tss';
     }
