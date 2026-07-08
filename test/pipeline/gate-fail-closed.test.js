@@ -51,6 +51,30 @@ test('malformed config gate blocks children regardless of the preceding sibling'
   assert.equal(b.body, clean);
 });
 
+// --- mediaquery / mediatarget are gates too: a missing param must fail CLOSED ---
+//
+// Both are documented child gates — mediaquery.handle sets v.io.c from the media match,
+// mediatarget.handle from the active-target set. A param typo (no `q` / no `t`) makes their
+// validate miss; without a gate marker the handler would treat them as pass-throughs and
+// render the guarded children (the same fail-open class as config). They carry gate: 1.
+test('mediaquery gate with no q does not render children (fail-closed)', async () => {
+  const { body } = await render(
+    '<body><div class="gate"><span class="gated">S</span></div></body>',
+    ".gate -> mediaquery(x: '1') { .gated -> attr { n: 'data-x'; v: '1'; }; }",
+    {}
+  );
+  assert.equal(body, '<div class="gate"><span class="gated">S</span></div>'); // no data-x leak
+});
+
+test('mediatarget gate with no t does not render children (fail-closed)', async () => {
+  const { body } = await render(
+    '<body><div class="gate"><span class="gated">S</span></div></body>',
+    ".gate -> mediatarget(x: '1') { .gated -> attr { n: 'data-x'; v: '1'; }; }",
+    {}
+  );
+  assert.equal(body, '<div class="gate"><span class="gated">S</span></div>'); // no data-x leak
+});
+
 // --- only GATES fail closed: a non-gate verb that misses validate is a pass-through ---
 //
 // The fail-closed decision is scoped to gate verbs (config.gate). A non-gate transform that
