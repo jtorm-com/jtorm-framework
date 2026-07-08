@@ -23,6 +23,14 @@ module.exports = {
             'cs'// Cache scope
         ],
 
+        // HTML raw-text elements: their content serializes VERBATIM (RAWTEXT/PLAINTEXT
+        // parsing — no entity escaping), so `textContent` cannot make it inert. The safe
+        // `t:` path FAILS CLOSED for these rather than falsely advertising escaping.
+        rawText: {
+            script: 1, style: 1, iframe: 1, xmp: 1,
+            noembed: 1, noframes: 1, noscript: 1, plaintext: 1, template: 1
+        },
+
         /** @param {ViewModel} v */
         validate: function (v) {
             return (
@@ -132,12 +140,22 @@ module.exports = {
         },
 
         // The SAFE-content writer: mirrors process()'s mode map but uses the DOM's
-        // native TEXT APIs (textContent / insertAdjacentText / a replacement text
-        // node) so `txt` is ESCAPED — a data value never becomes markup. Dep-free and
+        // native TEXT APIs (textContent / insertAdjacentText / a replacement text node)
+        // so `txt` is ESCAPED — a data value never becomes markup. Dep-free and
         // isomorphic: the elements come from windowModel's document via v.h.set.
+        // FAILS CLOSED when writing INSIDE a raw-text element (i/a/p → the element's own
+        // content): script/style/iframe/… serialize their text VERBATIM, so textContent
+        // can't escape it — the safe t: contract must throw, not silently emit unescaped.
+        // Outside-target modes (before/after/replace write into the PARENT) stay safe.
+        // Arrow callback preserves `this` (the method) for errorHandler/rawText.
         processText: async function (h, txt, m, v) {
-            await h.set(v, function (e) {
-                if (m === 'i')
+            await h.set(v, e => {
+                if (
+                    (m === 'i' || m === 'a' || m === 'p')
+                    && this.rawText[e.tagName.toLowerCase()]
+                )
+                    this.errorHandler.handle('unsafe t: content in raw-text <' + e.tagName.toLowerCase() + '> (serializes verbatim — use rawcontent/h: with a sanitizer)', v)
+                ; else if (m === 'i')
                     e.textContent = txt
                 ; else if (m === 'r')
                     e.parentNode.replaceChild(e.ownerDocument.createTextNode(txt), e)
