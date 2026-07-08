@@ -141,6 +141,30 @@ test('get{h} fetched body routes through the injected host sanitizer', async () 
   }
 });
 
+// --- Codex PR #28 P2 (round 3): get{h} must keep the zero-match drift error too ---
+// Same contract as insert: sanitizing the fetched body before v.h.set resolves the
+// get{h} target would mask a drifted (zero-match) selector behind a sanitizer error.
+test('zero-match get{h} surfaces the not-found drift error, not a sanitizer error', async () => {
+  setSanitize(() => { throw new Error('sanitizer exploded'); });
+  const log = console.log;
+  console.log = () => {};
+  try {
+    await assert.rejects(
+      render(
+        '<body><div>x</div></body>',
+        ".missing->get { h: '/frag.html'; }",
+        {},
+        'http://localhost/',
+        { '/frag.html': { text: '<b>ok</b>' } }
+      ),
+      /not found/i
+    );
+  } finally {
+    console.log = log;
+    setSanitize(null);
+  }
+});
+
 // --- the ESCAPED t: path is NEVER routed through the sanitizer (boundary proof) ---
 // t: escapes via the DOM's native text APIs — the value is already INERT text, not
 // markup a sanitizer should touch. The seam must not reach it: output stays the

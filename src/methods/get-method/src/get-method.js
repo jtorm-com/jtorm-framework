@@ -44,18 +44,23 @@ module.exports = {
             if (v.d.h) {
                 r = await this.get('html', v.d.h);
 
-                // RAW fetched-body sink: run it through the host XSS sanitizer seam
-                // before innerHTML (DI, DOMPurify-shaped, sync/async; default null →
-                // PASSTHROUGH — the fragment is author-trusted today). Local, not
-                // this.sanitize(r): see insert-method's clean() for the seam contract
-                // and the this-binding note.
+                // RAW fetched-body sink → host XSS sanitizer seam (DI, DOMPurify-shaped,
+                // sync/async; default null → PASSTHROUGH — the fragment is author-trusted
+                // today). Sanitize LAZILY inside the set callback, once, on the first
+                // matched element, so v.h.set() throws the zero-match drift error
+                // ("<sel> not found") BEFORE the sanitizer runs — a drifted selector must
+                // surface as drift, not a sanitizer error (mirrors insert-method's
+                // clean()). Local `s` (not this.sanitize): see insert-method clean() for
+                // the seam contract + this-binding note.
                 const s = this.sanitize;
+                let done;
 
-                if (s)
-                    r = await s(r)
-                ;
+                await v.h.set(v, async function (el) {
+                    if (s && !done) {
+                        r = await s(r);
+                        done = 1;
+                    }
 
-                await v.h.set(v, function (el) {
                     el.innerHTML = r;
                 });
             }
