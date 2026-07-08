@@ -14,7 +14,7 @@ datalist {
                     v: value;
                 )
                 ->inner {
-                    h: label;
+                    t: label;
                 }
         }
     }

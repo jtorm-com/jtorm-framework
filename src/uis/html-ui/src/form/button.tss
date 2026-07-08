@@ -2,7 +2,7 @@
 
 button {
     ->inner {
-        h: html;
+        t: html;
     }
 
     ->if(d: type, v: '^(button|reset|submit)$', r: true)

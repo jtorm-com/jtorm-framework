@@ -12,7 +12,7 @@ article {
         c: '@e.a';
         t: '0';
         a->inner {
-          h: articleSection;
+          t: articleSection;
         }
       }
       ->append->ui {

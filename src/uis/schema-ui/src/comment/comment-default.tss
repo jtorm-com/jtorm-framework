@@ -46,7 +46,7 @@ body {
         ->if(el: 'footer > a.schema-URL'){
           footer > a.schema-URL {
             ->text(lbl: 'Reply')->inner {
-              h: lbl;
+              t: lbl;
             }
             ->append->ui {
               c: '@t.sup';

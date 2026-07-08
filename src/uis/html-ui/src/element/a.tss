@@ -2,7 +2,7 @@
 
 a {
     ->inner {
-        h: html;
+        t: html;
     }
 
     ->attr {
