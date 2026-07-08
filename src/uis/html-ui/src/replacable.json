@@ -1,5 +1,5 @@
 {
   "html": {
-    "@description": "Text or html"
+    "@description": "Text content, HTML-escaped by default (rendered inert). For author-trusted raw HTML/markup use the insert h: param."
   }
 }

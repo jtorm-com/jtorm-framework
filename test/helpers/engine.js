@@ -80,7 +80,7 @@ const { jTormHtmlUi } = require('../../src/uis/html-ui/src/html-ui.js');
 // insert aliases — each/insert dispatch insert modes through the methods map
 // (mirrors the engine's jTormInsertAlias).
 class InsertAlias {
-    constructor(m) { this.m = m; this.params = ['h', 'd', 'm', 'p', 's', 'cid', 'cs']; }
+    constructor(m) { this.m = m; this.params = ['h', 't', 'd', 'm', 'p', 's', 'cid', 'cs']; }
     validate(v) { v.d.m = this.m; return jTormInsertMethod.validate(v); }
     async handle(v) { v.d.m = this.m; return await jTormInsertMethod.handle(v); }
 }

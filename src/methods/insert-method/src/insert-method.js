@@ -12,7 +12,8 @@ module.exports = {
 
         alias: 'i',
         params: [
-            'h',// Html
+            'h',// Html (RAW — the explicit opt-in: author literals + composed child markup)
+            't',// Text (ESCAPED — the safe path: data bound as content, rendered inert)
             'p',// Html prefix
             's',// Html suffix
             'd',// Data
@@ -25,13 +26,16 @@ module.exports = {
         /** @param {ViewModel} v */
         validate: function (v) {
             return (
-                (v.d.h || v.t.c.length)
+                (v.d.t || v.d.h || v.t.c.length)
                 && (v.d.m || this.m)
             );
         },
 
         /**
-         * Insert html (`v.d.h`) or boiled children into the target via the chosen mode; throw via errorHandler when the target element is absent.
+         * Insert escaped text (`v.d.t` — the SAFE default: data bound as content,
+         * rendered inert via the DOM's native text APIs), raw html (`v.d.h` — the
+         * explicit RAW opt-in: author literals + composed markup), or boiled children,
+         * via the chosen mode; throw via errorHandler when the target element is absent.
          * @param {ViewModel} v
          */
         handle: async function (v) {
@@ -41,7 +45,13 @@ module.exports = {
             v.cs = v.d.cs;
             v.l = v.d.l;
 
-            if (v.d.h) {
+            if (v.d.t) {
+                // SAFE content: a data value bound as element text. textContent /
+                // insertAdjacentText let the DOM escape it (inert) — an XSS payload
+                // in `v.m` renders as text, never markup. The raw `h:` path below is
+                // the deliberate, greppable opt-in for author-trusted HTML.
+                await this.processText(v.h, String(v.d.t), v.d.m, v);
+            } else if (v.d.h) {
                 if (v.d.p)
                     v.d.h = v.d.p + v.d.h
                 ;
@@ -114,6 +124,33 @@ module.exports = {
                         )
                     ;
                 }
+            });
+        },
+
+        // The SAFE-content writer: mirrors process()'s mode map but uses the DOM's
+        // native TEXT APIs (textContent / insertAdjacentText / a replacement text
+        // node) so `txt` is ESCAPED — a data value never becomes markup. Dep-free and
+        // isomorphic: the elements come from windowModel's document via v.h.set.
+        processText: async function (h, txt, m, v) {
+            await h.set(v, function (e) {
+                if (m === 'i')
+                    e.textContent = txt
+                ; else if (m === 'r')
+                    e.parentNode.replaceChild(e.ownerDocument.createTextNode(txt), e)
+                ; else
+                    e.insertAdjacentText(
+                        m === 'b'
+                            ? 'beforebegin'
+                            : m === 'p'
+                                ? 'afterbegin'
+                                : m === 'a'
+                                    ? 'beforeend'
+                                    : m === 'af'
+                                        ? 'afterend'
+                                        : m,
+                        txt
+                    )
+                ;
             });
         }
     }
