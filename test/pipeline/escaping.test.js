@@ -45,6 +45,27 @@ test('inner{t: <data>} on a plain-text value is identity (no gratuitous change)'
   assert.equal(body, '<span>Hello &amp; welcome</span>');
 });
 
+// Codex PR #26 P2: a legitimately FALSY text value (0, '') is real content, not
+// "missing" — the guard must key on presence (!= null), not truthiness, or
+// `t: count` with count 0 leaves stale template content instead of rendering '0'.
+test('inner{t: <data>} renders a falsy value like 0 (present, not treated as missing)', async () => {
+  const { body } = await render(
+    '<body><span>z</span></body>',
+    'span->inner { t: count; }',
+    { count: 0 }
+  );
+  assert.equal(body, '<span>0</span>');
+});
+
+test('inner{t: <data>} with an empty string clears the content', async () => {
+  const { body } = await render(
+    '<body><span>z</span></body>',
+    'span->inner { t: empty; }',
+    { empty: '' }
+  );
+  assert.equal(body, '<span></span>');
+});
+
 // --- The explicit raw opt-in stays available and greppable (h:) ---
 test('inner{h: literal} — author string literal renders as markup (raw opt-in)', async () => {
   const { body } = await render(

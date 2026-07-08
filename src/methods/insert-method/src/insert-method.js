@@ -26,7 +26,9 @@ module.exports = {
         /** @param {ViewModel} v */
         validate: function (v) {
             return (
-                (v.d.t || v.d.h || v.t.c.length)
+                // `t` keys on PRESENCE (!= null), not truthiness: a resolved falsy
+                // text value (0, '') is real content to escape, not a missing bind.
+                (v.d.t != null || v.d.h || v.t.c.length)
                 && (v.d.m || this.m)
             );
         },
@@ -45,11 +47,13 @@ module.exports = {
             v.cs = v.d.cs;
             v.l = v.d.l;
 
-            if (v.d.t) {
+            if (v.d.t != null) {
                 // SAFE content: a data value bound as element text. textContent /
                 // insertAdjacentText let the DOM escape it (inert) — an XSS payload
                 // in `v.m` renders as text, never markup. The raw `h:` path below is
-                // the deliberate, greppable opt-in for author-trusted HTML.
+                // the deliberate, greppable opt-in for author-trusted HTML. Presence
+                // (!= null) not truthiness: 0 / '' are real content (0 renders, ''
+                // clears), only an unresolved bind (null) falls through.
                 await this.processText(v.h, String(v.d.t), v.d.m, v);
             } else if (v.d.h) {
                 if (v.d.p)
