@@ -9,6 +9,7 @@ module.exports = {
         // errorHandler
         // handlerWrapper
         // viewModel
+        // sanitize
 
         alias: 'i',
         params: [
@@ -103,6 +104,30 @@ module.exports = {
             v.io = {c: c};
         },
 
+        // Host XSS sanitizer seam (DI, DOMPurify-shaped: html -> cleaned html; sync
+        // OR async — the caller awaits; assumed IDEMPOTENT, since boiled children can
+        // pass here twice). Runs over the h: content STRING this verb writes as live
+        // DOM through innerHTML / insertAdjacentHTML (modes i/a/p/b/af — the explicit
+        // opt-in, composed child markup, author literals). Dep-free DEFAULT: no
+        // sanitizer injected → PASSTHROUGH (greenfield; zero behaviour change — no host
+        // wires it yet). The ESCAPED t: path (processText) is already inert and is
+        // NEVER routed here. The host's sanitizer CONFIG owns the composition
+        // allow-list — a strict policy could strip <option>/<source>/<track>, so a host
+        // composing child markup must allow those.
+        //
+        // NOT covered by this seam (raw sinks flagged for a follow-up — backlog P0.1):
+        // insert's own m:'r' replace path (viewModel.create + replaceChild parses a
+        // NODE, not this string sink — and is non-functional without an s: selector
+        // anyway), plus the sibling wrap/swap verbs (their own innerHTML/parse in
+        // separate packages). Invoked via a LOCAL, not this.sanitize(h), so an injected
+        // free function runs with this=undefined rather than rebound to this method; a
+        // host wiring an unbound instance method must bind it: sanitize = h => c.clean(h).
+        clean: function (h) {
+            const s = this.sanitize;
+
+            return s ? s(h) : h;
+        },
+
         process: async function (h, h2, m, v) {
             await h.set(v, async e => {
                 const o = v._.isObject(h2);
@@ -114,9 +139,9 @@ module.exports = {
 
                     e.parentNode.replaceChild(h2.h.select(h2.h.getSelector(v.d.s, v.c.s)), e);
                 } else {
-                    const c = o
+                    const c = await this.clean(o
                         ? h2.select('body').innerHTML
-                        : h2
+                        : h2)
                     ;
 
                     if (m === 'i')

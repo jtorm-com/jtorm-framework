@@ -7,6 +7,7 @@ module.exports = {
     jTormGetMethod: {
         // DI
         // models[],
+        // sanitize
 
         params: ['h', 't', 'd', 'a'],
 
@@ -42,6 +43,17 @@ module.exports = {
 
             if (v.d.h) {
                 r = await this.get('html', v.d.h);
+
+                // RAW fetched-body sink: run it through the host XSS sanitizer seam
+                // before innerHTML (DI, DOMPurify-shaped, sync/async; default null →
+                // PASSTHROUGH — the fragment is author-trusted today). Local, not
+                // this.sanitize(r): see insert-method's clean() for the seam contract
+                // and the this-binding note.
+                const s = this.sanitize;
+
+                if (s)
+                    r = await s(r)
+                ;
 
                 await v.h.set(v, function (el) {
                     el.innerHTML = r;
