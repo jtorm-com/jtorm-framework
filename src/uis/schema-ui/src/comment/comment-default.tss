@@ -51,9 +51,7 @@ body {
             ->append->ui {
               c: '@t.sup';
               sup->inner {
-                p: ' (';
-                h: commentCount.Integer;
-                s: ')';
+                t: ' (' + commentCount.Integer + ')';
               }
             }
           }

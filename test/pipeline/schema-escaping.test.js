@@ -127,6 +127,42 @@ test('Text component renders an untrusted value INERT (comment-body path — PR 
   assert.equal(body, `<div class="a"><span>${ESC}</span></div>`);
 });
 
+// --- comment-default.tss:55 — an AFFIXED sink `sup->inner{ p:' ('; h: commentCount.Integer;
+// s:')' }`. `.Integer` is a plain dot-path walk, NOT a numeric coercion (data-parser.js), so an
+// untrusted value renders LIVE; and the insert p:/s: affixes ARE expressible under t: via the
+// data-parser `+` concat (this file's breadcrumb sink already uses it). Migrated to
+// `t: ' (' + commentCount.Integer + ')'` — escaped, with the "( )" wrap preserved.
+// (Adversarial-review finding. Comment.default can't boil as a unit — deep composition — so the
+// affix PATTERN is locked behaviorally here; the file edit is locked by the TSS snapshot.) ---
+
+test('affixed inner{ p/s + h: <data> } renders an untrusted value LIVE (the raw affix sink)', async () => {
+  const { body } = await render(
+    '<body><sup>z</sup></body>',
+    "sup->inner { p: ' ('; h: commentCount.Integer; s: ')'; }",
+    { commentCount: { Integer: XSS } }
+  );
+  assert.match(body, /<img/); // insert's h: path applies the p:/s: affixes and stays raw
+});
+
+test('affix migrated to t: concat escapes the value AND keeps the ( ) wrap (comment commentCount)', async () => {
+  const { body } = await render(
+    '<body><sup>z</sup></body>',
+    "sup->inner { t: ' (' + commentCount.Integer + ')'; }",
+    { commentCount: { Integer: XSS } }
+  );
+  assert.doesNotMatch(body, /<img/);
+  assert.equal(body, `<sup> (${ESC})</sup>`);
+});
+
+test('affix t: concat renders a numeric count unchanged (identity — no regression)', async () => {
+  const { body } = await render(
+    '<body><sup>z</sup></body>',
+    "sup->inner { t: ' (' + commentCount.Integer + ')'; }",
+    { commentCount: { Integer: 5 } }
+  );
+  assert.equal(body, '<sup> (5)</sup>');
+});
+
 // --- Carve-out: GENUINE markup composition STAYS raw (h:). @f.select composes its
 // <option> children from the `html` field (a variable holding built markup) — the design's
 // canonical composition sink. It must NOT be escaped (that would break the options); a host
