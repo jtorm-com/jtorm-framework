@@ -1,6 +1,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const { render } = require('../helpers/engine.js');
 
 // Schema/component-layer XSS text-sink sweep — the HIGH-priority follow-up to PR #26's
@@ -19,6 +21,7 @@ const { render } = require('../helpers/engine.js');
 
 const XSS = '<img src=x onerror=alert(1)>';
 const ESC = '&lt;img src=x onerror=alert(1)&gt;';
+const COUNT_SUFFIX = "a->if(d: commentCount.Integer)->append->ui { c: '@t.sup'; sup->inner { t: ' (' + commentCount.Integer + ')'; } }";
 
 // --- Live sinks: untrusted schema.org Text bound as element content, now ESCAPED ---
 // Each of these boils a REAL component that renders a live <img> today (verified) and is
@@ -133,7 +136,8 @@ test('Text component renders an untrusted value INERT (comment-body path — PR 
 // data-parser `+` concat (this file's breadcrumb sink already uses it). Migrated to
 // `t: ' (' + commentCount.Integer + ')'` — escaped, with the "( )" wrap preserved.
 // (Adversarial-review finding. Comment.default can't boil as a unit — deep composition — so the
-// affix PATTERN is locked behaviorally here; the file edit is locked by the TSS snapshot.) ---
+// affix PATTERN is locked behaviorally here; the file edit is locked by the source
+// ratchet + TSS snapshot.) ---
 
 test('affixed inner{ p/s + h: <data> } renders an untrusted value LIVE (the raw affix sink)', async () => {
   const { body } = await render(
@@ -161,6 +165,38 @@ test('affix t: concat renders a numeric count unchanged (identity — no regress
     { commentCount: { Integer: 5 } }
   );
   assert.equal(body, '<sup> (5)</sup>');
+});
+
+test('comment-default gates the reply count suffix before escaped concat', () => {
+  const tss = fs.readFileSync(
+    path.join(__dirname, '../../src/uis/schema-ui/src/comment/comment-default.tss'),
+    'utf8'
+  );
+  assert.match(
+    tss,
+    /->if\(d:\s*commentCount\.Integer\)\s*\{\s*->append->ui\s*\{\s*c:\s*'@t\.sup';\s*sup->inner\s*\{\s*t:\s*' \('\s*\+\s*commentCount\.Integer\s*\+\s*'\)';/s
+  );
+});
+
+test('guarded comment-count suffix omits absent and zero counts', async () => {
+  assert.equal(
+    (await render('<body><a>Reply</a></body>', COUNT_SUFFIX, {})).body,
+    '<a>Reply</a>'
+  );
+  assert.equal(
+    (await render('<body><a>Reply</a></body>', COUNT_SUFFIX, { commentCount: { Integer: 0 } })).body,
+    '<a>Reply</a>'
+  );
+});
+
+test('guarded comment-count suffix escapes a present count and keeps the wrap', async () => {
+  const { body } = await render(
+    '<body><a>Reply</a></body>',
+    COUNT_SUFFIX,
+    { commentCount: { Integer: XSS } }
+  );
+  assert.doesNotMatch(body, /<img/);
+  assert.equal(body, `<a>Reply<sup> (${ESC})</sup></a>`);
 });
 
 // --- Carve-out: GENUINE markup composition STAYS raw (h:). @f.select composes its

@@ -48,10 +48,12 @@ body {
             ->text(lbl: 'Reply')->inner {
               t: lbl;
             }
-            ->append->ui {
-              c: '@t.sup';
-              sup->inner {
-                t: ' (' + commentCount.Integer + ')';
+            ->if(d: commentCount.Integer) {
+              ->append->ui {
+                c: '@t.sup';
+                sup->inner {
+                  t: ' (' + commentCount.Integer + ')';
+                }
               }
             }
           }
