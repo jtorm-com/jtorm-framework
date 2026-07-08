@@ -75,6 +75,26 @@ test('inner{h: <data>} sanitizes ONCE for the whole operation, not per matched e
   }
 });
 
+// --- Codex PR #28 P2 (round 2): the zero-match drift error must win over a
+// sanitizer error. Sanitizing before h.set() resolves the target would mask a
+// zero-match (a drifted selector) behind a sanitizer throw/reject, breaking the
+// transform-verb drift-detector contract (AGENTS.md). Sanitize LAZILY on the first
+// matched element, so a zero-match throws "<sel> not found" before the sanitizer runs.
+test('zero-match insert{h:} surfaces the not-found drift error, not a sanitizer error', async () => {
+  setSanitize(() => { throw new Error('sanitizer exploded'); });
+  const log = console.log;
+  console.log = () => {}; // silence the error-handler pre-throw v dump
+  try {
+    await assert.rejects(
+      render('<body><div>x</div></body>', 'span->inner { h: html; }', { html: '<b>ok</b>' }),
+      /not found/i
+    );
+  } finally {
+    console.log = log;
+    setSanitize(null);
+  }
+});
+
 // --- greenfield default: NO sanitizer injected → raw path passes through ---
 test('default (no host sanitizer) leaves the raw h: path untouched — passthrough', async () => {
   const { body } = await render(

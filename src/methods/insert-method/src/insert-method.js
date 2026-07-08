@@ -130,16 +130,16 @@ module.exports = {
 
         process: async function (h, h2, m, v) {
             // Non-replace modes write a raw HTML STRING that doesn't depend on the
-            // target element — resolve + sanitize it ONCE here, not inside h.set's
-            // per-match callback: a multi-match insert then runs an async/remote
-            // sanitizer once (not per node), and a sanitizer rejection fails BEFORE any
-            // element is written (no partial write). The m:'r' branch parses its own
-            // node per match (the isObject/reassign stays in the loop) and is not
-            // routed through the seam (see clean()).
-            const c = m === 'r'
-                ? null
-                : await this.clean(v._.isObject(h2) ? h2.select('body').innerHTML : h2)
-            ;
+            // target element, so sanitize it ONCE for the whole operation — but
+            // LAZILY, on the first matched element. h.set() resolves the selector and
+            // throws the zero-match drift error ("<sel> not found") BEFORE the sanitizer
+            // ever runs (a drifted selector must surface as drift, not as a sanitizer
+            // error — AGENTS.md zero-match contract), while a >=1-match set still cleans
+            // once and, on a sanitizer rejection, fails on that first element before any
+            // write (no partial write). The m:'r' branch parses its own node per match
+            // (isObject/reassign stays in the loop) and is not routed through the seam
+            // (see clean()).
+            let c, done;
 
             await h.set(v, async e => {
                 if (m === 'r') {
@@ -148,22 +148,29 @@ module.exports = {
                     ;
 
                     e.parentNode.replaceChild(h2.h.select(h2.h.getSelector(v.d.s, v.c.s)), e);
-                } else if (m === 'i')
-                    e.innerHTML = c
-                ; else
-                    e.insertAdjacentHTML(
-                        m === 'b'
-                            ? 'beforebegin'
-                            : m === 'p'
-                                ? 'afterbegin'
-                                : m === 'a'
-                                    ? 'beforeend'
-                                    : m === 'af'
-                                        ? 'afterend'
-                                        : m,
-                        c
-                    )
-                ;
+                } else {
+                    if (!done) {
+                        c = await this.clean(v._.isObject(h2) ? h2.select('body').innerHTML : h2);
+                        done = 1;
+                    }
+
+                    if (m === 'i')
+                        e.innerHTML = c
+                    ; else
+                        e.insertAdjacentHTML(
+                            m === 'b'
+                                ? 'beforebegin'
+                                : m === 'p'
+                                    ? 'afterbegin'
+                                    : m === 'a'
+                                        ? 'beforeend'
+                                        : m === 'af'
+                                            ? 'afterend'
+                                            : m,
+                            c
+                        )
+                    ;
+                }
             });
         },
 
