@@ -9,6 +9,9 @@ module.exports = {
         // windowModel
 
         alias: 'mq',
+        // Child gate: handle sets v.io.c from the media match. On a validate MISS (no `q`)
+        // the handler fails CLOSED (skip children) rather than leak the guarded content.
+        gate: 1,
         m: null,
         params: [
             'q'// Query

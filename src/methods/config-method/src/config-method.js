@@ -9,6 +9,11 @@ module.exports = {
         // configModel
 
         alias: 'c',
+        // Gate verb (README: "functions like an if"): on a validate MISS the handler skips
+        // this rule's children (fail CLOSED) instead of inheriting the previous sibling's
+        // v.io.c — so a malformed gate (a key param the method never reads) cannot leak the
+        // content it was meant to block.
+        gate: 1,
         params: [
             'd',// Data — the config key (`d` is the framework-wide data param)
             'k',// Key — alias for `d`, the form documented in the README (config gates)

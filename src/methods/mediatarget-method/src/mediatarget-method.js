@@ -9,6 +9,9 @@ module.exports = {
         // mediaqueryMethod
 
         alias: 'mt',
+        // Child gate: handle sets v.io.c from the active-target set. On a validate MISS
+        // (no `t`) the handler fails CLOSED (skip children) rather than leak the guarded content.
+        gate: 1,
         current: [],
         params: [
             't'// Target
