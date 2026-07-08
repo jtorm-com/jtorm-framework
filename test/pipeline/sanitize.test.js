@@ -54,6 +54,27 @@ test('inner{h: <data>} routes the raw markup through the injected host sanitizer
   }
 });
 
+// --- Codex PR #28 P2: sanitize ONCE per operation, not once per matched element ---
+// The h: content doesn't depend on the target element, but the write happens inside
+// h.set's per-match callback. Sanitizing there would call an async/remote sanitizer
+// once per node (multiplied traffic) and, on a late rejection, leave earlier nodes
+// already written (partial write). Resolve + sanitize once, before the write loop.
+test('inner{h: <data>} sanitizes ONCE for the whole operation, not per matched element', async () => {
+  const s = recordingSanitizer();
+  setSanitize(s);
+  try {
+    const { body } = await render(
+      '<body><div><span>a</span><span>b</span><span>c</span></div></body>',
+      'span->inner { h: html; }',
+      { html: '<b>ok</b><script>x()</script>' }
+    );
+    assert.equal(body, '<div><span><b>ok</b></span><span><b>ok</b></span><span><b>ok</b></span></div>');
+    assert.equal(s.calls.length, 1, 'sanitized once for the operation, not once per matched node');
+  } finally {
+    setSanitize(null);
+  }
+});
+
 // --- greenfield default: NO sanitizer injected → raw path passes through ---
 test('default (no host sanitizer) leaves the raw h: path untouched — passthrough', async () => {
   const { body } = await render(

@@ -129,38 +129,41 @@ module.exports = {
         },
 
         process: async function (h, h2, m, v) {
-            await h.set(v, async e => {
-                const o = v._.isObject(h2);
+            // Non-replace modes write a raw HTML STRING that doesn't depend on the
+            // target element — resolve + sanitize it ONCE here, not inside h.set's
+            // per-match callback: a multi-match insert then runs an async/remote
+            // sanitizer once (not per node), and a sanitizer rejection fails BEFORE any
+            // element is written (no partial write). The m:'r' branch parses its own
+            // node per match (the isObject/reassign stays in the loop) and is not
+            // routed through the seam (see clean()).
+            const c = m === 'r'
+                ? null
+                : await this.clean(v._.isObject(h2) ? h2.select('body').innerHTML : h2)
+            ;
 
+            await h.set(v, async e => {
                 if (m === 'r') {
-                    if (!o)
+                    if (!v._.isObject(h2))
                         h2 = await this.viewModel.create(h2)
                     ;
 
                     e.parentNode.replaceChild(h2.h.select(h2.h.getSelector(v.d.s, v.c.s)), e);
-                } else {
-                    const c = await this.clean(o
-                        ? h2.select('body').innerHTML
-                        : h2)
-                    ;
-
-                    if (m === 'i')
-                        e.innerHTML = c
-                    ; else
-                        e.insertAdjacentHTML(
-                            m === 'b'
-                                ? 'beforebegin'
-                                : m === 'p'
-                                    ? 'afterbegin'
-                                    : m === 'a'
-                                        ? 'beforeend'
-                                        : m === 'af'
-                                            ? 'afterend'
-                                            : m,
-                            c
-                        )
-                    ;
-                }
+                } else if (m === 'i')
+                    e.innerHTML = c
+                ; else
+                    e.insertAdjacentHTML(
+                        m === 'b'
+                            ? 'beforebegin'
+                            : m === 'p'
+                                ? 'afterbegin'
+                                : m === 'a'
+                                    ? 'beforeend'
+                                    : m === 'af'
+                                        ? 'afterend'
+                                        : m,
+                        c
+                    )
+                ;
             });
         },
 
