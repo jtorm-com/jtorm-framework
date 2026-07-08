@@ -2,7 +2,7 @@
 
 textarea {
     ->inner {
-        h: html;
+        t: html;
     }
 
     ->if(d: cols, v: '^[0-9]+$', r: true)

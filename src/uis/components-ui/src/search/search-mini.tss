@@ -25,7 +25,7 @@
               v: 'mdc-button__label';
             }
             ->text(label: 'Search')->inner {
-              h: label;
+              t: label;
             }
           }
         }

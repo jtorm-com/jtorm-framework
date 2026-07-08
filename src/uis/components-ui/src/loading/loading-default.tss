@@ -30,7 +30,7 @@
                     small
                         ->text(label: 'Loading')
                         ->inner {
-                            h: label;
+                            t: label;
                         }
                 }
             }

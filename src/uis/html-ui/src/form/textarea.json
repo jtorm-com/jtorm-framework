@@ -1,6 +1,6 @@
 {
   "html": {
-    "@description": "Text or html"
+    "@description": "Text content, HTML-escaped by default (rendered inert). A textarea holds plain text only."
   },
   "cols": {
     "@description": "Specifies the visible width of a text area"

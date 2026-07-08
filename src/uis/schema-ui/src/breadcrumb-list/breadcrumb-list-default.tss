@@ -22,7 +22,7 @@
                     t: '0';
 
                     span->append {
-                        h: html + ': ';
+                        t: html + ': ';
                     }
                 }
 

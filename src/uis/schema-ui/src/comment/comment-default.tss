@@ -46,14 +46,14 @@ body {
         ->if(el: 'footer > a.schema-URL'){
           footer > a.schema-URL {
             ->text(lbl: 'Reply')->inner {
-              h: lbl;
+              t: lbl;
             }
-            ->append->ui {
-              c: '@t.sup';
-              sup->inner {
-                p: ' (';
-                h: commentCount.Integer;
-                s: ')';
+            ->if(d: commentCount.Integer) {
+              ->append->ui {
+                c: '@t.sup';
+                sup->inner {
+                  t: ' (' + commentCount.Integer + ')';
+                }
               }
             }
           }

@@ -5,6 +5,6 @@ span/*->data(count: '0')*/->if(d: count) {
     v: 'badge';
   }
   ->inner {
-    h: count;
+    t: count;
   }
 }

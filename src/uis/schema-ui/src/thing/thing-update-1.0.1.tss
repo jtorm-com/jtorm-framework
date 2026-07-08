@@ -40,7 +40,7 @@ ul
 
         li
             ->inner {
-                h: name;
+                t: name;
             }
     }
 

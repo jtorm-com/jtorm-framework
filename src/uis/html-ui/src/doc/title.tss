@@ -2,5 +2,5 @@
 
 title
     ->inner {
-        h: text;
+        t: text;
     }
