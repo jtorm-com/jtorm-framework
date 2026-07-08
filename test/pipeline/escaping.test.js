@@ -157,6 +157,34 @@ test('append{t: <data>} into a raw-text element (style) fails closed', async () 
   }
 });
 
+// Codex PR #26 P1 (round 2): the guard must key on the NORMALIZED position, not the
+// short mode code — insert also accepts full DOM positions (m: 'beforeend'), which are
+// inside-writes and must fail closed too.
+test('t: fails closed with a full DOM position too (m: beforeend into raw-text)', async () => {
+  const log = console.log;
+  console.log = () => {};
+  try {
+    await assert.rejects(
+      render('<body><script></script></body>', "script->insert { m: 'beforeend'; t: code; }", { code: '</script><img src=x onerror=1>' }),
+      /raw-text/i
+    );
+  } finally {
+    console.log = log;
+  }
+});
+
+// Precision: an OUTSIDE position (beforebegin writes into the PARENT, not the raw-text
+// element) stays allowed and escapes — the guard must not over-throw.
+test('t: on raw-text with an OUTSIDE position (m: beforebegin) is allowed and escapes', async () => {
+  const { body } = await render(
+    '<body><div><script></script></div></body>',
+    "script->insert { m: 'beforebegin'; t: code; }",
+    { code: '<img src=x onerror=1>' }
+  );
+  assert.doesNotMatch(body, /<img/);
+  assert.match(body, /&lt;img/);
+});
+
 // --- raw-text elements are a KNOWN raw sink, carved out to rawcontent.tss ---
 // style/script/iframe/template/noscript serialize their content VERBATIM (textContent
 // cannot escape them on SSR — a `</style><script>` breaks out either way), so they carry

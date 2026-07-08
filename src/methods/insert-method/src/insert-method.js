@@ -143,15 +143,28 @@ module.exports = {
         // native TEXT APIs (textContent / insertAdjacentText / a replacement text node)
         // so `txt` is ESCAPED — a data value never becomes markup. Dep-free and
         // isomorphic: the elements come from windowModel's document via v.h.set.
-        // FAILS CLOSED when writing INSIDE a raw-text element (i/a/p → the element's own
-        // content): script/style/iframe/… serialize their text VERBATIM, so textContent
-        // can't escape it — the safe t: contract must throw, not silently emit unescaped.
-        // Outside-target modes (before/after/replace write into the PARENT) stay safe.
-        // Arrow callback preserves `this` (the method) for errorHandler/rawText.
+        // FAILS CLOSED when writing INSIDE a raw-text element (textContent, or an
+        // afterbegin/beforeend insert → the element's own content): script/style/iframe/…
+        // serialize their text VERBATIM, so textContent can't escape it — the safe t:
+        // contract must throw, not silently emit unescaped. The position is NORMALIZED
+        // first, because insert also accepts full DOM position names directly
+        // (m: 'beforeend'); outside positions (before/afterend → the PARENT, and replace)
+        // stay safe. Arrow callback preserves `this` (the method) for errorHandler/rawText.
         processText: async function (h, txt, m, v) {
             await h.set(v, e => {
+                const pos = m === 'b'
+                    ? 'beforebegin'
+                    : m === 'p'
+                        ? 'afterbegin'
+                        : m === 'a'
+                            ? 'beforeend'
+                            : m === 'af'
+                                ? 'afterend'
+                                : m
+                ;
+
                 if (
-                    (m === 'i' || m === 'a' || m === 'p')
+                    (m === 'i' || pos === 'afterbegin' || pos === 'beforeend')
                     && this.rawText[e.tagName.toLowerCase()]
                 )
                     this.errorHandler.handle('unsafe t: content in raw-text <' + e.tagName.toLowerCase() + '> (serializes verbatim — use rawcontent/h: with a sanitizer)', v)
@@ -160,18 +173,7 @@ module.exports = {
                 ; else if (m === 'r')
                     e.parentNode.replaceChild(e.ownerDocument.createTextNode(txt), e)
                 ; else
-                    e.insertAdjacentText(
-                        m === 'b'
-                            ? 'beforebegin'
-                            : m === 'p'
-                                ? 'afterbegin'
-                                : m === 'a'
-                                    ? 'beforeend'
-                                    : m === 'af'
-                                        ? 'afterend'
-                                        : m,
-                        txt
-                    )
+                    e.insertAdjacentText(pos, txt)
                 ;
             });
         }
