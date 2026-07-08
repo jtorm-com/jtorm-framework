@@ -66,9 +66,12 @@
  * The handler runs `data` (optional hook, replacing the default data-parser pass)
  * → `validate` → `handle`. `handle` is **optional**: it runs only when it is a
  * function, so a data-only verb (e.g. `data-method`: `validate` + `data`, no
- * `handle`) is valid.
+ * `handle`) is valid. On a `validate` MISS the handler decides child handling: a
+ * `gate` verb fails CLOSED (children skipped), any other verb is a pass-through
+ * (children still render).
  * @typedef {Object} Method
  * @property {string} [alias]                                                       alternate name
+ * @property {number} [gate]                                                        gate flag — a validate MISS fails CLOSED (skip children); else a miss is a pass-through
  * @property {string[]} [params]                                                    declared parameter names
  * @property {(v: ViewModel) => (boolean|number|Promise<boolean|number>)} validate  gate run before handle
  * @property {(v: ViewModel) => (void|Promise<void>)} [data]                        optional data hook (replaces the default data-parser pass)

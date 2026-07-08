@@ -74,9 +74,17 @@ module.exports = {
 
                         if (v.io.v && v._.isFunction(r.handle))
                             await r.handle(v)
-                        ; else
-                            v.io.r = 0
-                        ;
+                        ; else {
+                            // No handle ran: either validate MISSED, or the verb is a pure
+                            // data/scope binder (validate-pass + no handle, e.g. `data`) that
+                            // already set its own v.io.c. Only on a MISS does the handler decide
+                            // child handling — set v.io.c explicitly rather than inherit the
+                            // previous sibling's stale flag: a gate verb fails CLOSED (skip
+                            // children), any other verb is a pass-through and still renders them.
+                            v.io.r = 0;
+                            if (!v.io.v)
+                                v.io.c = r.gate ? 0 : 1;
+                        }
 
                         await e.handle(v, 'after', 'method');
                     } else {
