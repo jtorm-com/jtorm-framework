@@ -51,9 +51,10 @@ module.exports = {
             if (this._.isObject(c))
                 v.c = c
             ; else
-                v.c.c = c
+                v.c = { c: c, s: null, a: null }
             ;
 
+            v.io = { d: null, c: 1, r: 1, v: 0 };
             v.m = m;
 
             if (this._.isString(t))

@@ -199,9 +199,6 @@ function reset() {
     jTormTSSParser.tree = [];
     jTormTSSParser.pairs = [];
     jTormTSSParser.tss = '';
-    jTormViewModel.data.c.c = 1; // restore the shared (prototype) context defaults
-    jTormViewModel.data.c.s = null; // handler-wrapper writes v.c.s (= shared data.c.s)
-    jTormViewModel.data.c.a = null; // get{t}/ui write v.c.a (ancestor scope)
     jTormLanguageModel.data = {};
     jTormDataModel.c = new Map(); // fetch-model caches (bounded-LRU singletons)
     jTormHtmlModel.c = new Map();
