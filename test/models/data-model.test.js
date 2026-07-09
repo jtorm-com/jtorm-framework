@@ -47,6 +47,24 @@ test('a repeated array-of-URLs key reuses the cache across distinct array instan
   assert.equal(fetches, 1, 'same-content array key must hit the cache (Map keys arrays by identity)');
 });
 
+test('cache key includes the resolved request base', async () => {
+  dm.c = new Map(); dm.max = 512;
+  let fetches = 0;
+  dm.requestModel = {
+    url: (u, c) => c.request.base + u,
+    get: (u, c) => ({ json: () => { fetches++; return Promise.resolve({ base: c.request.base }); } })
+  };
+
+  const a = { request: { base: 'https://a.example' } };
+  const b = { request: { base: 'https://b.example' } };
+
+  assert.deepEqual(await dm.get('/same.json', a), { base: 'https://a.example' });
+  assert.deepEqual(await dm.get('/same.json', b), { base: 'https://b.example' });
+  assert.equal(fetches, 2, 'same relative path under different bases must not share the cache');
+  assert.ok(dm.c.has('https://a.example/same.json'));
+  assert.ok(dm.c.has('https://b.example/same.json'));
+});
+
 test('a degenerate max (0) still returns the fetched value (never evicts the fresh entry)', async () => {
   dm.c = new Map(); dm.max = 0;
   dm.requestModel = { get: (u) => ({ json: () => Promise.resolve('v' + u) }) };

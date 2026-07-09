@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/tss-model",
   "description": "jTorm TSS Model",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,7 @@
     "directory": "src/models/tss-model"
   },
   "dependencies": {
-    "@jtorm/request-model": "^1.0.0",
+    "@jtorm/request-model": "^1.1.2",
     "@jtorm/tss-parser": "^1.0.0"
   }
 }

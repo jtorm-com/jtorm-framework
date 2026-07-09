@@ -43,3 +43,34 @@ test('get-method fetches multi-t artifacts through the real tss/request path in 
     rm.timeout = 0;
   }
 });
+
+test('get-method passes the render context to fetched content models', async () => {
+  const m = gm.models;
+  const ctx = { request: { base: 'https://tenant.example/' } };
+  let seen;
+
+  try {
+    gm.models = {
+      data: {
+        get: async (u, c) => {
+          seen = { u, c };
+          return { title: 'ok' };
+        }
+      }
+    };
+
+    const v = {
+      d: { d: '/data.json' },
+      m: {},
+      c: ctx,
+      _: { set: () => {} }
+    };
+
+    await gm.handle(v);
+
+    assert.deepEqual(v.io, { c: 1, d: { title: 'ok' } });
+    assert.deepEqual(seen, { u: '/data.json', c: ctx });
+  } finally {
+    gm.models = m;
+  }
+});

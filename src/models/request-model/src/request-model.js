@@ -20,21 +20,40 @@ module.exports = {
         base: '',   // optional base-URL prefix for relative URLs (host sets for SSR)
         timeout: 0, // ms; 0 = no timeout
 
-        url: function (u) {
+        context: function (c) {
+            if (c && c.c && typeof c.c === 'object')
+                c = c.c
+            ;
+
+            while (c && c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c && c.request && typeof c.request === 'object' ? c.request : c;
+        },
+
+        option: function (c, k, d) {
+            const r = this.context(c);
+
+            return r && r[k] != null ? r[k] : d;
+        },
+
+        url: function (u, c) {
             let r;
+            const b = this.option(c, 'base', this.base);
 
             try {
                 r = new URL(u).href;
             } catch (e) {
-                r = /^https?:\/\//i.test(u) ? u : this.base + u;
+                r = /^https?:\/\//i.test(u) ? u : b + u;
             }
 
             return r;
         },
 
         /** @type {jTormUrlGuard} */
-        allow: function (u) {
-            const b = this.base;
+        allow: function (u, c) {
+            const b = this.option(c, 'base', this.base);
             let r;
 
             if (/^[\u0000-\u0020]*\/\//.test(u))
@@ -70,16 +89,17 @@ module.exports = {
         /** @type {jTormTransport} */
         transport: function (u, o) { return fetch(u, o); },
 
-        fetch: async function (url) {
+        fetch: async function (url, c) {
             const o = {},
-                u = this.url(url)
+                u = this.url(url, c),
+                t = this.option(c, 'timeout', this.timeout)
             ;
 
-            if (this.timeout)
-                o.signal = AbortSignal.timeout(this.timeout)
+            if (t)
+                o.signal = AbortSignal.timeout(t)
             ;
 
-            if (!(await this.allow(u)))
+            if (!(await this.allow(u, c)))
                 throw new Error('URL blocked ' + u)
             ;
 
@@ -92,12 +112,12 @@ module.exports = {
             return r;
         },
 
-        get: function (url) {
+        get: function (url, c) {
             const s = this;
 
             return {
-                json: function () { return s.fetch(url).then(function (r) { return r.json(); }); },
-                text: function () { return s.fetch(url).then(function (r) { return r.text(); }); }
+                json: function () { return s.fetch(url, c).then(function (r) { return r.json(); }); },
+                text: function () { return s.fetch(url, c).then(function (r) { return r.text(); }); }
             };
         }
     }

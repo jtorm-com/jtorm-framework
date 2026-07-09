@@ -46,3 +46,21 @@ test('a repeated array-of-URLs key reuses the cache across distinct array instan
   await hm.get(['/a.html']);   // a DIFFERENT array, same content -> must hit, not refetch
   assert.equal(fetches, 1, 'same-content array key must hit the cache (Map keys arrays by identity)');
 });
+
+test('cache key includes the resolved request base', async () => {
+  hm.c = new Map(); hm.max = 512;
+  let fetches = 0;
+  hm.requestModel = {
+    url: (u, c) => c.request.base + u,
+    get: (u, c) => ({ text: () => { fetches++; return Promise.resolve(c.request.base); } })
+  };
+
+  const a = { request: { base: 'https://a.example' } };
+  const b = { request: { base: 'https://b.example' } };
+
+  assert.equal(await hm.get('/same.html', a), 'https://a.example');
+  assert.equal(await hm.get('/same.html', b), 'https://b.example');
+  assert.equal(fetches, 2, 'same relative path under different bases must not share the cache');
+  assert.ok(hm.c.has('https://a.example/same.html'));
+  assert.ok(hm.c.has('https://b.example/same.html'));
+});

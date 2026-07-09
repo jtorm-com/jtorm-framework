@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/html-model",
   "description": "jTorm HTML Model",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,6 +14,6 @@
     "directory": "src/models/html-model"
   },
   "dependencies": {
-    "@jtorm/request-model": "^1.0.0"
+    "@jtorm/request-model": "^1.1.2"
   }
 }

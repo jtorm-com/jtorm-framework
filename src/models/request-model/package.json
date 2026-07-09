@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/request-model",
   "description": "jTorm Request Model",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"

@@ -42,3 +42,22 @@ test('caches and returns an integer-like key (LRU order must not depend on key t
   await tm.get('/b');   // at max
   assert.equal(await tm.get(42), 'v42'); // integer key must round-trip, not return undefined
 });
+
+test('cache key includes the resolved request base', async () => {
+  tm.c = new Map(); tm.max = 512;
+  tm.tssParser = { handle: (t) => t };
+  let fetches = 0;
+  tm.requestModel = {
+    url: (u, c) => c.request.base + u,
+    get: (u, c) => ({ text: () => { fetches++; return Promise.resolve(c.request.base); } })
+  };
+
+  const a = { request: { base: 'https://a.example' } };
+  const b = { request: { base: 'https://b.example' } };
+
+  assert.equal(await tm.get('/same.tss', a), 'https://a.example');
+  assert.equal(await tm.get('/same.tss', b), 'https://b.example');
+  assert.equal(fetches, 2, 'same relative path under different bases must not share the cache');
+  assert.ok(tm.c.has('https://a.example/same.tss'));
+  assert.ok(tm.c.has('https://b.example/same.tss'));
+});
