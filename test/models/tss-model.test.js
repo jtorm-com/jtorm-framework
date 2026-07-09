@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormTssModel: tm } = require('../../src/models/tss-model/src/tss-model.js');
+const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
 const { makeTssParser } = require('../helpers/parser.js');
 
 test('awaits text BEFORE parsing (bug: a Promise must not reach tssParser.handle)', async () => {
@@ -41,4 +42,47 @@ test('caches and returns an integer-like key (LRU order must not depend on key t
   await tm.get('/a');
   await tm.get('/b');   // at max
   assert.equal(await tm.get(42), 'v42'); // integer key must round-trip, not return undefined
+});
+
+test('cache key includes the resolved request base', async () => {
+  tm.c = new Map(); tm.max = 512;
+  tm.tssParser = { handle: (t) => t };
+  let fetches = 0;
+  tm.requestModel = {
+    url: (u, c) => c.request.base + u,
+    get: (u, c) => ({ text: () => { fetches++; return Promise.resolve(c.request.base); } })
+  };
+
+  const a = { request: { base: 'https://a.example' } };
+  const b = { request: { base: 'https://b.example' } };
+
+  assert.equal(await tm.get('/same.tss', a), 'https://a.example');
+  assert.equal(await tm.get('/same.tss', b), 'https://b.example');
+  assert.equal(fetches, 2, 'same relative path under different bases must not share the cache');
+  assert.ok(tm.c.has('https://a.example/same.tss'));
+  assert.ok(tm.c.has('https://b.example/same.tss'));
+});
+
+test('absolute URL cache hits still honor the request base guard', async () => {
+  const savedM = tm.requestModel, savedT = rm.transport, savedB = rm.base, savedO = rm.timeout;
+  let fetches = 0;
+
+  try {
+    tm.c = new Map(); tm.max = 512; tm.requestModel = rm; tm.tssParser = { handle: (t) => t };
+    rm.base = ''; rm.timeout = 0;
+    rm.transport = async () => {
+      fetches++;
+      return { ok: true, status: 200, text: async () => 'TENANT A' };
+    };
+
+    assert.equal(await tm.get('https://a.example/secret.tss', { request: { tenant: 't', base: 'https://a.example/' } }), 'TENANT A');
+    await assert.rejects(() => tm.get('https://a.example/secret.tss', { request: { tenant: 't', base: 'https://b.example/' } }), /URL blocked/);
+    assert.equal(fetches, 1, 'blocked second context must not be served from tenant A cache');
+  } finally {
+    tm.requestModel = savedM;
+    tm.c = new Map();
+    rm.transport = savedT;
+    rm.base = savedB;
+    rm.timeout = savedO;
+  }
 });

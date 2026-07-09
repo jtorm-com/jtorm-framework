@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormHtmlModel: hm } = require('../../src/models/html-model/src/html-model.js');
+const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
 
 test('returns text and does not cache a rejection (#16)', async () => {
   hm.c = new Map();
@@ -45,4 +46,46 @@ test('a repeated array-of-URLs key reuses the cache across distinct array instan
   await hm.get(['/a.html']);   // ui-method passes a fresh array each render (ui-method.js:177)
   await hm.get(['/a.html']);   // a DIFFERENT array, same content -> must hit, not refetch
   assert.equal(fetches, 1, 'same-content array key must hit the cache (Map keys arrays by identity)');
+});
+
+test('cache key includes the resolved request base', async () => {
+  hm.c = new Map(); hm.max = 512;
+  let fetches = 0;
+  hm.requestModel = {
+    url: (u, c) => c.request.base + u,
+    get: (u, c) => ({ text: () => { fetches++; return Promise.resolve(c.request.base); } })
+  };
+
+  const a = { request: { base: 'https://a.example' } };
+  const b = { request: { base: 'https://b.example' } };
+
+  assert.equal(await hm.get('/same.html', a), 'https://a.example');
+  assert.equal(await hm.get('/same.html', b), 'https://b.example');
+  assert.equal(fetches, 2, 'same relative path under different bases must not share the cache');
+  assert.ok(hm.c.has('https://a.example/same.html'));
+  assert.ok(hm.c.has('https://b.example/same.html'));
+});
+
+test('absolute URL cache hits still honor the request base guard', async () => {
+  const savedM = hm.requestModel, savedT = rm.transport, savedB = rm.base, savedO = rm.timeout;
+  let fetches = 0;
+
+  try {
+    hm.c = new Map(); hm.max = 512; hm.requestModel = rm;
+    rm.base = ''; rm.timeout = 0;
+    rm.transport = async () => {
+      fetches++;
+      return { ok: true, status: 200, text: async () => 'TENANT A' };
+    };
+
+    assert.equal(await hm.get('https://a.example/secret.html', { request: { tenant: 't', base: 'https://a.example/' } }), 'TENANT A');
+    await assert.rejects(() => hm.get('https://a.example/secret.html', { request: { tenant: 't', base: 'https://b.example/' } }), /URL blocked/);
+    assert.equal(fetches, 1, 'blocked second context must not be served from tenant A cache');
+  } finally {
+    hm.requestModel = savedM;
+    hm.c = new Map();
+    rm.transport = savedT;
+    rm.base = savedB;
+    rm.timeout = savedO;
+  }
 });

@@ -48,6 +48,34 @@ module.exports = {
             return l + this.sep + id + this.sep + c;
         },
 
+        tenant: function (v) {
+            const c = this.context(v), r = c && c.request;
+
+            if (c && c.tenant != null)
+                return String(c.tenant)
+            ;
+
+            if (r && r.tenant != null)
+                return String(r.tenant)
+            ;
+
+            if (r && r.origin != null)
+                return String(r.origin)
+            ;
+
+            if (r && r.base != null)
+                return String(r.base)
+            ;
+
+            return '';
+        },
+
+        scope: function (v, c) {
+            const t = this.tenant(v);
+
+            return t ? t + this.sep + c : c;
+        },
+
         init: async function () {
             let o, l, id, c;
 
@@ -66,6 +94,7 @@ module.exports = {
 
         get: async function (v, l, id, c) {
             const s = this;
+            c = s.scope(v, c);
 
             if (s.cache[l] && s.cache[l][id] && s.cache[l][id][c] !== undefined) {// hit: bump recency (Map keeps insertion order)
                 const k = s.key(l, id, c);
@@ -78,6 +107,8 @@ module.exports = {
         },
 
         set: function (v, l, id, c, d) {
+            c = this.scope(v, c);
+
             if (!this.cache[l] || !this.cache[l][id] || this.cache[l][id][c] === undefined) {// write-once per (l,id,c)
                 this.put(l, id, c, d);
                 this.state(v).updated = 1;

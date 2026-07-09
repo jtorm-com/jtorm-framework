@@ -16,8 +16,8 @@ module.exports = {
             return !!(v.d.h || v.d.t || v.d.d);
         },
 
-        get: async function(t, u) {
-            let r = await this.models[t].get(u);
+        get: async function(t, u, c) {
+            let r = await this.models[t].get(u, c);
 
             return r; // raw model result (data: JSON, html: text, tss: parsed tree)
         },
@@ -32,7 +32,7 @@ module.exports = {
             if (v.d.d) {
                 nD = {...v.m};
 
-                r = await this.get('data', v.d.d);
+                r = await this.get('data', v.d.d, v.c);
 
                 if (v.d.a)
                     v._.set(nD, v.d.a, r)
@@ -42,7 +42,7 @@ module.exports = {
             }
 
             if (v.d.h) {
-                r = await this.get('html', v.d.h);
+                r = await this.get('html', v.d.h, v.c);
 
                 // RAW fetched-body sink → host XSS sanitizer seam (DI, DOMPurify-shaped,
                 // sync/async; default null → PASSTHROUGH — the fragment is author-trusted
@@ -71,7 +71,7 @@ module.exports = {
                     c: []
                 };
 
-                r = await this.get('tss', v.d.t);
+                r = await this.get('tss', v.d.t, v.c);
 
                 // Ancestor-scope: fetched rules boil UNDER the get target, not
                 // document-global. Resolve the get target `v.t.s` to its actual

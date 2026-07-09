@@ -43,6 +43,15 @@
  */
 
 /**
+ * Request-model per-render options on `v.c`.
+ * @typedef {Object} ViewRequestContext
+ * @property {?string} [base] request base URL prefix for relative fetches
+ * @property {number} [timeout] request timeout in ms; 0 = no timeout
+ * @property {?string} [origin] request origin discriminator for rendered-output caches
+ * @property {?string} [tenant] tenant discriminator for rendered-output caches
+ */
+
+/**
  * CSS-plugin render-local asset state on `v.c`.
  * @typedef {Object} ViewCssContext
  * @property {Object<string,number|boolean>} cache href de-dupe state for this render
@@ -64,6 +73,8 @@
  * @property {?(Element[])} [a] ancestor element(s) — get{t}/ui resolve these; document-model.scope matches a rule WITHIN them (descendant-first, else self; selectorless → the element). An element-ref array (not a selector string), shared by-ref via copy → REPLACE, never mutate in place
  * @property {?string} [b] body default — an iteration fragment's selectorless, unscoped rules target it (handler-wrapper)
  * @property {?string} [locale] request locale for render-path language lookup
+ * @property {?string} [tenant] tenant discriminator for rendered-output caches
+ * @property {ViewRequestContext} [request] request-model base/timeout for render-path fetches
  * @property {ViewContext} [p] parent/root render context for detached fragment state
  * @property {ViewLayerContext} [layer] per-render deferred layer state
  * @property {ViewUiCacheContext} [uiCache] per-render ui-cache dirty state

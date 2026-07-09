@@ -102,3 +102,34 @@ test('injected URL guard can opt in an external absolute URL', async () => {
     assert.equal(seen, 'https://api.example/x');
   } finally { rm.transport = savedT; rm.allow = savedA; rm.base = ''; }
 });
+
+test('per-call context keeps base/timeout stable across an interleaved singleton mutation', async () => {
+  let seen, release;
+  const savedT = rm.transport, savedA = rm.allow;
+  rm.allow = async function (u, c) {
+    await new Promise((resolve) => { release = resolve; });
+    return savedA.call(this, u, c);
+  };
+  rm.transport = async (u, o) => {
+    seen = { u, signal: !!(o && o.signal) };
+    return { ok: true, status: 200, text: async () => 'ok' };
+  };
+
+  try {
+    rm.base = 'https://a.example/assets/';
+    rm.timeout = 0;
+
+    const p = rm.get('item.html', { request: { base: 'https://a.example/assets/', timeout: 5 } }).text();
+    await Promise.resolve();
+    rm.base = 'https://b.example/assets/';
+    release();
+
+    assert.equal(await p, 'ok');
+    assert.deepEqual(seen, { u: 'https://a.example/assets/item.html', signal: true });
+  } finally {
+    rm.transport = savedT;
+    rm.allow = savedA;
+    rm.base = '';
+    rm.timeout = 0;
+  }
+});
