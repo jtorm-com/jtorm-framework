@@ -37,7 +37,7 @@ module.exports = {
          */
         handle: async function (v) {
             const s = this;
-            let r = '', d, k, h, sv, i = 0, e, l = v.c && v.c.locale, c;
+            let r = '', d, k, h, sv, i = 0, e, pc = v.c && typeof v.c === 'object' ? v.c : null, l = pc && pc.locale, c;
 
             if (!v.d.d)
                 v.d.d = v.m
@@ -81,8 +81,8 @@ module.exports = {
 
                     c = {c: 1, s: null, a: null};
 
-                    if (v.c && typeof v.c === 'object')
-                        c.p = v.c
+                    if (pc)
+                        c.p = pc
                     ;
 
                     if (l != null)

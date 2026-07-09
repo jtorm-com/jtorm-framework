@@ -66,3 +66,26 @@ test('unsaved layer state left by a thrown render cannot affect the next root co
         reset();
     }
 });
+
+test('initCache-loaded layers seed a root render context', async () => {
+    reset();
+    try {
+        const t = { s: 'p', m: 'attr', p: { n: 'data-x', v: 'cached' }, c: [] };
+        l.saveModel = {
+            get: async () => ({
+                event: { before: { iteration: [] }, after: { iteration: [], view: ['cached'] } },
+                layers: { cached: [{ z: 0, t: t }] }
+            })
+        };
+
+        await l.initCache();
+
+        assert.deepEqual(
+            l.get({ c: { c: 1, s: null, a: null } }, 'after', 'view'),
+            [t],
+            'a context-backed render must see cached layer state loaded by initCache()'
+        );
+    } finally {
+        reset();
+    }
+});

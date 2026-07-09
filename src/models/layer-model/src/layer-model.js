@@ -23,6 +23,45 @@ module.exports = {
             return { before: { iteration: [] }, after: { iteration: [], view: [] } };
         },
 
+        copyEvent: function (e) {
+            e = e || {};
+
+            return {
+                before: {
+                    iteration: e.before && e.before.iteration
+                        ? e.before.iteration.slice()
+                        : []
+                },
+                after: {
+                    iteration: e.after && e.after.iteration
+                        ? e.after.iteration.slice()
+                        : [],
+                    view: e.after && e.after.view
+                        ? e.after.view.slice()
+                        : []
+                }
+            };
+        },
+
+        copyLayers: function (l) {
+            const o = {};
+            l = l || {};
+
+            for (let i in l) {
+                o[i] = [];
+
+                for (let k in l[i])
+                    o[i].push({ z: l[i][k].z, t: l[i][k].t })
+                ;
+            }
+
+            return o;
+        },
+
+        freshState: function () {
+            return { cid: null, currentCid: [], event: this.copyEvent(this.event), layers: this.copyLayers(this.layers), updated: 0 };
+        },
+
         context: function (v) {
             let c = v && v.c;
 
@@ -45,7 +84,7 @@ module.exports = {
             ;
 
             if (!c.layer)
-                c.layer = { cid: null, currentCid: [], event: this.emptyEvent(), layers: {}, updated: 0 }
+                c.layer = this.freshState()
             ;
 
             if (v.c !== c)
