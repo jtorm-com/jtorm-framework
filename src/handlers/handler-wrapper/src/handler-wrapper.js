@@ -49,7 +49,13 @@ module.exports = {
             // the each(e:) path, which already creates with c:1. a:null is explicit: v.c.a
             // is element-refs bound to the PARENT document — never inherit them into this
             // detached fragment (a fresh doc); a nested get/ui inside re-resolves its own.
-            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, {s: null, a: null, b: 'body', c: 1}, 1);
+            const c = {s: null, a: null, b: 'body', c: 1};
+
+            if (v.c && v.c.locale != null)
+                c.locale = v.c.locale
+            ;
+
+            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, c, 1);
 
             v2.cid = v.cid;
             v2.cs = v.cs;

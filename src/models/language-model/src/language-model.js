@@ -52,12 +52,18 @@ module.exports = {
             return d.toUTCString();
         },
 
-        get: function (s) {
-            let l = this.language;
+        get: function (s, l) {
+            if (l) {
+                if (!this.data[l] || !this.data[l][s])
+                    l = this.getFallback(l)
+                ;
+            } else {
+                l = this.language;
 
-            if (!this.data[l] || !this.data[l][s])
-                l = this.fallback
-            ;
+                if (!this.data[l] || !this.data[l][s])
+                    l = this.fallback
+                ;
+            }
 
             return (
                 this.data[l]

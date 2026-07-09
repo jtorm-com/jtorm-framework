@@ -33,6 +33,7 @@
  * @property {?string} s  descendant selector — find appends it (`<rule> <s>`)
  * @property {?(Element[])} [a] ancestor element(s) — get{t}/ui resolve these; document-model.scope matches a rule WITHIN them (descendant-first, else self; selectorless → the element). An element-ref array (not a selector string), shared by-ref via copy → REPLACE, never mutate in place
  * @property {?string} [b] body default — an iteration fragment's selectorless, unscoped rules target it (handler-wrapper)
+ * @property {?string} [locale] request locale for render-path language lookup
  */
 
 /**
