@@ -7,6 +7,7 @@ module.exports = {
     jTormWrapMethod: {
         // DI
         // handlerWrapper
+        // sanitize
 
         alias: 'w',
         params: ['s', 'h', 'd'],
@@ -36,14 +37,32 @@ module.exports = {
         },
 
         process: async function (jD, s, w, h, d, v) {
+            const z = this;
+            let c, done;
+
             await jD.set({t: {s: s}, c: v.c}, async function (el) {
+                if (!done) {
+                    c = await z.clean(h);
+                    done = 1;
+                }
+
                 const tH = el.innerHTML;
-                el.innerHTML = h;
+                el.innerHTML = c;
 
                 await jD.set({t: {s: w}, c: v.c}, function (el2) {
                     el2.innerHTML = tH;
                 });
             });
+        },
+
+        // Host XSS sanitizer seam (DI): raw wrap{h} markup is parsed through
+        // innerHTML, so an injected sanitizer must see it before it becomes DOM.
+        // Invoked lazily from process() after target resolution so zero-match drift
+        // errors win and a sanitizer rejection cannot leave a partial write.
+        clean: function (h) {
+            const s = this.sanitize;
+
+            return s ? s(h) : h;
         }
     }
 };

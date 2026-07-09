@@ -121,11 +121,11 @@ jTormViewModel._ = _;
 jTormViewModel.documentModel = jTormDocumentModel;
 jTormDocumentModel.errorHandler = jTormInsertMethod.errorHandler = jTormUiMethod.errorHandler = jTormErrorHandler;
 // Host XSS sanitizer seam (DI): insert-method's h: content write (inner/append/
-// prepend/before/after) and get-method's get{h} body run raw markup through an
-// injected sanitize(html) before it becomes live DOM (see insert-method clean()).
+// prepend/before/after/replace), wrap/swap raw html, and get-method's get{h}
+// body run raw markup through an injected sanitize(html) before it becomes live DOM.
 // Default null → PASSTHROUGH (dep-free greenfield; no host wires it yet). Tests opt
 // in via setSanitize(); reset() re-applies it each boil (default null → no leak).
-jTormInsertMethod.sanitize = jTormGetMethod.sanitize = null;
+jTormInsertMethod.sanitize = jTormGetMethod.sanitize = jTormWrapMethod.sanitize = jTormSwapMethod.sanitize = null;
 jTormAttrsMethod.tssParser = jTormViewModel.tssParser = jTormDataParser.tssParser = jTormTSSParser;
 jTormHandler.dataParser = jTormAttrsMethod.dataParser = jTormIfMethod.dataParser = jTormTextMethod.dataParser = jTormDataParser;
 jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS this; text-method.js:23 needs it
@@ -176,7 +176,7 @@ jTormLayerModel.saveModel = null;
 const DEFAULT_TRANSPORT = jTormRequestModel.transport; // restore after any per-render fixture override
 
 // Host XSS sanitizer seam override (see the DI block). A test opts in with
-// setSanitize(fn) before render(); reset() re-applies it to the insert+get
+// setSanitize(fn) before render(); reset() re-applies it to the raw-sink
 // singletons each boil and clears to null when unset (no leak between boils).
 let SANITIZE = null;
 function setSanitize(fn) { SANITIZE = fn || null; }
@@ -215,7 +215,7 @@ function reset() {
     jTormRequestModel.base = '';
     jTormRequestModel.timeout = 0;
     jTormRequestModel.transport = DEFAULT_TRANSPORT; // drop any per-render fixture override
-    jTormInsertMethod.sanitize = jTormGetMethod.sanitize = SANITIZE; // host sanitizer seam (default null → passthrough)
+    jTormInsertMethod.sanitize = jTormGetMethod.sanitize = jTormWrapMethod.sanitize = jTormSwapMethod.sanitize = SANITIZE; // host sanitizer seam (default null → passthrough)
 }
 
 /** Resolve one artifact part (quote-stripped) to its served text: explicit fixture
