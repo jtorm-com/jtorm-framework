@@ -119,3 +119,21 @@ test('the exported `cache` field is the live store — a host read/reset takes e
   c.cache = {};                                   // a host reset via the exported field only
   assert.equal(await c.get(null, 'en', 'comp1', 'default'), null, 'get() reads the exported cache — a reset takes effect');
 });
+
+test('dirty tracking is per render context while cache/order remain shared', async () => {
+  const store = { sets: 0, o: null, set(o) { this.o = o; this.sets++; } };
+  const a = { c: { c: 1, s: null, a: null } };
+  const b = { c: { c: 1, s: null, a: null } };
+  c.cache = {}; c.order = new Map(); c.max = 512; c.updated = 0; c.saveModel = store;
+
+  c.set(a, 'en', 'comp1', 'default', 'A');
+
+  assert.equal(await c.get(b, 'en', 'comp1', 'default'), 'A', 'the persisted cache store is still shared');
+
+  await c.save(b);
+  assert.equal(store.sets, 0, 'another render save must not persist or clear render A dirty state');
+
+  await c.save(a);
+  assert.equal(store.sets, 1, 'render A save persists its own dirty write');
+  assert.deepEqual(store.o, { en: { comp1: { default: 'A' } } });
+});

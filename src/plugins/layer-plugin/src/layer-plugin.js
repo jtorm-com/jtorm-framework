@@ -25,6 +25,11 @@ module.exports = {
             }
         },
 
+        stack: function (v) {
+            const s = this.layerModel.state(v);
+            return s.currentCid ? s.currentCid : this.currentCid;
+        },
+
         handle: async function(v, e, t) {
             const c = this.layerModel.get(v, e, t);
             if (c && c.length)
@@ -34,9 +39,11 @@ module.exports = {
 
         beforeIteration: async function(v) {
             if (v.cid) {
-                this.currentCid.push(v.cid);
+                const s = this.layerModel.state(v);
 
-                this.layerModel.cid = v.cid;
+                this.stack(v).push(v.cid);
+
+                s.cid = v.cid;
             }
         },
 
@@ -44,12 +51,14 @@ module.exports = {
             if (v.cid) {
                 await this.handle(v, 'after', 'iteration');
 
-                v._.remove(this.currentCid, function (el) {
+                const c = this.stack(v);
+
+                v._.remove(c, function (el) {
                     return el === v.cid;
                 });
 
-                this.layerModel.cid = this.currentCid.length
-                    ? this.currentCid.pop()
+                this.layerModel.state(v).cid = c.length
+                    ? c.pop()
                     : 'default';
             }
         },
