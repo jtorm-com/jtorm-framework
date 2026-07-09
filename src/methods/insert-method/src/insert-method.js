@@ -9,6 +9,7 @@ module.exports = {
         // errorHandler
         // handlerWrapper
         // viewModel
+        // sanitize
 
         alias: 'i',
         params: [
@@ -103,21 +104,55 @@ module.exports = {
             v.io = {c: c};
         },
 
-        process: async function (h, h2, m, v) {
-            await h.set(v, async e => {
-                const o = v._.isObject(h2);
+        // Host XSS sanitizer seam (DI, DOMPurify-shaped: html -> cleaned html; sync
+        // OR async — the caller awaits; assumed IDEMPOTENT, since boiled children can
+        // pass here twice). Runs over the h: content STRING this verb writes as live
+        // DOM through innerHTML / insertAdjacentHTML (modes i/a/p/b/af — the explicit
+        // opt-in, composed child markup, author literals). Dep-free DEFAULT: no
+        // sanitizer injected → PASSTHROUGH (greenfield; zero behaviour change — no host
+        // wires it yet). The ESCAPED t: path (processText) is already inert and is
+        // NEVER routed here. The host's sanitizer CONFIG owns the composition
+        // allow-list — a strict policy could strip <option>/<source>/<track>, so a host
+        // composing child markup must allow those.
+        //
+        // NOT covered by this seam (raw sinks flagged for a follow-up — backlog P0.1):
+        // insert's own m:'r' replace path (viewModel.create + replaceChild parses a
+        // NODE, not this string sink — and is non-functional without an s: selector
+        // anyway), plus the sibling wrap/swap verbs (their own innerHTML/parse in
+        // separate packages). Invoked via a LOCAL, not this.sanitize(h), so an injected
+        // free function runs with this=undefined rather than rebound to this method; a
+        // host wiring an unbound instance method must bind it: sanitize = h => c.clean(h).
+        clean: function (h) {
+            const s = this.sanitize;
 
+            return s ? s(h) : h;
+        },
+
+        process: async function (h, h2, m, v) {
+            // Non-replace modes write a raw HTML STRING that doesn't depend on the
+            // target element, so sanitize it ONCE for the whole operation — but
+            // LAZILY, on the first matched element. h.set() resolves the selector and
+            // throws the zero-match drift error ("<sel> not found") BEFORE the sanitizer
+            // ever runs (a drifted selector must surface as drift, not as a sanitizer
+            // error — AGENTS.md zero-match contract), while a >=1-match set still cleans
+            // once and, on a sanitizer rejection, fails on that first element before any
+            // write (no partial write). The m:'r' branch parses its own node per match
+            // (isObject/reassign stays in the loop) and is not routed through the seam
+            // (see clean()).
+            let c, done;
+
+            await h.set(v, async e => {
                 if (m === 'r') {
-                    if (!o)
+                    if (!v._.isObject(h2))
                         h2 = await this.viewModel.create(h2)
                     ;
 
                     e.parentNode.replaceChild(h2.h.select(h2.h.getSelector(v.d.s, v.c.s)), e);
                 } else {
-                    const c = o
-                        ? h2.select('body').innerHTML
-                        : h2
-                    ;
+                    if (!done) {
+                        c = await this.clean(v._.isObject(h2) ? h2.select('body').innerHTML : h2);
+                        done = 1;
+                    }
 
                     if (m === 'i')
                         e.innerHTML = c

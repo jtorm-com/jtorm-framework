@@ -7,6 +7,7 @@ module.exports = {
     jTormGetMethod: {
         // DI
         // models[],
+        // sanitize
 
         params: ['h', 't', 'd', 'a'],
 
@@ -43,7 +44,23 @@ module.exports = {
             if (v.d.h) {
                 r = await this.get('html', v.d.h);
 
-                await v.h.set(v, function (el) {
+                // RAW fetched-body sink → host XSS sanitizer seam (DI, DOMPurify-shaped,
+                // sync/async; default null → PASSTHROUGH — the fragment is author-trusted
+                // today). Sanitize LAZILY inside the set callback, once, on the first
+                // matched element, so v.h.set() throws the zero-match drift error
+                // ("<sel> not found") BEFORE the sanitizer runs — a drifted selector must
+                // surface as drift, not a sanitizer error (mirrors insert-method's
+                // clean()). Local `s` (not this.sanitize): see insert-method clean() for
+                // the seam contract + this-binding note.
+                const s = this.sanitize;
+                let done;
+
+                await v.h.set(v, async function (el) {
+                    if (s && !done) {
+                        r = await s(r);
+                        done = 1;
+                    }
+
                     el.innerHTML = r;
                 });
             }
