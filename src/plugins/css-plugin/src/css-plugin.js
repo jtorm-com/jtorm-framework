@@ -17,8 +17,57 @@ module.exports = {
             }
         },
 
+        context: function (v) {
+            let c = v && v.c;
+
+            if (!c || typeof c !== 'object')
+                return null
+            ;
+
+            while (c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c;
+        },
+
+        state: function (v) {
+            const c = this.context(v);
+
+            if (!c)
+                return this
+            ;
+
+            if (!c.css)
+                c.css = { cache: {}, collection: [] }
+            ;
+
+            if (v.c !== c)
+                v.c.css = c.css
+            ;
+
+            return c.css;
+        },
+
+        adopt: function (v) {
+            const s = this.state(v);
+
+            if (s !== this && this.collection.length) {
+                for (let css of this.collection)
+                    s.collection.push(css)
+                ;
+
+                this.cache = {};
+                this.collection = [];
+            }
+
+            return s;
+        },
+
         process: async function(v, css) {
-            if(!this.cache[css.href]) {
+            const s = this.state(v);
+
+            if(!s.cache[css.href]) {
                 await v.h.set({t: {s: 'head'}, c: {s: null}}, el => {
                     const
                         po = v.h.d.createElement('link'),
@@ -52,18 +101,22 @@ module.exports = {
 
                     el.appendChild(po);
 
-                    this.cache[css.href] = true;
+                    s.cache[css.href] = true;
                 });
             }
         },
 
         afterView: async function(v) {
-            for (let css of this.collection)
-                await this.process(v, css)
-            ;
+            const s = this.adopt(v);
 
-            this.cache = {};
-            this.collection = [];
+            try {
+                for (let css of s.collection)
+                    await this.process(v, css)
+                ;
+            } finally {
+                s.cache = {};
+                s.collection = [];
+            }
 
             return v.h;
         }

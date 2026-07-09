@@ -30,7 +30,10 @@ module.exports = {
          * @param {ViewModel} v
          */
         handle: function (v) {
-            const s = this.cssPlugin;
+            const
+                p = this.cssPlugin,
+                s = p.state ? p.state(v) : p
+            ;
 
             if (v.c.c || !s.cache[v.t.p.href]) {
                 s.cache[v.d.href] = 0;

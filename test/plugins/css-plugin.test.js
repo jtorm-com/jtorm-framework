@@ -3,13 +3,16 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { JSDOM } = require('jsdom');
 const { jTormCssPlugin } = require('../../src/plugins/css-plugin/src/css-plugin.js');
+const { jTormCssMethod } = require('../../src/methods/css-method/src/css-method.js');
 
 function fakeView() {
     const { window } = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
     const doc = window.document;
     return {
         t: { s: 'body' },
-        c: { s: null },
+        c: { c: 1, s: null },
+        d: null,
+        io: null,
         h: {
             d: doc,
             set: async (vo, fn) => {
@@ -20,11 +23,18 @@ function fakeView() {
     };
 }
 
+function setup() {
+    jTormCssPlugin.cache = {};
+    jTormCssPlugin.collection = [];
+    jTormCssPlugin.uiMethod = { parseUrl: u => u };
+    jTormCssPlugin.cssMethod = jTormCssMethod;
+    jTormCssMethod.cssPlugin = jTormCssPlugin;
+}
+
 // Synthesis (decided): adopt main's reliable media=print defer swap (its
 // "Bugfix defer method"), drop dev's rel=preload/as=style approach.
 test('css-plugin defer uses the media=print swap, not rel=preload', async () => {
-    jTormCssPlugin.cache = {};
-    jTormCssPlugin.uiMethod = { parseUrl: u => u };
+    setup();
     jTormCssPlugin.cssMethod = { params: ['crossorigin', 'defer', 'href', 'integrity', 'media', 'rel'] };
 
     const v = fakeView();
@@ -44,8 +54,7 @@ test('css-plugin defer uses the media=print swap, not rel=preload', async () => 
 // The media is passed as DATA (data-media) and the onload reads it, so a media string
 // can never break out of the inline handler (no string interpolation into JS).
 test('css-plugin defer preserves a custom media via data-media (not hardcoded all)', async () => {
-    jTormCssPlugin.cache = {};
-    jTormCssPlugin.uiMethod = { parseUrl: u => u };
+    setup();
     jTormCssPlugin.cssMethod = { params: ['crossorigin', 'defer', 'href', 'integrity', 'media', 'rel'] };
 
     const v = fakeView();
@@ -59,8 +68,7 @@ test('css-plugin defer preserves a custom media via data-media (not hardcoded al
 
 // Retain dev capability: custom rel on non-deferred links.
 test('css-plugin keeps a custom rel on non-deferred links', async () => {
-    jTormCssPlugin.cache = {};
-    jTormCssPlugin.uiMethod = { parseUrl: u => u };
+    setup();
     jTormCssPlugin.cssMethod = { params: ['href', 'rel'] };
 
     const v = fakeView();
@@ -68,4 +76,54 @@ test('css-plugin keeps a custom rel on non-deferred links', async () => {
 
     const link = v.h.d.querySelector('head link');
     assert.equal(link.getAttribute('rel'), 'alternate stylesheet');
+});
+
+test('css collection is isolated between interleaved root contexts', async () => {
+    setup();
+
+    const a = fakeView(), b = fakeView();
+
+    a.t = { p: { href: 'a.css' } };
+    a.d = { href: 'a.css' };
+    jTormCssMethod.handle(a);
+
+    b.t = { p: { href: 'b.css' } };
+    b.d = { href: 'b.css' };
+    jTormCssMethod.handle(b);
+
+    await jTormCssPlugin.afterView(b);
+    await jTormCssPlugin.afterView(a);
+
+    assert.deepEqual([...b.h.d.querySelectorAll('head link')].map(e => e.getAttribute('href')), ['b.css']);
+    assert.deepEqual([...a.h.d.querySelectorAll('head link')].map(e => e.getAttribute('href')), ['a.css']);
+});
+
+test('css collection left by a thrown render does not affect the next root context', async () => {
+    setup();
+
+    const thrown = fakeView();
+    thrown.t = { p: { href: 'stale.css' } };
+    thrown.d = { href: 'stale.css' };
+    jTormCssMethod.handle(thrown);
+
+    const next = fakeView();
+    next.t = { p: { href: 'fresh.css' } };
+    next.d = { href: 'fresh.css' };
+    jTormCssMethod.handle(next);
+
+    await jTormCssPlugin.afterView(next);
+
+    assert.deepEqual([...next.h.d.querySelectorAll('head link')].map(e => e.getAttribute('href')), ['fresh.css']);
+});
+
+test('css afterView drains a legacy singleton queue when paired with an old/custom method', async () => {
+    setup();
+
+    const v = fakeView();
+    jTormCssPlugin.collection.push({ href: 'legacy.css' });
+
+    await jTormCssPlugin.afterView(v);
+
+    assert.deepEqual([...v.h.d.querySelectorAll('head link')].map(e => e.getAttribute('href')), ['legacy.css']);
+    assert.deepEqual(jTormCssPlugin.collection, []);
 });

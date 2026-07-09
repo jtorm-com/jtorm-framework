@@ -43,6 +43,20 @@
  */
 
 /**
+ * CSS-plugin render-local asset state on `v.c`.
+ * @typedef {Object} ViewCssContext
+ * @property {Object<string,number|boolean>} cache href de-dupe state for this render
+ * @property {Object<string,*>[]} collection queued stylesheet descriptors for this render
+ */
+
+/**
+ * JS-plugin render-local asset state on `v.c`.
+ * @typedef {Object} ViewJsContext
+ * @property {Object<string,number|boolean>} cache src de-dupe state for this render
+ * @property {Object<string,*>[]} collection queued script descriptors for this render
+ */
+
+/**
  * Render-context flags on `v.c`.
  * @typedef {Object} ViewContext
  * @property {number} c   create-doc flag — truthy → fresh detached doc (SSR); falsy → live doc (client)
@@ -53,6 +67,8 @@
  * @property {ViewContext} [p] parent/root render context for detached fragment state
  * @property {ViewLayerContext} [layer] per-render deferred layer state
  * @property {ViewUiCacheContext} [uiCache] per-render ui-cache dirty state
+ * @property {ViewCssContext} [css] per-render stylesheet collection/de-dupe state
+ * @property {ViewJsContext} [js] per-render script collection/de-dupe state
  */
 
 /**

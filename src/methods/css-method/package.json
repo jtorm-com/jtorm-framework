@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/css-method",
   "description": "jTorm CSS Method",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,7 @@
     "directory": "src/methods/css-method"
   },
   "dependencies": {
-    "@jtorm/css-plugin": "^1.0.0",
-    "@jtorm/types": "^1.0.0"
+    "@jtorm/css-plugin": "^1.0.2",
+    "@jtorm/types": "^1.0.5"
   }
 }
