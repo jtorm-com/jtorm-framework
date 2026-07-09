@@ -34,6 +34,8 @@ test('prepack emits a consumable .d.ts that exports the typedefs', () => {
     for (const t of ['ViewModel', 'ViewIO', 'ViewContext', 'TssNode', 'Method'])
       assert.match(dts, new RegExp('export type ' + t + '\\b'),
         t + ' must be an exported type so the import specifier resolves downstream');
+    assert.match(dts, /locale\?: string \| null;/,
+      'ViewContext must expose optional locale for per-render language lookup');
   } finally {
     fs.rmSync(out, { recursive: true, force: true });
   }

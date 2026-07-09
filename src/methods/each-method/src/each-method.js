@@ -37,7 +37,7 @@ module.exports = {
          */
         handle: async function (v) {
             const s = this;
-            let r = '', d, k, h, sv, i = 0, e;
+            let r = '', d, k, h, sv, i = 0, e, l = v.c && v.c.locale;
 
             if (!v.d.d)
                 v.d.d = v.m
@@ -79,7 +79,12 @@ module.exports = {
                         h = e[0].outerHTML
                     ;
 
-                    h = await s.handler.handle('<body>' + h + '</body>', v.t.c, d, 1);
+                    h = await s.handler.handle(
+                        '<body>' + h + '</body>',
+                        v.t.c,
+                        d,
+                        l != null ? {c: 1, s: null, a: null, locale: l} : 1
+                    );
 
                     if (e[i])
                         e[i].parentNode.replaceChild(h.select(v.d.e ?? v.t.s), e[i])

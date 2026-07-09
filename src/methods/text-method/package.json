@@ -16,6 +16,6 @@
   "dependencies": {
     "@jtorm/data-parser": "^1.0.0",
     "@jtorm/language-model": "^1.0.2",
-    "@jtorm/types": "^1.0.0"
+    "@jtorm/types": "^1.0.3"
   }
 }

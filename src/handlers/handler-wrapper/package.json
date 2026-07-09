@@ -17,6 +17,6 @@
     "@jtorm/handler": "^1.0.0",
     "@jtorm/event-model": "^1.0.0",
     "@jtorm/view-model": "^1.0.0",
-    "@jtorm/types": "^1.0.0"
+    "@jtorm/types": "^1.0.3"
   }
 }
