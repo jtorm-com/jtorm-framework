@@ -115,3 +115,15 @@ test('css collection left by a thrown render does not affect the next root conte
 
     assert.deepEqual([...next.h.d.querySelectorAll('head link')].map(e => e.getAttribute('href')), ['fresh.css']);
 });
+
+test('css afterView drains a legacy singleton queue when paired with an old/custom method', async () => {
+    setup();
+
+    const v = fakeView();
+    jTormCssPlugin.collection.push({ href: 'legacy.css' });
+
+    await jTormCssPlugin.afterView(v);
+
+    assert.deepEqual([...v.h.d.querySelectorAll('head link')].map(e => e.getAttribute('href')), ['legacy.css']);
+    assert.deepEqual(jTormCssPlugin.collection, []);
+});

@@ -49,6 +49,21 @@ module.exports = {
             return c.js;
         },
 
+        adopt: function (v) {
+            const s = this.state(v);
+
+            if (s !== this && this.collection.length) {
+                for (let js of this.collection)
+                    s.collection.push(js)
+                ;
+
+                this.cache = {};
+                this.collection = [];
+            }
+
+            return s;
+        },
+
         process: async function(v, js) {
             const s = this.state(v);
 
@@ -77,7 +92,7 @@ module.exports = {
         },
 
         afterView:  async function(v) {
-            const s = this.state(v);
+            const s = this.adopt(v);
 
             try {
                 for (let js of s.collection)

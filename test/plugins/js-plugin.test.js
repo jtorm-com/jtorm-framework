@@ -98,3 +98,15 @@ test('js collection left by a thrown render does not affect the next root contex
 
     assert.deepEqual([...next.h.d.querySelectorAll('head script')].map(e => e.getAttribute('src')), ['fresh.js']);
 });
+
+test('js afterView drains a legacy singleton queue when paired with an old/custom method', async () => {
+    setup();
+
+    const v = fakeView();
+    jTormJsPlugin.collection.push({ src: 'legacy.js' });
+
+    await jTormJsPlugin.afterView(v);
+
+    assert.deepEqual([...v.h.d.querySelectorAll('head script')].map(e => e.getAttribute('src')), ['legacy.js']);
+    assert.deepEqual(jTormJsPlugin.collection, []);
+});
