@@ -26,7 +26,7 @@ module.exports = {
             for (k in v.t.p) {
                 x = this.dataParser.parse(v.m, v.t.p[k]);
 
-                v.m[k] = this.languageModel.get(x ? x : v.t.p[k]);
+                v.m[k] = this.languageModel.get(x ? x : v.t.p[k], v.c.locale);
             }
 
             v.io = {c: 1, d: v.m};

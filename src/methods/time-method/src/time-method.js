@@ -101,7 +101,7 @@ module.exports = {
 
             r = this.time(dT);
 
-            nD[v.d.as] = l.get(r[0]);
+            nD[v.d.as] = l.get(r[0], v.c.locale);
 
             if (r[1])
                 nD[v.d.as] = nD[v.d.as].replace('%d', r[1])
