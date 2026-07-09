@@ -44,63 +44,69 @@ module.exports = {
                 // a later `i->attr` to `i b → not found`). Capture the object too:
                 // some methods REPLACE v.c (each-method sets `v.c = 1` for its `e:`
                 // path), so reset the captured object's fields and reinstate the ref
-                // rather than writing onto a non-object (strict-mode TypeError).
+                // rather than writing onto a non-object (strict-mode TypeError). The
+                // restore is a try/finally so it ALWAYS runs: a mid-render throw (e.g. a
+                // zero-match drift in a fetched child) must not leave the shared context
+                // mutated, or the leaked scope poisons the NEXT render on this worker
+                // (per-request isolation — code-review #9 / backlog P0.2).
                 const oc = v.c, cs = v.c.s, ca = v.c.a;
 
-                do {
-                    r = 0;
+                try {
+                    do {
+                        r = 0;
 
-                    if (v.t.m && ms[v.t.m])
-                        r = ms[v.t.m]
-                    ; else {
-                        for (k2 in ms) {
-                            if (ms[k2].alias === v.t.m) {
-                                r = ms[k2];
-                                break;
+                        if (v.t.m && ms[v.t.m])
+                            r = ms[v.t.m]
+                        ; else {
+                            for (k2 in ms) {
+                                if (ms[k2].alias === v.t.m) {
+                                    r = ms[k2];
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    if (r) {
-                        if (v._.isFunction(r.data))
-                            await r.data(v)
-                        ; else
-                            this.dataParser.handle(v, r.params)
-                        ;
+                        if (r) {
+                            if (v._.isFunction(r.data))
+                                await r.data(v)
+                            ; else
+                                this.dataParser.handle(v, r.params)
+                            ;
 
-                        v.io.v = await r.validate(v);
+                            v.io.v = await r.validate(v);
 
-                        await e.handle(v, 'before', 'method');
+                            await e.handle(v, 'before', 'method');
 
-                        if (v.io.v && v._.isFunction(r.handle))
-                            await r.handle(v)
-                        ; else {
-                            // No handle ran: either validate MISSED, or the verb is a pure
-                            // data/scope binder (validate-pass + no handle, e.g. `data`) that
-                            // already set its own v.io.c. Only on a MISS does the handler decide
-                            // child handling — set v.io.c explicitly rather than inherit the
-                            // previous sibling's stale flag: a gate verb fails CLOSED (skip
-                            // children), any other verb is a pass-through and still renders them.
+                            if (v.io.v && v._.isFunction(r.handle))
+                                await r.handle(v)
+                            ; else {
+                                // No handle ran: either validate MISSED, or the verb is a pure
+                                // data/scope binder (validate-pass + no handle, e.g. `data`) that
+                                // already set its own v.io.c. Only on a MISS does the handler decide
+                                // child handling — set v.io.c explicitly rather than inherit the
+                                // previous sibling's stale flag: a gate verb fails CLOSED (skip
+                                // children), any other verb is a pass-through and still renders them.
+                                v.io.r = 0;
+                                if (!v.io.v)
+                                    v.io.c = r.gate ? 0 : 1;
+                            }
+
+                            await e.handle(v, 'after', 'method');
+                        } else {
                             v.io.r = 0;
-                            if (!v.io.v)
-                                v.io.c = r.gate ? 0 : 1;
+                            v.io.c = 1;
                         }
+                    } while (v.io.r);
 
-                        await e.handle(v, 'after', 'method');
-                    } else {
-                        v.io.r = 0;
-                        v.io.c = 1;
-                    }
-                } while (v.io.r);
-
-                if (v.io.c && v.t.c.length)
-                    await this.handle(v.h, v.t.c, v.io.d ? v.io.d : v.m, v.c)
-                ;
-
-                v.io.d = null;
-                oc.s = cs;
-                oc.a = ca;
-                v.c = oc;
+                    if (v.io.c && v.t.c.length)
+                        await this.handle(v.h, v.t.c, v.io.d ? v.io.d : v.m, v.c)
+                    ;
+                } finally {
+                    v.io.d = null;
+                    oc.s = cs;
+                    oc.a = ca;
+                    v.c = oc;
+                }
             }
 
             return v.h;
