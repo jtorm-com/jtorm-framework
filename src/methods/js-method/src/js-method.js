@@ -29,7 +29,10 @@ module.exports = {
          * @param {ViewModel} v
          */
         handle: function (v) {
-            const s = this.jsPlugin;
+            const
+                p = this.jsPlugin,
+                s = p.state ? p.state(v) : p
+            ;
 
             if (v.c.c || !s.cache[v.t.p.src]) {
                 s.cache[v.t.p.src] = 0;

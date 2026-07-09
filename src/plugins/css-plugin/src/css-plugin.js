@@ -17,8 +17,42 @@ module.exports = {
             }
         },
 
+        context: function (v) {
+            let c = v && v.c;
+
+            if (!c || typeof c !== 'object')
+                return null
+            ;
+
+            while (c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c;
+        },
+
+        state: function (v) {
+            const c = this.context(v);
+
+            if (!c)
+                return this
+            ;
+
+            if (!c.css)
+                c.css = { cache: {}, collection: [] }
+            ;
+
+            if (v.c !== c)
+                v.c.css = c.css
+            ;
+
+            return c.css;
+        },
+
         process: async function(v, css) {
-            if(!this.cache[css.href]) {
+            const s = this.state(v);
+
+            if(!s.cache[css.href]) {
                 await v.h.set({t: {s: 'head'}, c: {s: null}}, el => {
                     const
                         po = v.h.d.createElement('link'),
@@ -52,18 +86,22 @@ module.exports = {
 
                     el.appendChild(po);
 
-                    this.cache[css.href] = true;
+                    s.cache[css.href] = true;
                 });
             }
         },
 
         afterView: async function(v) {
-            for (let css of this.collection)
-                await this.process(v, css)
-            ;
+            const s = this.state(v);
 
-            this.cache = {};
-            this.collection = [];
+            try {
+                for (let css of s.collection)
+                    await this.process(v, css)
+                ;
+            } finally {
+                s.cache = {};
+                s.collection = [];
+            }
 
             return v.h;
         }

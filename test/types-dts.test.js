@@ -31,11 +31,15 @@ test('prepack emits a consumable .d.ts that exports the typedefs', () => {
       '--rootDir', path.join(PKG_DIR, 'src'), '--outDir', out,
       path.join(PKG_DIR, 'src', 'types.js')], { stdio: 'pipe' });
     const dts = fs.readFileSync(path.join(out, 'types.d.ts'), 'utf8');
-    for (const t of ['ViewModel', 'ViewIO', 'ViewContext', 'ViewLayerContext', 'ViewUiCacheContext', 'TssNode', 'Method'])
+    for (const t of ['ViewModel', 'ViewIO', 'ViewContext', 'ViewLayerContext', 'ViewUiCacheContext', 'ViewCssContext', 'ViewJsContext', 'TssNode', 'Method'])
       assert.match(dts, new RegExp('export type ' + t + '\\b'),
         t + ' must be an exported type so the import specifier resolves downstream');
     assert.match(dts, /locale\?: string \| null;/,
       'ViewContext must expose optional locale for per-render language lookup');
+    assert.match(dts, /css\?: ViewCssContext;/,
+      'ViewContext must expose optional css plugin state');
+    assert.match(dts, /js\?: ViewJsContext;/,
+      'ViewContext must expose optional js plugin state');
   } finally {
     fs.rmSync(out, { recursive: true, force: true });
   }

@@ -17,8 +17,42 @@ module.exports = {
             }
         },
 
+        context: function (v) {
+            let c = v && v.c;
+
+            if (!c || typeof c !== 'object')
+                return null
+            ;
+
+            while (c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c;
+        },
+
+        state: function (v) {
+            const c = this.context(v);
+
+            if (!c)
+                return this
+            ;
+
+            if (!c.js)
+                c.js = { cache: {}, collection: [] }
+            ;
+
+            if (v.c !== c)
+                v.c.js = c.js
+            ;
+
+            return c.js;
+        },
+
         process: async function(v, js) {
-            if (!this.cache[js.src]) {
+            const s = this.state(v);
+
+            if (!s.cache[js.src]) {
                 await v.h.set({t: {s: 'head'}, c: {s: null}}, e => {
                     const
                         po = v.h.d.createElement('script'),
@@ -37,18 +71,22 @@ module.exports = {
 
                     e.appendChild(po);
 
-                    this.cache[js.src] = true;
+                    s.cache[js.src] = true;
                 });
             }
         },
 
         afterView:  async function(v) {
-            for (let js of this.collection)
-                await this.process(v, js)
-            ;
+            const s = this.state(v);
 
-            this.cache = {};
-            this.collection = [];
+            try {
+                for (let js of s.collection)
+                    await this.process(v, js)
+                ;
+            } finally {
+                s.cache = {};
+                s.collection = [];
+            }
 
             return v.h;
         }
