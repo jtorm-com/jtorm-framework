@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormDataModel: dm } = require('../../src/models/data-model/src/data-model.js');
+const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
 
 test('caches the value; a rejected fetch is NOT cached (review #16) — retry succeeds', async () => {
   dm.c = new Map();
@@ -63,6 +64,30 @@ test('cache key includes the resolved request base', async () => {
   assert.equal(fetches, 2, 'same relative path under different bases must not share the cache');
   assert.ok(dm.c.has('https://a.example/same.json'));
   assert.ok(dm.c.has('https://b.example/same.json'));
+});
+
+test('absolute URL cache hits still honor the request base guard', async () => {
+  const savedM = dm.requestModel, savedT = rm.transport, savedB = rm.base, savedO = rm.timeout;
+  let fetches = 0;
+
+  try {
+    dm.c = new Map(); dm.max = 512; dm.requestModel = rm;
+    rm.base = ''; rm.timeout = 0;
+    rm.transport = async () => {
+      fetches++;
+      return { ok: true, status: 200, json: async () => ({ tenant: 'a' }) };
+    };
+
+    assert.deepEqual(await dm.get('https://a.example/secret.json', { request: { base: 'https://a.example/' } }), { tenant: 'a' });
+    await assert.rejects(() => dm.get('https://a.example/secret.json', { request: { base: 'https://b.example/' } }), /URL blocked/);
+    assert.equal(fetches, 1, 'blocked second context must not be served from tenant A cache');
+  } finally {
+    dm.requestModel = savedM;
+    dm.c = new Map();
+    rm.transport = savedT;
+    rm.base = savedB;
+    rm.timeout = savedO;
+  }
 });
 
 test('a degenerate max (0) still returns the fetched value (never evicts the fresh entry)', async () => {

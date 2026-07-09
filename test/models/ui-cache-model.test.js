@@ -61,6 +61,18 @@ test('rendered fragments are separated by request base for the same (language,ci
   assert.equal(await c.get(b, 'en', 'comp1', 'default'), 'TENANT B');
 });
 
+test('rendered fragments prefer explicit request origin over a shared request base', async () => {
+  const a = { c: { request: { base: 'https://cdn.example/', origin: 'https://a.example/' } } };
+  const b = { c: { request: { base: 'https://cdn.example/', origin: 'https://b.example/' } } };
+  c.cache = {}; c.order = new Map(); c.max = 512; c.saveModel = null;
+
+  c.set(a, 'en', 'comp1', 'default', 'TENANT A');
+  c.set(b, 'en', 'comp1', 'default', 'TENANT B');
+
+  assert.equal(await c.get(a, 'en', 'comp1', 'default'), 'TENANT A');
+  assert.equal(await c.get(b, 'en', 'comp1', 'default'), 'TENANT B');
+});
+
 test('save() rebuilds the nested {l:{id:{c:d}}} shape for saveModel; init() reloads it', async () => {
   const store = { o: null, get() { return this.o; }, set(o) { this.o = o; } };
   c.cache = {}; c.order = new Map(); c.max = 512; c.updated = 0; c.saveModel = store;

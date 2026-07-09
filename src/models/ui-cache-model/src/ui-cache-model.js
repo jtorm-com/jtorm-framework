@@ -59,12 +59,12 @@ module.exports = {
                 return String(r.tenant)
             ;
 
-            if (r && r.base != null)
-                return String(r.base)
-            ;
-
             if (r && r.origin != null)
                 return String(r.origin)
+            ;
+
+            if (r && r.base != null)
+                return String(r.base)
             ;
 
             return '';

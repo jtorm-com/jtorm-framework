@@ -10,7 +10,9 @@ module.exports = {
         max: 512,// DI: LRU cap on cached fetch promises; least-recently-used evicted beyond this
 
         key: function (v, c) {
-            return this.requestModel && this.requestModel.url ? this.requestModel.url(v, c) : String(v);
+            return this.requestModel && this.requestModel.cacheKey ? this.requestModel.cacheKey(v, c)
+                : this.requestModel && this.requestModel.url ? this.requestModel.url(v, c) : String(v)
+            ;
         },
 
         get: async function (v, c) {

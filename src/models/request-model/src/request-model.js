@@ -19,6 +19,7 @@ module.exports = {
 
         base: '',   // optional base-URL prefix for relative URLs (host sets for SSR)
         timeout: 0, // ms; 0 = no timeout
+        sep: String.fromCharCode(0),
 
         context: function (c) {
             if (c && c.c && typeof c.c === 'object')
@@ -49,6 +50,26 @@ module.exports = {
             }
 
             return r;
+        },
+
+        policy: function (c) {
+            const r = this.context(c);
+
+            if (r && r.tenant != null)
+                return String(r.tenant)
+            ;
+
+            if (r && r.origin != null)
+                return String(r.origin)
+            ;
+
+            return this.option(c, 'base', this.base);
+        },
+
+        cacheKey: function (u, c) {
+            const p = this.policy(c), r = this.url(u, c);
+
+            return p ? p + this.sep + r : r;
         },
 
         /** @type {jTormUrlGuard} */
