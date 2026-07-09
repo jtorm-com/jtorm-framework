@@ -76,3 +76,14 @@ test('layer replays deferred fragments in z order (ascending)', async () => {
     );
     assert.equal(body, '<p class="first second"></p>');
 });
+
+test('layer registered inside a detached append fragment replays at root after-view', async () => {
+    const { body } = await render(
+        '<div><p></p></div>',
+        `div->append { ` +
+            `->layer { i: 'x'; e: 'after'; t: 'view'; ` +
+                `->find(e: 'p')->attr { n: 'class'; v: 'active'; } } }`,
+        {}
+    );
+    assert.equal(body, '<div><p class="active"></p></div>');
+});

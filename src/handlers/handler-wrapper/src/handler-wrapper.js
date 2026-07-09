@@ -51,6 +51,10 @@ module.exports = {
             // detached fragment (a fresh doc); a nested get/ui inside re-resolves its own.
             const c = {s: null, a: null, b: 'body', c: 1};
 
+            if (v.c && typeof v.c === 'object')
+                c.p = v.c
+            ;
+
             if (v.c && v.c.locale != null)
                 c.locale = v.c.locale
             ;

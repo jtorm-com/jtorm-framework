@@ -12,16 +12,36 @@ module.exports = {
         updated: 0,
         sep: String.fromCharCode(0),// NUL order-key separator (runtime-built, never a raw NUL in source); can't occur in a language/id/variant, so distinct (l,id,c) never collide
 
+        context: function (v) {
+            let c = v && v.c;
+
+            if (!c || typeof c !== 'object')
+                return null
+            ;
+
+            while (c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c;
+        },
+
         state: function (v) {
-            if (!v || !v.c || typeof v.c !== 'object')
+            const c = this.context(v);
+
+            if (!c)
                 return this
             ;
 
-            if (!v.c.uiCache)
-                v.c.uiCache = { updated: 0 }
+            if (!c.uiCache)
+                c.uiCache = { updated: 0 }
             ;
 
-            return v.c.uiCache;
+            if (v.c !== c)
+                v.c.uiCache = c.uiCache
+            ;
+
+            return c.uiCache;
         },
 
         key: function (l, id, c) {

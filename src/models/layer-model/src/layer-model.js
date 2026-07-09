@@ -23,16 +23,36 @@ module.exports = {
             return { before: { iteration: [] }, after: { iteration: [], view: [] } };
         },
 
+        context: function (v) {
+            let c = v && v.c;
+
+            if (!c || typeof c !== 'object')
+                return null
+            ;
+
+            while (c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c;
+        },
+
         state: function (v) {
-            if (!v || !v.c || typeof v.c !== 'object')
+            const c = this.context(v);
+
+            if (!c)
                 return this
             ;
 
-            if (!v.c.layer)
-                v.c.layer = { cid: null, currentCid: [], event: this.emptyEvent(), layers: {}, updated: 0 }
+            if (!c.layer)
+                c.layer = { cid: null, currentCid: [], event: this.emptyEvent(), layers: {}, updated: 0 }
             ;
 
-            return v.c.layer;
+            if (v.c !== c)
+                v.c.layer = c.layer
+            ;
+
+            return c.layer;
         },
 
         get: function (v, e, t) {
