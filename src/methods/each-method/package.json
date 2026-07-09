@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/each-method",
   "description": "jTorm Each Method",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@jtorm/handler": "^1.0.0",
-    "@jtorm/handler-wrapper": "^1.0.4",
+    "@jtorm/handler-wrapper": "^1.0.5",
     "@jtorm/view-model": "^1.0.0",
-    "@jtorm/types": "^1.0.3"
+    "@jtorm/types": "^1.0.4"
   }
 }

@@ -13,6 +13,7 @@ test.afterEach(() => {
 
 test('each(e:) carries v.c.locale into cloned element boils', async () => {
   let c;
+  const pc = { locale: 'nl-NL' };
   const el = { outerHTML: '<li></li>', parentNode: { replaceChild: () => {} } };
 
   each.handler = {
@@ -27,10 +28,14 @@ test('each(e:) carries v.c.locale into cloned element boils', async () => {
   await each.handle({
     d: { d: ['greeting'], e: 'li' },
     h: { selectAll: () => [el] },
-    c: { locale: 'nl-NL' },
+    c: pc,
     t: { s: 'ul', p: { e: 'li' }, c: [{}] },
     m: {}
   });
 
-  assert.deepEqual(c, { c: 1, s: null, a: null, locale: 'nl-NL' });
+  assert.equal(c.c, 1);
+  assert.equal(c.s, null);
+  assert.equal(c.a, null);
+  assert.equal(c.locale, 'nl-NL');
+  assert.equal(c.p, pc);
 });

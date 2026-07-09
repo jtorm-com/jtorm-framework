@@ -28,12 +28,31 @@
 
 /**
  * Render-context flags on `v.c`.
+ * @typedef {Object} ViewLayerContext
+ * @property {?string} cid                         current implicit layer id for layer rules without `i:`
+ * @property {string[]} currentCid                 implicit layer id stack for nested iterations
+ * @property {{before:{iteration:string[]},after:{iteration:string[],view:string[]}}} event registered layer ids per phase
+ * @property {Object<string,{z:number,t:TssNode}[]>} layers deferred layer fragments by id
+ * @property {number} updated                      dirty flag for optional layer persistence
+ */
+
+/**
+ * UI-cache render-local flags on `v.c`.
+ * @typedef {Object} ViewUiCacheContext
+ * @property {number} updated dirty flag for this render; the persisted cache/order stores stay shared
+ */
+
+/**
+ * Render-context flags on `v.c`.
  * @typedef {Object} ViewContext
  * @property {number} c   create-doc flag — truthy → fresh detached doc (SSR); falsy → live doc (client)
  * @property {?string} s  descendant selector — find appends it (`<rule> <s>`)
  * @property {?(Element[])} [a] ancestor element(s) — get{t}/ui resolve these; document-model.scope matches a rule WITHIN them (descendant-first, else self; selectorless → the element). An element-ref array (not a selector string), shared by-ref via copy → REPLACE, never mutate in place
  * @property {?string} [b] body default — an iteration fragment's selectorless, unscoped rules target it (handler-wrapper)
  * @property {?string} [locale] request locale for render-path language lookup
+ * @property {ViewContext} [p] parent/root render context for detached fragment state
+ * @property {ViewLayerContext} [layer] per-render deferred layer state
+ * @property {ViewUiCacheContext} [uiCache] per-render ui-cache dirty state
  */
 
 /**

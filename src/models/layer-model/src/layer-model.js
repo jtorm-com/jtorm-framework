@@ -19,11 +19,87 @@ module.exports = {
         layers: {},
         updated: 0,
 
+        emptyEvent: function () {
+            return { before: { iteration: [] }, after: { iteration: [], view: [] } };
+        },
+
+        copyEvent: function (e) {
+            e = e || {};
+
+            return {
+                before: {
+                    iteration: e.before && e.before.iteration
+                        ? e.before.iteration.slice()
+                        : []
+                },
+                after: {
+                    iteration: e.after && e.after.iteration
+                        ? e.after.iteration.slice()
+                        : [],
+                    view: e.after && e.after.view
+                        ? e.after.view.slice()
+                        : []
+                }
+            };
+        },
+
+        copyLayers: function (l) {
+            const o = {};
+            l = l || {};
+
+            for (let i in l) {
+                o[i] = [];
+
+                for (let k in l[i])
+                    o[i].push({ z: l[i][k].z, t: l[i][k].t })
+                ;
+            }
+
+            return o;
+        },
+
+        freshState: function () {
+            return { cid: null, currentCid: [], event: this.copyEvent(this.event), layers: this.copyLayers(this.layers), updated: 0 };
+        },
+
+        context: function (v) {
+            let c = v && v.c;
+
+            if (!c || typeof c !== 'object')
+                return null
+            ;
+
+            while (c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c;
+        },
+
+        state: function (v) {
+            const c = this.context(v);
+
+            if (!c)
+                return this
+            ;
+
+            if (!c.layer)
+                c.layer = this.freshState()
+            ;
+
+            if (v.c !== c)
+                v.c.layer = c.layer
+            ;
+
+            return c.layer;
+        },
+
         get: function (v, e, t) {
-            e = this.event[e][t];
+            const s = this.state(v);
+            e = s.event[e][t];
 
             const
-                l = this.layers,
+                l = s.layers,
                 o = []
             ;
 
@@ -49,13 +125,14 @@ module.exports = {
         },
 
         set: function (v) {
+            const s = this.state(v);
             const i = v.d.i
                 ? v.d.i
                 : v.d.cid
                     ? v.d.cid
                     : v.cid
                         ? v.cid
-                        : this.cid
+                        : s.cid
             ;
 
             if (!i)
@@ -66,22 +143,22 @@ module.exports = {
                 v.d.z = 0
             ;
 
-            if (!this.layers[i])
-                this.layers[i] = []
+            if (!s.layers[i])
+                s.layers[i] = []
             ;
 
             for (let k in v.t.c)
-                this.layers[i].push({
+                s.layers[i].push({
                     z: parseInt(v.d.z),
                     t: v.t.c[k]
                 })
             ;
 
-            if (this.event[v.d.e][v.d.t].indexOf(i) === -1)
-                this.event[v.d.e][v.d.t].push(i)
+            if (s.event[v.d.e][v.d.t].indexOf(i) === -1)
+                s.event[v.d.e][v.d.t].push(i)
             ;
 
-            this.updated = 1;
+            s.updated = 1;
         },
 
         initCache: async function () {
@@ -92,16 +169,18 @@ module.exports = {
             }
         },
 
-        save: async function () {
-            if (this.saveModel && this.updated)
-                this.saveModel.set(this.layers, this.event)
+        save: async function (v) {
+            const s = this.state(v);
+
+            if (this.saveModel && s.updated)
+                this.saveModel.set(s.layers, s.event)
             ;
 
-            this.event.before.iteration = [];
-            this.event.after.iteration = [];
-            this.event.after.view = [];
-            this.layers = {};
-            this.updated = 0;
+            s.cid = null;
+            s.currentCid = [];
+            s.event = this.emptyEvent();
+            s.layers = {};
+            s.updated = 0;
         }
     }
 };

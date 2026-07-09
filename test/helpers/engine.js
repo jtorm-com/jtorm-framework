@@ -276,7 +276,7 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     const v = await jTormViewModel.create(html, tss, data);
     await jTormEventModel.handle(v, 'before', 'view');
     const doc = await jTormHandler.handle(null, null, null, 1, v);
-    const v2 = await jTormViewModel.create(doc, null, data, 0);
+    const v2 = await jTormViewModel.create(doc, null, data, v.c);
     await jTormEventModel.handle(v2, 'after', 'view');
 
     return { html: v2.h.html(), head: v2.h.head(), body: v2.h.body() };

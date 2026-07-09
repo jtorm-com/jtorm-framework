@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const { jTormEventModel } = require('../../src/models/event-model/src/event-model.js');
+const { jTormLayerModel } = require('../../src/models/layer-model/src/layer-model.js');
 const { jTormLayerPlugin } = require('../../src/plugins/layer-plugin/src/layer-plugin.js');
 const { jTormUiCachePlugin } = require('../../src/plugins/ui-cache-plugin/src/ui-cache-plugin.js');
 
@@ -13,6 +14,26 @@ const freshTree = () => ({
     before: { iteration: [], method: [], view: [] },
     after: { iteration: [], method: [], view: [] }
 });
+
+const freshLayer = () => ({ before: { iteration: [] }, after: { iteration: [], view: [] } });
+const _ = {
+    remove(a, fn) {
+        for (let i = a.length - 1; i >= 0; i--)
+            if (fn(a[i]))
+                a.splice(i, 1)
+        ;
+    }
+};
+
+function resetLayer() {
+    jTormLayerModel.cid = null;
+    jTormLayerModel.event = freshLayer();
+    jTormLayerModel.layers = {};
+    jTormLayerModel.updated = 0;
+    jTormLayerModel.saveModel = null;
+    jTormLayerPlugin.currentCid = [];
+    jTormLayerPlugin.layerModel = jTormLayerModel;
+}
 
 // Regression lock for the working-tree bug: the `v1.0.0` commit (4675148) that
 // converted DI placeholders to comments ALSO dropped layer-plugin's `event`
@@ -51,4 +72,29 @@ test('layer is ordered before ui-cache in after.view (deferred transforms preced
         av.indexOf(jTormLayerPlugin) < av.indexOf(jTormUiCachePlugin),
         'layer must precede ui-cache in after.view so deferred transforms land before the cache snapshot'
     );
+});
+
+test('implicit layer cid stack is scoped to the current root context', async () => {
+    resetLayer();
+    try {
+        const
+            a = { _: _, c: { c: 1, s: null, a: null }, cid: 'render-a' },
+            b = {
+                c: { c: 1, s: null, a: null },
+                cid: null,
+                d: { e: 'after', t: 'view', z: '0' },
+                t: { c: [{ s: 'p', m: 'attr', p: { n: 'data-x', v: 'B' }, c: [] }] }
+            }
+        ;
+
+        await jTormLayerPlugin.beforeIteration(a);
+
+        assert.throws(
+            () => jTormLayerModel.set(b),
+            /ID not set/,
+            'render B must not fall back to render A cid'
+        );
+    } finally {
+        resetLayer();
+    }
 });

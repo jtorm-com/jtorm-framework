@@ -12,6 +12,38 @@ module.exports = {
         updated: 0,
         sep: String.fromCharCode(0),// NUL order-key separator (runtime-built, never a raw NUL in source); can't occur in a language/id/variant, so distinct (l,id,c) never collide
 
+        context: function (v) {
+            let c = v && v.c;
+
+            if (!c || typeof c !== 'object')
+                return null
+            ;
+
+            while (c.p && typeof c.p === 'object')
+                c = c.p
+            ;
+
+            return c;
+        },
+
+        state: function (v) {
+            const c = this.context(v);
+
+            if (!c)
+                return this
+            ;
+
+            if (!c.uiCache)
+                c.uiCache = { updated: 0 }
+            ;
+
+            if (v.c !== c)
+                v.c.uiCache = c.uiCache
+            ;
+
+            return c.uiCache;
+        },
+
         key: function (l, id, c) {
             return l + this.sep + id + this.sep + c;
         },
@@ -48,7 +80,7 @@ module.exports = {
         set: function (v, l, id, c, d) {
             if (!this.cache[l] || !this.cache[l][id] || this.cache[l][id][c] === undefined) {// write-once per (l,id,c)
                 this.put(l, id, c, d);
-                this.updated = 1;
+                this.state(v).updated = 1;
             }
         },
 
@@ -82,12 +114,14 @@ module.exports = {
             if (Object.keys(s.cache[l]).length === 0) delete s.cache[l];
         },
 
-        save: async function () {
-            if (this.saveModel && this.updated)// persist the nested cache unchanged (shape identical to the pre-LRU model)
+        save: async function (v) {
+            const s = this.state(v);
+
+            if (this.saveModel && s.updated)// persist the nested cache unchanged (shape identical to the pre-LRU model)
                 this.saveModel.set(this.cache)
             ;
 
-            this.updated = 0;
+            s.updated = 0;
         }
     }
 };

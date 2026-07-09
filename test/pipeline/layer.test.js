@@ -76,3 +76,25 @@ test('layer replays deferred fragments in z order (ascending)', async () => {
     );
     assert.equal(body, '<p class="first second"></p>');
 });
+
+test('layer registered inside a detached append fragment replays at root after-view', async () => {
+    const { body } = await render(
+        '<div><p></p></div>',
+        `div->append { ` +
+            `->layer { i: 'x'; e: 'after'; t: 'view'; ` +
+                `->find(e: 'p')->attr { n: 'class'; v: 'active'; } } }`,
+        {}
+    );
+    assert.equal(body, '<div><p class="active"></p></div>');
+});
+
+test('layer registered inside an each(e:) cloned element replays at root after-view', async () => {
+    const { body } = await render(
+        '<ul><li><a href="/x">A</a></li></ul>',
+        `ul->each { e: 'li'; d: items; ` +
+            `->layer { i: 'x'; e: 'after'; t: 'view'; ` +
+                `->find(e: 'a[href="/x"]')->attr { n: 'class'; v: 'active'; } } }`,
+        { items: [{ name: 'one' }] }
+    );
+    assert.equal(body, '<ul><li><a href="/x" class="active">A</a></li></ul>');
+});
