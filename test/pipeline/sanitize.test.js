@@ -122,6 +122,80 @@ test('append{h: <data>} (insertAdjacentHTML) also routes through the sanitizer',
   }
 });
 
+// --- remaining raw verbs (post-PR #34 audit): wrap/swap/replace m:r also need
+// the same host sanitizer seam before multi-tenant / untrusted-data SSR can enable.
+test('wrap{h: <data>} routes the wrapper markup through the injected host sanitizer', async () => {
+  const s = recordingSanitizer();
+  setSanitize(s);
+  try {
+    const { body } = await render(
+      '<body><span>old</span></body>',
+      "span->wrap { s: '.w'; h: html; }",
+      { html: '<div class="w" onclick=alert(1)><script>bad()</script></div>' }
+    );
+    assert.equal(body, '<span><div class="w">old</div></span>');
+    assert.ok(s.calls.some(c => c.includes('onclick') && c.includes('<script>')), 'wrapper markup went through the sanitizer');
+  } finally {
+    setSanitize(null);
+  }
+});
+
+test('swap{h: <data>} routes the replacement wrapper through the injected host sanitizer', async () => {
+  const s = recordingSanitizer();
+  setSanitize(s);
+  try {
+    const { body } = await render(
+      '<body><section>old</section></body>',
+      "section->swap { s: 'article'; h: html; }",
+      { html: '<article class="w" onclick=alert(1)></article>' }
+    );
+    assert.equal(body, '<article>old</article>'); // existing swap{h} behavior creates by tag; h is still parsed raw and must be sanitized before parse
+    assert.ok(s.calls.some(c => c.includes('onclick')), 'swap wrapper markup went through the sanitizer');
+  } finally {
+    setSanitize(null);
+  }
+});
+
+test("replace{m:'r', h: <data>} routes the raw replacement through the injected host sanitizer", async () => {
+  const s = recordingSanitizer();
+  setSanitize(s);
+  try {
+    const { body } = await render(
+      '<body><span>old</span></body>',
+      "span->replace { h: html; s: '.w'; }",
+      { html: '<strong class="w" onclick=alert(1)>ok<script>bad()</script></strong>' }
+    );
+    assert.equal(body, '.w'); // existing replace m:r selector/suffix coupling; this slice only routes the raw parse through sanitize
+    assert.ok(s.calls.some(c => c.includes('onclick') && c.includes('<script>')), 'replace raw markup went through the sanitizer');
+  } finally {
+    setSanitize(null);
+  }
+});
+
+test('zero-match remaining raw verbs surface not-found drift errors before sanitizing', async () => {
+  const cases = [
+    "span->wrap { s: '.w'; h: html; }",
+    "span->swap { s: 'article'; h: html; }",
+    "span->replace { h: html; s: '.w'; }"
+  ];
+  const log = console.log;
+  console.log = () => {};
+  try {
+    for (const tss of cases) {
+      let calls = 0;
+      setSanitize(() => { calls++; throw new Error('sanitizer exploded'); });
+      await assert.rejects(
+        render('<body><div>x</div></body>', tss, { html: '<article class="w">ok</article>' }),
+        /not found/i
+      );
+      assert.equal(calls, 0, tss + ' must not sanitize before target resolution');
+    }
+  } finally {
+    console.log = log;
+    setSanitize(null);
+  }
+});
+
 // --- get{h} fetched body runs through the injected sanitizer ---
 test('get{h} fetched body routes through the injected host sanitizer', async () => {
   const s = recordingSanitizer();

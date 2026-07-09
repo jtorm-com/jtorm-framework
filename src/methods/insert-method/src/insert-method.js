@@ -115,13 +115,11 @@ module.exports = {
         // allow-list — a strict policy could strip <option>/<source>/<track>, so a host
         // composing child markup must allow those.
         //
-        // NOT covered by this seam (raw sinks flagged for a follow-up — backlog P0.1):
-        // insert's own m:'r' replace path (viewModel.create + replaceChild parses a
-        // NODE, not this string sink — and is non-functional without an s: selector
-        // anyway), plus the sibling wrap/swap verbs (their own innerHTML/parse in
-        // separate packages). Invoked via a LOCAL, not this.sanitize(h), so an injected
-        // free function runs with this=undefined rather than rebound to this method; a
-        // host wiring an unbound instance method must bind it: sanitize = h => c.clean(h).
+        // The m:'r' replace path now routes raw strings through this same seam before
+        // viewModel.create parses them. Sibling wrap/swap own their package-local seam.
+        // Invoked via a LOCAL, not this.sanitize(h), so an injected free function runs
+        // with this=undefined rather than rebound to this method; a host wiring an
+        // unbound instance method must bind it: sanitize = h => c.clean(h).
         clean: function (h) {
             const s = this.sanitize;
 
@@ -136,15 +134,21 @@ module.exports = {
             // ever runs (a drifted selector must surface as drift, not as a sanitizer
             // error — AGENTS.md zero-match contract), while a >=1-match set still cleans
             // once and, on a sanitizer rejection, fails on that first element before any
-            // write (no partial write). The m:'r' branch parses its own node per match
-            // (isObject/reassign stays in the loop) and is not routed through the seam
-            // (see clean()).
+            // write (no partial write). The m:'r' branch parses its own node after
+            // the same lazy clean, before replaceChild.
             let c, done;
 
             await h.set(v, async e => {
                 if (m === 'r') {
-                    if (!v._.isObject(h2))
+                    if (!v._.isObject(h2)) {
+                        if (!done) {
+                            c = await this.clean(h2);
+                            done = 1;
+                        }
+
+                        h2 = c;
                         h2 = await this.viewModel.create(h2)
+                    }
                     ;
 
                     e.parentNode.replaceChild(h2.h.select(h2.h.getSelector(v.d.s, v.c.s)), e);
