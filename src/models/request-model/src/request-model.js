@@ -53,17 +53,21 @@ module.exports = {
         },
 
         policy: function (c) {
-            const r = this.context(c);
+            const r = this.context(c), b = this.option(c, 'base', this.base), a = [];
 
             if (r && r.tenant != null)
-                return String(r.tenant)
+                a.push('t:' + r.tenant)
             ;
 
             if (r && r.origin != null)
-                return String(r.origin)
+                a.push('o:' + r.origin)
             ;
 
-            return this.option(c, 'base', this.base);
+            if (b)
+                a.push('b:' + b)
+            ;
+
+            return a.join(this.sep);
         },
 
         cacheKey: function (u, c) {

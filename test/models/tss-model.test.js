@@ -75,8 +75,8 @@ test('absolute URL cache hits still honor the request base guard', async () => {
       return { ok: true, status: 200, text: async () => 'TENANT A' };
     };
 
-    assert.equal(await tm.get('https://a.example/secret.tss', { request: { base: 'https://a.example/' } }), 'TENANT A');
-    await assert.rejects(() => tm.get('https://a.example/secret.tss', { request: { base: 'https://b.example/' } }), /URL blocked/);
+    assert.equal(await tm.get('https://a.example/secret.tss', { request: { tenant: 't', base: 'https://a.example/' } }), 'TENANT A');
+    await assert.rejects(() => tm.get('https://a.example/secret.tss', { request: { tenant: 't', base: 'https://b.example/' } }), /URL blocked/);
     assert.equal(fetches, 1, 'blocked second context must not be served from tenant A cache');
   } finally {
     tm.requestModel = savedM;

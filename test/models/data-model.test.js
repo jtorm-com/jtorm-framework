@@ -78,8 +78,8 @@ test('absolute URL cache hits still honor the request base guard', async () => {
       return { ok: true, status: 200, json: async () => ({ tenant: 'a' }) };
     };
 
-    assert.deepEqual(await dm.get('https://a.example/secret.json', { request: { base: 'https://a.example/' } }), { tenant: 'a' });
-    await assert.rejects(() => dm.get('https://a.example/secret.json', { request: { base: 'https://b.example/' } }), /URL blocked/);
+    assert.deepEqual(await dm.get('https://a.example/secret.json', { request: { tenant: 't', base: 'https://a.example/' } }), { tenant: 'a' });
+    await assert.rejects(() => dm.get('https://a.example/secret.json', { request: { tenant: 't', base: 'https://b.example/' } }), /URL blocked/);
     assert.equal(fetches, 1, 'blocked second context must not be served from tenant A cache');
   } finally {
     dm.requestModel = savedM;
