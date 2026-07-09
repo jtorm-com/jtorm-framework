@@ -18,6 +18,22 @@ const { jTormViewModel } = require('../../src/models/view-model/src/view-model.j
 // Minimal DI: real handler + real view-model (the child boil calls viewModel.create
 // with an already-built wrapper + parsed tree, so document-model/tss-parser are never
 // touched); event-model + data-parser stubbed (this suite exercises scope, not verbs).
+// Capture the singleton DI fields this file overwrites and restore them after the suite
+// (AGENTS.md: reset singleton mutable fields a test touches) — so a shared-process run,
+// or tests later appended to this file, don't inherit the fake wiring. The no-reset
+// behavior that proves cross-render poison stays INSIDE the tests, not the teardown.
+const orig = {
+  m: jTormHandler.methods, vm: jTormHandler.viewModel,
+  em: jTormHandler.eventModel, dp: jTormHandler.dataParser, u: jTormViewModel._
+};
+test.after(() => {
+  jTormHandler.methods = orig.m;
+  jTormHandler.viewModel = orig.vm;
+  jTormHandler.eventModel = orig.em;
+  jTormHandler.dataParser = orig.dp;
+  jTormViewModel._ = orig.u;
+});
+
 jTormViewModel._ = _;
 jTormHandler.viewModel = jTormViewModel;
 jTormHandler.eventModel = { handle: async () => {} };
