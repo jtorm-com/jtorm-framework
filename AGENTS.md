@@ -78,6 +78,8 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 ## Git / PR workflow
 - **`dev` is the integration branch** — branch off `dev`, open PRs **into `dev`**. `dev` → `main`
   only for releases. Both are protected (require PR, no force-push).
+- **PRs are ready for review by default** — do not create drafts unless the maintainer explicitly
+  requests one.
 - **Codex review is the quality gate.** A PR is mergeable only when Codex's automated review against
   the **current head commit** returns a clean 👍 with no valid unresolved findings, and `test` CI is
   green. Iterate: apply valid fixes (failing-test-first), reply-and-resolve false positives with a
