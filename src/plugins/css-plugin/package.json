@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/css-plugin",
   "description": "jTorm CSS Plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@jtorm/css-method": "^1.0.0",
-    "@jtorm/ui-method": "^1.0.0"
+    "@jtorm/ui-resolver-model": "^1.0.0"
   }
 }

@@ -37,6 +37,13 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 - **Published packages** — each `src/**` dir is a published `@jtorm/*` package. **Never delete or
   deprecate exports / remove packages** (external projects depend on them). Greenfield: no
   backward-compat shims; bug-fixes get a **patch** bump to the touched package's `package.json`.
+- **UI resolution and compilation are separate DI models.** `@jtorm/ui-resolver-model` owns the
+  custom/registered mapper graph, framework fallback, component cache, aliases, and asset URL
+  expansion. `@jtorm/ui-compiler-model` owns descriptor → TSS compilation (`h/t/d`, nested `ui`,
+  `pT`, and `di`). `@jtorm/ui-method` owns only the verb lifecycle, mediatarget orchestration, and a
+  compatibility-forwarding facade for its published helper/state surface. Hosts inject both models
+  before configuring that facade; CSS/JS plugins inject the resolver directly. Do not fold these
+  responsibilities back into the verb or add runtime imports between them.
 - **`schema-ui` follows schema.org first** — component data contracts should reuse schema.org
   types/properties and mapper composition before inventing local fields or per-type artifacts.
   Keep the shipped UI graph small: add a new `.tss` only for a real schema.org type/variant
@@ -71,11 +78,13 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 ## Git / PR workflow
 - **`dev` is the integration branch** — branch off `dev`, open PRs **into `dev`**. `dev` → `main`
   only for releases. Both are protected (require PR, no force-push).
+- **PRs are ready for review by default** — do not create drafts unless the maintainer explicitly
+  requests one.
 - **Codex review is the quality gate.** A PR is mergeable only when Codex's automated review against
   the **current head commit** returns a clean 👍 with no valid unresolved findings, and `test` CI is
   green. Iterate: apply valid fixes (failing-test-first), reply-and-resolve false positives with a
   reason, push, re-request `@codex review`, re-poll until clean. A 👍 against an older head is stale.
 - Conventional commits (`feat|fix|refactor|docs|test|chore|perf|ci: …`).
 
-This repo mirrors `gitlab.com/jtorm/jtorm-framework`. Private strategy/planning lives in a separate
-repo and is intentionally absent here.
+The canonical repository is `github.com/jtorm-com/jtorm-framework`. Private strategy/planning lives
+in a separate repo and is intentionally absent here.

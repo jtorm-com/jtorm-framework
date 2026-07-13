@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/js-plugin",
   "description": "jTorm JS Plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -13,5 +13,8 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/plugins/js-plugin"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/js-method": "^1.0.0",
+    "@jtorm/ui-resolver-model": "^1.0.0"
+  }
 }

@@ -1,11 +1,25 @@
 # jTorm UI Method
 
-Registry and handling different UI frameworks.
+Orchestrates the `ui` TSS verb. Registry resolution lives in `@jtorm/ui-resolver-model`; descriptor compilation lives in `@jtorm/ui-compiler-model`.
 
 ## Install
 ```js
 npm install @jtorm/ui-method
 ```
+
+## Host wiring
+
+```js
+jTormUiMethod.resolverModel = jTormUiResolverModel;
+jTormUiMethod.compilerModel = jTormUiCompilerModel;
+jTormUiMethod.dataParser = jTormDataParser;
+jTormUiCompilerModel.methods = methods;
+jTormUiCompilerModel.viewModel = jTormViewModel;
+```
+
+Inject the models before assigning `jTormUiMethod.uis`, `ui`, or `framework`. The existing state and helper names remain forwarding facade entries; new consumers should use the dedicated models directly.
+
+An implicit component resolves through the trusted host custom mapper, the configured framework, then registered frameworks in order. An explicit `f` skips the custom mapper.
 
 
 ## Properties

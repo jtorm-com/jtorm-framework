@@ -27,6 +27,59 @@
  */
 
 /**
+ * Conditional mapper dispatch consumed by the UI compiler.
+ * @typedef {Object} UiDependency
+ * @property {Object<string,*>} m method name → method data
+ */
+
+/**
+ * A UI artifact URL, optionally guarded by method data.
+ * @typedef {Object} UiArtifact
+ * @property {string} url
+ * @property {UiDependency} [di]
+ */
+
+/**
+ * Nested `ui` parameters emitted by a mapper descriptor.
+ * @typedef {Object} UiCall
+ * @property {string} [c]
+ * @property {string} [f]
+ * @property {number|string} [t]
+ * @property {number|string} [h]
+ * @property {number|string} [m]
+ */
+
+/**
+ * A leaf descriptor stored in a UI package mapper.
+ * @typedef {Object} UiDescriptor
+ * @property {string|(string|UiArtifact)[]} [h]
+ * @property {(string|UiArtifact)[]} [t]
+ * @property {(string|UiArtifact)[]} [d]
+ * @property {UiCall} [ui]
+ * @property {Object} [pT]
+ * @property {UiDependency} [di]
+ */
+
+/**
+ * A host-injected UI registry package.
+ * @typedef {Object} UiPackage
+ * @property {string} id
+ * @property {string} alias
+ * @property {string} framework
+ * @property {Object<string,string>} [mapperAlias]
+ * @property {string} [url]
+ * @property {Object<string,*>} mapper
+ */
+
+/**
+ * A resolver result passed to the UI compiler.
+ * @typedef {Object} UiResolution
+ * @property {UiDescriptor} c
+ * @property {UiPackage|Object} ui
+ * @property {string} f
+ */
+
+/**
  * Render-context flags on `v.c`.
  * @typedef {Object} ViewLayerContext
  * @property {?string} cid                         current implicit layer id for layer rules without `i:`
