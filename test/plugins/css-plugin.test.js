@@ -26,7 +26,7 @@ function fakeView() {
 function setup() {
     jTormCssPlugin.cache = {};
     jTormCssPlugin.collection = [];
-    jTormCssPlugin.uiMethod = { parseUrl: u => u };
+    jTormCssPlugin.uiResolverModel = { parseUrl: u => u };
     jTormCssPlugin.cssMethod = jTormCssMethod;
     jTormCssMethod.cssPlugin = jTormCssPlugin;
 }
@@ -76,6 +76,20 @@ test('css-plugin keeps a custom rel on non-deferred links', async () => {
 
     const link = v.h.d.querySelector('head link');
     assert.equal(link.getAttribute('rel'), 'alternate stylesheet');
+});
+
+test('css-plugin expands href through the injected UI resolver', async () => {
+    setup();
+    const seen = [];
+    jTormCssPlugin.uiResolverModel = {
+        parseUrl: u => { seen.push(u); return 'https://cdn.example/' + u; }
+    };
+
+    const v = fakeView();
+    await jTormCssPlugin.process(v, { href: 'theme.css' });
+
+    assert.deepEqual(seen, ['theme.css']);
+    assert.equal(v.h.d.querySelector('head link').href, 'https://cdn.example/theme.css');
 });
 
 test('css collection is isolated between interleaved root contexts', async () => {

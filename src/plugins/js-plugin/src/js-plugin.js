@@ -5,7 +5,7 @@ module.exports = {
     jTormJsPlugin: {
         // DI
         // jsMethod
-        // uiMethod
+        // uiResolverModel
 
         cache: {},
         collection: [],
@@ -82,7 +82,7 @@ module.exports = {
                             po.setAttribute(p[k], js[p[k]])
                     ;
 
-                    po.src = this.uiMethod.parseUrl(js.src);
+                    po.src = this.uiResolverModel.parseUrl(js.src);
 
                     e.appendChild(po);
 

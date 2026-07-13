@@ -4,6 +4,10 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { WIRED_METHODS } = require('../helpers/engine.js');
+const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
+const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
+const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
+const { jTormDataParser } = require('../../src/parsers/data-parser/src/data-parser.js');
 
 // DI-drift guard: every src/methods/*-method must be either wired by the harness
 // or explicitly deferred. A newly-added method fails here until it is accounted
@@ -28,4 +32,13 @@ test('every src/methods/*-method is wired or explicitly deferred (DI-drift guard
     unaccounted, [],
     `Unaccounted methods — wire them in engine.js or add to DEFERRED: ${unaccounted.join(', ')}`
   );
+});
+
+test('ui verb is wired to resolver/compiler models before facade configuration', () => {
+  assert.equal(jTormUiMethod.resolverModel, jTormUiResolverModel);
+  assert.equal(jTormUiMethod.compilerModel, jTormUiCompilerModel);
+  assert.equal(jTormUiMethod.dataParser, jTormDataParser);
+  assert.ok(jTormUiCompilerModel.methods.ui);
+  assert.ok(jTormUiCompilerModel.viewModel);
+  assert.ok(Array.isArray(jTormUiResolverModel.uis));
 });

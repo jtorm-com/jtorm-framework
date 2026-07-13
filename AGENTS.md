@@ -37,6 +37,13 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 - **Published packages** — each `src/**` dir is a published `@jtorm/*` package. **Never delete or
   deprecate exports / remove packages** (external projects depend on them). Greenfield: no
   backward-compat shims; bug-fixes get a **patch** bump to the touched package's `package.json`.
+- **UI resolution and compilation are separate DI models.** `@jtorm/ui-resolver-model` owns the
+  custom/registered mapper graph, framework fallback, component cache, aliases, and asset URL
+  expansion. `@jtorm/ui-compiler-model` owns descriptor → TSS compilation (`h/t/d`, nested `ui`,
+  `pT`, and `di`). `@jtorm/ui-method` owns only the verb lifecycle, mediatarget orchestration, and a
+  compatibility-forwarding facade for its published helper/state surface. Hosts inject both models
+  before configuring that facade; CSS/JS plugins inject the resolver directly. Do not fold these
+  responsibilities back into the verb or add runtime imports between them.
 - **`schema-ui` follows schema.org first** — component data contracts should reuse schema.org
   types/properties and mapper composition before inventing local fields or per-type artifacts.
   Keep the shipped UI graph small: add a new `.tss` only for a real schema.org type/variant

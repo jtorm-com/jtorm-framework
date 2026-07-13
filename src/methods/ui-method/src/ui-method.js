@@ -6,14 +6,12 @@
 module.exports = {
     jTormUiMethod: {
         // DI
+        // compilerModel
+        // dataParser
         // errorHandler
         // mediatargetMethod
-        // methods[]
-        // viewModel
+        // resolverModel
 
-        cache: {},
-        default: 'default',
-        framework: 'h',
         params: [
             'f',// Framework
             'c',// Component
@@ -21,32 +19,79 @@ module.exports = {
             'h',// Use component html
             'm' // Use mediatarget
         ],
-        regexp: {},
-        ui: {
-            mapper: {}
+
+        get cache() {
+            return this.resolverModel.cache;
         },
-        uis: {},
+
+        set cache(v) {
+            this.resolverModel.cache = v;
+        },
+
+        get default() {
+            return this.resolverModel.default;
+        },
+
+        set default(v) {
+            this.resolverModel.default = v;
+        },
+
+        get framework() {
+            return this.resolverModel.framework;
+        },
+
+        set framework(v) {
+            this.resolverModel.framework = v;
+        },
+
+        get regexp() {
+            return this.resolverModel.regexp;
+        },
+
+        set regexp(v) {
+            this.resolverModel.regexp = v;
+        },
+
+        get ui() {
+            return this.resolverModel.ui;
+        },
+
+        set ui(v) {
+            this.resolverModel.ui = v;
+        },
+
+        get uis() {
+            return this.resolverModel.uis;
+        },
+
+        set uis(v) {
+            this.resolverModel.uis = v;
+        },
+
+        get methods() {
+            return this.compilerModel.methods;
+        },
+
+        set methods(v) {
+            this.compilerModel.methods = v;
+        },
+
+        get viewModel() {
+            return this.compilerModel.viewModel;
+        },
+
+        set viewModel(v) {
+            this.compilerModel.viewModel = v;
+        },
 
         init: async function () {
-            let ui, k, k2;
-
-            for (k in this.uis) {
-                ui = this.uis[k];
-
-                this.regexp[ui.alias] = {
-                    alias: new RegExp("^" + ui.alias + "\/", ''),
-                    mapper: {}
-                };
-
-                if (ui.mapperAlias)
-                    for (k2 in ui.mapperAlias)
-                        this.regexp[ui.alias].mapper[k2] = new RegExp("@" + k2 + '([\.\/])', '')
-                ;
-            }
+            return this.resolverModel.init();
         },
 
-        /** @param {ViewModel} v */
-        validate: function (v) {
+        /** Parse and normalize UI verb input before validation and method events. @param {ViewModel} v */
+        data: function (v) {
+            this.dataParser.handle(v, this.params);
+
             v.d.t = v.d.t === undefined
                 ? 1
                 : parseInt(v.d.t)
@@ -66,18 +111,18 @@ module.exports = {
                 this.errorHandler.handle('t is NaN', v)
             ;
 
-            v.d.c = this.parseComponent(v.d.c);
+            v.d.c = this.resolverModel.parseComponent(v.d.c);
+        },
 
+        /** Gate UI handling on a parsed component without mutating the view. @param {ViewModel} v */
+        validate: function (v) {
             return !!v.d.c;
         },
 
-        /**
-         * Resolve the schema.org component `v.d.c` for the chosen framework and rewrite `v.t` into its get/ui subtree (adding mediatarget variants).
-         * @param {ViewModel} v
-         */
+        /** Resolve and compile the UI component, including active mediatarget variants. @param {ViewModel} v */
         handle: async function (v) {
             const s = this;
-            let f = v.d.f,
+            let f = v.d.f || 'self',
                 c = v.d.c,
                 r,
                 i,
@@ -86,16 +131,16 @@ module.exports = {
                 k
             ;
 
-            if (!f)
-                f = s.framework
+            if (!s.resolverModel || !s.compilerModel)
+                s.errorHandler.handle('UI Models not injected', v)
             ;
 
-            r = await s.getComponent(c, f);
+            r = await s.resolverModel.getComponent(c, f);
             if (!r)
                 s.errorHandler.handle('Invalid UI Component', v)
             ;
 
-            t = await s.processComponent(v, r);
+            t = await s.compilerModel.processComponent(v, r);
 
             if (!t)
                 v.io = {c: 0, r: 0}
@@ -105,9 +150,9 @@ module.exports = {
 
                     if (r) {
                         for (i in r.current) {
-                            k = await s.getComponent(c + r.current[i], f);
+                            k = await s.resolverModel.getComponent(c + r.current[i], f);
                             if (k) {
-                                n = await s.processComponent(v, k);
+                                n = await s.compilerModel.processComponent(v, k);
                                 n.c = [];
 
                                 t.c.push(n);
@@ -125,261 +170,40 @@ module.exports = {
             }
         },
 
-        getComponent: async function (c, f, d) {
-            const s = this;
-
-            if (s.cache[c] && s.cache[c][f] !== undefined)
-                return s.cache[c][f]
-            ;
-
-            let
-                i,
-                r = await s.findUIComponent(f, c)
-            ;
-
-            if (!r) {
-                for (i in s.uis) {
-                    if (s.uis[i] && s.uis[i].framework !== f) {
-                        r = await s.findUIComponent(s.uis[i].framework, c);
-                        if (r)
-                            break
-                        ;
-                    }
-                }
-            }
-
-            if (!s.cache[c])
-                s.cache[c] = {}
-            ;
-
-            s.cache[c][f] = r;
-
-            return r;
+        getComponent: function (c, f, d) {
+            return this.resolverModel.getComponent(c, f, d);
         },
 
-        processComponent: async function (v, r) {
-            const s = this;
-            let f, tR, nT;
-
-            tR = v._.cloneDeep(r.c);
-
-            nT = v._.cloneDeep(v.t);
-            nT.p = {};
-
-            if (!v.d.t)
-                delete tR.t
-            ;
-
-            if (!v.d.h)
-                delete tR.h
-            ;
-
-            if (tR.h && !v._.isArray(tR.h))
-                tR.h = [tR.h]
-            ;
-
-            f = {};
-            await s.addLoop(tR, 'h', f, s, v);
-            await s.addLoop(tR, 't', f, s, v);
-            await s.addLoop(tR, 'd', f, s, v);
-
-            if (tR.ui) {
-                nT.m = 'ui';
-                if (tR.ui.c !== undefined)
-                    nT.p.c = "'" + tR.ui.c + "'"
-                ;
-
-                if (tR.ui.f !== undefined)
-                    nT.p.f = "'" + tR.ui.f + "'"
-                ;
-
-                if (tR.ui.t !== undefined)
-                    nT.p.t = "'" + tR.ui.t + "'"
-                ;
-
-                if (tR.ui.h !== undefined)
-                    nT.p.h = "'" + tR.ui.h + "'"
-                ;
-
-                if (tR.ui.m !== undefined)
-                    nT.p.m = "'" + tR.ui.m + "'"
-                ;
-
-                nT.c = [{s: nT.s, m: 'get', c: nT.c, p: f}];
-
-                if (tR.di) {
-                    r = await s.add(tR.di.m, v);
-                    if (!r)
-                        return null
-                    ;
-                }
-            } else if (tR.pT) {
-                if (!Array.isArray(tR.pT.c))
-                    tR.pT.c = []
-                ;
-
-                tR.pT.c.push({s: v.t.s, m: 'get', c: v.t.c, p: f});
-
-                nT.c = [tR.pT];
-            } else {
-                nT.m = 'get';
-                nT.p = f;
-            }
-
-            return nT;
+        processComponent: function (v, r) {
+            return this.compilerModel.processComponent(v, r);
         },
 
-        add: async function (di, v) {
-            if (di && di.m) {
-                let i, sV;
-                for (i in di.m) {
-                    sV = this.viewModel.copy(v);
-                    sV.d = di.m[i];
-
-                    await this.methods[i].handle(sV);
-
-                    return sV.io.c;
-                }
-            }
-
-            return 1;
+        add: function (di, v) {
+            return this.compilerModel.add(di, v);
         },
 
-        addLoop: async function (t, k, f, s, v) {
-            if (!t[k])
-                return f
-            ;
-
-            let r, i;
-
-            f[k] = [];
-            for (i in t[k]) {
-                if (typeof t[k][i] === 'object') {
-                    if (t[k][i].di) {
-                        r = await s.add(t[k][i].di, v);
-                        if (r)
-                            f[k].push(t[k][i].url)
-                        ;
-                    } else
-                        f[k].push(t[k][i].url)
-                    ;
-                } else
-                    f[k].push(t[k][i])
-                ;
-            }
-
-            // An empty artifact list (a pure `ui:{c:Parent}` delegator with `t:[]`, or
-            // one whose every entry was di-gated off) must NOT emit an empty get param:
-            // `f.t = []` reaches get as a truthy `v.d.t`, fetching an empty URL → 404.
-            // Drop the key so the get sees nothing to fetch and the delegation is clean.
-            if (!f[k].length) {
-                delete f[k];
-                return f;
-            }
-
-            f[k] = s.quotes(f[k]);
+        addLoop: function (t, k, f, s, v) {
+            return this.compilerModel.addLoop(t, k, f, s, v);
         },
 
-        findUIComponent(f, c) {
-            const
-                s = this,
-                uis = s.uis.filter(ui => ui.framework === f || ui.alias === f)
-            ;
-
-            if (!uis.length)
-                return 0
-            ;
-
-            const ui = uis[0];
-
-            let k, r, p;
-
-            r = ui.mapper;
-
-            if (!r)
-                return 0
-            ;
-
-            p = c.split('.');
-
-            for (k in p) {
-                if (r[p[k]])
-                    r = r[p[k]]
-                ; else
-                    return 0
-                ;
-            }
-
-            if (r[s.default])
-                r = r[s.default]
-            ;
-
-            return {c: r, ui: ui, f: f};
+        findUIComponent: function (f, c, d) {
+            return this.resolverModel.findUIComponent(f, c, d);
         },
 
         parseAlias: function (ui, v) {
-            if (ui.mapperAlias) {
-                for (let k in ui.mapperAlias)
-                    if (this.regexp[ui.alias].mapper[k].test(v))
-                        return v.replace(this.regexp[ui.alias].mapper[k], ui.mapperAlias[k] + '$1')
-                ;
-
-                return 0;
-            }
-
-            return 0;
+            return this.resolverModel.parseAlias(ui, v);
         },
 
         parseUrl: function (url) {
-            const s = this;
-            let r, k, ui;
-
-            for (k in s.uis) {
-                ui = s.uis[k];
-
-                if (s.regexp[ui.alias].alias.test(url)) {
-                    url = url.replace(s.regexp[ui.alias].alias, ui.id + "/");
-
-                    r = s.parseComponent(url);
-
-                    if (r)
-                        url = r
-                    ;
-
-                    if (ui.url)
-                        url = ui.url + url
-                    ;
-
-                    break;
-                }
-            }
-
-            return url;
+            return this.resolverModel.parseUrl(url);
         },
 
         quotes: function (d) {
-            for (let k in d)
-                d[k] = "'" + d[k] + "'"
-            ;
-
-            return d;
+            return this.compilerModel.quotes(d);
         },
 
         parseComponent: function (c) {
-            if (/@/.test(c)) {
-                let f, r;
-
-                for (f in this.uis) {
-                    r = this.parseAlias(this.uis[f], c);
-
-                    if (r) {
-                        c = r;
-                        break;
-                    }
-                }
-            }
-
-            return c;
+            return this.resolverModel.parseComponent(c);
         }
     }
 };

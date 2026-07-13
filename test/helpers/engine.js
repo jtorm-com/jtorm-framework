@@ -31,6 +31,8 @@ const { jTormDocumentModel } = require('../../src/models/document-model/src/docu
 const { jTormEventModel } = require('../../src/models/event-model/src/event-model.js');
 const { jTormLanguageModel } = require('../../src/models/language-model/src/language-model.js');
 const { jTormConfigModel } = require('../../src/models/config-model/src/config-model.js');
+const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
+const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
 // Fetch models + get verb (request transport seam — get boils via an injected transport)
 const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
 const { jTormDataModel } = require('../../src/models/data-model/src/data-model.js');
@@ -119,6 +121,8 @@ const methods = {
 jTormErrorHandler.util = util;
 jTormViewModel._ = _;
 jTormViewModel.documentModel = jTormDocumentModel;
+jTormUiMethod.resolverModel = jTormUiResolverModel;
+jTormUiMethod.compilerModel = jTormUiCompilerModel;
 jTormDocumentModel.errorHandler = jTormInsertMethod.errorHandler = jTormUiMethod.errorHandler = jTormErrorHandler;
 // Host XSS sanitizer seam (DI): insert-method's h: content write (inner/append/
 // prepend/before/after/replace), wrap/swap raw html, and get-method's get{h}
@@ -127,15 +131,15 @@ jTormDocumentModel.errorHandler = jTormInsertMethod.errorHandler = jTormUiMethod
 // in via setSanitize(); reset() re-applies it each boil (default null → no leak).
 jTormInsertMethod.sanitize = jTormGetMethod.sanitize = jTormWrapMethod.sanitize = jTormSwapMethod.sanitize = null;
 jTormAttrsMethod.tssParser = jTormViewModel.tssParser = jTormDataParser.tssParser = jTormTSSParser;
-jTormHandler.dataParser = jTormAttrsMethod.dataParser = jTormIfMethod.dataParser = jTormTextMethod.dataParser = jTormDataParser;
+jTormHandler.dataParser = jTormAttrsMethod.dataParser = jTormIfMethod.dataParser = jTormTextMethod.dataParser = jTormUiMethod.dataParser = jTormDataParser;
 jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS this; text-method.js:23 needs it
 jTormTimeMethod.languageModel = jTormLanguageModel;
 jTormLanguageModel.configModel = jTormConfigModel;
 jTormAttrsMethod.attrMethod = jTormAttrMethod;
 jTormEventModel.plugins = [jTormLayerPlugin, jTormUiCachePlugin];
 jTormHandler.eventModel = jTormHandlerWrapper.eventModel = jTormEventModel;
-jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = jTormUiMethod.methods = methods;
-jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormUiMethod.viewModel = jTormViewModel;
+jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = jTormUiCompilerModel.methods = methods;
+jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormUiCompilerModel.viewModel = jTormViewModel;
 jTormHandlerWrapper.handler = jTormEachMethod.handler = jTormIfMethod.handler = jTormSwapMethod.handler = jTormHandler;
 jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormWrapMethod.handlerWrapper = jTormHandlerWrapper;
 // fetch models + get verb DI (request transport seam) — get() resolves data/html/tss via the models

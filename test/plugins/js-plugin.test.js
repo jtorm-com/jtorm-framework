@@ -28,7 +28,7 @@ function fakeView() {
 function setup() {
     jTormJsPlugin.cache = {};
     jTormJsPlugin.collection = [];
-    jTormJsPlugin.uiMethod = { parseUrl: u => u };
+    jTormJsPlugin.uiResolverModel = { parseUrl: u => u };
     jTormJsPlugin.jsMethod = jTormJsMethod;
     jTormJsMethod.jsPlugin = jTormJsPlugin;
 }
@@ -59,6 +59,20 @@ test('js-plugin de-dupes by src via its cache', async () => {
     await jTormJsPlugin.process(v, { src: 'once.js' });
 
     assert.equal(v.h.d.querySelectorAll('head script').length, 1);
+});
+
+test('js-plugin expands src through the injected UI resolver', async () => {
+    setup();
+    const seen = [];
+    jTormJsPlugin.uiResolverModel = {
+        parseUrl: u => { seen.push(u); return 'https://cdn.example/' + u; }
+    };
+
+    const v = fakeView();
+    await jTormJsPlugin.process(v, { src: 'app.js' });
+
+    assert.deepEqual(seen, ['app.js']);
+    assert.equal(v.h.d.querySelector('head script').src, 'https://cdn.example/app.js');
 });
 
 test('js collection is isolated between interleaved root contexts', async () => {

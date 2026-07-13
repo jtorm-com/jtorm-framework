@@ -5,7 +5,7 @@ module.exports = {
     jTormCssPlugin: {
         // DI
         // cssMethod
-        // uiMethod
+        // uiResolverModel
 
         cache: {},
         collection: [],
@@ -82,7 +82,7 @@ module.exports = {
                             po.setAttribute(p[k], css[p[k]])
                     ;
 
-                    po.href = this.uiMethod.parseUrl(css.href);
+                    po.href = this.uiResolverModel.parseUrl(css.href);
                     po.rel = css.rel ? css.rel : 'stylesheet';
 
                     // defer: load without blocking via the media=print swap (main's
