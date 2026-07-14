@@ -8,6 +8,8 @@ const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js'
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
 const { jTormDataParser } = require('../../src/parsers/data-parser/src/data-parser.js');
+const { jTormIfMethod } = require('../../src/methods/if-method/src/if-method.js');
+const { jTormRegexPolicyModel } = require('../../src/models/regex-policy-model/src/regex-policy-model.js');
 
 // DI-drift guard: every src/methods/*-method must be either wired by the harness
 // or explicitly deferred. A newly-added method fails here until it is accounted
@@ -41,4 +43,8 @@ test('ui verb is wired to resolver/compiler models before facade configuration',
   assert.ok(jTormUiCompilerModel.methods.ui);
   assert.ok(jTormUiCompilerModel.viewModel);
   assert.ok(Array.isArray(jTormUiResolverModel.uis));
+});
+
+test('if verb is wired to the bounded regex policy model', () => {
+  assert.equal(jTormIfMethod.regexPolicyModel, jTormRegexPolicyModel);
 });

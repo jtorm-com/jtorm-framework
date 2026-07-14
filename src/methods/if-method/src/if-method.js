@@ -8,6 +8,7 @@ module.exports = {
         // DI
         // dataParser
         // handler
+        // regexPolicyModel
 
         or: '||',
         and: '&&',
@@ -32,7 +33,8 @@ module.exports = {
                 d = this.dataParser,
                 q = d.tssParser.c.quotes,
                 o = this.or,
-                a = this.and
+                a = this.and,
+                g = this.regexPolicyModel
             ;
 
             let
@@ -40,6 +42,7 @@ module.exports = {
                 e,
                 t,
                 k,
+                x = 0,
                 to = 1
             ;
 
@@ -82,10 +85,15 @@ module.exports = {
                     v.d.d = 1
                 ; else if (v.d.r) {
                     if (!v._.isString(v.t.p.v) || v.t.p.v !== q + v.d.v + q)
-                        throw new Error('Unsafe regex')
+                        throw new Error('Unsafe regex pattern')
                     ;
 
-                    r = new RegExp(v.d.v, 'm')
+                    if (!g || typeof g.validate !== 'function' || typeof g.test !== 'function')
+                        throw new Error('Regex policy model not configured')
+                    ;
+
+                    g.validate(v.d.v);
+                    x = 1;
                 } else if (!v._.isBoolean(v.d.v) && v.d.d && String(v.d.d).indexOf(String(v.d.v)) !== -1)
                     v.d.d = 1
                 ; else
@@ -97,12 +105,16 @@ module.exports = {
                 e = v.h.select(v.d.el)
             ;
 
+            if (to && !v.d.el && x && v.d.d)
+                r = g.test(v.d.v, v.d.d)
+            ;
+
             t = [];
             if (
                 to
                 && (
                     (v.d.el && e)
-                    || (!v.d.el && v.d.d && (!r || r.test(v.d.d)))
+                    || (!v.d.el && v.d.d && (!x || r))
                 )
             ) {
                 for (k in v.t.c) {
