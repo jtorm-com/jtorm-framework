@@ -1,17 +1,18 @@
 # Feature Development: Compile bindings onto AST nodes
 
-**Status:** VERIFIED — delivery in progress
+**Status:** COMPLETED
 **Claimed:** 2026-07-14T20:09:02Z
+**Completed:** 2026-07-14T22:05:14Z
 **Agent:** Codex `/root`
-**Current Mode:** Delivery — commit and PR
+**Current Mode:** Complete
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Review — finish-task verification
-**Current Mode:** Delivery — commit and PR
-**Next Action:** Stage the exact payload, run the staged ratchet, commit, push, and open a ready PR into `dev`.
+**Last Completed Mode:** Delivery
+**Current Mode:** Complete
+**Next Action:** Await review on PR #44; do not merge or publish as part of this task.
 **Files Created:**
 - `feature-reviews/compile-bindings-onto-ast-nodes.md` - Feature checkpoint and implementation record.
 
@@ -27,7 +28,7 @@
 - Keep `text` evaluation sequential against its mutating model and keep `attrs` parsed state fresh per render.
 
 **Context for Next Session:**
-The clean `dev` branch was fast-forward checked against `origin/dev`; it was already current. Work continues on `feature/compile-bindings-ast`. Fresh finish verification passed 59/59 focused tests, 427/427 full tests, typecheck, diff/invariant checks, production dependency audit, and the working-tree debt ratchet. The canonical architecture backlog is now complete; only delivery remains.
+The clean `dev` branch was fast-forward checked against `origin/dev`; it was already current. Fresh finish verification passed 59/59 focused tests, 427/427 full tests, typecheck, diff/invariant checks, production dependency audit, both debt ratchets, and all six package dry runs. The canonical architecture backlog is complete, and ready PR #44 targets `dev` from `feature/compile-bindings-ast`.
 
 ---
 
@@ -306,11 +307,11 @@ Focused command: `node --test test/parsers/data-parser-compiled.test.js test/mod
 - [x] Applicable review skills passed.
 - [x] Ten-dimension score is 100/100.
 - [x] Fresh verification loop passed.
-- [ ] `finish-task` delivery/staged-payload gate passed.
+- [x] `finish-task` delivery/staged-payload gate passed.
 
 ### Documentation and Delivery
 - [x] Relevant architecture/backlog documentation updated.
 - [x] Package patch versions bumped where required.
-- [ ] Conventional commit created.
-- [ ] Feature branch pushed.
-- [ ] Ready-for-review PR opened into `dev`.
+- [x] Conventional commit created (`cd1c19e`).
+- [x] Feature branch pushed.
+- [x] Ready-for-review PR #44 opened into `dev`.

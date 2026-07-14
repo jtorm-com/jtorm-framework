@@ -3,13 +3,14 @@
 **Branch:** `feature/compile-bindings-ast`
 **Base:** `origin/dev` at `e4ab711e7a502c33e39122016a2d0d1c7dbb9337`
 **Started:** `2026-07-14T21:48:37Z`
-**Status:** VERIFIED — delivery in progress
-**Mode:** Pre-PR branch evaluation
+**Status:** COMPLETED
+**Completed:** `2026-07-14T22:05:14Z`
+**Mode:** Post-delivery evaluation
 
 ## Resumption Context
 
-**Last Completed Phase:** Phase 6 — production-readiness, cleanup, static-analysis, ratchet, and fresh verification
-**Next Action:** Stage the exact payload, run the staged ratchet, commit, push, and open the ready PR.
+**Last Completed Phase:** Phase 7 — commit, push, and ready PR delivery
+**Next Action:** Await review on PR #44; publishing and merging remain outside this task.
 **Issues Found (not yet fixed):** None.
 **Accepted Findings Fixed:** One JSDoc contract correction: append/default descriptor arrays can contain `null` for empty append segments.
 **Review Comments:** Not a PR yet.
@@ -171,4 +172,11 @@ Flow: default cache warm-up → cached descriptors → ordered loop evaluates ea
 | Maintainability | 10/10 | One compiler/evaluator with small cache helpers; method grammar stays local; no dependency or abstraction layer added. |
 | Testability | 10/10 | Red count baseline, full binding matrix, invalidation/errors/modes/identity tests, and full golden suite. |
 | Readability | 10/10 | Plain tagged descriptors and documented cache contract make syntax/evaluation ownership explicit without closures. |
-| **Total** | **100/100** | Fresh verification complete; delivery gates remain. |
+| **Total** | **100/100** | Fresh verification and delivery gates complete. |
+
+## Delivery
+
+- Implementation commit: `cd1c19e` (`perf: compile bindings onto cached AST nodes`).
+- Branch: `feature/compile-bindings-ast`, pushed to the canonical origin.
+- Ready PR: [#44](https://github.com/jtorm-com/jtorm-framework/pull/44), open into `dev` and confirmed non-draft.
+- No package was published and the PR was not merged.
