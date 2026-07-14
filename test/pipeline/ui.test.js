@@ -23,13 +23,11 @@ const { render } = require('../helpers/engine.js');
 //   - ImageObject       — the figure→a→picture→img media chain (figure-default.tss)
 //   - BreadcrumbList    — the nav → ol->each{ body->append->ui } nested-iteration shape
 // Each golden is correctness-sanity-checked against schema.org/template intent below.
-// PAGE-LEVEL pieces (head.default/head.id, @f.inputEmail, the ul->each items path) are
-// locked at the foot of this file via the harness page mode (full <html> boil). The
-// full Thing.default composition is NOT golden-able as one unit: thing-default.tss is
-// content-level (selectorless `@e.section`, reached via Person→Thing) while
-// thing-update-1.0.1.tss adds page-level head/body/ul/footer rules that can't share a
-// scope with it — deferred to an author/design decision (docs/backlog.md). layer/
-// site-navigation-element still need the `layer` verb (deferred — see wiring.test.js).
+// Thing.default and Person.default are locked directly as coherent content components.
+// The retained thing-update-1.0.1.tss artifact's page-level pieces (head.default/head.id,
+// @f.inputEmail, the ul->each items path) remain locked independently at the foot of this
+// file via the harness page mode (full <html> boil). layer/site-navigation-element still
+// need the `layer` verb (deferred — see wiring.test.js).
 
 // --- ui → single html-ui element injection (the foundational Gate-B boil) ---
 
@@ -191,6 +189,42 @@ test('ui Thing.link with no alternateName/url emits a bare titled <a> (condition
     assert.equal(body, '<div class="a"><a title="Widget"></a></div>');
 });
 
+// --- Thing.default: one schema.org-first content component, with no page/demo rules ---
+
+const CONTENTS_NAME = '<div class="contents">'
+    + '<header class="header"><h1><a>Hello</a></h1></header>'
+    + '<section class="body"></section><footer class="footer"></footer></div>';
+const THING_DEFAULT = `<section class="thing">${CONTENTS_NAME}</section>`;
+const PERSON_DEFAULT = `<section class="thing schema-Person">${CONTENTS_NAME}</section>`;
+
+test('ui Thing.default renders only its content component and leaves page targets untouched', async () => {
+    const { head, body } = await render(
+        '<html><head><meta name="keep" content="1"></head><body>'
+            + '<div class="a"></div><ul><li>Keep</li></ul>'
+            + '<footer><span class="version">stable</span></footer></body></html>',
+        ".a->ui { c: 'Thing.default'; }",
+        {
+            name: 'Hello',
+            inLanguage: 'en',
+            identifier: 'thing-1',
+            placeholder: 'Email',
+            items: [{ name: 'Demo item' }]
+        }
+    );
+    assert.equal(head, '<meta name="keep" content="1">');
+    assert.equal(body, `<div class="a">${THING_DEFAULT}</div>`
+        + '<ul><li>Keep</li></ul><footer><span class="version">stable</span></footer>');
+});
+
+test('ui Person.default composes the repaired Thing.default content component', async () => {
+    const { body } = await render(
+        '<body></body>',
+        "body->ui { c: 'Person.default'; }",
+        { name: 'Hello' }
+    );
+    assert.equal(body, PERSON_DEFAULT);
+});
+
 // --- The schema inheritance chain: Article.default → CreativeWork.default → Thing.contents ---
 //
 // CreativeWork.default (creative-work-default.tss) wraps a `<section class="creative-work">`
@@ -201,9 +235,6 @@ test('ui Thing.link with no alternateName/url emits a bare titled <a> (condition
 const CW_DEFAULT = '<section class="creative-work"><div class="contents">'
     + '<header class="header"><h1><a>Hello</a></h1></header>'
     + '<section class="body"></section><footer class="footer"></footer></div></section>';
-const CONTENTS_NAME = '<div class="contents">'
-    + '<header class="header"><h1><a>Hello</a></h1></header>'
-    + '<section class="body"></section><footer class="footer"></footer></div>';
 
 test('ui CreativeWork.default wraps section.creative-work around the contents card', async () => {
     const { body } = await render(
@@ -705,14 +736,9 @@ test('ui @t.q gets citable attrs, inner html, and global attrs', async () => {
 //
 // These boil a FULL `<html><head></head><body>…</body></html>` document (the harness
 // page mode — documentModel.create's `/<html/` branch builds head+body; render()
-// returns `head`). They are the sub-components Thing.default's thing-update-1.0.1.tss
-// pulls in page-level. Thing.default ITSELF is NOT golden-able as one unit: its base
-// thing-default.tss is content-level (selectorless `@e.section` injection, reached
-// content-scoped via Person→Thing), while thing-update-1.0.1.tss bolts on these
-// page-level `head`/`body`/`ul`/`footer` rules — they throw under any content ancestor
-// AND have no target selectorlessly (`selectAll(null)` → "false not found"). Locking
-// the pieces here proves the page mode + sub-components; the full-page Thing.default
-// composition is deferred to an author/design decision (docs/backlog.md, continue.md).
+// returns `head`). They lock the standalone page components and the iteration behavior
+// still present in the intentionally retained thing-update-1.0.1.tss artifact. That
+// versioned artifact is not part of Thing.default's content-scoped mapper composition.
 
 // head.default (components-ui) — invoked with `head` as the ui target (ancestor=head)
 // so its selectorless `->data→append→ui{doc.meta}` rules land in <head>. With no
