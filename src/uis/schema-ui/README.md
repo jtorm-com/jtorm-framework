@@ -17,6 +17,8 @@ yet rendered. `Product.offers` accepts either one `Offer` object or an array of
 `Offer` objects through the same guarded composition.
 
 `Offer.default` renders `price`, `priceCurrency`, `availability`, and `url`.
-Numeric `price: 0` is preserved. Official `ItemAvailability` values receive
-human-readable labels; unknown values remain escaped text. Every field is
-optional, and all data-bound text uses the framework's escaped text path.
+Numeric `price: 0` is preserved. Canonical HTTP(S) schema.org
+`ItemAvailability` IRIs receive human-readable labels; all other values remain
+escaped text. Rendering does not mutate caller-owned `Product` or `Offer`
+objects. Every field is optional, and all data-bound text uses the framework's
+escaped text path.

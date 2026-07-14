@@ -6,6 +6,7 @@
     m: 'a';
 }
 
+// Scoped data copies preserve caller/frozen input while translating labels.
 .body
     ->if(d: sku) {
         ->data(skuLabel: 'SKU')
@@ -40,10 +41,7 @@
 
 .body
     ->if(d: brand.name)
-    ->data(
-        href: brand.url,
-        Text: ' ' + brand.name
-    )
+    ->data(Text: ' ' + brand.name)
     ->append
     ->ui {
         c: '@e.span';
@@ -54,8 +52,11 @@
                 v: 'product-brand';
             }
 
-            ->if(d: href) {
-                ->data(title: brand.name) {
+            ->if(d: brand.url) {
+                ->data(
+                    href: brand.url,
+                    title: brand.name
+                ) {
                     ->ui {
                         c: '@e.a';
 
@@ -79,14 +80,9 @@
     ->each(
         d: offers,
         a: 'offer'
-    )
-    ->data(
-        price: offer.price,
-        priceCurrency: offer.priceCurrency,
-        availability: offer.availability,
-        url: offer.url
     ) {
-        body->ui {
+        ->append(d: offer)
+        ->ui {
             c: 'Offer';
         }
     }

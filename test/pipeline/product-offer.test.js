@@ -259,6 +259,24 @@ test('ui Product.default renders a name-only brand as text instead of a link', a
     assert.equal(brand.querySelector('a'), null);
 });
 
+test('ui Product.default does not reuse a Product href for a name-only brand', async () => {
+    const { body } = await render(
+        '<body><div class="a"></div></body>',
+        ".a->ui { c: 'Product.default'; }",
+        {
+            '@type': 'Product',
+            name: 'Unrelated product link',
+            href: 'https://e.com/product',
+            brand: { '@type': 'Brand', name: 'Acme' }
+        }
+    );
+    const brand = new JSDOM(`<body>${body}</body>`).window.document.querySelector('.product-brand');
+
+    assert.equal(textContent(brand), 'Acme');
+    assert.equal(brand.querySelector('a'), null);
+    assert.equal(brand.querySelector('[href]'), null);
+});
+
 test('ui Product.default resolves SKU and GTIN labels through the language model', async t => {
     const get = jTormLanguageModel.get;
     jTormLanguageModel.get = function (value, locale) {

@@ -1,5 +1,6 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
+// Scoped data copies preserve caller/frozen input and reset the internal label.
 ->data(
     price: price,
     priceCurrency: priceCurrency,
@@ -48,52 +49,54 @@
 
         ->if(d: availability, v: '[\x0A\x0D\u2028\u2029]', r: true) {
             ->else {
-                ->if(d: availability, v: '^https?://schema[.]org/InStock$', r: true)->text {
-                    availabilityLabel: 'In stock';
-                }
+                ->if(d: availability, v: '^https?://schema[.]org/(InStock|OutOfStock|BackOrder|Discontinued|InStoreOnly|LimitedAvailability|MadeToOrder|OnlineOnly|PreOrder|PreSale|Reserved|SoldOut)$', r: true) {
+                    ->if(d: availability, v: '/InStock')->text {
+                        availabilityLabel: 'In stock';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/OutOfStock$', r: true)->text {
-                    availabilityLabel: 'Out of stock';
-                }
+                    ->if(d: availability, v: '/OutOfStock')->text {
+                        availabilityLabel: 'Out of stock';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/BackOrder$', r: true)->text {
-                    availabilityLabel: 'Back order';
-                }
+                    ->if(d: availability, v: '/BackOrder')->text {
+                        availabilityLabel: 'Back order';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/Discontinued$', r: true)->text {
-                    availabilityLabel: 'Discontinued';
-                }
+                    ->if(d: availability, v: '/Discontinued')->text {
+                        availabilityLabel: 'Discontinued';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/InStoreOnly$', r: true)->text {
-                    availabilityLabel: 'In-store only';
-                }
+                    ->if(d: availability, v: '/InStoreOnly')->text {
+                        availabilityLabel: 'In-store only';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/LimitedAvailability$', r: true)->text {
-                    availabilityLabel: 'Limited availability';
-                }
+                    ->if(d: availability, v: '/LimitedAvailability')->text {
+                        availabilityLabel: 'Limited availability';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/MadeToOrder$', r: true)->text {
-                    availabilityLabel: 'Made to order';
-                }
+                    ->if(d: availability, v: '/MadeToOrder')->text {
+                        availabilityLabel: 'Made to order';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/OnlineOnly$', r: true)->text {
-                    availabilityLabel: 'Online only';
-                }
+                    ->if(d: availability, v: '/OnlineOnly')->text {
+                        availabilityLabel: 'Online only';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/PreOrder$', r: true)->text {
-                    availabilityLabel: 'Pre-order';
-                }
+                    ->if(d: availability, v: '/PreOrder')->text {
+                        availabilityLabel: 'Pre-order';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/PreSale$', r: true)->text {
-                    availabilityLabel: 'Pre-sale';
-                }
+                    ->if(d: availability, v: '/PreSale')->text {
+                        availabilityLabel: 'Pre-sale';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/Reserved$', r: true)->text {
-                    availabilityLabel: 'Reserved';
-                }
+                    ->if(d: availability, v: '/Reserved')->text {
+                        availabilityLabel: 'Reserved';
+                    }
 
-                ->if(d: availability, v: '^https?://schema[.]org/SoldOut$', r: true)->text {
-                    availabilityLabel: 'Sold out';
+                    ->if(d: availability, v: '/SoldOut')->text {
+                        availabilityLabel: 'Sold out';
+                    }
                 }
             }
         }
