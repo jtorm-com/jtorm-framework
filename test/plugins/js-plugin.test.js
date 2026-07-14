@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const { JSDOM } = require('jsdom');
 const { jTormJsPlugin } = require('../../src/plugins/js-plugin/src/js-plugin.js');
 const { jTormJsMethod } = require('../../src/methods/js-method/src/js-method.js');
+const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
 
 // A minimal view object: dev's document-model.set(v, fn) reads v.t.s / v.c.s,
 // so the fake set() mirrors that contract and runs the callback against <head>.
@@ -29,6 +30,7 @@ function setup() {
     jTormJsPlugin.cache = {};
     jTormJsPlugin.collection = [];
     jTormJsPlugin.uiResolverModel = { parseUrl: u => u };
+    jTormJsPlugin.requestModel = jTormRequestModel;
     jTormJsPlugin.jsMethod = jTormJsMethod;
     jTormJsMethod.jsPlugin = jTormJsPlugin;
 }
@@ -65,14 +67,31 @@ test('js-plugin expands src through the injected UI resolver', async () => {
     setup();
     const seen = [];
     jTormJsPlugin.uiResolverModel = {
-        parseUrl: u => { seen.push(u); return 'https://cdn.example/' + u; }
+        parseUrl: u => { seen.push(u); return 'assets/' + u; }
     };
 
     const v = fakeView();
+    v.c.request = { base: 'https://cdn.example/' };
     await jTormJsPlugin.process(v, { src: 'app.js' });
 
     assert.deepEqual(seen, ['app.js']);
-    assert.equal(v.h.d.querySelector('head script').src, 'https://cdn.example/app.js');
+    assert.equal(v.h.d.querySelector('head script').src, 'https://cdn.example/assets/app.js');
+});
+
+test('js-plugin blocks an expanded external src before DOM injection', async () => {
+    setup();
+    jTormJsPlugin.uiResolverModel = {
+        parseUrl: () => 'https://evil.example/x.js'
+    };
+
+    const v = fakeView();
+    v.c.request = { base: 'https://cdn.example/' };
+
+    await assert.rejects(
+        () => jTormJsPlugin.process(v, { src: '@x/app.js' }),
+        /URL blocked https:\/\/evil\.example\/x\.js/
+    );
+    assert.equal(v.h.d.querySelector('head script'), null);
 });
 
 test('js collection is isolated between interleaved root contexts', async () => {

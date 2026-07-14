@@ -64,6 +64,12 @@ test('blocks fetch-normalized absolute HTTP URLs before transport', async () => 
   } finally { rm.transport = saved; rm.base = ''; }
 });
 
+test('blocks browser-normalized scheme-relative backslash URLs', () => {
+  rm.base = '';
+  assert.equal(rm.allow('\\\\evil.example/x'), false);
+  assert.equal(rm.allow('/\\evil.example/x'), false);
+});
+
 test('allows configured base-origin URLs by default', async () => {
   let seen;
   const saved = rm.transport;

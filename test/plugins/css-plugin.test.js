@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const { JSDOM } = require('jsdom');
 const { jTormCssPlugin } = require('../../src/plugins/css-plugin/src/css-plugin.js');
 const { jTormCssMethod } = require('../../src/methods/css-method/src/css-method.js');
+const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
 
 function fakeView() {
     const { window } = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
@@ -27,6 +28,7 @@ function setup() {
     jTormCssPlugin.cache = {};
     jTormCssPlugin.collection = [];
     jTormCssPlugin.uiResolverModel = { parseUrl: u => u };
+    jTormCssPlugin.requestModel = jTormRequestModel;
     jTormCssPlugin.cssMethod = jTormCssMethod;
     jTormCssMethod.cssPlugin = jTormCssPlugin;
 }
@@ -82,14 +84,31 @@ test('css-plugin expands href through the injected UI resolver', async () => {
     setup();
     const seen = [];
     jTormCssPlugin.uiResolverModel = {
-        parseUrl: u => { seen.push(u); return 'https://cdn.example/' + u; }
+        parseUrl: u => { seen.push(u); return 'assets/' + u; }
     };
 
     const v = fakeView();
+    v.c.request = { base: 'https://cdn.example/' };
     await jTormCssPlugin.process(v, { href: 'theme.css' });
 
     assert.deepEqual(seen, ['theme.css']);
-    assert.equal(v.h.d.querySelector('head link').href, 'https://cdn.example/theme.css');
+    assert.equal(v.h.d.querySelector('head link').href, 'https://cdn.example/assets/theme.css');
+});
+
+test('css-plugin blocks an expanded external href before DOM injection', async () => {
+    setup();
+    jTormCssPlugin.uiResolverModel = {
+        parseUrl: () => 'https://evil.example/x.css'
+    };
+
+    const v = fakeView();
+    v.c.request = { base: 'https://cdn.example/' };
+
+    await assert.rejects(
+        () => jTormCssPlugin.process(v, { href: '@x/theme.css' }),
+        /URL blocked https:\/\/evil\.example\/x\.css/
+    );
+    assert.equal(v.h.d.querySelector('head link'), null);
 });
 
 test('css collection is isolated between interleaved root contexts', async () => {
