@@ -235,7 +235,7 @@ function artifactText(fixtures, part) {
 
 /**
  * Build a deterministic fetch-shaped transport. A component with MULTIPLE `t`
- * artifacts (e.g. Thing.default = thing-default + thing-update-1.0.1) reaches the
+ * artifacts (e.g. Person.listItem = person-item + person-list-item) reaches the
  * transport COMMA-JOINED — request-model coerces the URL array (`['@s/a','@s/b']` →
  * `@s/a,@s/b`). Split it, serve each part (explicit { url: {json?, text?} } fixture
  * first — test-supplied get{d} data or a synthetic artifact — else the real src/uis/**

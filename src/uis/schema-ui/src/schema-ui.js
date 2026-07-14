@@ -333,8 +333,7 @@ module.exports = {
             Thing: {
                 default: {
                     t: [
-                        '@s/thing/thing-default.tss',
-                        '@s/thing/thing-update-1.0.1.tss'
+                        '@s/thing/thing-default.tss'
                     ]
                 },
                 item: {
