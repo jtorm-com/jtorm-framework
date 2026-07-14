@@ -187,6 +187,232 @@ test('attr preserves ordinary attrs and safe URL values', async () => {
   }
 });
 
+test('attr rejects CSS outside its allowlisted inline style grammar', async () => {
+  for (const value of [
+    'background:url(https://evil.example/x)',
+    '@IMPORT url(https://evil.example/x)',
+    'BaCkGrOuNd : uRl( https://evil.example/x )',
+    'background:u/**/rl(https://evil.example/x)',
+    'back\\67 round:url(https://evil.example/x)',
+    '--leak:url(https://evil.example/x);color:var(--leak)',
+    'color:expression(alert(1))',
+    'display:block'
+  ]) {
+    await assert.rejects(
+      render(
+        '<body><p>x</p></body>',
+        "p->attr { n: 'style'; v: value; }",
+        { value }
+      ),
+      /Unsafe attribute style/
+    );
+  }
+});
+
+test('attr preserves explicitly allowlisted inline color styles', async () => {
+  for (const [value, expected] of [
+    ['color:#abc;', '<p style="color:#abc;">x</p>'],
+    ['color: #abcd; background-color: #11223344;',
+      '<p style="color: #abcd; background-color: #11223344;">x</p>'],
+    ['COLOR:currentColor;background-color:transparent',
+      '<p style="COLOR:currentColor;background-color:transparent">x</p>']
+  ]) {
+    const { body } = await render(
+      '<body><p>x</p></body>',
+      "p->attr { n: 'style'; v: value; }",
+      { value }
+    );
+    assert.equal(body, expected);
+  }
+});
+
+test('attr rejects ping URLs outside the document HTTP origin', async () => {
+  for (const value of [
+    'https://evil.example/collect',
+    '/audit https://evil.example/collect',
+    '//evil.example/collect',
+    '/\\evil.example/collect',
+    'javascript:alert(1)',
+    'data:text/plain,ping',
+    'https://[invalid'
+  ]) {
+    await assert.rejects(
+      render(
+        '<body><a>x</a></body>',
+        "a->attr { n: 'ping'; v: value; }",
+        { value },
+        'https://app.example/page'
+      ),
+      /Unsafe attribute ping/
+    );
+  }
+});
+
+test('attr rejects a relative ping resolved cross-origin by document base', async () => {
+  await assert.rejects(
+    render(
+      '<html><head><base href="https://evil.example/"></head><body><a>x</a></body></html>',
+      "a->attr { n: 'ping'; v: value; }",
+      { value: 'collect' },
+      'https://app.example/page'
+    ),
+    /Unsafe attribute ping/
+  );
+});
+
+test('attr rejects ping when the document origin is opaque', async () => {
+  await assert.rejects(
+    render(
+      '<body><a>x</a></body>',
+      "a->attr { n: 'ping'; v: value; }",
+      { value: '/audit' },
+      'about:blank'
+    ),
+    /Unsafe attribute ping/
+  );
+});
+
+test('attr canonicalizes relative and absolute same-origin ping lists', async () => {
+  for (const [value, expected] of [
+    ['/audit', 'https://app.example/audit'],
+    ['./audit https://app.example/metrics',
+      'https://app.example/audit https://app.example/metrics'],
+    ['https://app.example:443/audit /metrics',
+      'https://app.example/audit https://app.example/metrics']
+  ]) {
+    const { body } = await render(
+      '<body><a>x</a></body>',
+      "a->attr { n: 'ping'; v: value; }",
+      { value },
+      'https://app.example/page'
+    );
+    assert.equal(body, '<a ping="' + expected + '">x</a>');
+  }
+});
+
+test('attr pins a ping destination before a later document base change', async () => {
+  const { body, head } = await render(
+    '<html><head><base></head><body><a>x</a></body></html>',
+    "a->attr { n: 'ping'; v: '/audit'; } base->attr { n: 'href'; v: 'https://evil.example/'; }",
+    {},
+    'https://app.example/page'
+  );
+  assert.equal(body, '<a ping="https://app.example/audit">x</a>');
+  assert.equal(head, '<base href="https://evil.example/">');
+});
+
+test('attr preserves a same-origin ping inside a detached each fragment', async () => {
+  const { body } = await render(
+    '<body><div class="a"></div></body>',
+    ".a->each { d: items; body->append { h: '<a>x</a>'; a->attr { n: 'ping'; v: '/audit'; } } }",
+    { items: [1] },
+    'https://app.example/page'
+  );
+  assert.equal(body, '<div class="a"><a ping="https://app.example/audit">x</a></div>');
+});
+
+test('attr rejects a cross-origin ping inside a detached each fragment', async () => {
+  await assert.rejects(
+    render(
+      '<body><div class="a"></div></body>',
+      ".a->each { d: items; body->append { h: '<a>x</a>'; a->attr { n: 'ping'; v: 'https://evil.example/collect'; } } }",
+      { items: [1] },
+      'https://app.example/page'
+    ),
+    /Unsafe attribute ping/
+  );
+});
+
+test('attr rejects a detached ping resolved by an external live document base', async () => {
+  await assert.rejects(
+    render(
+      '<html><head><base href="https://evil.example/"></head><body><div class="a"></div></body></html>',
+      ".a->each { d: items; body->append { h: '<a>x</a>'; a->attr { n: 'ping'; v: 'collect'; } } }",
+      { items: [1] },
+      'https://app.example/page'
+    ),
+    /Unsafe attribute ping/
+  );
+});
+
+test('attr rejects unsafe final style and ping compositions', async () => {
+  for (const [html, tss, data] of [
+    [
+      '<body><p style="background:url(https://evil.example/x)">x</p></body>',
+      "p->attr { n: 'style'; v: safe; m: 'a'; }",
+      { safe: 'color:#fff;' }
+    ],
+    [
+      '<body><p style="background:url(https://evil.example/x)">x</p></body>',
+      "p->attr { n: 'style'; v: safe; m: 'p'; }",
+      { safe: 'color:#fff;' }
+    ],
+    [
+      '<body><a ping="https://evil.example/collect">x</a></body>',
+      "a->attr { n: 'ping'; v: safe; m: 'a'; }",
+      { safe: '/audit' }
+    ],
+    [
+      '<body><a>x</a></body>',
+      "a->attr { n: 'ping'; v: safe; p: unsafe; }",
+      { safe: '/audit', unsafe: 'https://evil.example/collect ' }
+    ],
+    [
+      '<body><p>x</p></body>',
+      "p->attr { n: 'style'; v: safe; a: unsafe; }",
+      { safe: 'color:#fff;', unsafe: 'background:url(https://evil.example/x)' }
+    ]
+  ]) {
+    await assert.rejects(
+      render(html, tss, data, 'https://app.example/page'),
+      /Unsafe attribute (style|ping)/
+    );
+  }
+});
+
+test('attr preserves safe final style and ping append/prepend compositions', async () => {
+  const style = await render(
+    '<body><p style="color:#000;">x</p></body>',
+    "p->attr { n: 'style'; v: value; m: 'a'; }",
+    { value: 'background-color:#fff;' }
+  );
+  assert.equal(style.body, '<p style="color:#000; background-color:#fff;">x</p>');
+
+  const ping = await render(
+    '<body><a ping="/second">x</a></body>',
+    "a->attr { n: 'ping'; v: value; m: 'p'; }",
+    { value: '/first' },
+    'https://app.example/page'
+  );
+  assert.equal(ping.body,
+    '<a ping="https://app.example/first https://app.example/second">x</a>');
+});
+
+test('attrs delegates style and ping safety to attr', async () => {
+  for (const [attr, value] of [
+    ['style', 'background:url(https://evil.example/x)'],
+    ['ping', 'https://evil.example/collect']
+  ]) {
+    await assert.rejects(
+      render(
+        '<body><a>x</a></body>',
+        "a->attrs { n: '" + attr + "'; v: value; }",
+        { value },
+        'https://app.example/page'
+      ),
+      /Unsafe attribute (style|ping)/
+    );
+  }
+
+  const { body } = await render(
+    '<body><a>x</a></body>',
+    "a->attrs { n: 'style,ping'; v: style,ping; }",
+    { style: 'color:#123;', ping: '/audit' },
+    'https://app.example/page'
+  );
+  assert.equal(body, '<a style="color:#123;" ping="https://app.example/audit">x</a>');
+});
+
 test('attr on a zero-match selector throws via the error-handler (characterizes #14)', async () => {
   const log = console.log;
   console.log = () => {}; // silence the error-handler's pre-throw v dump
