@@ -32,6 +32,20 @@ while `srcdoc` is present. URL-bearing attributes (`cite`, `href`, `longdesc`,
 `src`, `srcset`, `action`, `formaction`, `poster`, `data`, `xlink:href`) reject
 `javascript:`, `data:`, and `vbscript:` schemes.
 
+`style` is an allowlisted color micro-grammar, not a general CSS sanitizer. It
+accepts only `color` and `background-color` declarations whose values are a
+3/4/6/8-digit hexadecimal color, `transparent`, or `currentColor`. Multiple
+semicolon-separated declarations and an optional trailing semicolon are allowed;
+functions, at-rules, comments, escapes, custom properties, `!important`, and all
+other properties and values are rejected.
+
+Every URL in a space-separated `ping` value must resolve to the actual HTTP(S)
+document origin. Relative values resolve against the document base first, so an
+external `<base>` does not widen the allowed origin. Invalid URLs, non-HTTP(S)
+schemes, and cross-origin URLs are rejected. This checks the URL written to the
+attribute, not later server redirects; allowed origins must not expose an open
+redirect to untrusted destinations and must enforce normal request controls.
+
 
 ## Example
 

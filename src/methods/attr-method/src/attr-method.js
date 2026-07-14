@@ -82,11 +82,44 @@ module.exports = {
             return e.getAttribute(n);
         },
 
+        style: function (v) {
+            let d = v.split(';');
+
+            if (!d[d.length - 1].trim())
+                d.pop()
+            ;
+
+            return !v.trim() || !!(
+                d.length
+                && d.every(p => /^\s*(?:background-color|color)\s*:\s*(?:#[\da-f]{3}|#[\da-f]{4}|#[\da-f]{6}|#[\da-f]{8}|transparent|currentcolor)\s*$/i.test(p))
+            );
+        },
+
+        ping: function (e, v) {
+            let d = e.ownerDocument,
+                u
+            ;
+
+            try { d = new URL(d.URL); } catch (e) { return false; }
+
+            if (!/^https?:$/.test(d.protocol))
+                return false
+            ;
+
+            return v.trim().split(/\s+/).filter(Boolean).every(p => {
+                try { u = new URL(p, e.ownerDocument.baseURI); } catch (e) { return false; }
+
+                return /^https?:$/.test(u.protocol) && u.origin === d.origin;
+            });
+        },
+
         safe: function (e, n, v) {
             const a = n.trim().toLowerCase();
 
             if (
                 /^on/.test(a)
+                || (a === 'style' && !this.style(v))
+                || (a === 'ping' && !this.ping(e, v))
                 || (a === 'srcdoc' && (!e.hasAttribute('sandbox') || /\ballow-scripts\b/i.test(e.getAttribute('sandbox'))))
                 || (a === 'sandbox' && e.hasAttribute('srcdoc') && /\ballow-scripts\b/i.test(v))
                 || (
