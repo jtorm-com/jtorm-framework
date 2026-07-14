@@ -55,16 +55,26 @@ module.exports = {
                     do {
                         r = 0;
 
-                        if (v.t.m && ms[v.t.m])
+                        if (
+                            v.t.m
+                            && Object.prototype.hasOwnProperty.call(ms, v.t.m)
+                        )
                             r = ms[v.t.m]
                         ; else {
                             for (k2 in ms) {
-                                if (ms[k2].alias === v.t.m) {
+                                if (
+                                    Object.prototype.hasOwnProperty.call(ms, k2)
+                                    && ms[k2].alias === v.t.m
+                                ) {
                                     r = ms[k2];
                                     break;
                                 }
                             }
                         }
+
+                        if (v.t.m && !r)
+                            throw new Error('Unknown method ' + v.t.m)
+                        ;
 
                         if (r) {
                             if (v._.isFunction(r.data))
