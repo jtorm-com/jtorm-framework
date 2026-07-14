@@ -24,6 +24,33 @@ module.exports = {
             return 1;
         },
 
+        bindings: function (t) {
+            const
+                d = this.dataParser,
+                b = d.cache(t),
+                o = this.or,
+                a = this.and,
+                k = o + '\u0000' + a
+            ;
+            let x = b.x.i, p = t.p.d, r = {k: k, o: 0, d: []};
+
+            if (x && x.k === k)
+                return x
+            ;
+
+            if (p.indexOf(o) !== -1) {
+                r.o = 1;
+                r.d = p.split(o).map(s => d.compile(s.trim()));
+            } else if (p.indexOf(a) !== -1) {
+                r.o = 2;
+                r.d = p.split(a).map(s => d.compile(s.trim()));
+            }
+
+            b.x.i = r;
+
+            return r;
+        },
+
         /**
          * Evaluate `v.d.d` (with `||`/`&&`, type, literal/trusted-regex, or element tests) and boil either the matching children or the `->else` branch.
          * @param {ViewModel} v
@@ -32,8 +59,6 @@ module.exports = {
             const
                 d = this.dataParser,
                 q = d.tssParser.c.quotes,
-                o = this.or,
-                a = this.and,
                 g = this.regexPolicyModel
             ;
 
@@ -59,20 +84,19 @@ module.exports = {
             }
 
             if (v.d.d === null) {
-                if (v.t.p.d.indexOf(o) !== -1) {
-                    t = v.t.p.d.split(o);
-                    for (k in t) {
-                        if (d.parse(v.m, t[k].trim())) {
+                t = this.bindings(v.t);
+                if (t.o === 1) {
+                    for (k in t.d) {
+                        if (d.evaluate(v.m, t.d[k])) {
                             v.d.d = 1;
                             break;
                         }
                     }
-                } else if (v.t.p.d.indexOf(a) !== -1) {
-                    t = v.t.p.d.split(a);
+                } else if (t.o === 2) {
                     v.d.d = 1;
 
-                    for (k in t) {
-                        if (!d.parse(v.m, t[k].trim())) {
+                    for (k in t.d) {
+                        if (!d.evaluate(v.m, t.d[k])) {
                             v.d.d = 0;
                             break;
                         }

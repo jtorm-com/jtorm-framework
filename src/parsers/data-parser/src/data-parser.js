@@ -17,8 +17,115 @@ module.exports = {
             this.dataRegex = new RegExp('(' + q + ')+', 'gm');
         },
 
+        grammar: function () {
+            const
+                a = this.appendRegex,
+                d = this.dataRegex,
+                q = this.tssParser.regexes.quotes
+            ;
+
+            return [a.source, a.flags, d.source, d.flags, q.source, q.flags, this.current, this.objectSeparator].join('\u0000');
+        },
+
+        items: function (a, b) {
+            if (!a || !b || a.length !== b.length)
+                return 0
+            ;
+
+            for (let i = 0; i < a.length; i++)
+                if (a[i] !== b[i])
+                    return 0
+                ;
+
+            return 1;
+        },
+
+        snapshot: function (p) {
+            const r = [];
+            let k, v;
+
+            for (k of Object.keys(p || {})) {
+                v = p[k];
+                r.push([k, Array.isArray(v) ? v.slice() : v]);
+            }
+
+            return r;
+        },
+
+        same: function (r, p) {
+            const k = Object.keys(p || {});
+            let a, b;
+
+            if (!r || r.length !== k.length)
+                return 0
+            ;
+
+            for (let i = 0; i < k.length; i++) {
+                if (r[i][0] !== k[i])
+                    return 0
+                ;
+
+                a = r[i][1];
+                b = p[k[i]];
+                if (Array.isArray(a) || Array.isArray(b)) {
+                    if (!Array.isArray(a) || !Array.isArray(b) || !this.items(a, b))
+                        return 0
+                    ;
+                } else if (a !== b)
+                    return 0
+                ;
+            }
+
+            return 1;
+        },
+
+        cache: function (t) {
+            const p = t.p || {}, k = this.grammar();
+
+            if (!t.b || t.b.k !== k || !this.same(t.b.r, p))
+                t.b = {k: k, r: this.snapshot(p), p: null, x: {}}
+            ;
+
+            return t.b;
+        },
+
+        bindings: function (t, d, l, a) {
+            const b = this.cache(t);
+            let r = a ? b.x.a : b.p, p, k, c;
+
+            if (a && r && this.items(r.r, a))
+                return r.p
+            ;
+
+            if (!a && r)
+                return r
+            ;
+
+            c = {};
+            for (p in d) {
+                if (d[p]) {
+                    if (l.isString(d[p]))
+                        c[p] = this.compile(d[p])
+                    ; else if (l.isArray(d[p])) {
+                        c[p] = [];
+                        for (k in d[p])
+                            c[p].push(this.compile(d[p][k]))
+                        ;
+                    }
+                }
+            }
+
+            if (a)
+                b.x.a = {r: a.slice(), p: c}
+            ; else
+                b.p = c
+            ;
+
+            return c;
+        },
+
         handle: function (v, a) {
-            let p, k, z = 0;
+            let p, k, b, z = 0;
             const
                 d = {...v.t.p},
                 tD = {}
@@ -39,14 +146,16 @@ module.exports = {
                 ;
             }
 
+            b = this.bindings(v.t, d, v._, z ? a : null);
+
             for (p in d) {
                 if (d[p]) {
                     if (v._.isString(d[p]))
-                        tD[p] = this.parse(v.m, d[p], z)
+                        tD[p] = this.evaluate(v.m, b[p], z)
                     ; else if (v._.isArray(d[p])) {
                         tD[p] = [];
                         for (k in d[p])
-                            tD[p].push(this.parse(v.m, d[p][k], z))
+                            tD[p].push(this.evaluate(v.m, b[p][k], z))
                         ;
                     }
                 }
@@ -55,40 +164,36 @@ module.exports = {
             v.d = tD;
         },
 
-        parse: function (d, k, a) {
+        compile: function (k) {
             if (!k)
                 return null
             ;
 
             const s = this;
-            let m, q, i = 0, tmp = d, p, ps;
+            let m, i = 0, p, ps;
 
             m = k.split(s.appendRegex);
 
             if (m.length > 1) {
-                tmp = '';
+                ps = [];
 
                 for (p of m) {
                     p = p.trim();
 
-                    if (p !== '+') {// application/ld+json
-                        q = s.parse(d, p);
-
-                        if (q)
-                            tmp += q
-                        ;
-                    }
+                    if (p !== '+')// application/ld+json
+                        ps.push(s.compile(p))
+                    ;
                 }
 
-                return tmp;
+                return {t: 'a', v: ps};
             }
 
             if (k.match(s.dataRegex))
-                return k.replace(s.dataRegex, '')
+                return {t: 'v', v: k.replace(s.dataRegex, '')}
             ; else if (k === 'true')
-                return true
+                return {t: 'v', v: true}
             ; else if (k === 'false')
-                return false
+                return {t: 'v', v: false}
             ; else if (!isNaN(parseFloat(k)) && isFinite(k)) {
                 i = 1;
                 if (k % 1 === 0)
@@ -96,8 +201,7 @@ module.exports = {
                 ; else
                     k = parseFloat(k)
                 ;
-            } else if (!d)
-                return null
+            }
             ;
 
             ps = i
@@ -105,7 +209,38 @@ module.exports = {
                 : k.split(s.objectSeparator)
             ;
 
-            for (p of ps) {
+            return {t: 'p', v: ps, n: i};
+        },
+
+        evaluate: function (d, b, a) {
+            if (!b)
+                return null
+            ;
+
+            const s = this;
+            let q, p, tmp = d;
+
+            if (b.t === 'a') {
+                tmp = '';
+                for (p of b.v) {
+                    q = s.evaluate(d, p);
+                    if (q)
+                        tmp += q
+                    ;
+                }
+
+                return tmp;
+            }
+
+            if (b.t === 'v')
+                return b.v
+            ;
+
+            if (!b.n && !d)
+                return null
+            ;
+
+            for (p of b.v) {
                 if (p === s.current)
                     tmp = tmp[Object.keys(tmp)[0]]
                 ; else {
@@ -115,8 +250,8 @@ module.exports = {
                             return
                         ;
 
-                        if (i)
-                            return k
+                        if (b.n)
+                            return b.v[0]
                         ;
 
                         // unquoted var that does not resolve = undefined var → null.
@@ -129,6 +264,10 @@ module.exports = {
             }
 
             return tmp;
+        },
+
+        parse: function (d, k, a) {
+            return this.evaluate(d, this.compile(k), a);
         }
     }
 };

@@ -146,7 +146,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P0** | Fix `Thing.default` demo-junk leak | ✅ Done — PR #41 | Ships stray `<input>` into every bare-`Thing` render today | S |
 | **P1** | Registry-membership check for unknown verbs | ✅ Done — `@jtorm/handler@1.0.5` | Closes the one-token hole in the "loud drift" promise | S |
 | **P1** | Close S2 (`style`/`ping`) + S3 (`if{r:}` bound) | ✅ Done — PRs #39/#40 | CSS-exfil + SSR DoS under untrusted data | S–M |
-| **P1** | Compile bindings onto AST nodes | **NEXT** | Eliminates per-render re-parse; large perf win | M |
+| **P1** | Compile bindings onto AST nodes | ✅ Done — `@jtorm/data-parser@1.0.3` | Eliminates per-render re-parse; large perf win | M |
 | **P2** | Precompile/manifest step for UI closures | Queued | Collapses 28→1 fetch; the architecture's biggest UX cost | L |
 | **P2** | Emit inline JSON-LD from typed model | Queued | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | Queued | Deletes the infinite-loop trap; makes dispatch an invariant | M |
