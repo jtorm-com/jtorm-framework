@@ -1,0 +1,88 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+.thing->attr {
+    n: 'class';
+    v: 'product';
+    m: 'a';
+}
+
+// Scoped data copies preserve caller/frozen input while translating labels.
+.body
+    ->if(d: sku) {
+        ->data(skuLabel: 'SKU')
+        ->text(skuLabel: skuLabel)
+        ->data(html: ' ' + skuLabel + ': ' + sku)
+        ->append
+        ->ui {
+            c: '@e.span';
+
+            span->attr {
+                n: 'class';
+                v: 'sku';
+            }
+        }
+    }
+
+.body
+    ->if(d: gtin) {
+        ->data(gtinLabel: 'GTIN')
+        ->text(gtinLabel: gtinLabel)
+        ->data(html: ' ' + gtinLabel + ': ' + gtin)
+        ->append
+        ->ui {
+            c: '@e.span';
+
+            span->attr {
+                n: 'class';
+                v: 'gtin';
+            }
+        }
+    }
+
+.body
+    ->if(d: brand.name)
+    ->data(Text: ' ' + brand.name)
+    ->append
+    ->ui {
+        c: '@e.span';
+
+        span {
+            ->attr {
+                n: 'class';
+                v: 'product-brand';
+            }
+
+            ->if(d: brand.url) {
+                ->data(
+                    href: brand.url,
+                    title: brand.name
+                ) {
+                    ->ui {
+                        c: '@e.a';
+
+                        a->ui {
+                            c: 'Text';
+                        }
+                    }
+                }
+
+                ->else
+                ->ui {
+                    c: 'Text';
+                }
+            }
+        }
+    }
+
+.body
+    ->if(d: offers)
+    ->append
+    ->each(
+        d: offers,
+        a: 'offer'
+    ) {
+        ->append(d: offer)
+        ->ui {
+            c: 'Offer';
+        }
+    }

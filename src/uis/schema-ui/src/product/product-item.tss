@@ -1,0 +1,7 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+.thing->attr {
+    n: 'class';
+    v: 'product-item';
+    m: 'a';
+}
