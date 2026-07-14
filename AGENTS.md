@@ -90,5 +90,6 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   reason, push, re-request `@codex review`, re-poll until clean. A 👍 against an older head is stale.
 - Conventional commits (`feat|fix|refactor|docs|test|chore|perf|ci: …`).
 
-The canonical repository is `github.com/jtorm-com/jtorm-framework`. Private strategy/planning lives
-in a separate repo and is intentionally absent here.
+The canonical repository is `github.com/jtorm-com/jtorm-framework`. Architecture reviews and their
+actionable backlog live in `feature-reviews/`; the automated review outcome ledger lives in
+`.claude-tasks/`. Broader private strategy/planning remains in a separate repo.
