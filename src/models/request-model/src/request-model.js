@@ -81,7 +81,7 @@ module.exports = {
             const b = this.option(c, 'base', this.base);
             let r;
 
-            if (/^[\u0000-\u0020]*\/\//.test(u))
+            if (/^[\u0000-\u0020]*[\\/]{2}/.test(u))
                 return false
             ;
 

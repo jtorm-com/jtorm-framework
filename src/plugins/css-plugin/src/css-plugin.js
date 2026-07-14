@@ -5,6 +5,7 @@ module.exports = {
     jTormCssPlugin: {
         // DI
         // cssMethod
+        // requestModel
         // uiResolverModel
 
         cache: {},
@@ -66,8 +67,27 @@ module.exports = {
 
         process: async function(v, css) {
             const s = this.state(v);
+            let c = v.c, d, u;
 
             if(!s.cache[css.href]) {
+                u = this.uiResolverModel.parseUrl(css.href);
+
+                if (!this.requestModel.option(c, 'base', this.requestModel.base)) {
+                    d = v.h.d;
+
+                    try { u = new URL(u, d.baseURI).href; } catch (e) {}
+
+                    if (/^https?:\/\//i.test(d.URL))
+                        c = {...(this.requestModel.context(c) || {}), base: d.URL}
+                    ;
+                }
+
+                u = this.requestModel.url(u, c);
+
+                if (!(await this.requestModel.allow(u, c)))
+                    throw new Error('URL blocked ' + u)
+                ;
+
                 await v.h.set({t: {s: 'head'}, c: {s: null}}, el => {
                     const
                         po = v.h.d.createElement('link'),
@@ -82,7 +102,7 @@ module.exports = {
                             po.setAttribute(p[k], css[p[k]])
                     ;
 
-                    po.href = this.uiResolverModel.parseUrl(css.href);
+                    po.href = u;
                     po.rel = css.rel ? css.rel : 'stylesheet';
 
                     // defer: load without blocking via the media=print swap (main's

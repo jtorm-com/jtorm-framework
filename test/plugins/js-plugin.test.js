@@ -4,11 +4,15 @@ const assert = require('node:assert/strict');
 const { JSDOM } = require('jsdom');
 const { jTormJsPlugin } = require('../../src/plugins/js-plugin/src/js-plugin.js');
 const { jTormJsMethod } = require('../../src/methods/js-method/src/js-method.js');
+const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
 
 // A minimal view object: dev's document-model.set(v, fn) reads v.t.s / v.c.s,
 // so the fake set() mirrors that contract and runs the callback against <head>.
-function fakeView() {
-    const { window } = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
+function fakeView(html, url) {
+    const { window } = new JSDOM(
+        html || '<!DOCTYPE html><html><head></head><body></body></html>',
+        url ? { url } : undefined
+    );
     const doc = window.document;
     return {
         t: { s: 'body' },
@@ -29,6 +33,7 @@ function setup() {
     jTormJsPlugin.cache = {};
     jTormJsPlugin.collection = [];
     jTormJsPlugin.uiResolverModel = { parseUrl: u => u };
+    jTormJsPlugin.requestModel = jTormRequestModel;
     jTormJsPlugin.jsMethod = jTormJsMethod;
     jTormJsMethod.jsPlugin = jTormJsPlugin;
 }
@@ -65,14 +70,45 @@ test('js-plugin expands src through the injected UI resolver', async () => {
     setup();
     const seen = [];
     jTormJsPlugin.uiResolverModel = {
-        parseUrl: u => { seen.push(u); return 'https://cdn.example/' + u; }
+        parseUrl: u => { seen.push(u); return 'assets/' + u; }
     };
 
     const v = fakeView();
+    v.c.request = { base: 'https://cdn.example/' };
     await jTormJsPlugin.process(v, { src: 'app.js' });
 
     assert.deepEqual(seen, ['app.js']);
-    assert.equal(v.h.d.querySelector('head script').src, 'https://cdn.example/app.js');
+    assert.equal(v.h.d.querySelector('head script').src, 'https://cdn.example/assets/app.js');
+});
+
+test('js-plugin blocks an expanded external src before DOM injection', async () => {
+    setup();
+    jTormJsPlugin.uiResolverModel = {
+        parseUrl: () => 'https://evil.example/x.js'
+    };
+
+    const v = fakeView();
+    v.c.request = { base: 'https://cdn.example/' };
+
+    await assert.rejects(
+        () => jTormJsPlugin.process(v, { src: '@x/app.js' }),
+        /URL blocked https:\/\/evil\.example\/x\.js/
+    );
+    assert.equal(v.h.d.querySelector('head script'), null);
+});
+
+test('js-plugin blocks a relative src resolved by an external document base', async () => {
+    setup();
+    const v = fakeView(
+        '<!DOCTYPE html><html><head><base href="https://evil.example/"></head><body></body></html>',
+        'https://app.example/page'
+    );
+
+    await assert.rejects(
+        () => jTormJsPlugin.process(v, { src: 'app.js' }),
+        /URL blocked https:\/\/evil\.example\/app\.js/
+    );
+    assert.equal(v.h.d.querySelector('head script'), null);
 });
 
 test('js collection is isolated between interleaved root contexts', async () => {

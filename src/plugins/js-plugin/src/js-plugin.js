@@ -5,6 +5,7 @@ module.exports = {
     jTormJsPlugin: {
         // DI
         // jsMethod
+        // requestModel
         // uiResolverModel
 
         cache: {},
@@ -66,8 +67,27 @@ module.exports = {
 
         process: async function(v, js) {
             const s = this.state(v);
+            let c = v.c, d, u;
 
             if (!s.cache[js.src]) {
+                u = this.uiResolverModel.parseUrl(js.src);
+
+                if (!this.requestModel.option(c, 'base', this.requestModel.base)) {
+                    d = v.h.d;
+
+                    try { u = new URL(u, d.baseURI).href; } catch (e) {}
+
+                    if (/^https?:\/\//i.test(d.URL))
+                        c = {...(this.requestModel.context(c) || {}), base: d.URL}
+                    ;
+                }
+
+                u = this.requestModel.url(u, c);
+
+                if (!(await this.requestModel.allow(u, c)))
+                    throw new Error('URL blocked ' + u)
+                ;
+
                 await v.h.set({t: {s: 'head'}, c: {s: null}}, e => {
                     const
                         po = v.h.d.createElement('script'),
@@ -82,7 +102,7 @@ module.exports = {
                             po.setAttribute(p[k], js[p[k]])
                     ;
 
-                    po.src = this.uiResolverModel.parseUrl(js.src);
+                    po.src = u;
 
                     e.appendChild(po);
 
