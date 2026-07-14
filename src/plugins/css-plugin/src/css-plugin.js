@@ -67,12 +67,24 @@ module.exports = {
 
         process: async function(v, css) {
             const s = this.state(v);
-            let u;
+            let c = v.c, d, u;
 
             if(!s.cache[css.href]) {
-                u = this.requestModel.url(this.uiResolverModel.parseUrl(css.href), v.c);
+                u = this.uiResolverModel.parseUrl(css.href);
 
-                if (!(await this.requestModel.allow(u, v.c)))
+                if (!this.requestModel.option(c, 'base', this.requestModel.base)) {
+                    d = v.h.d;
+
+                    try { u = new URL(u, d.baseURI).href; } catch (e) {}
+
+                    if (/^https?:\/\//i.test(d.URL))
+                        c = {...(this.requestModel.context(c) || {}), base: d.URL}
+                    ;
+                }
+
+                u = this.requestModel.url(u, c);
+
+                if (!(await this.requestModel.allow(u, c)))
                     throw new Error('URL blocked ' + u)
                 ;
 

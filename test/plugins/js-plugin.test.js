@@ -8,8 +8,11 @@ const { jTormRequestModel } = require('../../src/models/request-model/src/reques
 
 // A minimal view object: dev's document-model.set(v, fn) reads v.t.s / v.c.s,
 // so the fake set() mirrors that contract and runs the callback against <head>.
-function fakeView() {
-    const { window } = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
+function fakeView(html, url) {
+    const { window } = new JSDOM(
+        html || '<!DOCTYPE html><html><head></head><body></body></html>',
+        url ? { url } : undefined
+    );
     const doc = window.document;
     return {
         t: { s: 'body' },
@@ -90,6 +93,20 @@ test('js-plugin blocks an expanded external src before DOM injection', async () 
     await assert.rejects(
         () => jTormJsPlugin.process(v, { src: '@x/app.js' }),
         /URL blocked https:\/\/evil\.example\/x\.js/
+    );
+    assert.equal(v.h.d.querySelector('head script'), null);
+});
+
+test('js-plugin blocks a relative src resolved by an external document base', async () => {
+    setup();
+    const v = fakeView(
+        '<!DOCTYPE html><html><head><base href="https://evil.example/"></head><body></body></html>',
+        'https://app.example/page'
+    );
+
+    await assert.rejects(
+        () => jTormJsPlugin.process(v, { src: 'app.js' }),
+        /URL blocked https:\/\/evil\.example\/app\.js/
     );
     assert.equal(v.h.d.querySelector('head script'), null);
 });

@@ -6,8 +6,11 @@ const { jTormCssPlugin } = require('../../src/plugins/css-plugin/src/css-plugin.
 const { jTormCssMethod } = require('../../src/methods/css-method/src/css-method.js');
 const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
 
-function fakeView() {
-    const { window } = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
+function fakeView(html, url) {
+    const { window } = new JSDOM(
+        html || '<!DOCTYPE html><html><head></head><body></body></html>',
+        url ? { url } : undefined
+    );
     const doc = window.document;
     return {
         t: { s: 'body' },
@@ -107,6 +110,20 @@ test('css-plugin blocks an expanded external href before DOM injection', async (
     await assert.rejects(
         () => jTormCssPlugin.process(v, { href: '@x/theme.css' }),
         /URL blocked https:\/\/evil\.example\/x\.css/
+    );
+    assert.equal(v.h.d.querySelector('head link'), null);
+});
+
+test('css-plugin blocks a relative href resolved by an external document base', async () => {
+    setup();
+    const v = fakeView(
+        '<!DOCTYPE html><html><head><base href="https://evil.example/"></head><body></body></html>',
+        'https://app.example/page'
+    );
+
+    await assert.rejects(
+        () => jTormCssPlugin.process(v, { href: 'theme.css' }),
+        /URL blocked https:\/\/evil\.example\/theme\.css/
     );
     assert.equal(v.h.d.querySelector('head link'), null);
 });
