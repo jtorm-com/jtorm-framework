@@ -5,8 +5,9 @@
 
 > **Backlog update — 2026-07-14 (`dev` at `edd2de8`):** the three actionable
 > data-to-sink gaps are closed: S1 by PR #38, S2 by PR #39, and S3 by PR #40;
-> the `Thing.default` demo-junk leak is closed by PR #41. Next, take the
-> unknown-verb drift guard, then the binding-compilation performance slice.
+> the `Thing.default` demo-junk leak is closed by PR #41, and the unknown-verb
+> drift guard is closed by `@jtorm/handler@1.0.5`. Next, take the
+> binding-compilation performance slice.
 > Separate release gate: publish `@jtorm/regex-policy-model@1.0.0` before
 > `@jtorm/if-method@1.0.3`, and wire the model into both production host composition
 > roots before either host adopts the new method version.
@@ -143,9 +144,9 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 |---|---|---|---|---|
 | **P0** | Close S1 (`js{src}`/`css{href}` scheme filter) | ✅ Done — PR #38 | Arbitrary remote script if data-bound; worst reachable outcome | S |
 | **P0** | Fix `Thing.default` demo-junk leak | ✅ Done — PR #41 | Ships stray `<input>` into every bare-`Thing` render today | S |
-| **P1** | Registry-membership check for unknown verbs | **NEXT** | Closes the one-token hole in the "loud drift" promise | S |
+| **P1** | Registry-membership check for unknown verbs | ✅ Done — `@jtorm/handler@1.0.5` | Closes the one-token hole in the "loud drift" promise | S |
 | **P1** | Close S2 (`style`/`ping`) + S3 (`if{r:}` bound) | ✅ Done — PRs #39/#40 | CSS-exfil + SSR DoS under untrusted data | S–M |
-| **P1** | Compile bindings onto AST nodes | Ready after drift guard | Eliminates per-render re-parse; large perf win | M |
+| **P1** | Compile bindings onto AST nodes | **NEXT** | Eliminates per-render re-parse; large perf win | M |
 | **P2** | Precompile/manifest step for UI closures | Queued | Collapses 28→1 fetch; the architecture's biggest UX cost | L |
 | **P2** | Emit inline JSON-LD from typed model | Queued | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | Queued | Deletes the infinite-loop trap; makes dispatch an invariant | M |
