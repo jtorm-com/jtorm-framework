@@ -16,6 +16,7 @@
   "dependencies": {
     "@jtorm/data-parser": "^1.0.0",
     "@jtorm/handler": "^1.0.0",
+    "@jtorm/regex-policy-model": "^1.0.0",
     "@jtorm/types": "^1.0.0"
   }
 }

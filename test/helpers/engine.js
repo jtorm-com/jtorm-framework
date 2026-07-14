@@ -31,6 +31,7 @@ const { jTormDocumentModel } = require('../../src/models/document-model/src/docu
 const { jTormEventModel } = require('../../src/models/event-model/src/event-model.js');
 const { jTormLanguageModel } = require('../../src/models/language-model/src/language-model.js');
 const { jTormConfigModel } = require('../../src/models/config-model/src/config-model.js');
+const { jTormRegexPolicyModel } = require('../../src/models/regex-policy-model/src/regex-policy-model.js');
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
 // Fetch models + get verb (request transport seam — get boils via an injected transport)
@@ -132,6 +133,7 @@ jTormDocumentModel.errorHandler = jTormInsertMethod.errorHandler = jTormUiMethod
 jTormInsertMethod.sanitize = jTormGetMethod.sanitize = jTormWrapMethod.sanitize = jTormSwapMethod.sanitize = null;
 jTormAttrsMethod.tssParser = jTormViewModel.tssParser = jTormDataParser.tssParser = jTormTSSParser;
 jTormHandler.dataParser = jTormAttrsMethod.dataParser = jTormIfMethod.dataParser = jTormTextMethod.dataParser = jTormUiMethod.dataParser = jTormDataParser;
+jTormIfMethod.regexPolicyModel = jTormRegexPolicyModel;
 jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS this; text-method.js:23 needs it
 jTormTimeMethod.languageModel = jTormLanguageModel;
 jTormLanguageModel.configModel = jTormConfigModel;

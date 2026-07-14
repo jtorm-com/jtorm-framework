@@ -6,6 +6,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { render } = require('../helpers/engine.js');
 const { makeTssParser } = require('../helpers/parser.js');
+const { jTormIfMethod } = require('../../src/methods/if-method/src/if-method.js');
 
 const TSS = "p->if(d: show, v: 'yes')->attr { n: 'data-ok'; v: show; }";
 const REGEX_WORKER = path.join(__dirname, '../helpers/if-regex-worker.js');
@@ -103,6 +104,21 @@ test('if(r:) treats a quoted TSS value as a trusted regex', async () => {
   assert.equal((await render('<body><p>x</p></body>', t, { show: 'yesterday' })).body, '<p>x</p>');
 });
 
+test('if(r:) fails closed when the regex policy model is not configured', async (t) => {
+  const g = jTormIfMethod.regexPolicyModel;
+  t.after(() => { jTormIfMethod.regexPolicyModel = g; });
+  jTormIfMethod.regexPolicyModel = null;
+
+  await assert.rejects(
+    render(
+      '<body><p>x</p></body>',
+      "p->if(d: text, v: '^yes$', r: true)->attr { n: 'data-a'; v: '1'; }",
+      { text: 'yes' }
+    ),
+    /Regex policy model not configured/
+  );
+});
+
 test('if(r:) rejects model-derived regex operands', async () => {
   await assert.rejects(
     render(
@@ -150,47 +166,7 @@ test('if(r:) rejects malformed regex literals', async () => {
   );
 });
 
-test('if(r:) rejects syntax outside the supported micro-grammar', async () => {
-  await assert.rejects(
-    render(
-      '<body><p>x</p></body>',
-      "p->if(d: text, v: '^a*$', r: true)->attr { n: 'data-a'; v: '1'; }",
-      { text: 'a' }
-    ),
-    /Unsafe regex pattern/
-  );
-});
-
-test('if(r:) policy rejects every unsupported construct', async () => {
-  const patterns = [
-    '^a*$',
-    '^(?:a)$',
-    '^(?=a)a$',
-    '^(?!Other$).+',
-    '^(a)\\1$',
-    '^\\d+$',
-    '^[ab]$',
-    '^[9-0]$',
-    '^[\\x41]$',
-    '^a?b?c?$',
-    '^[0-9]+[0-9]+$',
-    '.+Z',
-    '^a|.+Z',
-    '^(((a)))$'
-  ];
-
-  for (const p of patterns)
-    await assert.rejects(
-      render(
-        '<body><p>x</p></body>',
-        `p->if(d: text, v: '${p}', r: true)->attr { n: 'data-a'; v: '1'; }`,
-        { text: 'a' }
-      ),
-      /Unsafe regex pattern/,
-      p
-    )
-  ;
-
+test('if(r:) rejects TSS braces before regex compilation', async () => {
   await assert.rejects(
     render(
       '<body><p>x</p></body>',
@@ -199,21 +175,6 @@ test('if(r:) policy rejects every unsupported construct', async () => {
     ),
     (e) => !/Invalid regular expression/.test(e.message),
     'TSS braces must fail before regex compilation'
-  );
-});
-
-test('if(r:) enforces the pattern bound before compilation', async () => {
-  const atPatternLimit = '^' + 'a'.repeat(254) + '$';
-  const overPatternLimit = '^' + 'a'.repeat(255) + '$';
-  const t = (p) => `p->if(d: text, v: '${p}', r: true)->attr { n: 'data-a'; v: '1'; }`;
-
-  assert.equal(
-    (await render('<body><p>x</p></body>', t(atPatternLimit), { text: 'a'.repeat(254) })).body,
-    '<p data-a="1">x</p>'
-  );
-  await assert.rejects(
-    render('<body><p>x</p></body>', t(overPatternLimit), { text: 'a'.repeat(255) }),
-    /Unsafe regex pattern/
   );
 });
 

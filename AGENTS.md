@@ -44,6 +44,10 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   compatibility-forwarding facade for its published helper/state surface. Hosts inject both models
   before configuring that facade; CSS/JS plugins inject the resolver directly. Do not fold these
   responsibilities back into the verb or add runtime imports between them.
+- **Regex validation and execution are one injected policy model.** `@jtorm/regex-policy-model`
+  owns the bounded `if(r:)` micro-grammar, input limits, native compilation, and matching;
+  `@jtorm/if-method` owns TSS-literal provenance and conditional flow. Hosts inject the policy
+  model. Do not move the grammar or regex sink back into the verb or add a runtime import.
 - **`schema-ui` follows schema.org first** — component data contracts should reuse schema.org
   types/properties and mapper composition before inventing local fields or per-type artifacts.
   Keep the shipped UI graph small: add a new `.tss` only for a real schema.org type/variant

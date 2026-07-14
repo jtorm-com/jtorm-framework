@@ -24,10 +24,17 @@ String values are literal substring checks. They are not regular expressions.
 Regular expression matching is opt-in via `r: true` and only accepts a single quoted TSS
 literal; model-derived or concatenated regex operands are rejected.
 
+The host injects the bounded regex policy model before configuring the method:
+
+```js
+jTormIfMethod.regexPolicyModel = jTormRegexPolicyModel;
+```
+
 ### Regular-expression subset
 
 `r: true` is a small validation-pattern language, not a general JavaScript-regex
-sanitizer. A pattern is limited to 256 UTF-16 code units and may contain:
+sanitizer. `@jtorm/regex-policy-model` owns validation and bounded native execution. A pattern
+is limited to 256 UTF-16 code units and may contain:
 
 - ASCII letters/digits and the literal characters `-`, `:`, and `/`; `.` is the
   wildcard, while literal dot/slash may be written as `\.` and `\/`;
@@ -35,8 +42,9 @@ sanitizer. A pattern is limited to 256 UTF-16 code units and may contain:
   class `[\x0A\x0D\u2028\u2029]`;
 - branch-boundary `^`/`$`, alternation, and capturing groups nested at most two deep;
 - `?` on an atom or a finite group with no inner quantifier, at most twice per pattern;
-- `+` on a class or `.` in a start-anchored branch, at most once per pattern and with
-  no top-level alternation. The shipped fixed-delimiter form
+- `+` on `.`, `[.]`, `[0-9]`, `[a-z]`, or `[A-Z]` in a start-anchored branch, at
+  most once per pattern and with no top-level alternation; the line-break class
+  cannot be quantified. The shipped fixed-delimiter form
   `^([0-9]+x[0-9]+)|(any)$` is the sole two-`+`/top-level-alternation exception;
 - the exact fixed-width negative lookahead `(?!ListItem$)`, only immediately after a
   branch-start `^`.
@@ -45,6 +53,8 @@ Everything else—including `*`, `{m,n}`, shorthand classes, backreferences, oth
 lookarounds, repeated groups, and non-capturing groups—is rejected before compilation.
 Each matched subject is limited to 1,024 UTF-16 code units and is rejected before
 matching when oversized. Rejections throw `Unsafe regex pattern` or `Unsafe regex input`.
+Missing or malformed host injection throws `Regex policy model not configured` before
+any pattern is compiled.
 
 
 ## Example
