@@ -2,6 +2,10 @@
 
 HTML Document wrapper.
 
+The wrapper retains the injected live document as `root`. URL-sensitive methods
+use it to evaluate detached fragment nodes against the page URL and base they will
+eventually join.
+
 ## Install
 ```js
 npm install @jtorm/document-model

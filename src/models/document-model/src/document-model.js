@@ -21,6 +21,9 @@ module.exports = {
                     ? this.windowModel.document.implementation.createHTMLDocument()
                     : this.windowModel.document,
 
+                // SECURITY: detached nodes validate URLs against the eventual page.
+                root: this.windowModel.document,
+
                 errorHandler: this.errorHandler,
 
                 head: function() {

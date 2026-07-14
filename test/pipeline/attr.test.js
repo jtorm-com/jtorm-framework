@@ -272,11 +272,13 @@ test('attr rejects ping when the document origin is opaque', async () => {
   );
 });
 
-test('attr preserves relative and absolute same-origin ping lists', async () => {
-  for (const value of [
-    '/audit',
-    './audit https://app.example/metrics',
-    'https://app.example:443/audit /metrics'
+test('attr canonicalizes relative and absolute same-origin ping lists', async () => {
+  for (const [value, expected] of [
+    ['/audit', 'https://app.example/audit'],
+    ['./audit https://app.example/metrics',
+      'https://app.example/audit https://app.example/metrics'],
+    ['https://app.example:443/audit /metrics',
+      'https://app.example/audit https://app.example/metrics']
   ]) {
     const { body } = await render(
       '<body><a>x</a></body>',
@@ -284,8 +286,53 @@ test('attr preserves relative and absolute same-origin ping lists', async () => 
       { value },
       'https://app.example/page'
     );
-    assert.equal(body, '<a ping="' + value + '">x</a>');
+    assert.equal(body, '<a ping="' + expected + '">x</a>');
   }
+});
+
+test('attr pins a ping destination before a later document base change', async () => {
+  const { body, head } = await render(
+    '<html><head><base></head><body><a>x</a></body></html>',
+    "a->attr { n: 'ping'; v: '/audit'; } base->attr { n: 'href'; v: 'https://evil.example/'; }",
+    {},
+    'https://app.example/page'
+  );
+  assert.equal(body, '<a ping="https://app.example/audit">x</a>');
+  assert.equal(head, '<base href="https://evil.example/">');
+});
+
+test('attr preserves a same-origin ping inside a detached each fragment', async () => {
+  const { body } = await render(
+    '<body><div class="a"></div></body>',
+    ".a->each { d: items; body->append { h: '<a>x</a>'; a->attr { n: 'ping'; v: '/audit'; } } }",
+    { items: [1] },
+    'https://app.example/page'
+  );
+  assert.equal(body, '<div class="a"><a ping="https://app.example/audit">x</a></div>');
+});
+
+test('attr rejects a cross-origin ping inside a detached each fragment', async () => {
+  await assert.rejects(
+    render(
+      '<body><div class="a"></div></body>',
+      ".a->each { d: items; body->append { h: '<a>x</a>'; a->attr { n: 'ping'; v: 'https://evil.example/collect'; } } }",
+      { items: [1] },
+      'https://app.example/page'
+    ),
+    /Unsafe attribute ping/
+  );
+});
+
+test('attr rejects a detached ping resolved by an external live document base', async () => {
+  await assert.rejects(
+    render(
+      '<html><head><base href="https://evil.example/"></head><body><div class="a"></div></body></html>',
+      ".a->each { d: items; body->append { h: '<a>x</a>'; a->attr { n: 'ping'; v: 'collect'; } } }",
+      { items: [1] },
+      'https://app.example/page'
+    ),
+    /Unsafe attribute ping/
+  );
 });
 
 test('attr rejects unsafe final style and ping compositions', async () => {
@@ -337,7 +384,8 @@ test('attr preserves safe final style and ping append/prepend compositions', asy
     { value: '/first' },
     'https://app.example/page'
   );
-  assert.equal(ping.body, '<a ping="/first /second">x</a>');
+  assert.equal(ping.body,
+    '<a ping="https://app.example/first https://app.example/second">x</a>');
 });
 
 test('attrs delegates style and ping safety to attr', async () => {
@@ -362,7 +410,7 @@ test('attrs delegates style and ping safety to attr', async () => {
     { style: 'color:#123;', ping: '/audit' },
     'https://app.example/page'
   );
-  assert.equal(body, '<a style="color:#123;" ping="/audit">x</a>');
+  assert.equal(body, '<a style="color:#123;" ping="https://app.example/audit">x</a>');
 });
 
 test('attr on a zero-match selector throws via the error-handler (characterizes #14)', async () => {

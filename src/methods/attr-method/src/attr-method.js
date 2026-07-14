@@ -37,7 +37,7 @@ module.exports = {
          * @param {ViewModel} v
          */
         handle: async function (v) {
-            const s = this;
+            const s = this, d = v.h.root;
 
             await v.h.set(v, function (e) {
                 if (v.d.v) {
@@ -52,9 +52,9 @@ module.exports = {
                     ;
 
                     if (v.d.m === 'p')
-                        s.set(e, v.d.n, v.d.v + (v.d.ns ? tV : (tV ? ' ' + tV : '')))
+                        s.set(e, v.d.n, v.d.v + (v.d.ns ? tV : (tV ? ' ' + tV : '')), d)
                     ; else if (v.d.m === 'a')
-                        s.set(e, v.d.n, (v.d.ns ? tV : (tV ? tV + ' ' : '')) + v.d.v)
+                        s.set(e, v.d.n, (v.d.ns ? tV : (tV ? tV + ' ' : '')) + v.d.v, d)
                     ; else if (v.d.m === 'r') {
                         const r = String(v.d.v).trim();
 
@@ -63,12 +63,12 @@ module.exports = {
                         ;
 
                         if (tV)
-                            s.set(e, v.d.n, tV)
+                            s.set(e, v.d.n, tV, d)
                         ; else
                             s.del(e, v.d.n)
                         ;
                     } else
-                        s.set(e, v.d.n, v.d.v)
+                        s.set(e, v.d.n, v.d.v, d)
                     ;
                 } else if (v.d.m === 'r')
                     s.del(e, v.d.n)
@@ -82,6 +82,7 @@ module.exports = {
             return e.getAttribute(n);
         },
 
+        // SECURITY: explicit color micro-grammar, not general CSS sanitization.
         style: function (v) {
             let d = v.split(';');
 
@@ -95,31 +96,51 @@ module.exports = {
             );
         },
 
-        ping: function (e, v) {
-            let d = e.ownerDocument,
+        // SECURITY: resolve and pin every target against the live HTTP(S) document.
+        ping: function (e, v, d) {
+            let a = [],
+                b,
                 u
             ;
 
-            try { d = new URL(d.URL); } catch (e) { return false; }
+            d = d || e.ownerDocument;
+
+            try {
+                b = d.baseURI;
+                d = new URL(d.URL);
+            } catch (e) {
+                return false;
+            }
 
             if (!/^https?:$/.test(d.protocol))
                 return false
             ;
 
-            return v.trim().split(/\s+/).filter(Boolean).every(p => {
-                try { u = new URL(p, e.ownerDocument.baseURI); } catch (e) { return false; }
+            for (let p of v.trim().split(/\s+/).filter(Boolean)) {
+                try { u = new URL(p, b); } catch (e) { return false; }
 
-                return /^https?:$/.test(u.protocol) && u.origin === d.origin;
-            });
+                if (!/^https?:$/.test(u.protocol) || u.origin !== d.origin)
+                    return false
+                ;
+
+                a.push(u.href);
+            }
+
+            return a;
         },
 
-        safe: function (e, n, v) {
+        safe: function (e, n, v, d) {
             const a = n.trim().toLowerCase();
+            let p;
+
+            if (a === 'ping')
+                p = this.ping(e, v, d)
+            ;
 
             if (
                 /^on/.test(a)
                 || (a === 'style' && !this.style(v))
-                || (a === 'ping' && !this.ping(e, v))
+                || (a === 'ping' && !p)
                 || (a === 'srcdoc' && (!e.hasAttribute('sandbox') || /\ballow-scripts\b/i.test(e.getAttribute('sandbox'))))
                 || (a === 'sandbox' && e.hasAttribute('srcdoc') && /\ballow-scripts\b/i.test(v))
                 || (
@@ -129,9 +150,11 @@ module.exports = {
             )
                 throw new Error('Unsafe attribute ' + n)
             ;
+
+            return p;
         },
 
-        set: function (e, n, v) {
+        set: function (e, n, v, d) {
             n = String(n);
 
             if (v === true)
@@ -140,7 +163,12 @@ module.exports = {
                 v = String(v)
             ;
 
-            this.safe(e, n, v);
+            const p = this.safe(e, n, v, d);
+
+            if (p)
+                v = p.join(' ')
+            ;
+
             e.setAttribute(n, v);
         },
 
