@@ -1,0 +1,137 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->data(
+    price: price,
+    priceCurrency: priceCurrency,
+    availability: availability,
+    url: url
+)
+->data(availabilityLabel: '')
+->ui {
+    c: '@e.div';
+    t: '0';
+
+    div {
+        ->attr {
+            n: 'class';
+            v: 'offer';
+        }
+
+        ->data(html: price)
+        ->append
+        ->ui {
+            c: '@e.span';
+
+            span {
+                ->attr {
+                    n: 'class';
+                    v: 'price';
+                }
+
+                ->prepend {
+                    t: ' ';
+                }
+            }
+        }
+
+        ->if(d: priceCurrency)
+        ->data(html: ' ' + priceCurrency)
+        ->append
+        ->ui {
+            c: '@e.span';
+
+            span->attr {
+                n: 'class';
+                v: 'price-currency';
+            }
+        }
+
+        ->if(d: availability, v: '[\x0A\x0D\u2028\u2029]', r: true) {
+            ->else {
+                ->if(d: availability, v: '^https?://schema[.]org/InStock$', r: true)->text {
+                    availabilityLabel: 'In stock';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/OutOfStock$', r: true)->text {
+                    availabilityLabel: 'Out of stock';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/BackOrder$', r: true)->text {
+                    availabilityLabel: 'Back order';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/Discontinued$', r: true)->text {
+                    availabilityLabel: 'Discontinued';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/InStoreOnly$', r: true)->text {
+                    availabilityLabel: 'In-store only';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/LimitedAvailability$', r: true)->text {
+                    availabilityLabel: 'Limited availability';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/MadeToOrder$', r: true)->text {
+                    availabilityLabel: 'Made to order';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/OnlineOnly$', r: true)->text {
+                    availabilityLabel: 'Online only';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/PreOrder$', r: true)->text {
+                    availabilityLabel: 'Pre-order';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/PreSale$', r: true)->text {
+                    availabilityLabel: 'Pre-sale';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/Reserved$', r: true)->text {
+                    availabilityLabel: 'Reserved';
+                }
+
+                ->if(d: availability, v: '^https?://schema[.]org/SoldOut$', r: true)->text {
+                    availabilityLabel: 'Sold out';
+                }
+            }
+        }
+
+        ->data(html: availabilityLabel || availability)
+        ->append
+        ->ui {
+            c: '@e.span';
+
+            span {
+                ->attr {
+                    n: 'class';
+                    v: 'availability';
+                }
+
+                ->prepend {
+                    t: ' ';
+                }
+            }
+        }
+
+        ->if(d: url)
+        ->data(href: url)
+        ->text(html: 'Offer')
+        ->append
+        ->ui {
+            c: '@e.a';
+
+            a {
+                ->attr {
+                    n: 'class';
+                    v: 'offer-url';
+                }
+
+                ->prepend {
+                    t: ' ';
+                }
+            }
+        }
+    }
+}

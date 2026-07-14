@@ -348,6 +348,26 @@ module.exports = {
                 }
             },
 
+            Product: {
+                default: {
+                    ui: {
+                        c: 'Thing.item'
+                    },
+                    t: ['@s/product/product-default.tss']
+                },
+                item: {
+                    ui: {
+                        c: 'Product.default'
+                    },
+                    t: ['@s/product/product-item.tss']
+                }
+            },
+            Offer: {
+                default: {
+                    t: ['@s/offer/offer-default.tss']
+                }
+            },
+
             ImageObject: {
                 default: {
                     t: ['@s/image-object/image-object-default.tss']
