@@ -20,3 +20,12 @@ test('text alone only preps the model — it does NOT write to the DOM (characte
   );
   assert.equal(body, '<span>z</span>');
 });
+
+test('text declarations evaluate sequentially against earlier model writes', async () => {
+  const { body } = await render(
+    '<body><span>z</span></body>',
+    'span->text(first: source, second: first)->inner { h: second; }',
+    { source: 'updated' }
+  );
+  assert.equal(body, '<span>updated</span>');
+});

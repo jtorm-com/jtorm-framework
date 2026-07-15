@@ -14,6 +14,22 @@ test('awaits text BEFORE parsing (bug: a Promise must not reach tssParser.handle
   assert.deepEqual(tree[0].p, { color: 'red' });
 });
 
+test('cache hits return the same parsed AST and node identities', async () => {
+  tm.c = new Map(); tm.max = 512;
+  tm.tssParser = makeTssParser();
+  let fetches = 0;
+  tm.requestModel = {
+    get: () => ({ text: async () => { fetches++; return "a->attr { n: 'data-x'; v: value; }"; } })
+  };
+
+  const a = await tm.get('/same.tss');
+  const b = await tm.get('/same.tss');
+
+  assert.strictEqual(b, a);
+  assert.strictEqual(b[0], a[0]);
+  assert.equal(fetches, 1);
+});
+
 test('bounds the cache to `max` entries — evicts oldest, no unbounded growth', async () => {
   tm.c = new Map(); tm.max = 3;
   tm.tssParser = { handle: (t) => t };

@@ -21,10 +21,11 @@ module.exports = {
          * @param {ViewModel} v
          */
         handle: async function (v) {
+            const d = this.dataParser, b = d.bindings(v.t, v.t.p, v._);
             let x, k;
 
             for (k in v.t.p) {
-                x = this.dataParser.parse(v.m, v.t.p[k]);
+                x = d.evaluate(v.m, b[k]);
 
                 v.m[k] = this.languageModel.get(x ? x : v.t.p[k], v.c.locale);
             }

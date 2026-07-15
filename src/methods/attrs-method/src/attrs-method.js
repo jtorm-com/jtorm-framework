@@ -32,16 +32,54 @@ module.exports = {
             return t;
         },
 
+        bindings: function (v, t, c) {
+            const
+                d = this.dataParser,
+                b = d.cache(v.t),
+                q = this.tssParser.regexes.quotes,
+                k = [this.separator, q.source, q.flags].join('\u0000'),
+                p = {n: t.p.n, v: t.p.v, m: t.p.m}
+            ;
+            let x = b.x.as, r, i;
+
+            if (
+                x
+                && x.k === k
+                && x.p.n === p.n
+                && x.p.v === p.v
+                && x.p.m === p.m
+            )
+                return x
+            ;
+
+            r = {k: k, p: p, n: p.n.split(this.separator), v: p.v.split(this.separator), d: []};
+            for (i in r.v)
+                r.d.push(r.v[i] ? d.compile(r.v[i]) : null)
+            ;
+
+            if (c)
+                b.x.as = r
+            ;
+
+            return r;
+        },
+
         /** @param {ViewModel} v */
         validate: function (v) {
             let t = this.parsed(v);
             v.d.parsed = t;
 
-            return (
+            const r = (
                 t.p.n
                 && (t.p.v || t.p.m === 'r')
                 && (!t.p.m || ['p', 'a', 'r'].indexOf(t.p.m) !== -1)
             );
+
+            if (r)
+                this.bindings(v, t, 1)
+            ;
+
+            return r;
         },
 
         /**
@@ -51,9 +89,9 @@ module.exports = {
         handle: async function (v) {
             let t = v.d.parsed,
                 k,
-                s = this.separator,
-                names = t.p.n.split(s),
-                values = t.p.v.split(s),
+                x = this.bindings(v, t),
+                names = x.n,
+                values = x.v,
                 tR = {
                     s: t.s,
                     m: 'attr'
@@ -69,7 +107,7 @@ module.exports = {
 
                 tD = {
                     n: names[k],
-                    v: this.dataParser.parse(v.m, values[k]) || values[k],
+                    v: this.dataParser.evaluate(v.m, x.d[k]) || values[k],
                     m: t.p.m
                 };
 

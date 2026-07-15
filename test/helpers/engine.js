@@ -269,9 +269,10 @@ function fixtureTransport(fixtures) {
  *
  * @param {string} [url] document URL (jsdom origin); some flows need an absolute base.
  * @param {object|null} [fixtures] { url: {json?, text?} } map → injected fetch transport for `get`.
+ * @param {number} [c] create-doc mode: `0` live SPA/PWA document, `1` detached SSR document.
  * @returns {Promise<{html:string, head:string, body:string}>} full-doc HTML, <head> and <body> innerHTML.
  */
-async function render(html, tss, data, url = 'http://localhost/', fixtures = null) {
+async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0) {
     const { window } = new JSDOM('', { url });
     jTormDocumentModel.windowModel = window;
     reset();
@@ -279,7 +280,7 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     // src/uis/** even when a boil supplies no data fixtures (a bare `->ui` still fetches).
     jTormRequestModel.transport = fixtureTransport(fixtures || {});
 
-    const v = await jTormViewModel.create(html, tss, data);
+    const v = await jTormViewModel.create(html, tss, data, c);
     await jTormEventModel.handle(v, 'before', 'view');
     const doc = await jTormHandler.handle(null, null, null, 1, v);
     const v2 = await jTormViewModel.create(doc, null, data, v.c);

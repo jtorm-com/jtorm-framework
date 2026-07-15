@@ -26,9 +26,16 @@ function lang() {
   lm.set('nl', 'Yesterday', 'Gisteren');
 }
 
+function dataParser() {
+  return {
+    bindings: t => t.p,
+    evaluate: (m, k) => m[k]
+  };
+}
+
 test('text uses v.c.locale when present', async () => {
   lang();
-  text.dataParser = { parse: (m, k) => m[k] };
+  text.dataParser = dataParser();
   text.languageModel = lm;
 
   const v = { t: { p: { label: 'key' } }, m: { key: 'greeting' }, c: { locale: 'nl-NL' } };
@@ -40,7 +47,7 @@ test('text uses v.c.locale when present', async () => {
 
 test('text falls back to the default language when v.c.locale is absent', async () => {
   lang();
-  text.dataParser = { parse: (m, k) => m[k] };
+  text.dataParser = dataParser();
   text.languageModel = lm;
 
   const v = { t: { p: { label: 'key' } }, m: { key: 'greeting' }, c: {} };

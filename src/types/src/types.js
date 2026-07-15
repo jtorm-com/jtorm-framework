@@ -18,12 +18,30 @@
  */
 
 /**
+ * A model-free compiled binding descriptor stored on a TSS node.
+ * @typedef {Object} BindingDescriptor
+ * @property {'a'|'p'|'v'} t descriptor type: append, model path, or literal value
+ * @property {Array<BindingDescriptor|null>|(string|number)[]|string|number|boolean} v descriptor data
+ * @property {number} [n] numeric-literal/model-key flag
+ */
+
+/**
+ * Grammar/raw-declaration-keyed compiled bindings for one TSS node.
+ * @typedef {Object} BindingCache
+ * @property {string} k effective data-parser grammar key
+ * @property {Array<[string,string|string[]]>} r ordered shallow declaration snapshot
+ * @property {?Object<string,BindingDescriptor|Array<BindingDescriptor|null>>} p compiled default declarations
+ * @property {Object<string,*>} x method-owner and auto-binding segments
+ */
+
+/**
  * A parsed TSS node produced by `tss-parser.handle()`.
  * @typedef {Object} TssNode
- * @property {string} s                  selector
- * @property {string|false} m            method name, or `false` when the rule has no `->method`
- * @property {Object<string,string>} p   declaration block (property → value)
- * @property {TssNode[]} c               nested child rules
+ * @property {string} s                           selector
+ * @property {string|false} m                     method name, or `false` when the rule has no `->method`
+ * @property {Object<string,string|string[]>} p   declaration block (property → value)
+ * @property {TssNode[]} c                        nested child rules
+ * @property {BindingCache} [b]                   model-free compiled binding cache
  */
 
 /**
