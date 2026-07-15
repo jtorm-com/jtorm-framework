@@ -12,7 +12,7 @@
 ## Resumption Context
 
 **Last Completed Phase:** 7 - Final Completion
-**Next Action:** Commit and run the GitHub delivery gate.
+**Next Action:** Complete green CI and clean current-head Codex review on ready PR #46.
 **Files Modified:** See the 28-file feature scope in `tmp/finish-task-files.txt`; the outcome ledger
 is appended by the finish gate.
 **Issues Found (not yet fixed):** None.
@@ -413,4 +413,4 @@ the rollback and preserves the existing waterfall.
 - [ ] Ready for production release
 
 **Last Completed Phase:** 7 - Final Completion
-**Next Action:** Commit, push, open the ready PR into `dev`, and run the project review loop.
+**Next Action:** Complete the green CI and clean current-head Codex review loop on ready PR #46.

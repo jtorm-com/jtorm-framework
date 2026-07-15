@@ -11,8 +11,8 @@
 
 **Last Completed Mode:** Implementation and scoped architecture/security review
 **Current Mode:** Delivery — GitHub PR gate
-**Next Action:** Commit the verified payload, open the ready PR into `dev`, and obtain green CI plus
-a clean Codex review against the current head.
+**Next Action:** Obtain green CI and a clean Codex review against the current head of ready PR #46
+into `dev`.
 **Files Created:**
 - `feature-reviews/ui-closure-manifest.md` - Feature-dev checkpoint and design record.
 - `feature-reviews/stride-ui-closure-manifest.md` - Implementation-linked STRIDE/PASTA record.
@@ -49,8 +49,8 @@ cycle detection made it green.
 **Context for Next Session:**
 The branch and local `dev` are based on merge commit `9dd480a` (PR #45). Implementation, 54-test
 focused verification, 476-test full-suite verification, typecheck, package/security/ratchet gates,
-host docs, 100/100 evaluation, and the PASTA red-team pass are complete. Only the commit and GitHub
-delivery loop remain.
+host docs, 100/100 evaluation, and the PASTA red-team pass are complete. The verified commits are
+published in ready PR #46; only its green CI/current-head Codex review loop remains.
 
 ---
 
