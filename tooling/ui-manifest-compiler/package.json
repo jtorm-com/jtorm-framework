@@ -1,0 +1,26 @@
+{
+  "name": "@jtorm/ui-manifest-compiler",
+  "description": "Deterministic static UI closure manifest compiler",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "main": "src/ui-manifest-compiler.js",
+  "bin": {
+    "jtorm-ui-manifest": "bin/jtorm-ui-manifest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm-framework.git",
+    "directory": "tooling/ui-manifest-compiler"
+  },
+  "dependencies": {
+    "@jtorm/data-parser": "^1.0.3",
+    "@jtorm/tss-parser": "^1.0.0",
+    "@jtorm/types": "^1.1.0",
+    "@jtorm/ui-manifest-model": "^1.0.0",
+    "@jtorm/ui-resolver-model": "^1.0.0"
+  }
+}

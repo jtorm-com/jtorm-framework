@@ -31,7 +31,7 @@ test('prepack emits a consumable .d.ts that exports the typedefs', () => {
       '--rootDir', path.join(PKG_DIR, 'src'), '--outDir', out,
       path.join(PKG_DIR, 'src', 'types.js')], { stdio: 'pipe' });
     const dts = fs.readFileSync(path.join(out, 'types.d.ts'), 'utf8');
-    for (const t of ['ViewModel', 'ViewIO', 'ViewContext', 'ViewLayerContext', 'ViewUiCacheContext', 'ViewRequestContext', 'ViewCssContext', 'ViewJsContext', 'TssNode', 'UiDependency', 'UiArtifact', 'UiCall', 'UiDescriptor', 'UiPackage', 'UiResolution', 'Method'])
+    for (const t of ['ViewModel', 'ViewIO', 'ViewContext', 'ViewLayerContext', 'ViewUiCacheContext', 'ViewUiManifestContext', 'ViewRequestContext', 'ViewCssContext', 'ViewJsContext', 'TssNode', 'UiDependency', 'UiArtifact', 'UiCall', 'UiDescriptor', 'UiPackage', 'UiResolution', 'JsonDepth', 'JsonValue', 'UiManifestDescriptor', 'UiManifestRoot', 'UiManifestCompilerRoot', 'UiManifestUi', 'UiManifestDynamic', 'UiManifestAsset', 'UiManifestConfig', 'UiManifestDocument', 'UiManifestPreparedIndex', 'UiManifestSourceRequest', 'UiManifestSourceResult', 'UiManifestSourceAdapter', 'UiManifestCompilerConfig', 'UiManifestCompileResult', 'UiManifestDigest', 'Method'])
       assert.match(dts, new RegExp('export type ' + t + '\\b'),
         t + ' must be an exported type so the import specifier resolves downstream');
     assert.match(dts, /locale\?: string \| null;/,
@@ -42,6 +42,30 @@ test('prepack emits a consumable .d.ts that exports the typedefs', () => {
       'ViewContext must expose optional js plugin state');
     assert.match(dts, /request\?: ViewRequestContext;/,
       'ViewContext must expose optional request model state');
+    assert.match(dts, /manifest\?: ViewUiManifestContext;/,
+      'ViewContext must expose optional root-local UI manifest state');
+    assert.match(dts, /promise\?: Promise<void> \| null;/,
+      'manifest preparation state must allow the runtime failure cleanup sentinel');
+    const jd = dts.match(/export type JsonDepth = \[([^\]]+)\];/);
+    assert.ok(jd, 'manifest values must expose their bounded recursive depth');
+    assert.equal(jd[1].split(',').filter((v) => v.trim() === 'unknown').length, 128,
+      'manifest value types must match the runtime 128-level nesting limit');
+    const js = dts.slice(dts.indexOf('export type JsonValue<'), dts.indexOf('\n/**', dts.indexOf('export type JsonValue<')));
+    assert.match(js, /export type JsonValue<D = JsonDepth>/,
+      'manifest values must use the shared runtime depth counter by default');
+    assert.match(js, /D extends readonly \[unknown, \.\.\.infer R\]/,
+      'manifest values must consume one nesting level recursively');
+    assert.match(js, /JsonValue<R>\[\] \| \{\n    \[key: string\]: JsonValue<R>;/,
+      'manifest arrays and objects must recursively contain JSON-safe values');
+    assert.doesNotMatch(js, /\bany\b/,
+      'manifest values must stay recursively JSON-safe without any');
+    assert.match(dts, /uis: UiManifestUi\[\];/,
+      'wire config must not require the build-only UiPackage.mapper field');
+    const cs = dts.indexOf('export type UiManifestCompilerConfig =');
+    assert.ok(cs >= 0, 'compiler config must be exported');
+    const compiler = dts.slice(cs, dts.indexOf('\n};', cs) + 3);
+    assert.match(compiler, /roots: UiManifestCompilerRoot\[\];/,
+      'compiler roots must expose the runtime-supported default framework input');
   } finally {
     fs.rmSync(out, { recursive: true, force: true });
   }

@@ -74,3 +74,37 @@ test('get-method passes the render context to fetched content models', async () 
     gm.models = m;
   }
 });
+test('get-method prefers a manifest hit and delegates only an explicit miss', async () => {
+  const models = gm.models;
+  const manifest = gm.manifest;
+  const context = { request: { tenant: 'a' } };
+  const seen = [];
+
+  try {
+    gm.manifest = {
+      get: async (type, request, ctx) => {
+        seen.push(['manifest', type, request, ctx]);
+        return request === '/packed.html' ? '' : undefined;
+      }
+    };
+    gm.models = {
+      html: {
+        get: async (request, ctx) => {
+            seen.push(['transport', 'html', request, ctx]);
+            return 'transport';
+        }
+      }
+    };
+
+    assert.equal(await gm.get('html', '/packed.html', context), '');
+      assert.equal(await gm.get('html', '/transport.html', context), 'transport');
+    assert.deepEqual(seen, [
+      ['manifest', 'html', '/packed.html', context],
+        ['manifest', 'html', '/transport.html', context],
+        ['transport', 'html', '/transport.html', context]
+    ]);
+  } finally {
+    gm.models = models;
+    gm.manifest = manifest;
+  }
+});
