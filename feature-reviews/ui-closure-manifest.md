@@ -26,12 +26,13 @@ into `dev`.
 - Package/root READMEs and `AGENTS.md` host/build/ownership contracts.
 - `feature-reviews/framework-architecture-review-2026-07-14.md` backlog status/evidence.
 
-**Tests Written:** 51 focused feature tests: 21 runtime-model, 24 compiler/CLI, five Product
+**Tests Written:** 52 focused feature tests: 21 runtime-model, 25 compiler/CLI, five Product
 pipeline, and one get overlay, plus generated declaration checks. The missing package/overlay and
 Product characterization were captured red before implementation; the later traversal-depth
 assertion was also captured red before adding harness instrumentation. Final fresh review found a
 cyclic render-context parent-chain hang; its subprocess timeout was captured red before bounded
-cycle detection made it green.
+cycle detection made it green. The delivery review loop also captured missing `pT.c` normalization
+red before matching the runtime compiler without mutating mapper descriptors.
 **External blockers/constraints:**
 - [x] PR #45 merged as `9dd480a`; the feature branch and local `dev` are synced, and the merged
   local/remote topic branches are cleaned up.
@@ -47,8 +48,8 @@ cycle detection made it green.
   verified with model-owned canonical UTF-8 plus injected native 32-byte SHA-256 crypto.
 
 **Context for Next Session:**
-The branch and local `dev` are based on merge commit `9dd480a` (PR #45). Implementation, 56-test
-focused verification, 478-test full-suite verification, typecheck, package/security/ratchet gates,
+The branch and local `dev` are based on merge commit `9dd480a` (PR #45). Implementation, 57-test
+focused verification, 479-test full-suite verification, typecheck, package/security/ratchet gates,
 host docs, 100/100 evaluation, and the PASTA red-team pass are complete. The verified commits are
 published in ready PR #46; only its green CI/current-head Codex review loop remains.
 

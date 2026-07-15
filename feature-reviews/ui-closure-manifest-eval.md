@@ -17,8 +17,8 @@
 is appended by the finish gate.
 **Issues Found (not yet fixed):** None.
 **Current Scores:** 100/100 confirmed after the independent verification loop.
-**Context for Next Session:** The scoped pre-PR evaluation is complete. Focused tests (56/56),
-`npm run typecheck`, `npm test` (478/478), package dry-runs, Semgrep, npm audit, source guards,
+**Context for Next Session:** The scoped pre-PR evaluation is complete. Focused tests (57/57),
+`npm run typecheck`, `npm test` (479/479), package dry-runs, Semgrep, npm audit, source guards,
 source-ratchet convergence, cleanup, and the tech-debt ratchet are green.
 
 ## Phase 1 - Claim and Discovery
@@ -240,17 +240,17 @@ Project AGENTS.md overrides the generic Bun/Elysia/DDD assumptions. The personas
 | Readability | 10/10 |
 | **Total** | **100/100** |
 
-Evidence: format/loading, graph compilation, existing fetch overlay, and atomic output each have one owner; runtime source remains import-free; canonical JSDoc is exact and escape-hatch-free; untrusted received text is bounded and fully validated; failures preserve identity and prior state; hashes/policy/Map/root isolation protect the trust boundaries; measured request/CPU/payload baselines are bounded; terse modules stay cohesive; 51 new behavior tests plus strengthened declaration checks cover success, failure, race, limit, and parity paths; host contracts and threat records explain every non-obvious decision.
+Evidence: format/loading, graph compilation, existing fetch overlay, and atomic output each have one owner; runtime source remains import-free; canonical JSDoc is exact and escape-hatch-free; untrusted received text is bounded and fully validated; failures preserve identity and prior state; hashes/policy/Map/root isolation protect the trust boundaries; measured request/CPU/payload baselines are bounded; terse modules stay cohesive; 52 new behavior tests plus strengthened declaration checks cover success, failure, race, limit, and parity paths; host contracts and threat records explain every non-obvious decision.
 
 **Last Completed Phase:** 4 - Code Quality and Scoring
 **Next Action:** Phase 4.5 tests and Phase 5 fresh verification loop
 
 ## Phase 4.5 - Fresh Test Gates
 
-- Focused feature verification: PASS, 56/56 across get overlay, runtime model, compiler/CLI,
+- Focused feature verification: PASS, 57/57 across get overlay, runtime model, compiler/CLI,
   Product pipeline, and generated declaration contracts.
 - Canonical JSDoc gate: PASS, `npm run typecheck`.
-- Full repository suite: PASS, 478/478 with the required quoted glob command from `AGENTS.md`.
+- Full repository suite: PASS, 479/479 with the required quoted glob command from `AGENTS.md`.
 - Publication dry-runs: PASS for `@jtorm/types@1.1.0`, `@jtorm/get-method@1.1.0`,
   `@jtorm/ui-manifest-model@1.0.0`, and `@jtorm/ui-manifest-compiler@1.0.0`; only intended files
   are packed and no generated declaration remains in the worktree.
@@ -316,6 +316,17 @@ ratchet reports zero findings.
   accepted.
 - Green proof: both red regressions, 24 focused owner/type tests, 56 focused feature tests,
   typecheck, and 478 full tests pass.
+
+### Current-head Codex finding 7 - Parent-target normalization parity
+
+- Red proof: a reachable mapper descriptor with a valid object-shaped `pT` and no explicit `c`
+  rendered through `ui-compiler-model` but failed manifest compilation at the scanner's child-array
+  guard.
+- Fix: manifest discovery now gives each object-shaped parent target a non-mutating scanner view,
+  preserving an existing child array and defaulting a missing/non-array one to `[]` exactly like
+  runtime `processComponent`.
+- Green proof: the isolated regression, 25 compiler tests, 57 focused feature tests, typecheck, and
+  479 full tests pass; the regression also locks that the mapper descriptor is not mutated.
 
 ### Fresh reliability matrix
 
@@ -412,9 +423,9 @@ preserving exact SSR/SPA output, runtime dependency injection, request policy, a
 
 | Category | Before | After | Delta |
 |---|---:|---:|---:|
-| Focused model/tooling/overlay behaviors | 0 | 46 | +46 |
+| Focused model/tooling/overlay behaviors | 0 | 47 | +47 |
 | Product pipeline behaviors | 0 | 5 | +5 |
-| **Repository total** | **427** | **478** | **+51** |
+| **Repository total** | **427** | **479** | **+52** |
 
 ### Code Quality Score
 

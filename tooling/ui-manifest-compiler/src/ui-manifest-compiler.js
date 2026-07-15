@@ -419,7 +419,12 @@ module.exports = {
                 await this.ui(d.ui, x, next)
             ;
             if (d.pT)
-                await this.scan(Array.isArray(d.pT) ? d.pT : [d.pT],
+                await this.scan((Array.isArray(d.pT) ? d.pT : [d.pT]).map(function (n) {
+                    if (n && typeof n === 'object' && !Array.isArray(n))
+                        return {...n, c: Array.isArray(n.c) ? n.c : []}
+                    ;
+                    return n;
+                }),
                     'mapper:' + id + ':' + v.c, '/pT', x, next)
             ;
 

@@ -730,6 +730,28 @@ test('compiler omits scalar falsy get and empty component edges like runtime val
   }
 });
 
+test('compiler normalizes a parent target without children like runtime compilation', async () => {
+  wire();
+  const descriptor = UI.mapper.Root.default;
+  const pT = { s: '.parent', m: 'get', p: { h: "'/parent.html'" } };
+  UI.mapper.Root.default = { pT };
+  TEXT['/parent.html'] = '<parent>';
+
+  try {
+    const cfg = config();
+    cfg.dynamicAllow = [];
+    const result = await compiler.compile(cfg);
+    assert.deepEqual(
+      result.manifest.assets.map(asset => asset.request),
+      ['/parent.html']
+    );
+    assert.equal(Object.hasOwn(pT, 'c'), false);
+  } finally {
+    UI.mapper.Root.default = descriptor;
+    delete TEXT['/parent.html'];
+  }
+});
+
 test('compiler treats unquoted numeric UI flags as static literals', async () => {
   wire();
   const descriptor = UI.mapper.Root.default;
