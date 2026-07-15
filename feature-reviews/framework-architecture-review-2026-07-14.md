@@ -148,8 +148,8 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P1** | Registry-membership check for unknown verbs | ✅ Done — `@jtorm/handler@1.0.5` | Closes the one-token hole in the "loud drift" promise | S |
 | **P1** | Close S2 (`style`/`ping`) + S3 (`if{r:}` bound) | ✅ Done — PRs #39/#40 | CSS-exfil + SSR DoS under untrusted data | S–M |
 | **P1** | Compile bindings onto AST nodes | ✅ Done — PR #44 | Eliminates per-render re-parse; large perf win | M |
-| **P2** | Precompile/manifest step for UI closures | 🚧 In review — PR #46 | Collapses 27 static fetches→1 cold/0 warm; exact dynamic edges stay on the existing path | L |
-| **P2** | Emit inline JSON-LD from typed model | Queued | Makes the headline SEO claim true | M |
+| **P2** | Precompile/manifest step for UI closures | ✅ Done — PR #46 | Collapses 27 static fetches→1 cold/0 warm; exact dynamic edges stay on the existing path | L |
+| **P2** | Emit inline JSON-LD from typed model | ✅ Done — `feature/inline-json-ld` | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | Queued | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | Queued | 4-way duplication; bundle + maintainability | M |
 | **P3** | Replace the parser (tokenizer + recursive descent) | Queued | Unblocks all future DSL work + real diagnostics | L |

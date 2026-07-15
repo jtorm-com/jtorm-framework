@@ -1,0 +1,17 @@
+{
+  "name": "@jtorm/json-ld-model",
+  "description": "jTorm bounded JSON-LD serialization policy model",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "main": "src/json-ld-model.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm-framework.git",
+    "directory": "src/models/json-ld-model"
+  },
+  "dependencies": {}
+}

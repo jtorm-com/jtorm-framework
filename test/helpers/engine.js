@@ -8,7 +8,7 @@
 // SOURCE OF TRUTH for the DI graph: ../../../nodejs-jtorm-ui-engine/bootstrap/jtorm.js
 // Deliberate deltas (see docs/superpowers/specs/2026-06-24-jtorm-full-pipeline-harness-design.md):
 //   - framework's own error-handler (not @jtorm/nodejs-error-handler)
-//   - no axios edge (request-model is native fetch); no plugins / mq-polyfill (v1)
+//   - no axios edge (request-model is native fetch); selected local plugins / no mq-polyfill
 //   - we wire textMethod.languageModel, which the engine bootstrap OMITS even
 //     though text-method.js:23 dereferences it (latent engine bug — flagged).
 
@@ -36,6 +36,7 @@ const { jTormRegexPolicyModel } = require('../../src/models/regex-policy-model/s
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
 const { jTormUiManifestModel } = require('../../src/models/ui-manifest-model/src/ui-manifest-model.js');
+const { jTormJsonLdModel } = require('../../src/models/json-ld-model/src/json-ld-model.js');
 // Fetch models + get verb (request transport seam — get boils via an injected transport)
 const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
 const { jTormDataModel } = require('../../src/models/data-model/src/data-model.js');
@@ -68,6 +69,7 @@ const { jTormMediatargetMethod } = require('../../src/methods/mediatarget-method
 const { jTormMediaqueryMethod } = require('../../src/methods/mediaquery-method/src/mediaquery-method.js');
 const { jTormUiCacheModel } = require('../../src/models/ui-cache-model/src/ui-cache-model.js');
 const { jTormUiCachePlugin } = require('../../src/plugins/ui-cache-plugin/src/ui-cache-plugin.js');
+const { jTormJsonLdPlugin } = require('../../src/plugins/json-ld-plugin/src/json-ld-plugin.js');
 // `layer` — deferred-fragment verb: layer-method stashes a child fragment via
 // layer-model, the layer-plugin replays it at the matching event phase (after.view
 // for site-navigation-element's active-link marking). Listed BEFORE ui-cache in
@@ -119,6 +121,7 @@ const methods = {
     replace: new InsertAlias('r'),
     inner: new InsertAlias('i')
 };
+const WIRED_PLUGINS = [jTormLayerPlugin, jTormJsonLdPlugin, jTormUiCachePlugin];
 
 // --- DI (mirrors bootstrap/jtorm.js `// DI` block, scoped to the v1 subset) ---
 jTormErrorHandler.util = util;
@@ -140,7 +143,7 @@ jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS th
 jTormTimeMethod.languageModel = jTormLanguageModel;
 jTormLanguageModel.configModel = jTormConfigModel;
 jTormAttrsMethod.attrMethod = jTormAttrMethod;
-jTormEventModel.plugins = [jTormLayerPlugin, jTormUiCachePlugin];
+jTormEventModel.plugins = WIRED_PLUGINS;
 jTormHandler.eventModel = jTormHandlerWrapper.eventModel = jTormEventModel;
 jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = jTormUiCompilerModel.methods = methods;
 jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormUiCompilerModel.viewModel = jTormViewModel;
@@ -179,6 +182,7 @@ jTormUiMethod.ui = { mapper: null }; // host UI-mapper override slot (no custom 
 jTormUiMethod.framework = 'schema';
 jTormUiCacheModel.saveModel = null;
 jTormUiCachePlugin.uiCacheModel = jTormUiCacheModel;
+jTormJsonLdPlugin.jsonLdModel = jTormJsonLdModel;
 // layer DI (mirrors context.js): method + plugin share the layer-model; the plugin
 // replays stashed fragments through the handler against a copied view. saveModel=null
 // → no persistence (parity with ui-cache-model).
@@ -202,13 +206,17 @@ jTormMediaqueryMethod.init();  // resolve matchMedia from windowModel
 jTormMediatargetMethod.init(); // build `current` targets (consumes mediaquery.m)
 jTormUiMethod.init();          // build the per-uis alias regexps from .uis
 jTormUiCacheModel.init();      // saveModel === null → no-op (parity with the engine)
-jTormEventModel.init();        // register uiCachePlugin into the event tree (plugins set above)
+jTormEventModel.init();        // register the configured plugins into the event tree
 jTormLanguageModel.setLanguage('en');
 
 const WIRED_METHODS = Object.keys(methods);
+const freshEvents = () => ({
+    before: { iteration: [], method: [], view: [] },
+    after: { iteration: [], method: [], view: [] }
+});
 
 /** Reset the mutable state of the WIRED singletons between boils. */
-function reset() {
+function reset(jsonLd = 1) {
     jTormTSSParser.tree = [];
     jTormTSSParser.pairs = [];
     jTormTSSParser.tss = '';
@@ -223,6 +231,10 @@ function reset() {
     jTormUiManifestModel.maxDepth = 128;
     jTormUiManifestModel.maxAssets = 8192;
     jTormUiManifestModel.maxMetadata = 65536;
+    jTormJsonLdModel.maxText = 1048576;
+    jTormJsonLdModel.maxValues = 262144;
+    jTormJsonLdModel.maxDepth = 128;
+    jTormJsonLdPlugin.jsonLdModel = jTormJsonLdModel;
     jTormUiManifestModel.requestModel = jTormRequestModel;
     jTormUiManifestModel.digest = async bytes => new Uint8Array(
         createHash('sha256').update(bytes).digest()
@@ -237,6 +249,9 @@ function reset() {
     jTormLayerModel.cid = null;
     jTormLayerModel.updated = 0;
     jTormLayerPlugin.currentCid = [];
+    jTormEventModel.event = freshEvents();
+    jTormEventModel.plugins = jsonLd ? WIRED_PLUGINS : WIRED_PLUGINS.filter(p => p !== jTormJsonLdPlugin);
+    jTormEventModel.init();
     jTormRequestModel.base = '';
     jTormRequestModel.timeout = 0;
     jTormRequestModel.transport = DEFAULT_TRANSPORT; // drop any per-render fixture override
@@ -298,9 +313,10 @@ function fixtureTransport(fixtures, metrics) {
  * @param {number} [c] create-doc mode: `0` live SPA/PWA document, `1` detached SSR document.
  * @param {{url:string,hash:string,mode:'required'|'optional'}[]|null} [manifests] ordered UI packs prepared after root creation and before events/handler.
  * @param {number} [warm] when truthy, repeat prepare on the same root and report its request delta.
+ * @param {{jsonLd?:boolean}|null} [options] harness plugin switches; JSON-LD is registered unless explicitly false.
  * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
  */
-async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0) {
+async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0, options = null) {
     const { window } = new JSDOM('', { url });
     const metrics = {
         requests: [],
@@ -311,7 +327,7 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
         handlerDepth: 0
     };
     jTormDocumentModel.windowModel = window;
-    reset();
+    reset(!options || options.jsonLd !== false);
     const handle = jTormHandler.handle;
     jTormHandler.handle = async function (...args) {
         metrics.depth++;
@@ -356,4 +372,4 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     }
 }
 
-module.exports = { render, reset, setSanitize, WIRED_METHODS, uisDiskPath };
+module.exports = { render, reset, setSanitize, WIRED_METHODS, WIRED_PLUGINS, uisDiskPath };

@@ -19,9 +19,10 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 - **`@jtorm/types`** has the repo's only build step: a `prepack` runs `tsc --emitDeclarationOnly` to
   generate its published `.d.ts` from the JSDoc (gitignored artifact; `typescript` is its devDep).
 - Full-pipeline harness: `test/helpers/engine.js`
-  (`render(html,tss,data,url,fixtures,c,manifests,warm)`), goldens in `test/pipeline/`. The optional
-  final arguments prepare UI manifests and expose transport request/byte metrics; `jsdom`+`lodash`
-  are devDeps, while the runtime stays dependency-free.
+  (`render(html,tss,data,url,fixtures,c,manifests,warm,options)`), goldens in `test/pipeline/`. The
+  optional final arguments prepare UI manifests, expose transport request/byte metrics, and let
+  compatibility tests unregister optional JSON-LD; `jsdom`+`lodash` are devDeps, while the runtime
+  stays dependency-free.
 
 ## Locked architecture — must hold (flag violations)
 - **Pure CommonJS; dependency-free runtime *code*** — the `src/` tree calls `require()` **nowhere**

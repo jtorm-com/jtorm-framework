@@ -8,6 +8,25 @@ We also believe there should be some consensus about generally known UI componen
 That combined, in feeding a template engine a schema markup that knows how to parse it based on its contents and desired UI framework, is what jTorm ultimately is trying to achieve.
 But also having the freedom to do something different.
 
+## Inline JSON-LD
+
+Hosts may opt into `@jtorm/json-ld-plugin` with an injected `@jtorm/json-ld-model` to publish the
+root schema.org-typed view model as one inline `application/ld+json` block after rendering. The
+plugin owns only `script[data-jtorm-json-ld]`, updates/removes stale owned blocks, and preserves
+hand-authored JSON-LD plus the existing external `.jsonld` alternate link.
+
+Plugin registration asserts that the root model is already a curated public presentation model.
+Unknown `@` controls such as `@meta`, `@config`, and `@template` are filtered recursively, but every
+ordinary key is published. Never pass raw API, session, or authentication records; keep
+authentication material in headers and project only authorized public fields before rendering.
+Use root `@meta.jsonLd: false` as a per-model kill switch.
+
+Serialization accepts strict plain JSON data, fails loud on accessors/cycles/exotic values, applies
+depth/value/1 MiB UTF-8 limits, and escapes HTML raw-text delimiters before DOM insertion. It uses
+`textContent`, adds no executable script or CSP relaxation, and mutates neither the model nor
+unmarked scripts. See the two package READMEs for exact DI wiring, limits, CSP behavior, and
+rollback steps.
+
 ## UI closure manifests
 
 Applications may precompile a trusted UI component closure with
