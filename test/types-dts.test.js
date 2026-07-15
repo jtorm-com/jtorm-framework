@@ -61,7 +61,10 @@ test('prepack emits a consumable .d.ts that exports the typedefs', () => {
       'manifest values must stay recursively JSON-safe without any');
     assert.match(dts, /uis: UiManifestUi\[\];/,
       'wire config must not require the build-only UiPackage.mapper field');
-    assert.match(dts, /roots: UiManifestCompilerRoot\[\];/,
+    const cs = dts.indexOf('export type UiManifestCompilerConfig =');
+    assert.ok(cs >= 0, 'compiler config must be exported');
+    const compiler = dts.slice(cs, dts.indexOf('\n};', cs) + 3);
+    assert.match(compiler, /roots: UiManifestCompilerRoot\[\];/,
       'compiler roots must expose the runtime-supported default framework input');
   } finally {
     fs.rmSync(out, { recursive: true, force: true });

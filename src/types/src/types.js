@@ -258,7 +258,7 @@
  * Trusted static compiler input.
  * @typedef {Object} UiManifestCompilerConfig
  * @property {string} id
- * @property {UiManifestRoot[]} roots
+ * @property {UiManifestCompilerRoot[]} roots
  * @property {Object} resolver
  * @property {Object} tssParser
  * @property {Object} dataParser

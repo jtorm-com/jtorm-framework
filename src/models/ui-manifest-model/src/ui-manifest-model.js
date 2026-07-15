@@ -606,13 +606,14 @@ module.exports = {
             if (t === 'tss' && Array.isArray(u)) {
                 a = u.map(function (n) { return String(n); });
                 if (a.some((n) => !i.assets.has(JSON.stringify([t, n])))) {
-                    if (!a.some((n) => this.own(i, n)))
+                    v = a.find((n) => !i.assets.has(JSON.stringify([t, n])) && this.own(i, n));
+                    if (!v)
                         return undefined
                     ;
                     for (k of a)
                         await this.allowed(k, c)
                     ;
-                    throw new Error('Manifest asset missing ' + t + ' ' + a.find((n) => !i.assets.has(JSON.stringify([t, n]))));
+                    throw new Error('Manifest asset missing ' + t + ' ' + v);
                 }
 
                 v = [];

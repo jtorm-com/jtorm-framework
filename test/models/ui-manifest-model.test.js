@@ -324,6 +324,13 @@ test('required namespace misses await policy while optional misses delegate unto
     ['allow', 'resolved:@s/missing.tss']
   ]);
 
+  calls.length = 0;
+  assert.equal(
+    await mm.get('tss', ['@s/a.tss', '/tenant.tss'], required),
+    undefined
+  );
+  assert.deepEqual(calls, []);
+
   const optional = {};
   await mm.prepare([
     { url: '/optional.json', hash: built.hash, mode: 'optional' }

@@ -300,6 +300,23 @@ ratchet reports zero findings.
 - Green proof: both isolated regressions, 45 owner tests, 56 focused tests, typecheck, and 478 full
   tests pass.
 
+### Current-head Codex findings 5-6 - Mixed TSS ownership and compiler root types
+
+- Finding 5 red proof: a required pack containing `@s/a.tss` made the mixed request
+  `['@s/a.tss', '/tenant.tss']` throw for the unowned missing tenant artifact instead of delegating
+  the array unchanged to the model-bound request path.
+- Finding 5 fix: required-array ownership is now tested only on missing parts. An unowned-only miss
+  delegates without invoking pack policy, while a missing owned part remains fail-loud and names the
+  owned part after complete URL-policy mediation.
+- Finding 6 red proof: the generated `UiManifestCompilerConfig.roots` declaration used
+  `UiManifestRoot[]`, requiring `f` even though the compiler defaults an omitted framework to
+  `self`; the previous declaration assertion accidentally matched the wire-config root instead.
+- Finding 6 fix: compiler inputs now use `UiManifestCompilerRoot[]`, and the generated-declaration
+  regression is scoped to the compiler-config type so valid `{ c: 'Product.default' }` roots remain
+  accepted.
+- Green proof: both red regressions, 24 focused owner/type tests, 56 focused feature tests,
+  typecheck, and 478 full tests pass.
+
 ### Fresh reliability matrix
 
 | Path | Result | Evidence |
