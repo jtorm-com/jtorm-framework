@@ -14,6 +14,7 @@
 
 const util = require('node:util');
 const fs = require('node:fs');
+const { createHash } = require('node:crypto');
 const _ = require('lodash');
 const { JSDOM } = require('jsdom');
 const { uisDiskPath } = require('./uis-disk-path.js');
@@ -34,6 +35,7 @@ const { jTormConfigModel } = require('../../src/models/config-model/src/config-m
 const { jTormRegexPolicyModel } = require('../../src/models/regex-policy-model/src/regex-policy-model.js');
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
+const { jTormUiManifestModel } = require('../../src/models/ui-manifest-model/src/ui-manifest-model.js');
 // Fetch models + get verb (request transport seam — get boils via an injected transport)
 const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
 const { jTormDataModel } = require('../../src/models/data-model/src/data-model.js');
@@ -147,7 +149,12 @@ jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormWrapMet
 // fetch models + get verb DI (request transport seam) — get() resolves data/html/tss via the models
 jTormDataModel.requestModel = jTormHtmlModel.requestModel = jTormTssModel.requestModel = jTormRequestModel;
 jTormTssModel.tssParser = jTormTSSParser;
+jTormUiManifestModel.requestModel = jTormRequestModel;
+jTormUiManifestModel.digest = async bytes => new Uint8Array(
+    createHash('sha256').update(bytes).digest()
+);
 jTormGetMethod.models = { data: jTormDataModel, html: jTormHtmlModel, tss: jTormTssModel };
+jTormGetMethod.manifest = jTormUiManifestModel;
 // Gate-B DI (mirrors nodejs-context/src/context.js `ui` wiring, NOT its axios transport).
 jTormDataMethod.dataParser = jTormDataParser;
 jTormConfigMethod.configModel = jTormConfigModel;
@@ -209,6 +216,18 @@ function reset() {
     jTormDataModel.c = new Map(); // fetch-model caches (bounded-LRU singletons)
     jTormHtmlModel.c = new Map();
     jTormTssModel.c = new Map();
+    jTormUiManifestModel.c = new Map();
+    jTormUiManifestModel.max = 32;
+    jTormUiManifestModel.maxText = 1048576;
+    jTormUiManifestModel.maxValues = 262144;
+    jTormUiManifestModel.maxDepth = 128;
+    jTormUiManifestModel.maxAssets = 8192;
+    jTormUiManifestModel.maxMetadata = 65536;
+    jTormUiManifestModel.requestModel = jTormRequestModel;
+    jTormUiManifestModel.digest = async bytes => new Uint8Array(
+        createHash('sha256').update(bytes).digest()
+    );
+    jTormGetMethod.manifest = jTormUiManifestModel;
     jTormUiMethod.cache = {};          // resolved-component cache (singleton)
     jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache (nested store)
     jTormUiCacheModel.order = new Map(); // LRU recency tracker parallel to cache
@@ -243,12 +262,19 @@ function artifactText(fixtures, part) {
  * 1-part case. Any missing part → 404 (a miss → get throws → loud). get{d} (json) is
  * always single-artifact, so json resolves from the first part.
  */
-function fixtureTransport(fixtures) {
+function fixtureTransport(fixtures, metrics) {
     return async function (u) {
         const parts = String(u).split(',').map(s => s.replace(/^['"]|['"]$/g, ''));
         const texts = parts.map(p => artifactText(fixtures, p));
-        if (texts.some(t => t === null)) return { ok: false, status: 404 };
         const f0 = fixtures && fixtures[parts[0]];
+        metrics.requests.push(String(u));
+        metrics.requestDepths.push(metrics.depth);
+        if (texts.some(t => t === null)) return { ok: false, status: 404 };
+        metrics.bytes += Buffer.byteLength(
+            f0 && Object.prototype.hasOwnProperty.call(f0, 'json')
+                ? JSON.stringify(f0.json)
+                : texts.join('\n')
+        );
         return {
             ok: true,
             status: 200,
@@ -270,23 +296,64 @@ function fixtureTransport(fixtures) {
  * @param {string} [url] document URL (jsdom origin); some flows need an absolute base.
  * @param {object|null} [fixtures] { url: {json?, text?} } map → injected fetch transport for `get`.
  * @param {number} [c] create-doc mode: `0` live SPA/PWA document, `1` detached SSR document.
- * @returns {Promise<{html:string, head:string, body:string}>} full-doc HTML, <head> and <body> innerHTML.
+ * @param {{url:string,hash:string,mode:'required'|'optional'}[]|null} [manifests] ordered UI packs prepared after root creation and before events/handler.
+ * @param {number} [warm] when truthy, repeat prepare on the same root and report its request delta.
+ * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
  */
-async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0) {
+async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0) {
     const { window } = new JSDOM('', { url });
+    const metrics = {
+        requests: [],
+        warmRequests: [],
+        requestDepths: [],
+        bytes: 0,
+        depth: 0,
+        handlerDepth: 0
+    };
     jTormDocumentModel.windowModel = window;
     reset();
+    const handle = jTormHandler.handle;
+    jTormHandler.handle = async function (...args) {
+        metrics.depth++;
+        metrics.handlerDepth = Math.max(metrics.handlerDepth, metrics.depth);
+        try {
+            return await handle.apply(this, args);
+        } finally {
+            metrics.depth--;
+        }
+    };
     // Always install the combined transport: component artifacts are disk-served from
     // src/uis/** even when a boil supplies no data fixtures (a bare `->ui` still fetches).
-    jTormRequestModel.transport = fixtureTransport(fixtures || {});
+    jTormRequestModel.transport = fixtureTransport(fixtures || {}, metrics);
 
-    const v = await jTormViewModel.create(html, tss, data, c);
-    await jTormEventModel.handle(v, 'before', 'view');
-    const doc = await jTormHandler.handle(null, null, null, 1, v);
-    const v2 = await jTormViewModel.create(doc, null, data, v.c);
-    await jTormEventModel.handle(v2, 'after', 'view');
+    try {
+        const v = await jTormViewModel.create(html, tss, data, c);
+        if (manifests) {
+            await jTormUiManifestModel.prepare(manifests, v.c);
+            if (warm) {
+                const n = metrics.requests.length;
+                await jTormUiManifestModel.prepare(manifests, v.c);
+                metrics.warmRequests = metrics.requests.slice(n);
+            }
+        }
+        await jTormEventModel.handle(v, 'before', 'view');
+        const doc = await jTormHandler.handle(null, null, null, 1, v);
+        const v2 = await jTormViewModel.create(doc, null, data, v.c);
+        await jTormEventModel.handle(v2, 'after', 'view');
 
-    return { html: v2.h.html(), head: v2.h.head(), body: v2.h.body() };
+        return {
+            html: v2.h.html(),
+            head: v2.h.head(),
+            body: v2.h.body(),
+            requests: metrics.requests,
+            warmRequests: metrics.warmRequests,
+            requestDepths: metrics.requestDepths,
+            bytes: metrics.bytes,
+            handlerDepth: metrics.handlerDepth
+        };
+    } finally {
+        jTormHandler.handle = handle;
+    }
 }
 
 module.exports = { render, reset, setSanitize, WIRED_METHODS, uisDiskPath };

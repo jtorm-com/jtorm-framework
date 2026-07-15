@@ -3,11 +3,12 @@
 **Date:** 2026-07-14 · **Reviewer:** Claude Fable 5 (4-lens parallel deep-read + primary-file review)
 **Scope:** whole framework at `feature/schema-product-offer` (working tree as-is). Evidence cited `file:line`.
 
-> **Backlog update — 2026-07-14 (`dev` at `edd2de8`):** the three actionable
+> **Backlog update — 2026-07-15 (`dev` at `9dd480a`):** the three actionable
 > data-to-sink gaps are closed: S1 by PR #38, S2 by PR #39, and S3 by PR #40;
 > the `Thing.default` demo-junk leak is closed by PR #41, and the unknown-verb
-> drift guard is closed by `@jtorm/handler@1.0.5`. Next, take the
-> binding-compilation performance slice.
+> drift guard is closed by `@jtorm/handler@1.0.5`. Binding compilation landed
+> in PR #44; the precompile/manifest UI-closure slice is now in progress on
+> `feature/ui-closure-manifest`.
 > Separate release gate: publish `@jtorm/regex-policy-model@1.0.0` before
 > `@jtorm/if-method@1.0.3`, and wire the model into both production host composition
 > roots before either host adopts the new method version.
@@ -147,7 +148,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P1** | Registry-membership check for unknown verbs | ✅ Done — `@jtorm/handler@1.0.5` | Closes the one-token hole in the "loud drift" promise | S |
 | **P1** | Close S2 (`style`/`ping`) + S3 (`if{r:}` bound) | ✅ Done — PRs #39/#40 | CSS-exfil + SSR DoS under untrusted data | S–M |
 | **P1** | Compile bindings onto AST nodes | ✅ Done — PR #44 | Eliminates per-render re-parse; large perf win | M |
-| **P2** | Precompile/manifest step for UI closures | **NEXT** | Collapses 28→1 fetch; the architecture's biggest UX cost | L |
+| **P2** | Precompile/manifest step for UI closures | ✅ Implemented — delivery PR pending | Collapses 27 static fetches→1 cold/0 warm; exact dynamic edges stay on the existing path | L |
 | **P2** | Emit inline JSON-LD from typed model | Queued | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | Queued | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | Queued | 4-way duplication; bundle + maintainability | M |

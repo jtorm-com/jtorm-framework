@@ -7,6 +7,7 @@ module.exports = {
     jTormGetMethod: {
         // DI
         // models[],
+        // manifest
         // sanitize
 
         params: ['h', 't', 'd', 'a'],
@@ -17,7 +18,16 @@ module.exports = {
         },
 
         get: async function(t, u, c) {
-            let r = await this.models[t].get(u, c);
+            let r;
+
+            if (this.manifest) {
+                r = await this.manifest.get(t, u, c);
+                if (r !== undefined)
+                    return r
+                ;
+            }
+
+            r = await this.models[t].get(u, c);
 
             return r; // raw model result (data: JSON, html: text, tss: parsed tree)
         },

@@ -97,6 +97,191 @@
  * @property {string} f
  */
 
+/** @typedef {[unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown,unknown]} JsonDepth */
+
+/**
+ * JSON-safe manifest data bounded to the runtime's 128-level nesting limit.
+ * The generic counter keeps TypeScript from eagerly rejecting recursive JSDoc.
+ * @template [D=JsonDepth]
+ * @typedef {D extends readonly [unknown, ...infer R] ? null|boolean|number|string|JsonValue<R>[]|{[key:string]: JsonValue<R>} : null|boolean|number|string} JsonValue
+ */
+
+/**
+ * One host-selected runtime manifest.
+ * @typedef {Object} UiManifestDescriptor
+ * @property {string} url
+ * @property {string} hash
+ * @property {'required'|'optional'} mode
+ */
+
+/**
+ * One static component root and its UI usage flags.
+ * @typedef {Object} UiManifestRoot
+ * @property {string} c
+ * @property {string} f
+ * @property {number|string} [t]
+ * @property {number|string} [h]
+ * @property {number|string} [m]
+ */
+
+/**
+ * Compiler root input before default framework and usage flags are materialized.
+ * @typedef {Object} UiManifestCompilerRoot
+ * @property {string} c
+ * @property {string} [f]
+ * @property {number|string} [t]
+ * @property {number|string} [h]
+ * @property {number|string} [m]
+ */
+
+/**
+ * Model-free UI package identity serialized into a manifest.
+ * @typedef {Object} UiManifestUi
+ * @property {string} id
+ * @property {string} alias
+ * @property {string} framework
+ * @property {string} [url]
+ * @property {Object<string,string>} [mapperAlias]
+ */
+
+/**
+ * Ordered method metadata used for implicit leaf bindings.
+ * @typedef {Object} UiManifestMethod
+ * @property {string} id
+ * @property {string[]} params
+ */
+
+/**
+ * A model-bound get/ui edge that static discovery cannot follow.
+ * @typedef {Object} UiManifestDynamic
+ * @property {string} from
+ * @property {string} at
+ * @property {string} param
+ * @property {string} type
+ * @property {string|string[]} binding
+ * @property {boolean} implicit
+ */
+
+/**
+ * One model-free packed fetch value.
+ * @template [D=JsonDepth]
+ * @typedef {Object} UiManifestAsset
+ * @property {'data'|'html'|'tss'} type
+ * @property {string} request
+ * @property {string} valueHash
+ * @property {JsonValue<D>} value
+ */
+
+/**
+ * Hash-bound manifest build configuration.
+ * @typedef {Object} UiManifestConfig
+ * @property {string} default
+ * @property {string} framework
+ * @property {UiManifestCompilerRoot[]} roots
+ * @property {UiManifestUi[]} uis
+ * @property {string[]} namespaces
+ * @property {UiManifestMethod[]} methods
+ * @property {string[]} [mediatargets]
+ * @property {UiManifestDynamic[]} dynamicAllow
+ * @property {Object<string,string|number|boolean>} toolchain
+ * @property {Object<string,number>} [limits]
+ */
+
+/**
+ * UI closure manifest wire document.
+ * @typedef {Object} UiManifestDocument
+ * @property {'@jtorm/ui-manifest'} format
+ * @property {1} version
+ * @property {string} id
+ * @property {string} hash
+ * @property {UiManifestConfig} config
+ * @property {UiManifestAsset[]} assets
+ * @property {UiManifestDynamic[]} dynamic
+ * @property {{id:string,hash:string}[]} mappers
+ * @property {{id:string,hash:string,bytes:number}[]} sources
+ */
+
+/**
+ * Immutable conflict token plus cached parsed value.
+ * @template [D=JsonDepth]
+ * @typedef {Object} UiManifestPreparedAsset
+ * @property {JsonValue<D>} value
+ * @property {string} valueHash
+ */
+
+/**
+ * Atomically installed render-root lookup state.
+ * @typedef {Object} UiManifestPreparedIndex
+ * @property {Map<string,UiManifestPreparedAsset>} assets
+ * @property {string[][]} required
+ */
+
+/**
+ * Root-local prepare generation and installed index.
+ * @typedef {Object} ViewUiManifestContext
+ * @property {number} generation
+ * @property {UiManifestPreparedIndex} [index]
+ * @property {?string} [key]
+ * @property {?Promise<void>} [promise]
+ */
+
+/**
+ * Type-tagged source request from the build compiler.
+ * @typedef {Object} UiManifestSourceRequest
+ * @property {'data'|'html'|'tss'} type
+ * @property {string} request
+ */
+
+/**
+ * Trusted source adapter result: raw bytes are fingerprinted; text is parsed.
+ * @typedef {Object} UiManifestSourceResult
+ * @property {string} id
+ * @property {Uint8Array} raw
+ * @property {string} text
+ */
+
+/**
+ * Trusted build-time source adapter.
+ * @typedef {Object} UiManifestSourceAdapter
+ * @property {string} version
+ * @property {(request:UiManifestSourceRequest)=>Promise<UiManifestSourceResult>} read
+ */
+
+/**
+ * Native SHA-256 adapter; the model owns UTF-8 and lowercase string formatting.
+ * @callback UiManifestDigest
+ * @param {Uint8Array} bytes
+ * @returns {Promise<Uint8Array>}
+ */
+
+/**
+ * Trusted static compiler input.
+ * @typedef {Object} UiManifestCompilerConfig
+ * @property {string} id
+ * @property {UiManifestRoot[]} roots
+ * @property {Object} resolver
+ * @property {Object} tssParser
+ * @property {Object} dataParser
+ * @property {Object<string,Method>} methods
+ * @property {UiPackage[]} uis
+ * @property {UiManifestSourceAdapter} source
+ * @property {string[]} namespaces
+ * @property {UiManifestDynamic[]} dynamicAllow
+ * @property {UiManifestCompilerRoot[]} [extraRoots]
+ * @property {string[]} [mediatargets]
+ * @property {Object<string,string|number|boolean>} toolchain
+ * @property {Object<string,number>} [limits]
+ */
+
+/**
+ * Deterministic build output.
+ * @typedef {Object} UiManifestCompileResult
+ * @property {UiManifestDocument} manifest
+ * @property {string} json
+ * @property {string} hash
+ * @property {string} filename
+ */
+
 /**
  * Render-context flags on `v.c`.
  * @typedef {Object} ViewLayerContext
@@ -149,6 +334,7 @@
  * @property {ViewContext} [p] parent/root render context for detached fragment state
  * @property {ViewLayerContext} [layer] per-render deferred layer state
  * @property {ViewUiCacheContext} [uiCache] per-render ui-cache dirty state
+ * @property {ViewUiManifestContext} [manifest] root-local prepared UI closure state
  * @property {ViewCssContext} [css] per-render stylesheet collection/de-dupe state
  * @property {ViewJsContext} [js] per-render script collection/de-dupe state
  */

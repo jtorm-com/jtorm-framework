@@ -18,8 +18,10 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   + `view-model.js`). No Biome/ESLint/Knip in this repo.
 - **`@jtorm/types`** has the repo's only build step: a `prepack` runs `tsc --emitDeclarationOnly` to
   generate its published `.d.ts` from the JSDoc (gitignored artifact; `typescript` is its devDep).
-- Full-pipeline harness: `test/helpers/engine.js` (`render(html,tss,data,url,fixtures)`), goldens in
-  `test/pipeline/`. `jsdom`+`lodash` are devDeps; the runtime stays dependency-free.
+- Full-pipeline harness: `test/helpers/engine.js`
+  (`render(html,tss,data,url,fixtures,c,manifests,warm)`), goldens in `test/pipeline/`. The optional
+  final arguments prepare UI manifests and expose transport request/byte metrics; `jsdom`+`lodash`
+  are devDeps, while the runtime stays dependency-free.
 
 ## Locked architecture — must hold (flag violations)
 - **Pure CommonJS; dependency-free runtime *code*** — the `src/` tree calls `require()` **nowhere**
@@ -44,6 +46,15 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   compatibility-forwarding facade for its published helper/state surface. Hosts inject both models
   before configuring that facade; CSS/JS plugins inject the resolver directly. Do not fold these
   responsibilities back into the verb or add runtime imports between them.
+- **UI closure generation and runtime loading are separate DI owners.** The build-only
+  `@jtorm/ui-manifest-compiler` traverses trusted static UI closures through the existing resolver
+  and parsers, records dynamic edges, fingerprints inputs, and writes deterministic
+  content-addressed JSON. Runtime `@jtorm/ui-manifest-model` owns wire canonicalization, digest and
+  schema validation, bounded pack caching, root-local atomic indexes, and required/optional lookup
+  policy. `@jtorm/get-method` owns only the optional lookup-before-legacy-model seam. Hosts prepare
+  manifests after root-context creation and before events/handler traversal, and inject native
+  SHA-256 plus the existing request model. Do not move graph discovery into runtime, prime the three
+  fetch-model caches, bypass `request-model` URL policy on hits, or add runtime imports.
 - **Regex validation and execution are one injected policy model.** `@jtorm/regex-policy-model`
   owns the bounded `if(r:)` micro-grammar, input limits, native compilation, and matching;
   `@jtorm/if-method` owns TSS-literal provenance and conditional flow. Hosts inject the policy
