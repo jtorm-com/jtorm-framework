@@ -275,6 +275,17 @@ described baseline/runtime paths, not compatibility shims. They were narrowed to
 labels, the 3-test overlay and 28-test pipeline/compiler reruns pass, and the authoritative staged
 ratchet reports zero findings.
 
+### CI finding 2 - Exact gzip byte count varied by zlib build
+
+- CI witness: Node LTS produced a 7,243-byte level-9 gzip stream while local Node 25 produced
+  7,368 bytes for the same exact 32,068-byte canonical JSON and manifest hash.
+- Root cause: compressed representation size is a toolchain measurement, not a canonical manifest
+  property; zlib implementation changes may produce different valid streams.
+- Fix: retain exact raw bytes, content hash, JSON, asset count, diagnostics, requests, and rendered
+  output, but gate compression with a portable 8,192-byte upper-bound regression envelope.
+- Verification: the focused Product pipeline and full repository suite pass locally; CI is rerun on
+  the current head.
+
 ### Fresh reliability matrix
 
 | Path | Result | Evidence |

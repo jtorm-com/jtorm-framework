@@ -75,7 +75,8 @@ Measured through the full-pipeline production-bootstrap mirror:
 - Prepared dynamic closure: one bundle plus the one 108-byte model-bound JSON request.
 - Deterministic bundle: 37 assets, ten exact dynamic diagnostics,
   `sha256-99604a0217bc7d486071efce14b45bcaeaf04b87ffe0faaa335474463ce14f85`, and
-  7,368 bytes at gzip level 9.
+  32,068 raw bytes. Gzip level 9 measures 7,368 bytes on local Node 25/zlib and 7,243 bytes on
+  CI Node LTS/zlib; the portable regression envelope is at most 8,192 bytes.
 - Raw serial traversal: maximum handler recursion depth 34; deepest request at handler depth 32.
 - UI/get-only discovery metric: deepest request is eight nested UI/get edges below the root (nine layers including the root). The architecture review records the same closure more coarsely as an approximately 12-deep dependency chain.
 - Request order:
@@ -877,7 +878,7 @@ library/build-tool controls pass:
 
 | Category | Status | Evidence |
 |---|---|---|
-| Data Scale | PASS | 27 static requests collapse to one; graph/assets/text/values/depth/metadata/descriptors and 32-entry LRU have exact/+1 tests; Product pack is 32,068 raw / 7,368 gzip. |
+| Data Scale | PASS | 27 static requests collapse to one; graph/assets/text/values/depth/metadata/descriptors and 32-entry LRU have exact/+1 tests; Product pack is 32,068 raw and 7,243–7,368 gzip across verified zlib builds, under an 8,192-byte gate. |
 | Resilience | PASS | Request-model owns timeout/abort and policy; production timeout obligation is documented; optional acquisition degrades intentionally, received-invalid and required paths fail loud; no retries; prepare/output are atomic with retry-safe cleanup. |
 | Security Surface | PASS | PASTA/STRIDE and red-team record links expected/declared/computed/value hashes, URL complete mediation, bounded JSON, own-field/`Map` indexes, trusted config, contained no-shell output, and zero new external dependencies. |
 | User Experience | PASS | Existing hosts and optional misses preserve the legacy waterfall; required failures occur before handler/DOM mutation; live/detached bodies match legacy exactly; this change adds no visual or interactive UI. |

@@ -5,6 +5,8 @@ const { gzipSync } = require('node:zlib');
 const { render } = require('../helpers/engine.js');
 const { PRODUCT_DYNAMIC, productManifest } = require('../helpers/ui-manifest.js');
 
+const MAX_GZIP_BYTES = 8192;
+
 const STATIC_REQUESTS = [
   '@s/thing/thing-default.tss',
   '@h/@e/section.html',
@@ -108,7 +110,8 @@ test('compiler emits the deterministic model-free Product closure and ten diagno
     'sha256-99604a0217bc7d486071efce14b45bcaeaf04b87ffe0faaa335474463ce14f85'
   );
   assert.equal(Buffer.byteLength(result.json), 32068);
-  assert.equal(gzipSync(result.json, { level: 9, mtime: 0 }).length, 7368);
+  const gzipBytes = gzipSync(result.json, { level: 9, mtime: 0 }).length;
+  assert.ok(gzipBytes <= MAX_GZIP_BYTES, `${gzipBytes} > ${MAX_GZIP_BYTES}`);
   assert.match(result.filename, /^product[.]sha256-[0-9a-f]{64}[.]json$/);
   assert.equal(result.json, JSON.stringify(JSON.parse(result.json)));
 });
@@ -118,7 +121,7 @@ test('prepared Product closure collapses live/detached static waterfalls to one 
   const url = '/ui/' + result.filename;
   const descriptors = [{ url, hash: result.hash, mode: 'required' }];
   const fixtures = { [url]: { text: result.json } };
-    const baseline = await render(HTML, TSS, product(IMAGE));
+  const baseline = await render(HTML, TSS, product(IMAGE));
   const live = await render(
     HTML, TSS, product(IMAGE), 'http://localhost/', fixtures, 0, descriptors, 1
   );
@@ -132,8 +135,8 @@ test('prepared Product closure collapses live/detached static waterfalls to one 
   assert.deepEqual(detached.warmRequests, []);
   assert.equal(live.bytes, Buffer.byteLength(result.json));
   assert.equal(detached.bytes, Buffer.byteLength(result.json));
-    assert.equal(live.body, baseline.body);
-    assert.equal(detached.body, baseline.body);
+  assert.equal(live.body, baseline.body);
+  assert.equal(detached.body, baseline.body);
 });
 
 test('prepared Product closure leaves only model-bound @id data outside the bundle', async () => {
