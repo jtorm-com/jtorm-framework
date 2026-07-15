@@ -730,7 +730,29 @@ test('compiler omits scalar falsy get and empty component edges like runtime val
   }
 });
 
-  test('descriptor arrays preserve TSS parts and runtime HTML/data request identities', async () => {
+test('compiler treats unquoted numeric UI flags as static literals', async () => {
+  wire();
+  const descriptor = UI.mapper.Root.default;
+  UI.mapper.Root.default = { t: ['/numeric-flags.tss'] };
+  TEXT['/numeric-flags.tss'] =
+    "->ui { c: 'Child.default'; t: 0; h: 1; m: 0; }";
+
+  try {
+    const cfg = config();
+    cfg.dynamicAllow = [];
+    const result = await compiler.compile(cfg);
+    assert.deepEqual(
+      result.manifest.assets.map(asset => asset.request),
+      ['/child.html', '/numeric-flags.tss']
+    );
+    assert.deepEqual(result.manifest.dynamic, []);
+  } finally {
+    UI.mapper.Root.default = descriptor;
+    delete TEXT['/numeric-flags.tss'];
+  }
+});
+
+test('descriptor arrays preserve TSS parts and runtime HTML/data request identities', async () => {
   wire();
   const descriptor = UI.mapper.Root.default;
   UI.mapper.Root.default = {

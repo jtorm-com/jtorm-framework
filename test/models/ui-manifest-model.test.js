@@ -82,10 +82,10 @@ test('prepare rejects a cyclic render-context parent chain without hanging', () 
     'const c = {}; c.p = c;',
     "m.prepare([], c).then(() => { process.exitCode = 1; }, e => { console.log(e.message); });"
   ].join('\n');
-    const result = spawnSync(process.execPath, ['-e', script], {
-      encoding: 'utf8',
-      timeout: 2000
-    });
+  const result = spawnSync(process.execPath, ['-e', script], {
+    encoding: 'utf8',
+    timeout: 2000
+  });
 
   assert.equal(result.status, 0, result.error && result.error.message || result.stderr);
   assert.match(result.stdout, /Manifest context invalid/);
@@ -206,6 +206,51 @@ test('prepare installs verified assets and reuses request-model identity and pol
     ]
   );
 });
+
+test('cached manifest packs recheck URL policy for each prepare context', async () => {
+  reset();
+  const built = await pack([]);
+  const descriptor = {
+    url: '/product.json',
+    hash: built.hash,
+    mode: 'required'
+  };
+  const calls = [];
+  let reads = 0;
+  mm.requestModel = {
+    cacheKey: (url) => url,
+    get: () => {
+      reads++;
+      return { text: async () => JSON.stringify(built.manifest) };
+    },
+    url: (url, ctx) => {
+      calls.push(['url', url, ctx]);
+      return 'resolved:' + url;
+    },
+    allow: async (url, ctx) => {
+      calls.push(['allow', url, ctx]);
+      return !ctx.blocked;
+    }
+  };
+
+  await mm.prepare([descriptor], {});
+  const optional = { blocked: true };
+  await mm.prepare([{ ...descriptor, mode: 'optional' }], optional);
+  assert.equal(optional.manifest.index.assets.size, 0);
+  const blocked = { blocked: true };
+  await assert.rejects(
+    () => mm.prepare([descriptor], blocked),
+    /URL blocked resolved:\/product[.]json/
+  );
+  assert.equal(reads, 1);
+  assert.deepEqual(calls, [
+    ['url', '/product.json', optional],
+    ['allow', 'resolved:/product.json', optional],
+    ['url', '/product.json', blocked],
+    ['allow', 'resolved:/product.json', blocked]
+  ]);
+});
+
 function deferred() {
   let resolve;
   let reject;

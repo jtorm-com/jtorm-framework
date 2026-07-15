@@ -625,7 +625,7 @@ module.exports = {
                 return false
             ;
             if (b.t === 'p')
-                return true
+                return !b.n
             ;
             return Array.isArray(b.v) && b.v.some((v) => this.hasPath(v));
         },
@@ -635,6 +635,9 @@ module.exports = {
 
             if (b.t === 'v')
                 return b.v
+            ;
+            if (b.t === 'p' && b.n)
+                return b.v[0]
             ;
             if (b.t !== 'a')
                 throw new Error('Manifest binding dynamic')

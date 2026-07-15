@@ -17,8 +17,8 @@
 is appended by the finish gate.
 **Issues Found (not yet fixed):** None.
 **Current Scores:** 100/100 confirmed after the independent verification loop.
-**Context for Next Session:** The scoped pre-PR evaluation is complete. Focused tests (54/54),
-`npm run typecheck`, `npm test` (476/476), package dry-runs, Semgrep, npm audit, source guards,
+**Context for Next Session:** The scoped pre-PR evaluation is complete. Focused tests (56/56),
+`npm run typecheck`, `npm test` (478/478), package dry-runs, Semgrep, npm audit, source guards,
 source-ratchet convergence, cleanup, and the tech-debt ratchet are green.
 
 ## Phase 1 - Claim and Discovery
@@ -240,17 +240,17 @@ Project AGENTS.md overrides the generic Bun/Elysia/DDD assumptions. The personas
 | Readability | 10/10 |
 | **Total** | **100/100** |
 
-Evidence: format/loading, graph compilation, existing fetch overlay, and atomic output each have one owner; runtime source remains import-free; canonical JSDoc is exact and escape-hatch-free; untrusted received text is bounded and fully validated; failures preserve identity and prior state; hashes/policy/Map/root isolation protect the trust boundaries; measured request/CPU/payload baselines are bounded; terse modules stay cohesive; 49 new behavior tests plus strengthened declaration checks cover success, failure, race, limit, and parity paths; host contracts and threat records explain every non-obvious decision.
+Evidence: format/loading, graph compilation, existing fetch overlay, and atomic output each have one owner; runtime source remains import-free; canonical JSDoc is exact and escape-hatch-free; untrusted received text is bounded and fully validated; failures preserve identity and prior state; hashes/policy/Map/root isolation protect the trust boundaries; measured request/CPU/payload baselines are bounded; terse modules stay cohesive; 51 new behavior tests plus strengthened declaration checks cover success, failure, race, limit, and parity paths; host contracts and threat records explain every non-obvious decision.
 
 **Last Completed Phase:** 4 - Code Quality and Scoring
 **Next Action:** Phase 4.5 tests and Phase 5 fresh verification loop
 
 ## Phase 4.5 - Fresh Test Gates
 
-- Focused feature verification: PASS, 54/54 across get overlay, runtime model, compiler/CLI,
+- Focused feature verification: PASS, 56/56 across get overlay, runtime model, compiler/CLI,
   Product pipeline, and generated declaration contracts.
 - Canonical JSDoc gate: PASS, `npm run typecheck`.
-- Full repository suite: PASS, 476/476 with the required quoted glob command from `AGENTS.md`.
+- Full repository suite: PASS, 478/478 with the required quoted glob command from `AGENTS.md`.
 - Publication dry-runs: PASS for `@jtorm/types@1.1.0`, `@jtorm/get-method@1.1.0`,
   `@jtorm/ui-manifest-model@1.0.0`, and `@jtorm/ui-manifest-compiler@1.0.0`; only intended files
   are packed and no generated declaration remains in the worktree.
@@ -264,8 +264,8 @@ Evidence: format/loading, graph compilation, existing fetch overlay, and atomic 
 - Red proof: a timed child process with `c.p = c` exceeded its deadline and failed with `ETIMEDOUT`.
 - Fix: identity-based cycle detection rejects the context through the existing
   `Manifest context invalid` fail-closed path.
-- Green proof: the isolated regression, the 20-test runtime suite, the 54-test focused suite, and
-  the 476-test full suite all pass.
+- Green proof: the isolated regression, the 21-test runtime suite, the 56-test focused suite, and
+  the 478-test full suite all pass.
 
 ### Ratchet reconciliation
 
@@ -285,6 +285,20 @@ ratchet reports zero findings.
   output, but gate compression with a portable 8,192-byte upper-bound regression envelope.
 - Verification: the focused Product pipeline and full repository suite pass locally; CI is rerun on
   the current head.
+
+### Current-head Codex findings 3-4 - Policy cache hits and numeric UI flags
+
+- Finding 3 red proof: a second root reused a cached pack without calling the current context's
+  request URL/allow policy and therefore succeeded while blocked.
+- Finding 3 fix: cached pack promises now re-run the existing URL/allow owner before reuse, retain
+  the promise LRU/dedup identity, and preserve optional acquisition fallthrough versus required
+  fail-loud behavior.
+- Finding 4 red proof: unquoted `t: 0; h: 1; m: 0;` compiled to numeric `p/n` descriptors but was
+  reported as a missing dynamic policy.
+- Finding 4 fix: only non-numeric `p` descriptors are paths; numeric `p/n` descriptors use their
+  data-parser-owned literal value and traverse exactly the statically selected component assets.
+- Green proof: both isolated regressions, 45 owner tests, 56 focused tests, typecheck, and 478 full
+  tests pass.
 
 ### Fresh reliability matrix
 
@@ -381,9 +395,9 @@ preserving exact SSR/SPA output, runtime dependency injection, request policy, a
 
 | Category | Before | After | Delta |
 |---|---:|---:|---:|
-| Focused model/tooling/overlay behaviors | 0 | 44 | +44 |
+| Focused model/tooling/overlay behaviors | 0 | 46 | +46 |
 | Product pipeline behaviors | 0 | 5 | +5 |
-| **Repository total** | **427** | **476** | **+49** |
+| **Repository total** | **427** | **478** | **+51** |
 
 ### Code Quality Score
 

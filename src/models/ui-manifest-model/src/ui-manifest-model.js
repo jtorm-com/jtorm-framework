@@ -305,7 +305,17 @@ module.exports = {
             if (p !== undefined) {
                 s.c.delete(q);
                 s.c.set(q, p);
-                return p;
+                return (async function () {
+                    try {
+                        await s.allowed(d.url, c);
+                    } catch (e) {
+                        const x = new Error(e && e.message || String(e));
+                        x.acquisition = 1;
+                        throw x;
+                    }
+
+                    return p;
+                })();
             }
 
             p = (async function () {

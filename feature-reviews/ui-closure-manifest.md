@@ -26,7 +26,7 @@ into `dev`.
 - Package/root READMEs and `AGENTS.md` host/build/ownership contracts.
 - `feature-reviews/framework-architecture-review-2026-07-14.md` backlog status/evidence.
 
-**Tests Written:** 49 focused feature tests: 20 runtime-model, 23 compiler/CLI, five Product
+**Tests Written:** 51 focused feature tests: 21 runtime-model, 24 compiler/CLI, five Product
 pipeline, and one get overlay, plus generated declaration checks. The missing package/overlay and
 Product characterization were captured red before implementation; the later traversal-depth
 assertion was also captured red before adding harness instrumentation. Final fresh review found a
@@ -47,8 +47,8 @@ cycle detection made it green.
   verified with model-owned canonical UTF-8 plus injected native 32-byte SHA-256 crypto.
 
 **Context for Next Session:**
-The branch and local `dev` are based on merge commit `9dd480a` (PR #45). Implementation, 54-test
-focused verification, 476-test full-suite verification, typecheck, package/security/ratchet gates,
+The branch and local `dev` are based on merge commit `9dd480a` (PR #45). Implementation, 56-test
+focused verification, 478-test full-suite verification, typecheck, package/security/ratchet gates,
 host docs, 100/100 evaluation, and the PASTA red-team pass are complete. The verified commits are
 published in ready PR #46; only its green CI/current-head Codex review loop remains.
 
@@ -582,7 +582,8 @@ out of scope.
   duplicates, `c/f/t/h/m` visitation keys, literal/dynamic flags, and mediatarget expansion.
 - [x] Dynamic tests cover literal concatenation, mixed and nested append descriptors, naked leaf
   get/ui parameter synthesis, exact node-pointer plus `param`, missing/unused/duplicate policy,
-  conservative dynamic flags, and the Product golden's ten data/component diagnostics.
+  conservative dynamic flags, static unquoted numeric UI flags, and the Product golden's ten
+  data/component diagnostics.
 - [x] Fingerprint/order tests prove a same-version reachable-mapper edit invalidates while an
   unreachable branch does not; TSS declaration keys, static JSON keys, `di` method keys, child
   arrays, and artifact arrays retain exact legacy order; per-asset `valueHash` is stable.

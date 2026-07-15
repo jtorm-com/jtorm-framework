@@ -122,7 +122,7 @@ an exact legacy value shape or delegates to the unchanged fetch model.
 | ID | STRIDE | Threat | Primary controls |
 |---|---|---|---|
 | TM-1 | S/T | Substitute or replay a stale/tampered pack | URL allow policy; host-pinned expected hash; computed = declared = expected SHA-256 |
-| TM-2 | T/E | Packed hit bypasses request authorization | Call requestModel.url, then await requestModel.allow in legacy scalar/array order before every hit or required miss |
+| TM-2 | T/E | Packed asset or cached pack hit bypasses request authorization | Call requestModel.url, then await requestModel.allow before every cached pack reuse, asset hit, or required miss |
 | TM-3 | T/E | Prototype-like keys or duplicate identities poison the index | Full own-property schema validation; Map indexes; duplicate/conflict rejection |
 | TM-4 | T | Lazy PR #44 node mutation creates false cross-pack equivalence/conflict | Immutable per-asset valueHash stored separately from mutable AST values |
 | TM-5 | I | Model, request, tenant, DOM, secret, or PII enters a shared bundle/cache | Static trusted sources only; plain-data validation; artifact scan tests; root-local context |
@@ -197,11 +197,11 @@ change:
 | Control | Implemented verification |
 |---|---|
 | Triple digest equality and canonical byte rules | `test/models/ui-manifest-model.test.js`: declared/expected/payload/value witnesses, exact TextEncoder bytes, Unicode vectors, and invalid digest preflight |
-| URL policy continuity | manifest-model policy spies cover packed hits, required misses, optional fallthrough, scalar and TSS-array order |
+| URL policy continuity | manifest-model policy spies cover cached pack reuse in required/optional modes, packed asset hits, required misses, optional fallthrough, scalar and TSS-array order |
 | Schema, own-key, Map, and immutable conflict tokens | authenticated schema rejection, prototype identities, falsy hits, duplicates/conflicts, and lazy `node.b` mutation tests |
 | Bounded parsing, graph, metadata, descriptors, contexts, and LRU | runtime and compiler suites admit every configured default exactly and reject limit + 1; a subprocess witness proves a cyclic context rejects instead of hanging |
 | Atomic prepare and deterministic races | invalid-call non-supersession, valid latest ownership, descriptor-order settlement, prior-index retention, retry, dedup, and LRU tests |
-| Static/dynamic reconciliation | compiler suite covers literal/mixed/nested bindings, implicit leaves, exact pointers/params, dynamic policy failures, flags, mediatargets, and Product's ten diagnostics |
+| Static/dynamic reconciliation | compiler suite covers literal/mixed/nested bindings, numeric literals, implicit leaves, exact pointers/params, dynamic policy failures, flags, mediatargets, and Product's ten diagnostics |
 | Compiler state isolation | overlap rejection, success/failure restoration, restore-error unlock, and sequential CLI config-array tests |
 | CLI containment and no-clobber output | path-bearing id rejection, atomic identical/conflicting concurrent writer tests, cleanup, and CLI argument tests |
 | No sensitive/runtime state | compiler emits only validated JSON-safe source-derived values; Product golden contains 37 assets and ten binding diagnostics, never evaluated model values |
