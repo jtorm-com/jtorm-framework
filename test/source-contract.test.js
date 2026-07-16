@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { scan } = require('./helpers/source-contract.js');
 
@@ -12,14 +13,25 @@ function files(dir) {
   const out = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const file = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...files(file));
-    else out.push(file);
+    if (entry.isDirectory()) {
+      if (entry.name !== 'node_modules') out.push(...files(file));
+    } else out.push(file);
   }
   return out;
 }
 
 const source = files(SRC);
 const js = source.filter(file => file.endsWith('.js'));
+
+test('source walk skips package-local dependency trees', t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'jtorm-source-contract-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(dir, 'own.js'), '');
+  fs.mkdirSync(path.join(dir, 'node_modules', 'dependency'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'node_modules', 'dependency', 'index.js'), 'require("dependency")');
+
+  assert.deepEqual(files(dir).map(file => path.relative(dir, file)), ['own.js']);
+});
 
 test('runtime source keeps pure DI and the returned-effect control contract', () => {
   const imports = [];

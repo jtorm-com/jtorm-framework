@@ -3,7 +3,7 @@
 **Branch:** `feature/explicit-view-effects`
 **Base:** `dev` at `4bfab8f`
 **Started:** `2026-07-16T06:58:27Z`
-**Completed:** `2026-07-16T08:25:08Z`
+**Completed:** `2026-07-16T08:39:25Z`
 **Status:** COMPLETED
 **Mode:** Pre-PR feature evaluation
 
@@ -120,12 +120,14 @@ logging, export, identity, or third-party transfer.
 
 ### Source-ratchet review
 
-PASS after two local tooling findings: quoted `"io"` object properties were
-added to the rejected family, and an unrelated object method named `require`
-was added as a safe negative. The TypeScript-AST helper now distinguishes code
-from comments/strings and locks registry-handle ownership plus real synthesized
-dispatch calls. The required convergence report/sentinel are present under
-ignored `tmp/`; the ratchet passes 5/5.
+PASS after three tooling findings: quoted `"io"` object properties were added
+to the rejected family, an unrelated object method named `require` was added as
+a safe negative, and first-head Codex review found the source walker included
+package-local `node_modules`. The dependency-tree case failed first; the walker
+now skips that directory before classification. The TypeScript-AST helper still
+distinguishes code from comments/strings and locks registry-handle ownership
+plus real synthesized dispatch calls. The required convergence report/sentinel
+are present under ignored `tmp/`; the ratchet passes 6/6.
 
 ### Accepted findings fixed
 
@@ -141,6 +143,10 @@ ignored `tmp/`; the ratchet passes 5/5.
 4. **Low — source guard false positive:** a harmless object method named
    `require` was blocked. A safe-negative fixture failed first, then property
    definitions were excluded without permitting loader aliases/access.
+5. **P2 — package-local dependency traversal:** first-head Codex review found
+   that a package-local `node_modules` would be scanned as project source. A
+   temporary dependency-tree regression failed first, then directory traversal
+   excluded `node_modules` while retaining nested own source.
 
 No unresolved finding remains.
 
@@ -215,10 +221,10 @@ published.
 | Original red regression | FAIL on base: second invocation threw finite sentinel `would repeat forever` |
 | Review red regression | FAIL before strict normalization: `Method malformed repeat limit exceeded` |
 | Final-review red regression | FAIL before single-read snapshots: normalized `children: 'open'` |
-| Focused handler/method/compiler/type/source suites | 53/53 pass |
-| Exact `npm test` from AGENTS.md | 514/514 pass |
+| Focused handler/method/compiler/type/source suites | 54/54 pass |
+| Exact `npm test` from AGENTS.md | 515/515 pass |
 | `npm run typecheck` | PASS |
-| Source-contract ratchet | 5/5 pass |
+| Source-contract ratchet | 6/6 pass |
 | Runtime import guard | zero source imports |
 | Mutable-control guard | zero runtime `io` tokens/fields |
 | Handwritten TS/declaration guard | zero tracked files |
@@ -257,8 +263,9 @@ published.
 - `batch-simulator` is not available in this Codex session. Fresh focused/full
   execution, package dry-runs, and the eventual current-head PR Codex review are
   the available independent gates.
-- The multi-package campaign's separate-agent convergence check remains pending
-  until the ready PR receives its required current-head `@codex review`.
+- First-head Codex review supplied one valid source-walker finding, reproduced
+  and fixed red-first. A new current-head review remains required after the
+  follow-up commit.
 
 ## Documentation
 

@@ -3,15 +3,15 @@
 **Status:** IN_PROGRESS
 **Claimed:** 2026-07-16T06:58:27Z
 **Agent:** Codex (GPT-5)
-**Current Mode:** Documentation and Delivery
+**Current Mode:** External Review
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Review and Test
-**Current Mode:** Documentation and Delivery
-**Next Action:** Run the final finish-task/staged gates, commit, push, open the ready PR, and request current-head Codex review.
+**Last Completed Mode:** Documentation and Delivery
+**Current Mode:** External Review
+**Next Action:** Commit/push the first-head Codex source-walker fix, reply/resolve its thread, and request review on the new head.
 **Files Created:**
 - `feature-reviews/explicit-returned-view-effects.md` - Feature-dev state and implementation spec.
 
@@ -83,10 +83,10 @@ Task selected from `feature-reviews/framework-architecture-review-2026-07-14.md`
 - [x] Architecture feature review updated
 - [x] Architecture backlog updated
 - [x] Completion evaluation written
-- [ ] Conventional commit created
-- [ ] Feature branch pushed
-- [ ] Ready PR opened into `dev`
-- [ ] `@codex review` requested
+- [x] Conventional commit created
+- [x] Feature branch pushed
+- [x] Ready PR #49 opened into `dev`
+- [x] `@codex review` requested
 - [ ] Current-head Codex review polled to outcome (do not merge)
 
 ## Research Summary
@@ -336,6 +336,7 @@ None.
 - Runtime source changes before red: none.
 - Review regression: `node --test --test-name-pattern='malformed and inherited' test/handlers/handler.test.js` failed because inherited `children:true` and string `repeat:'false'` were accepted, reaching `Method malformed repeat limit exceeded`; strict own-boolean normalization made it green.
 - Final-review regression: `node --test --test-name-pattern='effect control getters' test/handlers/handler.test.js` failed with normalized `children: 'open'` because a stateful getter was read once for its type and again for its value; snapshotting each own field once made it green.
+- First-head Codex regression: `node --test --test-name-pattern='source walk skips' test/source-contract.test.js` failed because `files()` returned `node_modules/dependency/index.js`; the walker now excludes dependency trees and the source ratchet passes 6/6.
 
 ## Plan Quality Gate
 
@@ -445,3 +446,7 @@ the seven production-readiness categories, 27-package scorecard, exact
 verification evidence, review limitations, and delivery conditions; see
 `feature-reviews/explicit-returned-view-effects-security-review.md` for the
 differential security review.
+
+First-head Codex review at `2859ccd` produced one valid P2 source-walker
+finding. It was reproduced red-first, fixed, and fully reverified; clean review
+must now be obtained against the follow-up head.
