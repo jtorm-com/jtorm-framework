@@ -1,18 +1,18 @@
 # Feature Development: P3 Explicit Policy Owners
 
-**Status:** IN_PROGRESS
+**Status:** COMPLETE
 **Claimed:** 2026-07-16T10:21:34Z
 **Agent:** Codex (GPT-5)
-**Current Mode:** Deliver — local gates complete, ready PR pending
+**Current Mode:** Delivered — ready PR #51 open; do not merge
 **Source:** `feature-reviews/framework-architecture-review-2026-07-14.md` — P3
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Review and fresh verification
-**Current Mode:** Deliver — staged ratchet, commit, ready PR, CI/current-head Codex review
-**Next Action:** Stage the reviewed scope, run the final ratchet, commit, push, and open the ready PR into `dev`.
+**Last Completed Mode:** Delivery and external review
+**Current Mode:** Delivered — ready PR #51 into `dev`; do not merge
+**Next Action:** Maintainer review/merge. Any new head commit requires fresh CI and `@codex review`.
 **Files Created:**
 - Three new policy-owner packages, direct owner tests, AST ownership ratchet/helper, this feature
   record, completion evaluation, and differential security report.
@@ -29,7 +29,7 @@ focused model/plugin/pipeline tests, root/backlog docs, and the review outcome l
 **Workflow Override:** On 2026-07-16 the maintainer explicitly directed implementation immediately after the spec self-review, with no separate implementation-plan document or second spec-review approval. This overrides the cached Superpowers `writing-plans` and user-review handoff gates for this task; the comprehensive spec remains the pre-code contract.
 
 **Context for Next Session:**
-Started from clean `dev` at merge commit `1b28afb` on branch `feature/p3-policy-owners`. Local implementation, reviews, exact full tests, typecheck, Semgrep, production audit, tech-debt ratchet, and twelve package dry-runs are green. Delivery still requires a staged ratchet, ready PR, green CI, and clean current-head Codex review; do not merge.
+Started from clean `dev` at merge commit `1b28afb` on branch `feature/p3-policy-owners`. Local implementation, reviews, exact full tests, typecheck, Semgrep, production audit, tech-debt ratchet, and twelve package dry-runs are green. PR #51 is ready into `dev`; CI and Codex were clean on implementation head `3183a49`. The ledger-only finalization commit is re-reviewed before handoff; do not merge.
 
 ---
 
@@ -78,6 +78,7 @@ Started from clean `dev` at merge commit `1b28afb` on branch `feature/p3-policy-
 - **2026-07-16 reset-review red/green:** the new complete-asset-graph reset test failed 6/7 because `cssMethod` remained poisoned; restoring method/plugin/request/resolver collaborators made it pass 7/7.
 - **2026-07-16 ratchet-review red/green:** a local helper containing consumer cache/rejection code escaped the first method-scoped AST pass, failing 3/4; whole-file primitive inspection now catches relocation and passes 4/4 after a no-edit reread.
 - **2026-07-16 final green:** architecture-focused flows pass 90/90, exact `npm test` passes 540/540, typecheck passes, Semgrep reports zero findings, and all twelve package dry-runs pass.
+- **2026-07-16 first PR head:** CI passed and Codex reported no major issue on implementation commit `3183a49` with no review threads.
 
 ### Review Mode
 - [x] Required scoped reviews pass
@@ -442,7 +443,7 @@ Tests use Node's built-in `node:test`, deterministic injected collaborators, no 
 - [x] Typecheck and exact full suite pass; package dry-runs pass for every new/touched release package; pure-JS/runtime-import/source guards and `git diff --check` pass.
 - [x] Architecture, refactor, source-ratchet, security, tech-debt, differential, privacy, and production-readiness reviews have no unresolved finding; all ten quality dimensions score 10/10 and a fresh verification pass confirms them.
 - [x] Root/package/project docs, selected architecture backlog, completion evaluation, review ledger, release versions/minima, and rollback evidence are current.
-- [ ] Conventional commit is pushed on the feature branch; a ready PR targets `dev`; CI and current-head `@codex review` are clean; the PR is not merged.
+- [x] Conventional commit is pushed on the feature branch; a ready PR targets `dev`; CI and current-head `@codex review` are clean; the PR is not merged.
 
 ### Approval
 
