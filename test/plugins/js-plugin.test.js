@@ -5,6 +5,8 @@ const { JSDOM } = require('jsdom');
 const { jTormJsPlugin } = require('../../src/plugins/js-plugin/src/js-plugin.js');
 const { jTormJsMethod } = require('../../src/methods/js-method/src/js-method.js');
 const { jTormRequestModel } = require('../../src/models/request-model/src/request-model.js');
+const { jTormAssetPluginModel } = require('../../src/models/asset-plugin-model/src/asset-plugin-model.js');
+const { jTormRenderContextModel } = require('../../src/models/render-context-model/src/render-context-model.js');
 
 // A minimal view object: dev's document-model.set(v, fn) reads v.t.s / v.c.s,
 // so the fake set() mirrors that contract and runs the callback against <head>.
@@ -29,10 +31,13 @@ function fakeView(html, url) {
 }
 
 function setup() {
+    jTormAssetPluginModel.renderContextModel = jTormRenderContextModel;
+    jTormJsPlugin.assetPluginModel = jTormAssetPluginModel;
     jTormJsPlugin.cache = {};
     jTormJsPlugin.collection = [];
     jTormJsPlugin.uiResolverModel = { parseUrl: u => u };
     jTormJsPlugin.requestModel = jTormRequestModel;
+    jTormRequestModel.renderContextModel = jTormRenderContextModel;
     jTormJsPlugin.jsMethod = jTormJsMethod;
     jTormJsMethod.jsPlugin = jTormJsPlugin;
 }
@@ -87,12 +92,16 @@ test('js-plugin blocks an expanded external src before DOM injection', async () 
     };
 
     const v = fakeView();
+    const create = v.h.d.createElement.bind(v.h.d);
+    let creates = 0;
+    v.h.d.createElement = (...args) => { creates++; return create(...args); };
     v.c.request = { base: 'https://cdn.example/' };
 
     await assert.rejects(
         () => jTormJsPlugin.process(v, { src: '@x/app.js' }),
         /URL blocked https:\/\/evil\.example\/x\.js/
     );
+    assert.equal(creates, 0, 'policy runs before element creation');
     assert.equal(v.h.d.querySelector('head script'), null);
 });
 
@@ -154,8 +163,31 @@ test('js afterView drains a legacy singleton queue when paired with an old/custo
     const v = fakeView();
     jTormJsPlugin.collection.push({ src: 'legacy.js' });
 
-    await jTormJsPlugin.afterView(v);
+    const h = await jTormJsPlugin.afterView(v);
 
+    assert.strictEqual(h, v.h);
     assert.deepEqual([...v.h.d.querySelectorAll('head script')].map(e => e.getAttribute('src')), ['legacy.js']);
+    assert.deepEqual(jTormJsPlugin.collection, []);
+});
+
+test('js afterView clears render state when asset policy rejects', async () => {
+    setup();
+    const v = fakeView();
+    v.c.request = { base: 'https://app.example/' };
+    jTormJsPlugin.collection.push({ src: 'https://evil.example/x.js' });
+
+    await assert.rejects(() => jTormJsPlugin.afterView(v), /URL blocked/);
+    assert.deepEqual(v.c.js, { cache: {}, collection: [] });
+    assert.deepEqual(jTormJsPlugin.collection, []);
+});
+
+test('js afterView clears render state when head insertion throws', async () => {
+    setup();
+    const v = fakeView();
+    v.h.set = async (vo, fn) => fn({appendChild: () => { throw new Error('insert failed'); }});
+    jTormJsPlugin.collection.push({ src: 'local.js' });
+
+    await assert.rejects(() => jTormJsPlugin.afterView(v), /insert failed/);
+    assert.deepEqual(v.c.js, { cache: {}, collection: [] });
     assert.deepEqual(jTormJsPlugin.collection, []);
 });

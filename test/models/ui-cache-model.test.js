@@ -2,6 +2,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormUiCacheModel: c } = require('../../src/models/ui-cache-model/src/ui-cache-model.js');
+const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
+
+c.renderContextModel = cm;
 
 test('get() returns the value set() stored for the same (l,id,c)', async () => {
   c.cache = {}; c.order = new Map(); c.max = 512; c.saveModel = null;

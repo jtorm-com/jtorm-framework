@@ -8,13 +8,16 @@ render-root index installation.
 const { jTormUiManifestModel: manifest } = require('@jtorm/ui-manifest-model');
 
 manifest.requestModel = requestModel;
+manifest.renderContextModel = renderContextModel;
+manifest.promiseCacheModel = promiseCacheModel;
 manifest.digest = async bytes => sha256Bytes(bytes);
 await manifest.prepare([
   { url: '/ui/product.sha256.json', hash: 'sha256-…', mode: 'required' }
 ], renderContext);
 ```
 
-Runtime source has no imports. Hosts inject `requestModel` and a
+Runtime source has no imports. Hosts inject `requestModel`, `renderContextModel`,
+`promiseCacheModel`, and a
 `digest(Uint8Array) -> Promise<Uint8Array>` function returning exactly 32 bytes.
 Production hosts must set a non-zero request-model timeout (globally or on the render request
 context), and an injected transport must honor its abort signal.
@@ -50,5 +53,6 @@ getMethod.manifest = manifest;
 ```
 
 Removing the `prepare()` call and the optional `getMethod.manifest` injection restores the legacy
-waterfall without changing asset URLs. Publish `@jtorm/types@1.1.0` and this package before
-`@jtorm/get-method@1.1.0` or `@jtorm/ui-manifest-compiler@1.0.0`.
+waterfall without changing asset URLs. For this patch release, publish the render-context and
+promise-cache owners first, then `@jtorm/request-model@1.1.4`, then the asset owner, this package,
+and the remaining consumers.

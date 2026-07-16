@@ -32,6 +32,9 @@ const { jTormDocumentModel } = require('../../src/models/document-model/src/docu
 const { jTormEventModel } = require('../../src/models/event-model/src/event-model.js');
 const { jTormLanguageModel } = require('../../src/models/language-model/src/language-model.js');
 const { jTormConfigModel } = require('../../src/models/config-model/src/config-model.js');
+const { jTormRenderContextModel } = require('../../src/models/render-context-model/src/render-context-model.js');
+const { jTormPromiseCacheModel } = require('../../src/models/promise-cache-model/src/promise-cache-model.js');
+const { jTormAssetPluginModel } = require('../../src/models/asset-plugin-model/src/asset-plugin-model.js');
 const { jTormRegexPolicyModel } = require('../../src/models/regex-policy-model/src/regex-policy-model.js');
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
@@ -58,10 +61,14 @@ const { jTormRemoveMethod } = require('../../src/methods/remove-method/src/remov
 const { jTormFindMethod } = require('../../src/methods/find-method/src/find-method.js');
 const { jTormTitleMethod } = require('../../src/methods/title-method/src/title-method.js');
 const { jTormTimeMethod } = require('../../src/methods/time-method/src/time-method.js');
+const { jTormCssMethod } = require('../../src/methods/css-method/src/css-method.js');
+const { jTormJsMethod } = require('../../src/methods/js-method/src/js-method.js');
+const { jTormCssPlugin } = require('../../src/plugins/css-plugin/src/css-plugin.js');
+const { jTormJsPlugin } = require('../../src/plugins/js-plugin/src/js-plugin.js');
 // Gate-B (schema.org → component) path: the `ui` verb + its mediatarget/mediaquery
 // deps, the data/config/time methods components bind through, the uis ARRAY (resolves
-// code-review #7), and the ui-cache model+plugin. (css/js stay deferred — see
-// wiring.test.js.)
+// code-review #7), and the ui-cache model+plugin. CSS/JS execution stays deferred,
+// but their published facades are DI-wired below so the shared asset owner is covered.
 const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
 const { jTormDataMethod } = require('../../src/methods/data-method/src/data-method.js');
 const { jTormConfigMethod } = require('../../src/methods/config-method/src/config-method.js');
@@ -124,6 +131,16 @@ const methods = {
 const WIRED_PLUGINS = [jTormLayerPlugin, jTormJsonLdPlugin, jTormUiCachePlugin];
 
 // --- DI (mirrors bootstrap/jtorm.js `// DI` block, scoped to the v1 subset) ---
+jTormAssetPluginModel.renderContextModel = jTormRenderContextModel;
+jTormRequestModel.renderContextModel = jTormUiManifestModel.renderContextModel = jTormLayerModel.renderContextModel = jTormUiCacheModel.renderContextModel = jTormRenderContextModel;
+jTormDataModel.promiseCacheModel = jTormHtmlModel.promiseCacheModel = jTormTssModel.promiseCacheModel = jTormUiManifestModel.promiseCacheModel = jTormPromiseCacheModel;
+jTormCssPlugin.assetPluginModel = jTormJsPlugin.assetPluginModel = jTormAssetPluginModel;
+jTormCssPlugin.cssMethod = jTormCssMethod;
+jTormJsPlugin.jsMethod = jTormJsMethod;
+jTormCssPlugin.requestModel = jTormJsPlugin.requestModel = jTormRequestModel;
+jTormCssPlugin.uiResolverModel = jTormJsPlugin.uiResolverModel = jTormUiResolverModel;
+jTormCssMethod.cssPlugin = jTormCssPlugin;
+jTormJsMethod.jsPlugin = jTormJsPlugin;
 jTormErrorHandler.util = util;
 jTormViewModel._ = _;
 jTormViewModel.documentModel = jTormDocumentModel;
@@ -216,6 +233,19 @@ const freshEvents = () => ({
 
 /** Reset the mutable state of the WIRED singletons between boils. */
 function reset(jsonLd = 1) {
+    jTormRenderContextModel.max = 128;
+    jTormAssetPluginModel.renderContextModel = jTormRenderContextModel;
+    jTormRequestModel.renderContextModel = jTormUiManifestModel.renderContextModel = jTormLayerModel.renderContextModel = jTormUiCacheModel.renderContextModel = jTormRenderContextModel;
+    jTormDataModel.promiseCacheModel = jTormHtmlModel.promiseCacheModel = jTormTssModel.promiseCacheModel = jTormUiManifestModel.promiseCacheModel = jTormPromiseCacheModel;
+    jTormCssPlugin.assetPluginModel = jTormJsPlugin.assetPluginModel = jTormAssetPluginModel;
+    jTormCssPlugin.cssMethod = jTormCssMethod;
+    jTormJsPlugin.jsMethod = jTormJsMethod;
+    jTormCssPlugin.requestModel = jTormJsPlugin.requestModel = jTormRequestModel;
+    jTormCssPlugin.uiResolverModel = jTormJsPlugin.uiResolverModel = jTormUiResolverModel;
+    jTormCssMethod.cssPlugin = jTormCssPlugin;
+    jTormJsMethod.jsPlugin = jTormJsPlugin;
+    jTormCssPlugin.cache = jTormJsPlugin.cache = {};
+    jTormCssPlugin.collection = jTormJsPlugin.collection = [];
     jTormTSSParser.tree = [];
     jTormTSSParser.pairs = [];
     jTormTSSParser.tss = '';

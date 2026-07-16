@@ -18,6 +18,11 @@
 > remaining P2 control-flow item. All runtime methods now return
 > `{children, repeat, data}`, `handler.dispatch()` owns normal/alias/synthesized
 > lifecycle policy, missing effects cannot repeat, and explicit repeats are capped.
+>
+> **Backlog update — 2026-07-16:** the P3 DRY-debt slice now has three explicit
+> injected policy owners for bounded render context/state, promise-cache/LRU mechanics,
+> and CSS/JS asset lifecycle. Existing packages remain compatibility facades with their
+> public singleton/reset surfaces intact; source ratchets prevent duplicate policy copies.
 
 ---
 
@@ -157,7 +162,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P2** | Precompile/manifest step for UI closures | ✅ Done — PR #46 | Collapses 27 static fetches→1 cold/0 warm; exact dynamic edges stay on the existing path | L |
 | **P2** | Emit inline JSON-LD from typed model | ✅ Done — PR #47 | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | ✅ Done — PR #49 | Deletes the infinite-loop trap; makes dispatch an invariant | M |
-| **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | Queued | 4-way duplication; bundle + maintainability | M |
+| **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | ✅ Done — policy-owner release set | 4-way duplication; bundle + maintainability | M |
 | **P3** | Replace the parser (tokenizer + recursive descent) | Queued | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | Queued | Info-disclosure + dead weight | S |
 

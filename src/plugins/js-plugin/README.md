@@ -5,5 +5,7 @@
 npm install @jtorm/js-plugin
 ```
 
-Inject `uiResolverModel` to expand UI-package asset aliases and `requestModel` to
-enforce its URL allowlist before a script is injected.
+Inject `assetPluginModel`, `jsMethod`, `uiResolverModel`, and `requestModel`. The shared asset
+owner expands aliases and enforces the request URL allowlist before creating or injecting a
+script; this plugin retains its public cache, collection, lifecycle methods, attributes, and
+original-`src` dedupe behavior.

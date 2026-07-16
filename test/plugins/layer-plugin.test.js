@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 
 const { jTormEventModel } = require('../../src/models/event-model/src/event-model.js');
 const { jTormLayerModel } = require('../../src/models/layer-model/src/layer-model.js');
+const { jTormRenderContextModel } = require('../../src/models/render-context-model/src/render-context-model.js');
 const { jTormLayerPlugin } = require('../../src/plugins/layer-plugin/src/layer-plugin.js');
 const { jTormUiCachePlugin } = require('../../src/plugins/ui-cache-plugin/src/ui-cache-plugin.js');
 
@@ -26,6 +27,7 @@ const _ = {
 };
 
 function resetLayer() {
+    jTormLayerModel.renderContextModel = jTormRenderContextModel;
     jTormLayerModel.cid = null;
     jTormLayerModel.event = freshLayer();
     jTormLayerModel.layers = {};

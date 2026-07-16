@@ -2,10 +2,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormLayerModel: l } = require('../../src/models/layer-model/src/layer-model.js');
+const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
 
 const ev = () => ({ before: { iteration: [] }, after: { iteration: [], view: [] } });
 
 function reset() {
+    l.renderContextModel = cm;
     l.cid = null;
     l.event = ev();
     l.layers = {};

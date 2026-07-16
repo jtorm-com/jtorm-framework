@@ -3,6 +3,11 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormHtmlModel: hm } = require('../../src/models/html-model/src/html-model.js');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
+const { jTormPromiseCacheModel: pm } = require('../../src/models/promise-cache-model/src/promise-cache-model.js');
+const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
+
+hm.promiseCacheModel = pm;
+rm.renderContextModel = cm;
 
 test('returns text and does not cache a rejection (#16)', async () => {
   hm.c = new Map();
@@ -10,6 +15,20 @@ test('returns text and does not cache a rejection (#16)', async () => {
   await assert.rejects(() => hm.get('/x'));
   hm.requestModel = { get: () => ({ text: () => Promise.resolve('<b>hi</b>') }) };
   assert.equal(await hm.get('/x'), '<b>hi</b>');
+});
+
+test('concurrent callers share one in-flight fetch', async () => {
+  let release, fetches = 0;
+  hm.c = new Map(); hm.max = 512;
+  hm.requestModel = { get: () => ({ text: () => {
+    fetches++;
+    return new Promise(resolve => { release = resolve; });
+  } }) };
+
+  const a = hm.get('/same'), b = hm.get('/same');
+  assert.equal(fetches, 1);
+  release('same');
+  assert.deepEqual(await Promise.all([a, b]), ['same', 'same']);
 });
 
 test('bounds the cache to `max` entries — evicts oldest, no unbounded growth', async () => {

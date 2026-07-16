@@ -1,9 +1,12 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+const state = Object.freeze({n: 'uiCache', f: 'freshState'});
+
 module.exports = {
     jTormUiCacheModel: {
         // DI
+        // renderContextModel
         // saveModel
 
         cache: {},// exported nested store {l:{id:{c:d}}} the host persists via saveModel — the source of truth
@@ -12,36 +15,16 @@ module.exports = {
         updated: 0,
         sep: String.fromCharCode(0),// NUL order-key separator (runtime-built, never a raw NUL in source); can't occur in a language/id/variant, so distinct (l,id,c) never collide
 
+        freshState: function () {
+            return { updated: 0 };
+        },
+
         context: function (v) {
-            let c = v && v.c;
-
-            if (!c || typeof c !== 'object')
-                return null
-            ;
-
-            while (c.p && typeof c.p === 'object')
-                c = c.p
-            ;
-
-            return c;
+            return this.renderContextModel.context(v);
         },
 
         state: function (v) {
-            const c = this.context(v);
-
-            if (!c)
-                return this
-            ;
-
-            if (!c.uiCache)
-                c.uiCache = { updated: 0 }
-            ;
-
-            if (v.c !== c)
-                v.c.uiCache = c.uiCache
-            ;
-
-            return c.uiCache;
+            return this.renderContextModel.state(this, v, state);
         },
 
         key: function (l, id, c) {

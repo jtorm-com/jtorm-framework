@@ -15,6 +15,9 @@
 
 module.exports = {
     jTormRequestModel: {
+        // DI
+        // renderContextModel
+
         // dependency-free isomorphic native-fetch client (Node 18+ / browser global fetch)
 
         base: '',   // optional base-URL prefix for relative URLs (host sets for SSR)
@@ -22,13 +25,7 @@ module.exports = {
         sep: String.fromCharCode(0),
 
         context: function (c) {
-            if (c && c.c && typeof c.c === 'object')
-                c = c.c
-            ;
-
-            while (c && c.p && typeof c.p === 'object')
-                c = c.p
-            ;
+            c = this.renderContextModel.context(c);
 
             return c && c.request && typeof c.request === 'object' ? c.request : c;
         },

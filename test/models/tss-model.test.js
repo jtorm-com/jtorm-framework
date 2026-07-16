@@ -3,7 +3,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormTssModel: tm } = require('../../src/models/tss-model/src/tss-model.js');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
+const { jTormPromiseCacheModel: pm } = require('../../src/models/promise-cache-model/src/promise-cache-model.js');
+const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
 const { makeTssParser } = require('../helpers/parser.js');
+
+tm.promiseCacheModel = pm;
+rm.renderContextModel = cm;
 
 test('awaits text BEFORE parsing (bug: a Promise must not reach tssParser.handle)', async () => {
   tm.c = new Map();
@@ -28,6 +33,42 @@ test('cache hits return the same parsed AST and node identities', async () => {
   assert.strictEqual(b, a);
   assert.strictEqual(b[0], a[0]);
   assert.equal(fetches, 1);
+});
+
+test('concurrent callers share one in-flight parse', async () => {
+  let release, fetches = 0, parses = 0;
+  tm.c = new Map(); tm.max = 512;
+  tm.tssParser = { handle: t => { parses++; return [t]; } };
+  tm.requestModel = { get: () => ({ text: () => {
+    fetches++;
+    return new Promise(resolve => { release = resolve; });
+  } }) };
+
+  const a = tm.get('/same'), b = tm.get('/same');
+  assert.equal(fetches, 1);
+  release('same');
+  const [x, y] = await Promise.all([a, b]);
+  assert.strictEqual(y, x);
+  assert.equal(parses, 1);
+});
+
+test('array inputs load and concatenate sequentially in source order', async () => {
+  const starts = [], releases = {};
+  tm.c = new Map(); tm.max = 512;
+  tm.tssParser = { handle: t => [t] };
+  tm.requestModel = { get: u => ({ text: () => {
+    starts.push(u);
+    return new Promise(resolve => { releases[u] = resolve; });
+  } }) };
+
+  const p = tm.get(['/a', '/b']);
+  await Promise.resolve();
+  assert.deepEqual(starts, ['/a']);
+  releases['/a']('A');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(starts, ['/a', '/b']);
+  releases['/b']('B');
+  assert.deepEqual(await p, ['A', 'B']);
 });
 
 test('bounds the cache to `max` entries — evicts oldest, no unbounded growth', async () => {
