@@ -21,13 +21,7 @@ for (const [verb, params] of [
   ['remove', '']
 ]) {
   test(`zero-match selector → ${verb} throws loud (drift detector)`, async () => {
-    const log = console.log;
-    console.log = () => {};
-    try {
-      await assert.rejects(render(HTML, `.none->${verb} { ${params} }`, {}), /\.none not found/);
-    } finally {
-      console.log = log;
-    }
+    await assert.rejects(render(HTML, `.none->${verb} { ${params} }`, {}), /\.none not found/);
   });
 }
 

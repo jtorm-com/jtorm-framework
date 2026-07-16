@@ -22,14 +22,8 @@ test('append alias inserts inline h at beforeend', async () => {
 });
 
 test('insert on a zero-match selector throws via the error-handler (characterizes #14)', async () => {
-  const log = console.log;
-  console.log = () => {}; // silence the error-handler's pre-throw v dump
-  try {
-    await assert.rejects(
-      render('<body><p>x</p></body>', ".none->insert { h: '<b>y</b>'; m: 'i'; }", {}),
-      /\.none not found/
-    );
-  } finally {
-    console.log = log;
-  }
+  await assert.rejects(
+    render('<body><p>x</p></body>', ".none->insert { h: '<b>y</b>'; m: 'i'; }", {}),
+    /\.none not found/
+  );
 });

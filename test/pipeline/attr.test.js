@@ -414,14 +414,8 @@ test('attrs delegates style and ping safety to attr', async () => {
 });
 
 test('attr on a zero-match selector throws via the error-handler (characterizes #14)', async () => {
-  const log = console.log;
-  console.log = () => {}; // silence the error-handler's pre-throw v dump
-  try {
-    await assert.rejects(
-      render('<body><p>x</p></body>', ".none->attr { n: 'x'; v: '1'; }", {}),
-      /\.none not found/
-    );
-  } finally {
-    console.log = log;
-  }
+  await assert.rejects(
+    render('<body><p>x</p></body>', ".none->attr { n: 'x'; v: '1'; }", {}),
+    /\.none not found/
+  );
 });
