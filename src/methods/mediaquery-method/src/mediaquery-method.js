@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormMediaqueryMethod: {
@@ -9,8 +10,8 @@ module.exports = {
         // windowModel
 
         alias: 'mq',
-        // Child gate: handle sets v.io.c from the media match. On a validate MISS (no `q`)
-        // the handler fails CLOSED (skip children) rather than leak the guarded content.
+        // Child gate: handle returns the media match. On a validate MISS (no `q`)
+        // the handler fails CLOSED rather than leak the guarded content.
         gate: 1,
         m: null,
         params: [
@@ -28,11 +29,12 @@ module.exports = {
         },
 
         /**
-         * Set `v.io.c` from whether the media query `v.d.q` currently matches (windowModel.matchMedia).
+         * Return whether the media query `v.d.q` currently matches (windowModel.matchMedia).
          * @param {ViewModel} v
+         * @returns {MethodEffect}
          */
         handle: function (v) {
-            v.io = {c: this.process(v.d.q)};
+            return {children: !!this.process(v.d.q)};
         },
 
         process: function (q) {

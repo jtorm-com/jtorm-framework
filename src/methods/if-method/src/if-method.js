@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormIfMethod: {
@@ -54,6 +55,7 @@ module.exports = {
         /**
          * Evaluate `v.d.d` (with `||`/`&&`, type, literal/trusted-regex, or element tests) and boil either the matching children or the `->else` branch.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const
@@ -159,7 +161,7 @@ module.exports = {
                 await this.handler.handle(v.h, t, v.m, v.c)
             ;
 
-            v.io = {};
+            return {children: false};
         }
     }
 };

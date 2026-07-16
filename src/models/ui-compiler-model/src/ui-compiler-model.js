@@ -7,6 +7,7 @@
 module.exports = {
     jTormUiCompilerModel: {
         // DI
+        // handler
         // methods[]
         // viewModel
 
@@ -65,7 +66,7 @@ module.exports = {
                 nT.c = [{s: nT.s, m: 'get', c: nT.c, p: f}];
 
                 if (tR.di) {
-                    r = await s.add(tR.di.m, v);
+                    r = await s.add(tR.di, v);
                     if (!r)
                         return null
                     ;
@@ -92,11 +93,11 @@ module.exports = {
                 let i, sV;
                 for (i in di.m) {
                     sV = this.viewModel.copy(v);
-                    sV.d = di.m[i];
+                    sV.t = {s: v.t.s, m: i, p: {}, c: []};
 
-                    await this.methods[i].handle(sV);
+                    const e = await this.handler.dispatch(sV, di.m[i]);
 
-                    return sV.io.c;
+                    return e.children;
                 }
             }
 

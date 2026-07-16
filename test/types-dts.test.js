@@ -31,7 +31,7 @@ test('prepack emits a consumable .d.ts that exports the typedefs', () => {
       '--rootDir', path.join(PKG_DIR, 'src'), '--outDir', out,
       path.join(PKG_DIR, 'src', 'types.js')], { stdio: 'pipe' });
     const dts = fs.readFileSync(path.join(out, 'types.d.ts'), 'utf8');
-    for (const t of ['ViewModel', 'ViewIO', 'ViewContext', 'ViewLayerContext', 'ViewUiCacheContext', 'ViewUiManifestContext', 'ViewRequestContext', 'ViewCssContext', 'ViewJsContext', 'TssNode', 'UiDependency', 'UiArtifact', 'UiCall', 'UiDescriptor', 'UiPackage', 'UiResolution', 'JsonDepth', 'JsonValue', 'UiManifestDescriptor', 'UiManifestRoot', 'UiManifestCompilerRoot', 'UiManifestUi', 'UiManifestDynamic', 'UiManifestAsset', 'UiManifestConfig', 'UiManifestDocument', 'UiManifestPreparedIndex', 'UiManifestSourceRequest', 'UiManifestSourceResult', 'UiManifestSourceAdapter', 'UiManifestCompilerConfig', 'UiManifestCompileResult', 'UiManifestDigest', 'Method'])
+    for (const t of ['ViewModel', 'MethodEffect', 'ViewEffect', 'ViewIO', 'ViewContext', 'ViewLayerContext', 'ViewUiCacheContext', 'ViewUiManifestContext', 'ViewRequestContext', 'ViewCssContext', 'ViewJsContext', 'TssNode', 'UiDependency', 'UiArtifact', 'UiCall', 'UiDescriptor', 'UiPackage', 'UiResolution', 'JsonDepth', 'JsonValue', 'UiManifestDescriptor', 'UiManifestRoot', 'UiManifestCompilerRoot', 'UiManifestUi', 'UiManifestDynamic', 'UiManifestAsset', 'UiManifestConfig', 'UiManifestDocument', 'UiManifestPreparedIndex', 'UiManifestSourceRequest', 'UiManifestSourceResult', 'UiManifestSourceAdapter', 'UiManifestCompilerConfig', 'UiManifestCompileResult', 'UiManifestDigest', 'Method'])
       assert.match(dts, new RegExp('export type ' + t + '\\b'),
         t + ' must be an exported type so the import specifier resolves downstream');
     assert.match(dts, /locale\?: string \| null;/,
@@ -44,6 +44,10 @@ test('prepack emits a consumable .d.ts that exports the typedefs', () => {
       'ViewContext must expose optional request model state');
     assert.match(dts, /manifest\?: ViewUiManifestContext;/,
       'ViewContext must expose optional root-local UI manifest state');
+    assert.match(dts, /export type ViewIO = ViewEffect;/,
+      'the published ViewIO name must remain as an alias of the returned effect');
+    assert.doesNotMatch(dts, /\bio: ViewIO;/,
+      'ViewModel must not expose the removed mutable control-flow side channel');
     assert.match(dts, /promise\?: Promise<void> \| null;/,
       'manifest preparation state must allow the runtime failure cleanup sentinel');
     const jd = dts.match(/export type JsonDepth = \[([^\]]+)\];/);

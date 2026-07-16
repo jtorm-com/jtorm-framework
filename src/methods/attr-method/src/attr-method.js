@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormAttrMethod: {
@@ -35,6 +36,7 @@ module.exports = {
         /**
          * Set, append, prepend, or remove a single attribute (`v.d.n`) on each selected element via `v.h.set`.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const s = this, d = v.h.root;
@@ -75,7 +77,7 @@ module.exports = {
                 ;
             });
 
-            v.io = {c: 1};
+            return {children: true};
         },
 
         get: function (e, n) {

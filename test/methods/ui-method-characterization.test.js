@@ -40,7 +40,6 @@ function view(d = { t: 1, h: 1 }) {
   return {
     _: _,
     d,
-    io: {},
     t: { s: '.target', m: 'ui', p: { c: 'Old' }, c: [{ s: 'b', m: 'text', p: {}, c: [] }] }
   };
 }
@@ -221,18 +220,17 @@ test('pT wraps the original target get as the parent-target node sole child', as
   }
 });
 
-test('artifact di gates each URL and root ui di preserves its historical double-m nesting', async () => {
+test('artifact and root ui di use the compiler dispatch path', async () => {
   const s = state();
+  const handler = c.handler;
   const calls = [];
 
   try {
-    m.viewModel = { copy: v => ({ ...v, d: {}, io: {} }) };
-    m.methods = {
-      allow: {
-        handle: v => {
-          calls.push(v.d);
-          v.io.c = v.d.pass;
-        }
+    m.viewModel = { copy: v => ({ ...v, d: {} }) };
+    c.handler = {
+      dispatch: async (v, d) => {
+        calls.push({ method: v.t.m, d });
+        return { children: !!d.pass, repeat: false, data: undefined };
       }
     };
 
@@ -250,14 +248,14 @@ test('artifact di gates each URL and root ui di preserves its historical double-
     const oneM = await m.processComponent(view(), {
       c: { ui: { c: 'Parent' }, di: { m: { allow: { pass: 0 } } } }
     });
-    assert.ok(oneM, 'one m level is historically not dispatched and therefore allows');
-
-    const twoM = await m.processComponent(view(), {
-      c: { ui: { c: 'Parent' }, di: { m: { m: { allow: { pass: 0 } } } } }
-    });
-    assert.equal(twoM, null, 'two m levels reach add() and can suppress the component');
-    assert.deepEqual(calls, [{ pass: 1 }, { pass: 0 }, { pass: 0 }]);
+    assert.equal(oneM, null, 'canonical di reaches dispatch and can suppress the component');
+    assert.deepEqual(calls, [
+      { method: 'allow', d: { pass: 1 } },
+      { method: 'allow', d: { pass: 0 } },
+      { method: 'allow', d: { pass: 0 } }
+    ]);
   } finally {
+    c.handler = handler;
     restore(s);
   }
 });

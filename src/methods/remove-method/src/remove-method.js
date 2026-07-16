@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormRemoveMethod: {
@@ -16,13 +17,14 @@ module.exports = {
         /**
          * Remove each element selected by `v.t.s` from its parent.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             await v.h.set(v, e => {
                 e.parentElement.removeChild(e);
             }, v);
 
-            v.io = {};
+            return {children: false};
         }
     }
 };

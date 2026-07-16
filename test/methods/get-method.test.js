@@ -66,9 +66,9 @@ test('get-method passes the render context to fetched content models', async () 
       _: { set: () => {} }
     };
 
-    await gm.handle(v);
+    const effect = await gm.handle(v);
 
-    assert.deepEqual(v.io, { c: 1, d: { title: 'ok' } });
+    assert.deepEqual(effect, { children: true, data: { title: 'ok' } });
     assert.deepEqual(seen, { u: '/data.json', c: ctx });
   } finally {
     gm.models = m;

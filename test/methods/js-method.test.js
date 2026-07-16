@@ -20,13 +20,12 @@ test('js-method queues the full parsed attr set (not just src)', () => {
     const v = {
         c: { c: 1 },
         t: { p: { src: 'a.js' } },
-        d: { src: 'a.js', async: 'async', type: 'module' },
-        io: null
+        d: { src: 'a.js', async: 'async', type: 'module' }
     };
 
-    jTormJsMethod.handle(v);
+    const effect = jTormJsMethod.handle(v);
 
     assert.equal(plugin.collection.length, 1);
     assert.deepEqual(plugin.collection[0], { src: 'a.js', async: 'async', type: 'module' });
-    assert.deepEqual(v.io, { c: 1 });
+    assert.deepEqual(effect, { children: true });
 });

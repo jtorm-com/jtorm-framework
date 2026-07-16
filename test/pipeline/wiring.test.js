@@ -7,6 +7,10 @@ const { WIRED_METHODS, WIRED_PLUGINS } = require('../helpers/engine.js');
 const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
+const { jTormHandler } = require('../../src/handlers/handler/src/handler.js');
+const { jTormAttrsMethod } = require('../../src/methods/attrs-method/src/attrs-method.js');
+const { jTormEachMethod } = require('../../src/methods/each-method/src/each-method.js');
+const { jTormMoveMethod } = require('../../src/methods/move-method/src/move-method.js');
 const { jTormDataParser } = require('../../src/parsers/data-parser/src/data-parser.js');
 const { jTormIfMethod } = require('../../src/methods/if-method/src/if-method.js');
 const { jTormRegexPolicyModel } = require('../../src/models/regex-policy-model/src/regex-policy-model.js');
@@ -44,9 +48,16 @@ test('ui verb is wired to resolver/compiler models before facade configuration',
   assert.equal(jTormUiMethod.resolverModel, jTormUiResolverModel);
   assert.equal(jTormUiMethod.compilerModel, jTormUiCompilerModel);
   assert.equal(jTormUiMethod.dataParser, jTormDataParser);
+  assert.equal(jTormUiCompilerModel.handler, jTormHandler);
   assert.ok(jTormUiCompilerModel.methods.ui);
   assert.ok(jTormUiCompilerModel.viewModel);
   assert.ok(Array.isArray(jTormUiResolverModel.uis));
+});
+
+test('synthesized attrs/each/move verbs share the handler dispatch owner', () => {
+  assert.equal(jTormAttrsMethod.handler, jTormHandler);
+  assert.equal(jTormEachMethod.handler, jTormHandler);
+  assert.equal(jTormMoveMethod.handler, jTormHandler);
 });
 
 test('if verb is wired to the bounded regex policy model', () => {

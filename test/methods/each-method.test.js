@@ -3,11 +3,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormEachMethod: each } = require('../../src/methods/each-method/src/each-method.js');
 
-const h = each.handler, m = each.methods, v = each.viewModel;
+const h = each.handler, v = each.viewModel;
 
 test.afterEach(() => {
   each.handler = h;
-  each.methods = m;
   each.viewModel = v;
 });
 
@@ -20,9 +19,9 @@ test('each(e:) carries v.c.locale into cloned element boils', async () => {
     handle: async (h, t, m, ctx) => {
       c = ctx;
       return { select: () => ({}), body: () => '<li>Hallo</li>' };
-    }
+    },
+    dispatch: async () => ({ children: true, repeat: false, data: undefined })
   };
-  each.methods = { append: { handle: async () => {} } };
   each.viewModel = { copy: () => ({}) };
 
   await each.handle({

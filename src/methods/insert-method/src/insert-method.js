@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormInsertMethod: {
@@ -48,6 +49,7 @@ module.exports = {
          * explicit RAW opt-in: author literals + composed markup), or boiled children,
          * via the chosen mode; throw via errorHandler when the target element is absent.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             let e, h, c = 1;
@@ -101,7 +103,7 @@ module.exports = {
 
             v.cid = v.cs = v.l = null;
 
-            v.io = {c: c};
+            return {children: !!c};
         },
 
         // Host XSS sanitizer seam (DI, DOMPurify-shaped: html -> cleaned html; sync

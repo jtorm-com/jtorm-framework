@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/js-method",
   "description": "jTorm JS Method",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@jtorm/js-plugin": "^1.0.2",
-    "@jtorm/types": "^1.0.5"
+    "@jtorm/handler": "^1.0.6",
+    "@jtorm/types": "^1.1.1"
   }
 }

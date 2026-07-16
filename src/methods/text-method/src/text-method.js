@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormTextMethod: {
@@ -17,8 +18,9 @@ module.exports = {
         },
 
         /**
-         * Resolve each `v.t.p` value against `v.m` via dataParser, translate it through languageModel, write it back onto `v.m`, and emit the model on `v.io.d`.
+         * Resolve each `v.t.p` value against `v.m` via dataParser, translate it through languageModel, write it back onto `v.m`, and return the model as child data.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const d = this.dataParser, b = d.bindings(v.t, v.t.p, v._);
@@ -30,7 +32,7 @@ module.exports = {
                 v.m[k] = this.languageModel.get(x ? x : v.t.p[k], v.c.locale);
             }
 
-            v.io = {c: 1, d: v.m};
+            return {children: true, data: v.m};
         }
     }
 };

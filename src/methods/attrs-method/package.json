@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/attrs-method",
   "description": "jTorm Attributes Method",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,10 +14,11 @@
     "directory": "src/methods/attrs-method"
   },
   "dependencies": {
-    "@jtorm/attr-method": "^1.0.0",
+    "@jtorm/attr-method": "^1.0.5",
     "@jtorm/data-parser": "^1.0.3",
+    "@jtorm/handler": "^1.0.6",
     "@jtorm/tss-parser": "^1.0.0",
-    "@jtorm/view-model": "^1.0.0",
-    "@jtorm/types": "^1.0.0"
+    "@jtorm/view-model": "^1.0.4",
+    "@jtorm/types": "^1.1.1"
   }
 }

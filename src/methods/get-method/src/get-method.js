@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormGetMethod: {
@@ -35,6 +36,7 @@ module.exports = {
         /**
          * Fetch data/html/tss models (`v.d.d`/`v.d.h`/`v.d.t`) and merge them into the model, the DOM, or the `v.t` subtree (setting ancestor scope `v.c.a`).
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         async handle(v) {
             let r, k, nD, nT;
@@ -115,7 +117,7 @@ module.exports = {
                 v.t = nT;
             }
 
-            v.io = {c: 1, d: nD};
+            return {children: true, data: nD};
         }
     }
 };

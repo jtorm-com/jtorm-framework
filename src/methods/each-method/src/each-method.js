@@ -2,13 +2,13 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormEachMethod: {
         // DI
         // handler
         // handlerWrapper
-        // methods[]
         // viewModel
 
         defaultMethod: 'append',
@@ -34,6 +34,7 @@ module.exports = {
         /**
          * Iterate `v.d.d` (or `v.m`), boil `v.t.c` per item, and apply the collected fragment via the chosen insert method (default append).
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const s = this;
@@ -116,11 +117,10 @@ module.exports = {
             ;
 
             sv = s.viewModel.copy(v);
-            sv.t = {s: v.t.s, m: v.d.m, c: []};
-            sv.d = {h: r};
-            await s.methods[v.d.m].handle(sv);
+            sv.t = {s: v.t.s, m: v.d.m, p: {}, c: []};
+            await s.handler.dispatch(sv, {h: r});
 
-            v.io = {};
+            return {children: false};
         }
     }
 };

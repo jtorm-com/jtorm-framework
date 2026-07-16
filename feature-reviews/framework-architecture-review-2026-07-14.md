@@ -12,6 +12,12 @@
 > Separate release gate: publish `@jtorm/regex-policy-model@1.0.0` before
 > `@jtorm/if-method@1.0.3`, and wire the model into both production host composition
 > roots before either host adopts the new method version.
+>
+> **Backlog update — 2026-07-16 (`dev` base `4bfab8f`):** PR #46 completed the
+> UI-closure manifest and PR #47 completed inline JSON-LD. The explicit-effect
+> change closes the remaining P2 control-flow item: all runtime methods return
+> `{children, repeat, data}`, `handler.dispatch()` owns normal/alias/synthesized
+> lifecycle policy, missing effects cannot repeat, and explicit repeats are capped.
 
 ---
 
@@ -49,13 +55,13 @@ Live in production on a Magento store via a Node host engine.
 
 ### Render flow (one paragraph)
 
-`viewModel.create(html, tss, data)` parses TSS once (cached) into an AST of `{s,m,p,c}` nodes and wraps HTML in a `document-model`. The **handler** is the single driver loop: per node it resolves the verb, runs data-binding, `validate`s, fires before/after events, runs `handle` (mutating the DOM through the one seam `v.h.set` → `document-model.set`), then recurses into children within the rule's lexical scope. Everything hangs off a view object `v` with one-letter fields (`v.t/v.d/v.m/v.h/v.io/v.c`) documented centrally in `@jtorm/types`.
+`viewModel.create(html, tss, data)` parses TSS once (cached) into an AST of `{s,m,p,c}` nodes and wraps HTML in a `document-model`. The **handler** is the single driver loop: `dispatch()` resolves the verb/alias, prepares data, validates, fires before/after events, runs `handle` (mutating the DOM through the one seam `v.h.set` → `document-model.set`), normalizes its returned effect, and applies bounded repeat; `handle()` owns rule traversal and child recursion within lexical scope. Everything hangs off a view object `v` with one-letter fields (`v.t/v.d/v.m/v.h/v.c`) plus an explicit `{children,repeat,data}` result, documented centrally in `@jtorm/types`.
 
 ### Best design decisions (keep in any rebuild)
 
 1. **Single DOM-mutation chokepoint** (document-model.js:67-96). All 9 DOM-writing verbs route through `set()`; the zero-match **drift throw** (upgrade-safety detector), ancestor-scope, and find-scope live there — enforced once, unforgettable.
 2. **The `t:`/`h:` escaping split** (insert-method.js:192-217) — strongest thing in the codebase. `t:` uses native text APIs the DOM escapes; `h:` is the greppable raw opt-in. **Fail-closed guard** refuses `t:` inside raw-text elements (`script`/`style`/`iframe`…) where `textContent` can't escape (insert-method.js:205-209). Every data-reachable raw-markup sink (insert/get/wrap/swap, all modes) routes through the host `sanitize()` DI seam, placed *lazily after target resolution* so drift stays drift. Verified sink-by-sink; the only bypasses are DOM-to-DOM relocations and the trusted template parse.
-3. **Declarative fail-closed gates** (handler.js:89-91): `v.io.c = r.gate ? 0 : 1` on validate-miss. Config/mediaquery/mediatarget skip children rather than leak — one line, one place.
+3. **Declarative fail-closed gates:** `handler.dispatch()` defaults missing/invalid gate effects to `children:false`, while non-gate misses pass through. Config/mediaquery/mediatarget skip children rather than leak — one policy owner for normal, aliased, and synthesized execution.
 4. **Promise-cache done right** (tss-model.js:35-49): caches the in-flight promise (dedupes concurrent fetches) with identity-guarded delete-on-reject.
 5. **Per-request isolation landed** (PRs #29–#34, verified on `dev`): per-render state threaded on the request's own context object `v.c`, typed `ViewContext` in `@jtorm/types`. Instance-per-request semantics without instances.
 6. **The decoder-ring types package** — one canonical JSDoc source for `v` and the verb contract; what makes 981 LOC of one-letter fields legible at all.
@@ -67,9 +73,9 @@ Live in production on a Magento store via a Node host engine.
 3. **"SEO for free" is ~15% delivered.** The framework consumes schema.org shapes but emits none. The `.jsonld` alternate link (head-id.tss:24-40) points at an *externally* served document most crawlers won't treat as page markup. Emitting `<script type="application/ld+json">` from the already-typed model would be nearly free and is absent.
 4. **Three open data→sink security gaps** (see §Security).
 5. **Unknown verbs pass silently** (handler.js:95-98). A typo'd method name renders its children and drops the transform with **no signal** — while a typo'd *selector* throws loud. The core promise ("drift is detected loudly") has a hole exactly one token wide. Cheap fix: registry-membership check when `t.m` is truthy.
-6. **The `v.io` implicit-replacement contract is an infinite-loop trap.** `v.io.r` (repeat) defaults to `1` (view-model.js:57); the handler re-runs the same node while `io.r` is truthy (handler.js:99). Every verb must wholesale-replace `v.io` — a duty documented nowhere and enforced only by all-existing-code convention. Forget it in a new verb → infinite render loop. 9 distinct ad-hoc `v.io` literal shapes across verbs; no shared builder.
+6. **✅ Closed 2026-07-16 — the former `v.io` implicit-replacement infinite-loop trap.** The view model no longer owns mutable control flags; all 23 methods return effect intents and the handler normalizes missing effects to `repeat:false`. Explicit repeat re-runs the full lifecycle, re-resolves rewritten nodes, and throws at 100 executions. A failing-test-first sentinel proves a method that returns nothing runs once.
 7. **`handler-wrapper` mutates the cached AST at render time** (`t2[k].s = 'body'`, handler-wrapper.js:32-34) — writing onto trees that `tss-model` caches across renders/tenants. A repair in the wrong layer (undoing the parser's eager selector inheritance). Same family as the isolation gate, distinct mechanism.
-8. **Five internal sites dispatch verbs directly, bypassing the pipeline** (each-method.js:121, move-method.js:41, attrs-method.js:79, mediatarget-method.js:64, ui-compiler-model.js:97) — no data-parse, validate, gate, or events. The handler's centralized contract is therefore *not* an invariant: plugins on method events see a partial stream, and a future validate-side security check would be skippable from inside the engine.
+8. **✅ Closed 2026-07-16 — internal lifecycle bypasses.** attrs, each, move, and UI compiler `di` build complete synthetic nodes and call injected `handler.dispatch()` with prepared data; mediatarget asks mediaquery's pure match helper instead of invoking a verb. Data hooks, validation, fail-closed gates, aliases, unknown errors, and before/after events are now dispatch invariants.
 9. **Binding re-parse per node per render** (handler.js:73; data-parser has no cache). The AST is cached but every binding string is re-regexed and re-split on every render. Cheapest large perf win available: compile bindings onto the AST node once.
 10. **DRY debt from the isolation retrofit.** 5 near-identical `context(v)` walks, 4 `state(v)` copies, 3 near-clone fetch models (tss/data/html, ~85% identical), 2 near-clone css/js plugins (~90% identical). Every isolation fix had to be applied in ≥4 places — the slice history shows exactly that. Directly against the CLAUDE.md DRY/smallest-bundle mandate.
 11. **`Thing.default` ships demo junk.** `thing-update-1.0.1.tss` (schema-ui.js:336-338) appends a stray `<input type=email>` and a `ul` to `<body>` — so any bare `ui:{c:'Thing'}` (e.g. `Person.default`, schema-ui.js:427-430) inherits it. The one live instance of the "versioned update file" mechanic is a landmine; no end-to-end test covers `Thing.default` or `Person.default`.
@@ -77,7 +83,7 @@ Live in production on a Magento store via a Node host engine.
 
 ### DRY / SOLID grade
 
-- **SOLID: B.** Verbs are single-responsibility; the handler is the only place dispatch/scope/gate/recursion live; DI is uniform. Dinged by the 5 pipeline-bypass sites and `ui-method` being a 130-line forwarding facade.
+- **SOLID: B+.** Verbs are single-responsibility; the handler is the only place dispatch/scope/gate/recursion live; DI is uniform, and the five pipeline bypasses are closed. The compatibility-forwarding `ui-method` facade remains deliberate published surface.
 - **DRY: C+.** The isolation retrofit left 4-way duplication (context/state/fetch-models/plugins); the sanitize `clean()` seam is copied into 4 packages; css/js method+plugin are near-twins.
 
 ---
@@ -129,7 +135,7 @@ Also noted, lower priority: `error-handler` `console.log`s every populated `v` f
 Keep the `windowModel` + `v.c.c` seams. Make the **root render context a first-class `RenderSession` object** created by one factory instead of lazily hung off `v.c` by 5 modules — deletes the 5 `context()` copies and the singleton-fallback bug class in one move. Singletons then hold only immutable boot config + shared caches. Make tenant discrimination **fail-closed** (refuse cache participation when no discriminator, don't silently share).
 
 ### Security
-Close S1–S3: route `js{src}`/`css{href}` through the same `allow()` scheme/origin allowlist before injection; add `style`+`ping` to the attr net with a CSS-safe policy; length-bound + timeout `if{r:}` input (or document it trusted-input-only). Keep the `t:`/`h:` split and fail-closed raw-text guard verbatim. Normalize `v.io` to a returned effect object (`{children, repeat, data}`) — deletes the infinite-loop trap and routes all dispatch (incl. synthesized nodes) through one internal `dispatch()` so validate/gate/events become true invariants.
+S1–S3 and the control-flow item are now closed. Keep the `t:`/`h:` split and fail-closed raw-text guard verbatim. Method control remains an explicit returned effect (`{children, repeat, data}`), with all registered execution (including synthesized nodes) routed through one internal `dispatch()` so validation, gates, events, and repeat bounds remain invariants.
 
 ### Bundle strategy
 Realistic SPA payload today ≈ **27–31 KB gz** (framework + registries) — already small; bundle size is *not* the problem, the **asset waterfall is**. Priorities: (1) the manifest/precompile step above; (2) tree-shake the DI'd lodash subset (cherry-picked ≈4–8 KB gz vs ~25 KB full); (3) ship UI assets as one manifested pack per page rather than hundreds of 10–90 B files.
@@ -150,7 +156,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P1** | Compile bindings onto AST nodes | ✅ Done — PR #44 | Eliminates per-render re-parse; large perf win | M |
 | **P2** | Precompile/manifest step for UI closures | ✅ Done — PR #46 | Collapses 27 static fetches→1 cold/0 warm; exact dynamic edges stay on the existing path | L |
 | **P2** | Emit inline JSON-LD from typed model | ✅ Done — PR #47 | Makes the headline SEO claim true | M |
-| **P2** | Normalize `v.io` → returned effect object | Queued | Deletes the infinite-loop trap; makes dispatch an invariant | M |
+| **P2** | Normalize `v.io` → returned effect object | ✅ Done — explicit-effect change | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | Queued | 4-way duplication; bundle + maintainability | M |
 | **P3** | Replace the parser (tokenizer + recursive descent) | Queued | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | Queued | Info-disclosure + dead weight | S |

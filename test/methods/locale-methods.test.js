@@ -62,9 +62,9 @@ test('time uses v.c.locale when present', () => {
   time.time = () => ['Yesterday'];
 
   const v = { d: { as: 'html', dT: '2020-01-01T00:00:00.000Z' }, c: { locale: 'nl-NL' } };
-  time.handle(v);
+  const effect = time.handle(v);
 
-  assert.equal(v.io.d.html, 'Gisteren');
+  assert.equal(effect.data.html, 'Gisteren');
   assert.equal(lm.language, 'en-US');
 });
 
@@ -74,7 +74,7 @@ test('time falls back to the default language when v.c.locale is absent', () => 
   time.time = () => ['Yesterday'];
 
   const v = { d: { as: 'html', dT: '2020-01-01T00:00:00.000Z' }, c: {} };
-  time.handle(v);
+  const effect = time.handle(v);
 
-  assert.equal(v.io.d.html, 'Yesterday');
+  assert.equal(effect.data.html, 'Yesterday');
 });

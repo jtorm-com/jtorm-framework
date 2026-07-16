@@ -13,6 +13,7 @@ npm install @jtorm/ui-method
 jTormUiMethod.resolverModel = jTormUiResolverModel;
 jTormUiMethod.compilerModel = jTormUiCompilerModel;
 jTormUiMethod.dataParser = jTormDataParser;
+jTormUiCompilerModel.handler = jTormHandler;
 jTormUiCompilerModel.methods = methods;
 jTormUiCompilerModel.viewModel = jTormViewModel;
 ```

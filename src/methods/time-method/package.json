@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/time-method",
   "description": "jTorm Time Method",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,8 @@
     "directory": "src/methods/time-method"
   },
   "dependencies": {
+    "@jtorm/handler": "^1.0.6",
     "@jtorm/language-model": "^1.0.2",
-    "@jtorm/types": "^1.0.3"
+    "@jtorm/types": "^1.1.1"
   }
 }

@@ -142,12 +142,11 @@ jTormIfMethod.regexPolicyModel = jTormRegexPolicyModel;
 jTormTextMethod.languageModel = jTormLanguageModel; // engine bootstrap OMITS this; text-method.js:23 needs it
 jTormTimeMethod.languageModel = jTormLanguageModel;
 jTormLanguageModel.configModel = jTormConfigModel;
-jTormAttrsMethod.attrMethod = jTormAttrMethod;
 jTormEventModel.plugins = WIRED_PLUGINS;
 jTormHandler.eventModel = jTormHandlerWrapper.eventModel = jTormEventModel;
-jTormHandler.methods = jTormEachMethod.methods = jTormMoveMethod.methods = jTormUiCompilerModel.methods = methods;
+jTormHandler.methods = jTormUiCompilerModel.methods = methods;
 jTormInsertMethod.viewModel = jTormHandler.viewModel = jTormHandlerWrapper.viewModel = jTormEachMethod.viewModel = jTormAttrsMethod.viewModel = jTormMoveMethod.viewModel = jTormUiCompilerModel.viewModel = jTormViewModel;
-jTormHandlerWrapper.handler = jTormEachMethod.handler = jTormIfMethod.handler = jTormSwapMethod.handler = jTormHandler;
+jTormAttrsMethod.handler = jTormHandlerWrapper.handler = jTormEachMethod.handler = jTormIfMethod.handler = jTormMoveMethod.handler = jTormSwapMethod.handler = jTormUiCompilerModel.handler = jTormHandler;
 jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormWrapMethod.handlerWrapper = jTormHandlerWrapper;
 // fetch models + get verb DI (request transport seam) — get() resolves data/html/tss via the models
 jTormDataModel.requestModel = jTormHtmlModel.requestModel = jTormTssModel.requestModel = jTormRequestModel;

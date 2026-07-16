@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormTimeMethod: {
@@ -79,8 +80,9 @@ module.exports = {
         },
 
         /**
-         * Compute a relative-time label for `v.d.dT`/`v.d.d` and merge the formatted fields onto `v.io.d`.
+         * Compute a relative-time label for `v.d.dT`/`v.d.d` and return the formatted child data.
          * @param {ViewModel} v
+         * @returns {MethodEffect}
          */
         handle: function (v) {
             const l = this.languageModel,
@@ -110,7 +112,7 @@ module.exports = {
             nD.l = l.getDate(nD.d);
             nD.title = nD.l;
 
-            v.io = {c: 1, d: nD};
+            return {children: true, data: nD};
         },
 
         time: function (t) {
