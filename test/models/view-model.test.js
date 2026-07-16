@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const _ = require('lodash');
 const { jTormViewModel: vm } = require('../../src/models/view-model/src/view-model.js');
+const { makeTssParser } = require('../helpers/parser.js');
 
 function reset() {
     vm._ = _;
@@ -48,6 +49,40 @@ test('view-model.create preserves object context by reference for child scopes',
         assert.equal(c.s, '.next');
         assert.deepEqual(vm.data.c, { c: 1, s: null, a: null });
     } finally {
+        reset();
+    }
+});
+
+test('view-model.create preserves parser error identity and source position', async () => {
+    reset();
+    const parser = makeTssParser();
+    let observed;
+    vm.tssParser = {
+        handle: function (source) {
+            try {
+                return parser.handle(source);
+            } catch (error) {
+                observed = error;
+                throw error;
+            }
+        }
+    };
+
+    try {
+        await assert.rejects(
+            () => vm.create({}, 'a{', {}, 1),
+            error => {
+                assert.strictEqual(error, observed);
+                assert.ok(error instanceof SyntaxError);
+                assert.deepEqual(
+                    [error.line, error.column, error.offset],
+                    [1, 2, 1]
+                );
+                return true;
+            }
+        );
+    } finally {
+        delete vm.tssParser;
         reset();
     }
 });

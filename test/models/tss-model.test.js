@@ -35,6 +35,38 @@ test('cache hits return the same parsed AST and node identities', async () => {
   assert.equal(fetches, 1);
 });
 
+test('a located parser rejection keeps identity, evicts, and retries', async () => {
+  tm.c = new Map(); tm.max = 512;
+  const parser = makeTssParser();
+  let source = 'a{', observed, fetches = 0;
+  tm.tssParser = {
+    handle: value => {
+      try {
+        return parser.handle(value);
+      } catch (error) {
+        observed = error;
+        throw error;
+      }
+    }
+  };
+  tm.requestModel = {
+    get: () => ({ text: async () => { fetches++; return source; } })
+  };
+
+  await assert.rejects(
+    () => tm.get('/located.tss'),
+    error => {
+      assert.strictEqual(error, observed);
+      assert.deepEqual([error.line, error.column, error.offset], [1, 2, 1]);
+      return true;
+    }
+  );
+
+  source = 'a{x:1;}';
+  assert.deepEqual((await tm.get('/located.tss'))[0].p, { x: '1' });
+  assert.equal(fetches, 2);
+});
+
 test('concurrent callers share one in-flight parse', async () => {
   let release, fetches = 0, parses = 0;
   tm.c = new Map(); tm.max = 512;

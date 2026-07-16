@@ -72,8 +72,14 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 
 ## Known non-issues — do NOT flag these as bugs
 - **TSS requires a trailing `;`** on the final property — by design (a final property without it is dropped).
-- **`tss-parser` arithmetic is correct** — the brace `i <= ps.length` and the whitespace/offset code
-  were reviewed and **DEBUNKED**; "fixing" them corrupts 190/252 fixtures. Do not touch.
+- **The frozen v1 `tss-parser` oracle arithmetic is historical evidence** — the brace
+  `i <= ps.length` and whitespace/offset code in `test/fixtures/tss-parser-oracle.js` were reviewed
+  and piecemeal fixes were **DEBUNKED**; changing them corrupts the compatibility baseline. Do not
+  edit that oracle or restore its fixed-point parser to production. The active v2 parser is the
+  bounded tokenizer/recursive-descent implementation, locked against all 257 `src/**/*.tss` files.
+  To preserve valid offset-era ASTs exactly, parsed one-character interleavings may enter one
+  bounded compatibility-layout/blanking pass; it never executes, reparses, or fixed-point rescans
+  the oracle/source.
 - **Zero-match contract** — transform verbs (`attr`/`attrs`/`insert`/`text`/`move`/`swap`/`remove`…)
   **throw loud** via `error-handler` on zero matches: that is the upgrade-safe drift detector, not a
   bug. `if`/`->else`/`each` are control flow; optional target = `->if(el: X)->verb`.

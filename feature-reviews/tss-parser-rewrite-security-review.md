@@ -1,0 +1,216 @@
+# TSS Parser Rewrite — Differential Security Review
+
+**Date:** 2026-07-16
+**Range:** working tree on agent/p3-tss-parser-rewrite versus origin/dev at 6e352fa
+**Reviewer:** Codex using differential-review
+**Verdict:** APPROVED — no unresolved security finding
+
+## Review coverage
+
+The repository is large, so this review used the skill's surgical strategy:
+the parser implementation, its package/config surface, frozen oracle, parser
+tests, four direct production/build consumers, and changed propagation tests
+were reviewed deeply. Documentation and ledger changes were checked for
+security-contract consistency. No unrelated framework subsystem was audited.
+
+The installed differential-review package references methodology.md,
+adversarial.md, patterns.md, and reporting.md, but those files are absent from
+the installed skill directory and the ai-config checkout. This review therefore
+uses the complete workflow stated in SKILL.md and records that coverage limit
+instead of claiming the missing guidance was loaded.
+
+## Risk triage
+
+| Area | Risk | Reason |
+|---|---|---|
+| Production parser | Medium/high | Public synchronous validation and resource boundary used by every TSS render/fetch/build |
+| Config and compatibility state | Medium | Mutable singleton observed by injected consumers and compiler snapshots |
+| Oracle and characterization | Medium | A changed oracle could redefine every compatibility assertion |
+| Consumer propagation tests | Medium | Verify failure identity, cache eviction, and singleton restoration |
+| README/package/spec | Low | No executable trust boundary; publication/migration accuracy matters |
+
+No authentication, authorization, payment, cryptography, PII persistence,
+database, route, queue, secret, external API, or executable-source boundary is
+introduced.
+
+## Baseline and history
+
+- The parser dates to the initial 2022 implementation and v1.0.0 package commit.
+- Commit 6c44cb7 changed quote configuration to address quoted selectors; the
+  replacement preserves its default c/regex behavior and adds structural quote
+  protection tests.
+- Commit 1afbed7 introduced the 252-file snapshot after adversarial review.
+  The corpus now contains 257 files; the existing golden is unchanged.
+- The locked whitespace, pair, offset, and i <= ps.length arithmetic remains
+  byte-identical only in the test oracle. No piecemeal security/validation code
+  was removed from v1; v1 had no source/type/resource validation or positions.
+
+## Data flow and blast radius
+
+Inline view TSS, fetched TSS, and build-time manifest TSS converge on:
+
+source/config → source ceiling → comment/whitespace normalization with original
+offset mapping → quote-aware literal tokenizer → recursive-descent grammar with
+counters → direct AST or bounded compatibility-layout projection → complete
+{s,m,p,c} AST or located native error.
+
+Success atomically publishes tree/pairs/tss. Failure publishes empty tree/pairs/tss
+and preserves the original error through view-model, tss-model, and the manifest
+compiler. A fetched rejection is identity-evicted and retries. Compiler
+snapshots are restored in finally.
+
+Four source/build files directly own or call the parser; data-parser,
+attrs-method, and if-method additionally observe c.quotes, regexes.quotes, or
+quotes(). The transitive blast radius is every SSR/SPA render using TSS. Wrong
+AST data could alter selector/method traversal, while slow parsing blocks the
+current event loop. The independent oracle, 257 golden hashes, consumer tests,
+linear scanner, and hard ceilings contain those outcomes at the synchronous
+parse boundary.
+
+## Adversarial scenarios
+
+| Scenario | Control and evidence | Result |
+|---|---|---|
+| Oversized source blocks the event loop | 128 KiB lower-only hard ceiling checked before scanning; exact/+1 test and peak-memory measurement | Mitigated |
+| Delimiter/token explosion consumes memory | 32,768 token ceiling during token creation; exact/over effective-limit test | Mitigated |
+| Deep blocks/chains overflow recursion | Public AST depth 128, method chains built iteratively; 128/129 chain plus nested-rule tests | Mitigated |
+| Huge AST/declaration set consumes memory | Separate 4,096 node and 16,384 declaration ceilings plus exact/over and dense compatibility-projection tests | Mitigated |
+| Quote/comment confusion changes method/selector authority | Comments retain legacy precedence; configured quotes protect structure; curated/generated/oracle tests | Mitigated |
+| Offset-era compatibility drift changes valid traversal | Minimized collision/method cases, 260 interleavings, 768 combinatorial plus 4,096 seeded forms, independent 200,000-case differential, direct 257-file equality, unchanged hashes | Fixed |
+| Malformed config leaves mixed singleton policy | Complete config staged locally and atomically published into existing c object | Fixed |
+| Diagnostics leak template/model values | Fixed condition text plus line/column/offset only; secret-value negative assertion | Mitigated |
+| Rejected fetched parse poisons cache | Original rejection identity is evicted and same URL retries successfully | Mitigated |
+| Build failure poisons collaborators | Compiler error identity/position and tree/pairs/tss restoration test | Mitigated |
+| Legacy oracle is modified or published | Pinned complete-file SHA-256 with mutation controls; three-file package dry-run | Mitigated |
+| Regex metacharacters steer active grammar | Active tokenizer uses literal bounded strings; legacy regexes remain compatibility-only | Mitigated |
+
+## Findings
+
+### Fixed — MEDIUM: rejected config partially published syntax state
+
+**Mapping:** CWE-665 (Improper Initialization), CWE-20 (Improper Input
+Validation)
+**Location:** src/parsers/tss-parser/src/tss-parser.js, config()
+**Attack/failure:** A trusted host could supply valid early syntax plus an
+invalid later limit. The method threw, but c had already changed while regexes
+and limits retained prior values. A subsequent parse/consumer could therefore
+observe mixed policy state.
+**Fix:** Build and validate the full candidate config, compatibility regex set,
+and limits locally; only then copy syntax into the existing c object and replace
+regexes/limits.
+**Evidence:** a rejected config cannot partially publish syntax, regex, or limit
+state was observed red, then passes while preserving c/regexes/limits identity
+and parsing with the prior custom syntax.
+
+### Fixed — MEDIUM: proposed source ceiling exceeded isolate memory budget
+
+**Mapping:** CWE-400 (Uncontrolled Resource Consumption)
+**Location:** src/parsers/tss-parser/src/tss-parser.js, HARD limits
+**Attack/failure:** The initially specified 1 MiB input completed in linear time
+but peaked at about 180 MiB RSS because original-offset and normalization maps
+coexist during scanning. That exceeds a 128 MiB isolate before host/runtime
+overhead and made the nominal bound operationally unsafe.
+**Fix:** Lower immutable defaults to 128 KiB source, 32,768 tokens, 4,096
+nodes, and 16,384 declarations. The checked-in maximum is 5,359 bytes, 74
+nodes, and 73 declarations. Final exact-bound measurements peak around
+66–76 MiB RSS for direct source/token/node/declaration shapes.
+**Evidence:** the 128-KiB hard source boundary completes and one code unit over
+fails first; exact/over effective-limit tests; recorded `/usr/bin/time` and
+process.memoryUsage measurements in the evaluation record.
+
+### Fixed — HIGH: valid offset-collision and nested-method AST drift
+
+**Mapping:** CWE-682 (Incorrect Calculation)
+**Location:** src/parsers/tss-parser/src/tss-parser.js, compatibility projection
+**Attack/failure:** The first original-span projection did not compose the
+historical `from = 0` collision at a selectorless document root or the virtual
+offsets introduced by a nested method chain before parent blanking. Valid TSS
+could therefore move/drop method nodes or gain an empty-key declaration,
+changing which selector/method the handler would traverse. A broad skeptic
+generator found 8,218 divergences in 200,000 both-accepted inputs.
+**Fix:** Pin minimized quote-free witnesses red-first, then lower the parsed
+rule tree once into virtual legacy coordinates and apply the blanking sequence
+with a bounded implicit piece rope. Ordinary inputs bypass this phase; the
+frozen parser is never called or reparsed at runtime.
+**Evidence:** focused offset-collision/method-expansion tests, frozen 4,096-form
+seeded matrix, all 257 package files, and a fresh independent 200,000-case run
+with zero JSON divergence.
+
+### Fixed — MEDIUM: compatibility projection exceeded isolate memory at the old node cap
+
+**Mapping:** CWE-400 (Uncontrolled Resource Consumption)
+**Location:** src/parsers/tss-parser/src/tss-parser.js, HARD.nodes and compatibility gate
+**Attack/failure:** Although ordinary 8,192-node inputs were bounded, a dense
+method/interleaving source forced the exact piece projection and peaked above a
+128 MiB isolate. The source was only about 30 KiB, so the source ceiling did not
+contain this shape.
+**Fix:** Gate the compatibility layout to nested collisions/interleavings and
+lower the immutable node ceiling to 4,096.
+**Evidence:** the red-first near-ceiling compatibility test now completes in
+about 0.18 s at 83 MiB RSS after coordinate-compressed parent lookup; direct
+source/token/node/declaration boundaries use about 66–76 MiB. Exact/+1 node
+tests enforce the revised ceiling.
+
+### Fixed — MEDIUM: compatibility parent discovery contradicted the complexity bound
+
+**Mapping:** CWE-400 (Uncontrolled Resource Consumption)
+**Location:** src/parsers/tss-parser/src/tss-parser.js, projectedTree()
+**Attack/failure:** The first exact projection used a nested scan over all prior
+legacy frames to choose each parent. Although the 4,096-node cap bounded it,
+that path was O(nodes²) while the specification claimed O(nodes log nodes), and
+the near-ceiling witness took about 0.9 s.
+**Fix:** Coordinate-compress all legacy `from` values, process equal-close
+frames as a group, and use a Fenwick predecessor index so parent discovery and
+piece operations are O(nodes log nodes).
+**Evidence:** every differential matrix remains exact; the near-ceiling witness
+now completes in about 0.18 s at 83 MiB RSS under the same 4,096-node ceiling.
+
+No critical, high, medium, or low finding remains open.
+
+## Security properties checked
+
+- Production source has no runtime import, eval, Function constructor, dynamic
+  module load, network call, logging, source excerpt, or new dependency.
+- AST shape and method names remain data; execution still goes through the
+  existing handler registry/dispatch boundary.
+- Resource errors identify only the bounded dimension and location.
+- Scanner scratch state is call-local; compiler snapshot ownership does not
+  expand.
+- Test-only legacy code is outside the package tarball.
+- Semgrep and the repository source-contract ratchets passed as independent
+  final local gates; this report does not substitute for them.
+
+## Residual risk and limitations
+
+- TSS remains trusted author input. If a host exposes handle() directly to
+  untrusted users, the maximum 128 KiB synchronous parse still consumes bounded
+  CPU and memory; host request/rate limits remain necessary.
+- Published legacy helper methods remain callable for compatibility. The hard
+  parse ceilings are guaranteed on handle(), not on arbitrary direct mutation
+  or invocation of those historical helper surfaces by a trusted host.
+- The valid differential envelope is broad but not an exhaustive proof over
+  every possible 64-code-unit custom delimiter combination. Lexically ambiguous
+  configurations are rejected; literal multi-character/metacharacter behavior
+  is an explicit v2 extension with direct tests, not a v1 oracle claim.
+- Compatibility regexes are retained for adjacent v1 consumers and trusted
+  configuration. The active parser does not use them for structural matching.
+
+## Verification reviewed
+
+- Frozen oracle source hash plus mutate/append/truncate controls
+- Curated, 768 combinatorial, and 4,096 seeded valid grammar forms
+- 260 balanced declaration/child interleavings
+- Independent 200,000-case differential with zero drift
+- Direct equality and unchanged hashes for all 257 src/**/*.tss files
+- Located malformed-input, quote/comment, config, atomic-state, and resource tests
+- View, fetched-cache retry, and manifest compiler propagation/restoration tests
+- Exact 579-test repository suite, typecheck, package dry-run, syntax, and diff hygiene
+
+## Conclusion
+
+The rewrite removes the old unbounded active fixed-point parser, narrows
+malformed-input behavior to explicit located errors, and adds hard synchronous
+resource limits without creating an executable-source or external trust
+boundary. All review findings were fixed red-first. Differential security
+review approves the change. Requested static and production gates are clean;
+CI and current-head external review remain delivery gates after PR publication.
