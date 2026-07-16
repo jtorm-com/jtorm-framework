@@ -3,26 +3,25 @@
 **Status:** COMPLETED
 **Claimed:** 2026-07-15T15:02:49Z
 **Agent:** Codex /root
-**Mode:** Pre-PR branch evaluation
+**Mode:** Post-merge feature evaluation
 **Base Ref:** origin/dev
 **Base SHA:** e07992453346218c6e01d9154afa73cdf20eca70
-**Diff Range:** origin/dev plus the unstaged working-tree feature diff
+**Diff Range:** PR #47 head `2fbb958`, merged into `dev` as `a2fe9ea`
 **Current Phase:** 7 - Final Completion
 
 ## Resumption Context
 
 **Last Completed Phase:** 7 - Final Completion
-**Next Action:** Publish the ready PR, then obtain green CI and a clean current-head Codex review.
-**Files Modified:** See the feature map below and `tmp/finish-task-files.txt`.
+**Next Action:** None; PR #47 is merged and all delivery gates passed.
+**Files Modified:** See the feature map below and PR #47.
 **Issues Found (not yet fixed):** None; three independent-review findings were fixed red-first.
 **Current Scores:** 100/100 confirmed by the fresh verification loop.
 **Agent Reviews Completed:** architect, security-reviewer, red-team-specialist,
 authentication-architect, performance-benchmarker, performance-engineer, api-tester.
-**Context for Next Session:** Feature evaluation is complete: 22/22 focused tests, 498/498 full
-tests, typecheck, both package dry-runs, source guards, Semgrep, production readiness, the staged
-tech-debt ratchet, and self-review pass. External Claude review was unavailable and explicitly
-replaced by maintainer-directed self-review. GitHub CI and current-head Codex review remain delivery
-gates.
+**Context for Next Session:** Feature evaluation and delivery are complete. PR #47 merged head
+`2fbb958` into `dev` as `a2fe9ea` after green CI and a clean current-head Codex review. The
+22/22 focused tests, 498/498 full tests, typecheck, both package dry-runs, source guards, Semgrep,
+production readiness, staged tech-debt ratchet, and maintainer-directed self-review all passed.
 
 ## Phase 1 - Claim and Discovery
 
@@ -330,5 +329,5 @@ registration restores the prior output; `@meta.jsonLd:false` is the per-page kil
 - [x] STRIDE analysis reviewed
 - [x] Tests passing
 - [x] Documentation updated
-- [ ] Green CI and clean current-head Codex review
-- [ ] Ready for production release
+- [x] Green CI and clean current-head Codex review
+- [x] Ready for production release

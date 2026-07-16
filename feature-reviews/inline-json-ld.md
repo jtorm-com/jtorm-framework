@@ -3,15 +3,15 @@
 **Status:** COMPLETED
 **Claimed:** 2026-07-15T15:02:49Z
 **Agent:** /root
-**Current Mode:** Delivery - Ready PR publication
+**Current Mode:** Complete - Merged as PR #47
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Documentation (all local finish-task gates passed)
-**Current Mode:** Delivery
-**Next Action:** Publish the ready PR, then obtain green CI and a clean current-head Codex review.
+**Last Completed Mode:** Delivery (PR #47 merged into `dev`)
+**Current Mode:** Complete
+**Next Action:** None; PR #47 merged with green CI and a clean current-head Codex review.
 **Files Created:**
 - `feature-reviews/inline-json-ld.md` - Feature checkpoint and design record.
 - `test/models/json-ld-model.test.js` - Seven red-first serializer policy and safety tests.
@@ -24,7 +24,7 @@
 - `test/pipeline/wiring.test.js` - Extended DI drift coverage.
 
 **Files Modified:**
-- `feature-reviews/framework-architecture-review-2026-07-14.md` - Marked PR #46 done and this item in progress.
+- `feature-reviews/framework-architecture-review-2026-07-14.md` - Recorded inline JSON-LD completion as PR #47.
 - `test/helpers/engine.js` - Registered/reset the injected plugin and added an explicit legacy switch.
 **Tests Written:** Nineteen new behavior tests; the focused model/plugin/pipeline/wiring suite passes
 22/22 including three pre-existing wiring checks.
@@ -40,11 +40,12 @@
   guess which ordinary names are sensitive.
 
 **Context for Next Session:**
-Implementation and local review are complete on merged-`dev` base `e079924`: two additive packages,
-19 new behavior tests, 22/22 focused tests, 498/498 repository tests, typecheck, package dry-runs,
-Semgrep, source guards, production readiness, self-adversarial review, and the staged tech-debt
-ratchet pass. External Claude review was unavailable and the maintainer explicitly directed a
-self-only review. GitHub CI and a clean current-head Codex review remain delivery gates.
+PR #47 merged head `2fbb958` into `dev` as `a2fe9ea` with green CI and a clean current-head
+Codex review. The two additive packages, 19 new behavior tests, 22/22 focused tests, 498/498
+repository tests, typecheck, package dry-runs, Semgrep, source guards, production readiness,
+self-adversarial review, and staged tech-debt ratchet all passed. External Claude review was
+unavailable and the maintainer explicitly directed a self-only local review. No delivery gate
+remains.
 
 ---
 
