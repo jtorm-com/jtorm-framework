@@ -3,6 +3,11 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { jTormDataModel: dm } = require('../../src/models/data-model/src/data-model.js');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
+const { jTormPromiseCacheModel: pm } = require('../../src/models/promise-cache-model/src/promise-cache-model.js');
+const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
+
+dm.promiseCacheModel = pm;
+rm.renderContextModel = cm;
 
 test('caches the value; a rejected fetch is NOT cached (review #16) — retry succeeds', async () => {
   dm.c = new Map();
@@ -10,6 +15,20 @@ test('caches the value; a rejected fetch is NOT cached (review #16) — retry su
   await assert.rejects(() => dm.get('/x'));
   dm.requestModel = { get: () => ({ json: () => Promise.resolve({ ok: 1 }) }) };
   assert.deepEqual(await dm.get('/x'), { ok: 1 }); // would stay rejected if the rejection were cached
+});
+
+test('concurrent callers share one in-flight fetch', async () => {
+  let release, fetches = 0;
+  dm.c = new Map(); dm.max = 512;
+  dm.requestModel = { get: () => ({ json: () => {
+    fetches++;
+    return new Promise(resolve => { release = resolve; });
+  } }) };
+
+  const a = dm.get('/same'), b = dm.get('/same');
+  assert.equal(fetches, 1);
+  release({ok: 1});
+  assert.deepEqual(await Promise.all([a, b]), [{ok: 1}, {ok: 1}]);
 });
 
 test('bounds the cache to `max` entries — evicts oldest, no unbounded growth', async () => {

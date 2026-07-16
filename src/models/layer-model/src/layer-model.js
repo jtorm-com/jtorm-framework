@@ -1,9 +1,12 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+const state = Object.freeze({n: 'layer', f: 'freshState'});
+
 module.exports = {
     jTormLayerModel: {
         // DI
+        // renderContextModel
         // saveModel: null
 
         cid: null,
@@ -63,35 +66,11 @@ module.exports = {
         },
 
         context: function (v) {
-            let c = v && v.c;
-
-            if (!c || typeof c !== 'object')
-                return null
-            ;
-
-            while (c.p && typeof c.p === 'object')
-                c = c.p
-            ;
-
-            return c;
+            return this.renderContextModel.context(v);
         },
 
         state: function (v) {
-            const c = this.context(v);
-
-            if (!c)
-                return this
-            ;
-
-            if (!c.layer)
-                c.layer = this.freshState()
-            ;
-
-            if (v.c !== c)
-                v.c.layer = c.layer
-            ;
-
-            return c.layer;
+            return this.renderContextModel.state(this, v, state);
         },
 
         get: function (v, e, t) {

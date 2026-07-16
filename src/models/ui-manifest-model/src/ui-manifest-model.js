@@ -4,6 +4,8 @@
 module.exports = {
     jTormUiManifestModel: {
         // DI
+        // promiseCacheModel
+        // renderContextModel
         // requestModel
         // digest(Uint8Array) -> Promise<Uint8Array>
 
@@ -193,17 +195,7 @@ module.exports = {
         },
 
         root: function (c) {
-            const s = new Set();
-
-            while (c && c.p && typeof c.p === 'object') {
-                if (s.has(c))
-                    return null
-                ;
-                s.add(c);
-                c = c.p;
-            }
-
-            return c;
+            return this.renderContextModel.context(c);
         },
 
         descriptors: function (d) {
@@ -300,12 +292,8 @@ module.exports = {
 
         load: function (d, c) {
             const s = this, q = s.cacheKey(d, c);
-            let p = s.c.get(q), k;
-
-            if (p !== undefined) {
-                s.c.delete(q);
-                s.c.set(q, p);
-                return (async function () {
+            return s.promiseCacheModel.get(s, q, {
+                hit: async function () {
                     try {
                         await s.allowed(d.url, c);
                     } catch (e) {
@@ -313,45 +301,34 @@ module.exports = {
                         x.acquisition = 1;
                         throw x;
                     }
+                },
+                load: function () {
+                    return (async function () {
+                        let t;
 
-                    return p;
-                })();
-            }
+                        try {
+                            t = await s.requestModel.get(d.url, c).text();
+                        } catch (e) {
+                            const x = new Error(e && e.message || String(e));
+                            x.acquisition = 1;
+                            throw x;
+                        }
 
-            p = (async function () {
-                let t;
+                        if (typeof t !== 'string' || t.length > s.maxText)
+                            throw new Error('Manifest text invalid')
+                        ;
 
-                try {
-                    t = await s.requestModel.get(d.url, c).text();
-                } catch (e) {
-                    const x = new Error(e && e.message || String(e));
-                    x.acquisition = 1;
-                    throw x;
+                        try {
+                            return await s.pack(JSON.parse(t), d.hash);
+                        } catch (e) {
+                            if (e instanceof SyntaxError)
+                                throw new Error('Manifest JSON invalid')
+                            ;
+                            throw e;
+                        }
+                    })();
                 }
-
-                if (typeof t !== 'string' || t.length > s.maxText)
-                    throw new Error('Manifest text invalid')
-                ;
-
-                try {
-                    return await s.pack(JSON.parse(t), d.hash);
-                } catch (e) {
-                    if (e instanceof SyntaxError)
-                        throw new Error('Manifest JSON invalid')
-                    ;
-                    throw e;
-                }
-            })();
-            p.catch(function () { if (s.c.get(q) === p) s.c.delete(q); });
-            s.c.set(q, p);
-
-            while (s.c.size > s.max) {
-                k = s.c.keys().next().value;
-                if (k === q) break;
-                s.c.delete(k);
-            }
-
-            return p;
+            });
         },
 
         walk: function (v, d, n) {

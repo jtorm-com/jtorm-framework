@@ -1,9 +1,31 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
+const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
+
+rm.renderContextModel = cm;
 
 function stub(fn) { const o = global.fetch; global.fetch = fn; return () => { global.fetch = o; }; }
+
+test('cyclic context lookup terminates instead of hanging the render worker', () => {
+  const r = spawnSync(process.execPath, ['-e', `
+    const { jTormRequestModel: rm } = require('./src/models/request-model/src/request-model.js');
+    try {
+      const { jTormRenderContextModel: cm } = require('./src/models/render-context-model/src/render-context-model.js');
+      rm.renderContextModel = cm;
+    } catch (e) {
+      if (e.code !== 'MODULE_NOT_FOUND') throw e;
+    }
+    const a = {}, b = {p: a};
+    a.p = b;
+    process.stdout.write(String(rm.context(a)));
+  `], {encoding: 'utf8', timeout: 1000});
+
+  assert.equal(r.status, 0, r.error ? r.error.message : r.stderr);
+  assert.equal(r.stdout, 'null');
+});
 
 test('get(url).json() returns parsed JSON on ok', async () => {
   const r = stub(async () => ({ ok: true, json: async () => ({ a: 1 }) }));

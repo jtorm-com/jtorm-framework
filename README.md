@@ -52,6 +52,23 @@ Hosts that synthesize method nodes must inject and call `jTormHandler.dispatch(v
 preparedData)`. Method packages publish the canonical JSDoc contract through `@jtorm/types`; the
 runtime remains pure CommonJS with dependency injection and no runtime imports.
 
+## Shared runtime policy owners
+
+Hosts compose three stateless policy models before rendering:
+
+- `@jtorm/render-context-model` owns bounded, cycle-safe render-root traversal and
+  namespaced root state.
+- `@jtorm/promise-cache-model` owns in-flight promise dedupe, rejection cleanup, and
+  bounded LRU mechanics while each fetch model retains its own cache, key, and loader.
+- `@jtorm/asset-plugin-model` owns the shared CSS/JS collection, URL-policy, DOM insertion,
+  dedupe, and cleanup lifecycle while both plugins retain their public facades.
+
+Runtime packages still import nothing; hosts inject these owners into request, manifest,
+layer, UI-cache, data/HTML/TSS, and CSS/JS collaborators. Publish render-context and
+promise-cache first, then request-model, then asset-plugin-model, then the remaining consumer
+release set. Rollback requires pinning the prior consumer versions together and restoring the
+previous host DI graph.
+
 ## Credits
 The idea is heavily inspired from [Transphporm](https://github.com/Level-2/Transphporm), all credits go to them in finding a different way to handle template rendering.
 

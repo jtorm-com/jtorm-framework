@@ -4,6 +4,7 @@
 module.exports = {
     jTormHtmlModel: {
         // DI
+        // promiseCacheModel
         // requestModel
 
         c: new Map(),
@@ -18,25 +19,10 @@ module.exports = {
         get: async function (v, c) {
             const s = this;
             const q = s.key(v, c);// Map keys arrays/numbers by identity; coerce to a stable string (mirrors the old object cache) — v (e.g. an array of URLs) stays fresh per render
-            let p = s.c.get(q), k;
 
-            if (p !== undefined) {// hit: re-insert to bump recency (Map keeps true insertion order)
-                s.c.delete(q);
-                s.c.set(q, p);
-                return p;
-            }
-
-            p = s.requestModel.get(v, c).text();
-            p.catch(function () { if (s.c.get(q) === p) s.c.delete(q); });// clear only if still this promise
-            s.c.set(q, p);
-
-            while (s.c.size > s.max) {// evict LRU; never the entry just added (guards max <= 0)
-                k = s.c.keys().next().value;
-                if (k === q) break;
-                s.c.delete(k);
-            }
-
-            return p;
+            return s.promiseCacheModel.get(s, q, {
+                load: function () { return s.requestModel.get(v, c).text(); }
+            });
         }
     }
 };

@@ -5,5 +5,7 @@
 npm install @jtorm/css-plugin
 ```
 
-Inject `uiResolverModel` to expand UI-package asset aliases and `requestModel` to
-enforce its URL allowlist before a stylesheet is injected.
+Inject `assetPluginModel`, `cssMethod`, `uiResolverModel`, and `requestModel`. The shared asset
+owner expands aliases and enforces the request URL allowlist before creating or injecting a
+stylesheet; this plugin retains its public cache, collection, lifecycle methods, attributes,
+custom `rel`, and media-print defer behavior.

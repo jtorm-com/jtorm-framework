@@ -6,12 +6,20 @@ const { createHash, webcrypto } = require('node:crypto');
 const {
   jTormUiManifestModel: mm
 } = require('../../src/models/ui-manifest-model/src/ui-manifest-model.js');
+const {
+  jTormPromiseCacheModel: promiseCacheModel
+} = require('../../src/models/promise-cache-model/src/promise-cache-model.js');
+const {
+  jTormRenderContextModel: renderContextModel
+} = require('../../src/models/render-context-model/src/render-context-model.js');
 
 const nativeDigest = async (bytes) => new Uint8Array(
   createHash('sha256').update(bytes).digest()
 );
 
 function reset() {
+  mm.promiseCacheModel = promiseCacheModel;
+  mm.renderContextModel = renderContextModel;
   mm.c = new Map();
   mm.max = 32;
   mm.maxText = 1048576;
@@ -77,8 +85,12 @@ async function rehash(manifest) {
 
 test('prepare rejects a cyclic render-context parent chain without hanging', () => {
   const model = require.resolve('../../src/models/ui-manifest-model/src/ui-manifest-model.js');
+  const context = require.resolve('../../src/models/render-context-model/src/render-context-model.js');
+  const cache = require.resolve('../../src/models/promise-cache-model/src/promise-cache-model.js');
   const script = [
     "const { jTormUiManifestModel: m } = require(" + JSON.stringify(model) + ");",
+    "m.renderContextModel = require(" + JSON.stringify(context) + ").jTormRenderContextModel;",
+    "m.promiseCacheModel = require(" + JSON.stringify(cache) + ").jTormPromiseCacheModel;",
     'const c = {}; c.p = c;',
     "m.prepare([], c).then(() => { process.exitCode = 1; }, e => { console.log(e.message); });"
   ].join('\n');

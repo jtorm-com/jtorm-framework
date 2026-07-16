@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/request-model",
   "description": "jTorm Request Model",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -13,5 +13,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/models/request-model"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/render-context-model": "^1.0.0"
+  }
 }

@@ -4,7 +4,12 @@ const assert = require('node:assert/strict');
 const { jTormGetMethod: gm } = require('../../src/methods/get-method/src/get-method.js');
 const { jTormTssModel: tm } = require('../../src/models/tss-model/src/tss-model.js');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
+const { jTormPromiseCacheModel: pm } = require('../../src/models/promise-cache-model/src/promise-cache-model.js');
+const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
 const { makeTssParser } = require('../helpers/parser.js');
+
+tm.promiseCacheModel = pm;
+rm.renderContextModel = cm;
 
 test('get-method fetches multi-t artifacts through the real tss/request path in order and caches parts', async () => {
   const d = {
