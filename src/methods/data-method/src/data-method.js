@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormDataMethod: {
@@ -40,8 +41,9 @@ module.exports = {
         },
 
         /**
-         * Resolve each declaration (honouring `||` fallbacks) from `v.m` into a nested object and merge it onto `v.io.d`.
+         * Resolve each declaration (honouring `||` fallbacks) from `v.m` into nested child data.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         data: async function (v) {
             let ks, k, k2, p;
@@ -62,10 +64,10 @@ module.exports = {
             }
 
             if (v._.isEmpty(tD))
-                v.io = {c: 0}
-            ; else
-                v.io = {d: {...v.m, ...tD}, c: 1}
+                return {children: false}
             ;
+
+            return {children: true, data: {...v.m, ...tD}};
         },
 
         set: function (d, ks, v) {

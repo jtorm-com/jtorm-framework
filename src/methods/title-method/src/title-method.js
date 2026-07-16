@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormTitleMethod: {
@@ -17,11 +18,12 @@ module.exports = {
         /**
          * Set the document title from `v.d.t`.
          * @param {ViewModel} v
+         * @returns {MethodEffect}
          */
         handle(v) {
             v.h.d.title = v.d.t;
 
-            v.io = {c: 1};
+            return {children: true};
         }
     }
 };

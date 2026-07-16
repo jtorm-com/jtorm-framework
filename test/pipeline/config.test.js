@@ -66,8 +66,8 @@ test('config(k: key) (the documented form) looks up and binds the value', async 
 // --- config as a GATE must FAIL CLOSED, never open (README: "functions like an if") ---
 //
 // `config(…, v: 1)` gates its children on config[key] === 1. A key param the method
-// does not read makes validate miss → the skip (v.io={}) never runs → children render
-// anyway (fail-OPEN). Both documented key params (k and d) must reach the gate so a
+// does not read makes validation miss; the former mutable child flag could then leak
+// children (fail-OPEN). Both documented key params (k and d) must reach the gate so a
 // config-off value blocks the children. (Guards Codex P1 on PR #10.)
 test('config(k: key, v: value) gate blocks children when the config value mismatches', async () => {
     jTormConfigModel.d = { createDoc: 0 }; // gate OFF

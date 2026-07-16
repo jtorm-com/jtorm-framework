@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const _ = require('lodash');
 const { jTormUiCompilerModel: c } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
 
-const initial = { methods: c.methods, viewModel: c.viewModel };
+const initial = { handler: c.handler, methods: c.methods, viewModel: c.viewModel };
 
 test.afterEach(() => {
   for (const k in initial) {
@@ -17,7 +17,7 @@ test.afterEach(() => {
 
 function view(d = { t: 1, h: 1 }) {
   return {
-    _: _, d, io: {},
+    _: _, d,
     t: { s: '.target', m: 'ui', p: {}, c: [{ s: 'i', m: 'text', p: {}, c: [] }] }
   };
 }
@@ -58,11 +58,14 @@ test('compiler preserves the pT parent-target AST branch', async () => {
   });
 });
 
-test('compiler preserves artifact di and double-nested root ui di dispatch', async () => {
+test('compiler routes artifact and root ui di through dispatch with prepared data', async () => {
   const calls = [];
-  c.viewModel = { copy: v => ({ ...v, d: {}, io: {} }) };
-  c.methods = {
-    allow: { handle: v => { calls.push(v.d); v.io.c = v.d.pass; } }
+  c.viewModel = { copy: v => ({ ...v, d: {} }) };
+  c.handler = {
+    dispatch: async (v, d) => {
+      calls.push({ t: v.t, d });
+      return { children: !!d.pass, repeat: false, data: undefined };
+    }
   };
 
   const artifacts = await c.processComponent(view(), {
@@ -74,8 +77,12 @@ test('compiler preserves artifact di and double-nested root ui di dispatch', asy
   assert.deepEqual(artifacts.p.t, ["'yes.tss'"]);
 
   const gated = await c.processComponent(view(), {
-    c: { ui: { c: 'Parent' }, di: { m: { m: { allow: { pass: 0 } } } } }
+    c: { ui: { c: 'Parent' }, di: { m: { allow: { pass: 0 } } } }
   });
   assert.equal(gated, null);
-  assert.deepEqual(calls, [{ pass: 1 }, { pass: 0 }, { pass: 0 }]);
+  assert.deepEqual(calls, [
+    { t: { s: '.target', m: 'allow', p: {}, c: [] }, d: { pass: 1 } },
+    { t: { s: '.target', m: 'allow', p: {}, c: [] }, d: { pass: 0 } },
+    { t: { s: '.target', m: 'allow', p: {}, c: [] }, d: { pass: 0 } }
+  ]);
 });

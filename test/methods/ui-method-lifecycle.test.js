@@ -49,6 +49,20 @@ test('ui data phase parses parameters and normalizes t/h/m before validation', a
   }
 });
 
+test('ui data phase normalizes prepared synthesized data without reparsing it', () => {
+  const p = m.dataParser;
+  const v = { d: {}, t: { p: {} } };
+
+  try {
+    m.dataParser = { handle: () => { throw new Error('must not parse prepared data'); } };
+    m.data(v, { c: 'Thing', t: '0', h: '0', m: '1' });
+
+    assert.deepEqual(v.d, { c: 'Thing', t: 0, h: 0, m: 1 });
+  } finally {
+    m.dataParser = p;
+  }
+});
+
 test('ui data phase keeps the invalid-t error before validation and method events', () => {
   const p = m.dataParser;
   const e = m.errorHandler;
@@ -72,8 +86,7 @@ test('ui handle orchestrates implicit resolution, mediatarget compilation, clean
   const calls = [];
   const v = {
     d: { c: 'Thing', t: 1, h: 1, m: 1, keep: 'yes' },
-    t: { s: '.target', m: 'ui', p: {}, c: [] },
-    io: {}
+    t: { s: '.target', m: 'ui', p: {}, c: [] }
   };
 
   try {
@@ -91,7 +104,7 @@ test('ui handle orchestrates implicit resolution, mediatarget compilation, clean
     };
     m.mediatargetMethod = { current: ['Desktop', 'Missing'] };
 
-    await m.handle(v);
+    const effect = await m.handle(v);
 
     assert.deepEqual(calls, [
       ['resolve', 'Thing', 'self'],
@@ -101,7 +114,7 @@ test('ui handle orchestrates implicit resolution, mediatarget compilation, clean
       ['resolve', 'ThingMissing', 'self']
     ]);
     assert.deepEqual(v.d, { keep: 'yes' });
-    assert.deepEqual(v.io, { c: 1, r: 1 });
+    assert.deepEqual(effect, { children: true, repeat: true });
     assert.deepEqual(v.t.c, [{ s: 'old' }, {
       s: '.target', m: 'get', p: { id: 'ThingDesktop' }, c: []
     }]);
@@ -116,7 +129,7 @@ test('ui handle fails loudly for missing DI models and unresolved components', a
   const resolver = m.resolverModel;
   const compiler = m.compilerModel;
   const error = m.errorHandler;
-  const v = { d: { c: 'Missing' }, t: { s: '', p: {}, c: [] }, io: {} };
+  const v = { d: { c: 'Missing' }, t: { s: '', p: {}, c: [] } };
 
   try {
     m.errorHandler = { handle: message => { throw new Error(message); } };

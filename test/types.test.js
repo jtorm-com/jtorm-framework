@@ -12,6 +12,6 @@ test('view-model.data keeps the documented ViewModel field set (keep the types.j
   // If view-model.data gains/loses a field, update the ViewModel typedef in types.js.
   assert.deepEqual(
     Object.keys(jTormViewModel.data).sort(),
-    ['c', 'cid', 'cs', 'd', 'h', 'io', 'm', 'r', 't', 'tss']
+    ['c', 'cid', 'cs', 'd', 'h', 'm', 'r', 't', 'tss']
   );
 });

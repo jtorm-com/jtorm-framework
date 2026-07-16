@@ -2,6 +2,31 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
+/** @typedef {import('@jtorm/types').ViewEffect} ViewEffect */
+
+const MAX_REPEAT = 100;
+const OWN = Object.prototype.hasOwnProperty;
+
+/**
+ * Normalize one method's partial intent, reading each own field once.
+ * @param {MethodEffect|void} e
+ * @param {boolean} children
+ * @returns {ViewEffect}
+ */
+function effect(e, children) {
+    let c, r, d;
+    e = e && typeof e === 'object' ? e : {};
+    c = OWN.call(e, 'children') ? e.children : undefined;
+    r = OWN.call(e, 'repeat') ? e.repeat : undefined;
+    d = OWN.call(e, 'data') ? e.data : undefined;
+
+    return {
+        children: typeof c === 'boolean' ? c : children,
+        repeat: typeof r === 'boolean' ? r : false,
+        data: d
+    };
+}
 
 module.exports = {
     jTormHandler: {
@@ -10,6 +35,86 @@ module.exports = {
         // eventModel
         // methods[]
         // viewModel
+
+        /**
+         * Execute one normal, aliased, or synthesized method through the same
+         * data/validate/event lifecycle and return a complete safe effect.
+         * @param {ViewModel} v
+         * @param {*} [d] prepared method data
+         * @returns {Promise<ViewEffect>}
+         */
+        dispatch: async function(v, d) {
+            let e = this.eventModel,
+                ms = this.methods,
+                prepared = arguments.length > 1,
+                r,
+                k,
+                x,
+                valid,
+                n = 0
+            ;
+
+            do {
+                r = 0;
+
+                if (
+                    v.t.m
+                    && Object.prototype.hasOwnProperty.call(ms, v.t.m)
+                )
+                    r = ms[v.t.m]
+                ; else {
+                    for (k in ms) {
+                        if (
+                            Object.prototype.hasOwnProperty.call(ms, k)
+                            && ms[k].alias === v.t.m
+                        ) {
+                            r = ms[k];
+                            break;
+                        }
+                    }
+                }
+
+                if (v.t.m && !r)
+                    throw new Error('Unknown method ' + v.t.m)
+                ;
+
+                if (!r)
+                    return effect(undefined, true)
+                ;
+
+                if (prepared)
+                    v.d = d
+                ;
+
+                x = undefined;
+                if (v._.isFunction(r.data))
+                    x = prepared ? await r.data(v, d) : await r.data(v)
+                ; else if (!prepared)
+                    this.dataParser.handle(v, r.params)
+                ;
+
+                prepared = false;
+                valid = await r.validate(v);
+
+                await e.handle(v, 'before', 'method');
+
+                if (valid && v._.isFunction(r.handle))
+                    x = await r.handle(v)
+                ; else if (!valid)
+                    x = undefined
+                ;
+
+                await e.handle(v, 'after', 'method');
+
+                x = effect(x, !r.gate);
+                n++;
+                if (x.repeat && n >= MAX_REPEAT)
+                    throw new Error('Method ' + v.t.m + ' repeat limit exceeded')
+                ;
+            } while (x.repeat);
+
+            return x;
+        },
 
         /**
          * The method loop: build or receive `v`, resolve each TSS node’s verb,
@@ -23,12 +128,7 @@ module.exports = {
          * @returns {Promise<*>}   the resulting DOM wrapper (`v.h`)
          */
         handle: async function (h, t, m, c, v) {
-            let e = this.eventModel,
-                ms = this.methods,
-                r,
-                k,
-                k2
-            ;
+            let k;
 
             if (!v)
                 v = await this.viewModel.create(h, t, m, c)
@@ -52,67 +152,12 @@ module.exports = {
                 const oc = v.c, cs = v.c.s, ca = v.c.a;
 
                 try {
-                    do {
-                        r = 0;
+                    const x = await this.dispatch(v);
 
-                        if (
-                            v.t.m
-                            && Object.prototype.hasOwnProperty.call(ms, v.t.m)
-                        )
-                            r = ms[v.t.m]
-                        ; else {
-                            for (k2 in ms) {
-                                if (
-                                    Object.prototype.hasOwnProperty.call(ms, k2)
-                                    && ms[k2].alias === v.t.m
-                                ) {
-                                    r = ms[k2];
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (v.t.m && !r)
-                            throw new Error('Unknown method ' + v.t.m)
-                        ;
-
-                        if (r) {
-                            if (v._.isFunction(r.data))
-                                await r.data(v)
-                            ; else
-                                this.dataParser.handle(v, r.params)
-                            ;
-
-                            v.io.v = await r.validate(v);
-
-                            await e.handle(v, 'before', 'method');
-
-                            if (v.io.v && v._.isFunction(r.handle))
-                                await r.handle(v)
-                            ; else {
-                                // No handle ran: either validate MISSED, or the verb is a pure
-                                // data/scope binder (validate-pass + no handle, e.g. `data`) that
-                                // already set its own v.io.c. Only on a MISS does the handler decide
-                                // child handling — set v.io.c explicitly rather than inherit the
-                                // previous sibling's stale flag: a gate verb fails CLOSED (skip
-                                // children), any other verb is a pass-through and still renders them.
-                                v.io.r = 0;
-                                if (!v.io.v)
-                                    v.io.c = r.gate ? 0 : 1;
-                            }
-
-                            await e.handle(v, 'after', 'method');
-                        } else {
-                            v.io.r = 0;
-                            v.io.c = 1;
-                        }
-                    } while (v.io.r);
-
-                    if (v.io.c && v.t.c.length)
-                        await this.handle(v.h, v.t.c, v.io.d ? v.io.d : v.m, v.c)
+                    if (x.children && v.t.c.length)
+                        await this.handle(v.h, v.t.c, x.data === undefined ? v.m : x.data, v.c)
                     ;
                 } finally {
-                    v.io.d = null;
                     oc.s = cs;
                     oc.a = ca;
                     v.c = oc;

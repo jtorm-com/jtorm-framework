@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormUnwrapMethod: {
@@ -18,6 +19,7 @@ module.exports = {
         /**
          * Replace each selected element’s content with the inner HTML of its `v.d.s` descendant.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             await v.h.set({t: {s: v.d.s}, c: v.c}, async function (e) {
@@ -28,7 +30,7 @@ module.exports = {
                 });
             });
 
-            v.io = {c: 1};
+            return {children: true};
         }
     }
 };

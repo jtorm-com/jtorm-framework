@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormMediatargetMethod: {
@@ -9,8 +10,8 @@ module.exports = {
         // mediaqueryMethod
 
         alias: 'mt',
-        // Child gate: handle sets v.io.c from the active-target set. On a validate MISS
-        // (no `t`) the handler fails CLOSED (skip children) rather than leak the guarded content.
+        // Child gate: handle returns the active-target match. On a validate MISS
+        // (no `t`) the handler fails CLOSED rather than leak the guarded content.
         gate: 1,
         current: [],
         params: [
@@ -37,9 +38,7 @@ module.exports = {
             for (k in this.target) {
                 v = {d: {t: k}};
 
-                this.process(v);
-
-                if (v.io.c)
+                if (this.process(v))
                     this.current.push(k)
                 ;
             }
@@ -53,15 +52,16 @@ module.exports = {
         /**
          * Gate children on whether the named breakpoint `v.d.t` is in the currently-active target set.
          * @param {ViewModel} v
+         * @returns {MethodEffect}
          */
         handle: function (v) {
-            v.io.c = this.current.indexOf(v.d.t) !== -1;
+            return {children: this.current.indexOf(v.d.t) !== -1};
         },
 
         process: function (v) {
             v.d.q = this.target[v.d.t];
 
-            this.mediaqueryMethod.handle(v);
+            return this.mediaqueryMethod.process(v.d.q);
         }
     }
 };

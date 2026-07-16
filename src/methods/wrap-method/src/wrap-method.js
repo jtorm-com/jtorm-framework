@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormWrapMethod: {
@@ -20,6 +21,7 @@ module.exports = {
         /**
          * Wrap each element selected by `v.t.s` in the `v.d.s` element, filled from `v.d.h` or boiled children.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const s = this;
@@ -33,7 +35,7 @@ module.exports = {
                 await s.process(v.h, v.t.s, v.d.s, h, v.d, v);
             }
 
-            v.io = {};
+            return {children: false};
         },
 
         process: async function (jD, s, w, h, d, v) {

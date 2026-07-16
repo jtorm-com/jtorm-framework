@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormSwapMethod: {
@@ -25,6 +26,7 @@ module.exports = {
         /**
          * Replace each selected element with a new `v.d.s` wrapper (optionally built from `ui`/`h`), carrying over inner HTML and attributes.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const s = this;
@@ -56,7 +58,7 @@ module.exports = {
                 el.parentNode.replaceChild(w, el);
             });
 
-            v.io = {c: 1};
+            return {children: true};
         },
 
         // Host XSS sanitizer seam (DI): swap{h} is parsed as raw HTML by the

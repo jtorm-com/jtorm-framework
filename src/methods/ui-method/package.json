@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/ui-method",
   "description": "jTorm UI Method",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -16,10 +16,11 @@
   "dependencies": {
     "@jtorm/data-parser": "^1.0.0",
     "@jtorm/error-handler": "^1.0.0",
-    "@jtorm/mediatarget-method": "^1.0.0",
-    "@jtorm/ui-compiler-model": "^1.0.0",
+    "@jtorm/handler": "^1.0.6",
+    "@jtorm/mediatarget-method": "^1.0.3",
+    "@jtorm/ui-compiler-model": "^1.0.1",
     "@jtorm/ui-resolver-model": "^1.0.0",
-    "@jtorm/view-model": "^1.0.0",
-    "@jtorm/types": "^1.0.0"
+    "@jtorm/view-model": "^1.0.4",
+    "@jtorm/types": "^1.1.1"
   }
 }

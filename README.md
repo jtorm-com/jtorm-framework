@@ -39,6 +39,19 @@ of executing them, and emits parsed model-free assets. Runtime loading is bounde
 wire format and SHA-256 against a host-pinned expected hash, and continues to enforce the existing
 request URL policy. See the package READMEs for the build and host wiring contracts.
 
+## Method effects and dispatch
+
+TSS methods return a partial effect with `children`, `repeat`, and `data`; they do not mutate a
+view-side control object. The injected handler executes normal names, aliases, and synthesized
+nodes through one `dispatch()` lifecycle: data preparation, validation, before-event, method,
+after-event, then effect normalization. Missing effects never repeat, gate methods default to
+`children: false`, and explicit repeats fail loud after 100 lifecycle executions. Only own boolean
+control fields are accepted; malformed or inherited values fall back to those safe defaults.
+
+Hosts that synthesize method nodes must inject and call `jTormHandler.dispatch(view,
+preparedData)`. Method packages publish the canonical JSDoc contract through `@jtorm/types`; the
+runtime remains pure CommonJS with dependency injection and no runtime imports.
+
 ## Credits
 The idea is heavily inspired from [Transphporm](https://github.com/Level-2/Transphporm), all credits go to them in finding a different way to handle template rendering.
 

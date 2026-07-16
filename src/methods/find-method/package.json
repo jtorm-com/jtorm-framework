@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/find-method",
   "description": "jTorm Find Method",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,6 +14,7 @@
     "directory": "src/methods/find-method"
   },
   "dependencies": {
-    "@jtorm/types": "^1.0.0"
+    "@jtorm/handler": "^1.0.6",
+    "@jtorm/types": "^1.1.1"
   }
 }

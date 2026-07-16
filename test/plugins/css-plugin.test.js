@@ -16,7 +16,6 @@ function fakeView(html, url) {
         t: { s: 'body' },
         c: { c: 1, s: null },
         d: null,
-        io: null,
         h: {
             d: doc,
             set: async (vo, fn) => {

@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormJsMethod: {
@@ -27,6 +28,7 @@ module.exports = {
         /**
          * Collect the `<script>` descriptor (`v.d`) into jsPlugin for injection, deduped by src.
          * @param {ViewModel} v
+         * @returns {MethodEffect}
          */
         handle: function (v) {
             const
@@ -39,7 +41,7 @@ module.exports = {
                 s.collection.push(v.d);
             }
 
-            v.io = {c: 1};
+            return {children: true};
         }
     }
 };

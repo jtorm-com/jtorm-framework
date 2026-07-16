@@ -10,7 +10,7 @@ module.exports = {
         // documentModel
         // tssParser
 
-        copyAttrs: ['_', 't', 'params', 'io', 'c'],
+        copyAttrs: ['_', 't', 'params', 'c'],
         data: {
             cid: null,// cache id
             cs: null,// cache scope
@@ -24,13 +24,7 @@ module.exports = {
             d: null,// method data
             tss: null,
             t: null,// method tss
-            r: null, // result from handlechildren
-            io: {
-                d: null, // alt data
-                c: 1, // handle children
-                r: 1, // repeat current iteration
-                v: 0 // validated
-            }
+            r: null // result from handlechildren
         },
 
         /**
@@ -54,7 +48,6 @@ module.exports = {
                 v.c = { c: c, s: null, a: null }
             ;
 
-            v.io = { d: null, c: 1, r: 1, v: 0 };
             v.m = m;
 
             if (this._.isString(t))

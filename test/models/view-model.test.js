@@ -7,10 +7,9 @@ const { jTormViewModel: vm } = require('../../src/models/view-model/src/view-mod
 function reset() {
     vm._ = _;
     vm.data.c = { c: 1, s: null, a: null };
-    vm.data.io = { d: null, c: 1, r: 1, v: 0 };
 }
 
-test('view-model.create gives root renders distinct own context and io objects', async () => {
+test('view-model.create gives root renders distinct own context objects and no mutable io side channel', async () => {
     reset();
     try {
         const v1 = await vm.create({}, [], { id: 1 }, 1);
@@ -25,20 +24,13 @@ test('view-model.create gives root renders distinct own context and io objects',
         assert.deepEqual(v2.c, { c: 0, s: null, a: null });
         assert.deepEqual(vm.data.c, { c: 1, s: null, a: null });
 
-        assert.ok(Object.hasOwn(v1, 'io'));
-        assert.ok(Object.hasOwn(v2, 'io'));
-        assert.notStrictEqual(v1.io, v2.io);
-        assert.notStrictEqual(v1.io, vm.data.io);
-        assert.notStrictEqual(v2.io, vm.data.io);
-        assert.deepEqual(v1.io, { d: null, c: 1, r: 1, v: 0 });
-        assert.deepEqual(v2.io, { d: null, c: 1, r: 1, v: 0 });
+        assert.ok(!Object.hasOwn(v1, 'io'));
+        assert.ok(!Object.hasOwn(v2, 'io'));
+        assert.ok(!Object.hasOwn(vm.data, 'io'));
 
         v1.c.s = '.one';
-        v1.io.c = 0;
         assert.equal(v2.c.s, null);
-        assert.equal(v2.io.c, 1);
         assert.deepEqual(vm.data.c, { c: 1, s: null, a: null });
-        assert.deepEqual(vm.data.io, { d: null, c: 1, r: 1, v: 0 });
     } finally {
         reset();
     }

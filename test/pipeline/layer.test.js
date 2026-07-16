@@ -5,8 +5,8 @@ const { render } = require('../helpers/engine.js');
 const { jTormConfigModel } = require('../../src/models/config-model/src/config-model.js');
 
 // `layer` — the deferred-fragment verb. layer-method stashes its child fragment via
-// layer-model (registering it under event[e][t], e.g. after.view) and halts inline
-// processing (v.io={}); the layer-plugin replays the stashed fragments at the matching
+// layer-model (registering it under event[e][t], e.g. after.view) and returns
+// children:false; the layer-plugin replays the stashed fragments at the matching
 // event phase, against the FINISHED document. Its canonical use is marking the active
 // nav link after the whole view has rendered (site-navigation-element).
 //
@@ -26,8 +26,8 @@ const { jTormConfigModel } = require('../../src/models/config-model/src/config-m
 
 // --- the deferred after-view replay marks the matching element ---
 //
-// The find→attr fragment lives INSIDE `->layer`, so layer-method does NOT run it inline
-// (v.io={}); it is the layer-plugin's afterView replay that boils it against the final
+// The find→attr fragment lives INSIDE `->layer`, so layer-method returns children:false;
+// it is the layer-plugin's afterView replay that boils it against the final
 // document. The `class="active"` therefore only appears because the deferred replay ran
 // — i.e. it proves the plugin wiring end-to-end. Only the matched href is marked.
 test('layer defers a find→attr to after-view, marking only the matched link', async () => {

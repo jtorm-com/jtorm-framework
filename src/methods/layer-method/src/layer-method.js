@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormLayerMethod: {
@@ -24,11 +25,12 @@ module.exports = {
         /**
          * Register the rule’s children as a deferred layer via layerModel.
          * @param {ViewModel} v
+         * @returns {MethodEffect}
          */
         handle: function (v) {
             this.layerModel.set(v);
 
-            v.io = {};
+            return {children: false};
         }
     }
 };

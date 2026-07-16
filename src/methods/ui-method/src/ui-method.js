@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormUiMethod: {
@@ -88,9 +89,13 @@ module.exports = {
             return this.resolverModel.init();
         },
 
-        /** Parse and normalize UI verb input before validation and method events. @param {ViewModel} v */
-        data: function (v) {
-            this.dataParser.handle(v, this.params);
+        /** Parse and normalize UI verb input before validation and method events. @param {ViewModel} v @param {*} [d] prepared method data */
+        data: function (v, d) {
+            if (arguments.length > 1)
+                v.d = d
+            ; else
+                this.dataParser.handle(v, this.params)
+            ;
 
             v.d.t = v.d.t === undefined
                 ? 1
@@ -119,7 +124,7 @@ module.exports = {
             return !!v.d.c;
         },
 
-        /** Resolve and compile the UI component, including active mediatarget variants. @param {ViewModel} v */
+        /** Resolve and compile the UI component, including active mediatarget variants. @param {ViewModel} v @returns {Promise<MethodEffect>} */
         handle: async function (v) {
             const s = this;
             let f = v.d.f || 'self',
@@ -143,7 +148,7 @@ module.exports = {
             t = await s.compilerModel.processComponent(v, r);
 
             if (!t)
-                v.io = {c: 0, r: 0}
+                return {children: false}
             ; else {
                 if (v.d.m) {
                     r = s.mediatargetMethod;
@@ -166,7 +171,7 @@ module.exports = {
                 ;
 
                 v.t = t;
-                v.io = {c: 1, r: 1};
+                return {children: true, repeat: true};
             }
         },
 

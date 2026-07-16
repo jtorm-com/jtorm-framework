@@ -2,11 +2,12 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormMoveMethod: {
         // DI
-        // methods[]
+        // handler
         // viewModel
 
         alias: 'm',
@@ -24,6 +25,7 @@ module.exports = {
         /**
          * Move (or copy, when `v.d.k`) each selected element to `v.d.l` via the chosen method.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const s = this;
@@ -31,17 +33,16 @@ module.exports = {
             await v.h.set(v, async function (e) {
                 const sv = s.viewModel.copy(v);
 
-                sv.d = {h: e.outerHTML};
                 sv.t = {s: v.d.l, m: v.d.m, c: [], p: {}};
 
                 if (!parseInt(v.d.k))
                     e.parentElement.removeChild(e)
                 ;
 
-                await s.methods[v.d.m].handle(sv);
+                await s.handler.dispatch(sv, {h: e.outerHTML});
             });
 
-            v.io = {};
+            return {children: false};
         }
     }
 };

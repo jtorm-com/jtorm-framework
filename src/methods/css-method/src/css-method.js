@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormCssMethod: {
@@ -28,6 +29,7 @@ module.exports = {
         /**
          * Collect the stylesheet `<link>` descriptor (`v.d`) into cssPlugin for head injection, deduped by href.
          * @param {ViewModel} v
+         * @returns {MethodEffect}
          */
         handle: function (v) {
             const
@@ -40,7 +42,7 @@ module.exports = {
                 s.collection.push(v.d);
             }
 
-            v.io = {c: 1};
+            return {children: true};
         }
     }
 };

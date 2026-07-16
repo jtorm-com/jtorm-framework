@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormFindMethod: {
@@ -19,11 +20,12 @@ module.exports = {
         /**
          * Set the descendant scope `v.c.s` so the rule’s children select beneath `v.d.e`.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             v.c.s = v.d.e;
 
-            v.io = {c: 1};
+            return {children: true};
         }
     }
 };

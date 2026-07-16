@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/get-method",
   "description": "jTorm Get Method",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -15,9 +15,10 @@
   },
   "dependencies": {
     "@jtorm/data-model": "^1.0.4",
+    "@jtorm/handler": "^1.0.6",
     "@jtorm/html-model": "^1.0.4",
     "@jtorm/tss-model": "^1.0.4",
     "@jtorm/ui-manifest-model": "^1.0.0",
-    "@jtorm/types": "^1.1.0"
+    "@jtorm/types": "^1.1.1"
   }
 }

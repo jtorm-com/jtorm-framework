@@ -2,6 +2,7 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormConfigMethod: {
@@ -10,9 +11,8 @@ module.exports = {
 
         alias: 'c',
         // Gate verb (README: "functions like an if"): on a validate MISS the handler skips
-        // this rule's children (fail CLOSED) instead of inheriting the previous sibling's
-        // v.io.c — so a malformed gate (a key param the method never reads) cannot leak the
-        // content it was meant to block.
+        // this rule's children (fail CLOSED), so a malformed gate (a key param the
+        // method never reads) cannot leak the content it was meant to block.
         gate: 1,
         params: [
             'd',// Data — the config key (`d` is the framework-wide data param)
@@ -27,8 +27,9 @@ module.exports = {
         },
 
         /**
-         * Look up the config key (`v.d.d`/`v.d.k`) via configModel; gate children when it mismatches, else merge the value onto `v.io.d`.
+         * Look up the config key (`v.d.d`/`v.d.k`) via configModel; gate children when it mismatches, else return the merged child data.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             // Accept the key under `d` (the convention the components use) OR `k` (the
@@ -40,18 +41,18 @@ module.exports = {
                 (r === undefined && v.t.p.v !== undefined)
                 || (r !== undefined && v.d.v !== undefined && r !== v.d.v)
             )
-                v.io = {}
-            ; else {
-                const d = {};
+                return {children: false}
+            ;
 
-                if (v.d.a)
-                    d[v.d.a] = r
-                ; else
-                    d[k] = r
-                ;
+            const d = {};
 
-                v.io = {c: 1, d: {...v.m, ...d}};
-            }
+            if (v.d.a)
+                d[v.d.a] = r
+            ; else
+                d[k] = r
+            ;
+
+            return {children: true, data: {...v.m, ...d}};
         }
     }
 };

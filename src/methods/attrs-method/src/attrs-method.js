@@ -2,12 +2,13 @@
 'use strict';
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
+/** @typedef {import('@jtorm/types').MethodEffect} MethodEffect */
 
 module.exports = {
     jTormAttrsMethod: {
         // DI
-        // attrMethod
         // dataParser
+        // handler
         // tssParser
         // viewModel
 
@@ -85,6 +86,7 @@ module.exports = {
         /**
          * Split the comma-lists in `v.d` into one `attr` call per name/value pair across the selected elements.
          * @param {ViewModel} v
+         * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             let t = v.d.parsed,
@@ -92,10 +94,6 @@ module.exports = {
                 x = this.bindings(v, t),
                 names = x.n,
                 values = x.v,
-                tR = {
-                    s: t.s,
-                    m: 'attr'
-                },
                 tD,
                 sv
             ;
@@ -111,13 +109,13 @@ module.exports = {
                     m: t.p.m
                 };
 
-                sv = this.viewModel.copy(v, null, tR);
-                sv.d = tD;
+                sv = this.viewModel.copy(v);
+                sv.t = {s: t.s, m: 'attr', p: {}, c: []};
 
-                await this.attrMethod.handle(sv);
+                await this.handler.dispatch(sv, tD);
             }
 
-            v.io = {c: 1};
+            return {children: true};
         }
     }
 };

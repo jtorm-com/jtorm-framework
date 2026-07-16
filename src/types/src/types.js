@@ -6,8 +6,9 @@
  *
  * Canonical "decoder ring" for the view object `v`: the single source of truth
  * for the one-letter fields threaded through the handler/method pipeline
- * (`v.t` node, `v.d` method data, `v.m` model, `v.h` DOM, `v.io` flags,
- * `v.c` context). Don't duplicate the field map elsewhere — link here.
+ * (`v.t` node, `v.d` method data, `v.m` model, `v.h` DOM, `v.c` context).
+ * Method control flow is returned as an effect rather than stored on `v`.
+ * Don't duplicate the field map elsewhere — link here.
  *
  * Pull a typedef into any .js file with an import() JSDoc reference, e.g.
  * `@typedef {import('@jtorm/types').ViewModel} ViewModel` — every method
@@ -340,13 +341,22 @@
  */
 
 /**
- * Control flags on `v.io`.
- * @typedef {Object} ViewIO
- * @property {*} d        alt data
- * @property {number} c   handle children (1/0)
- * @property {number} r   repeat current iteration (1/0)
- * @property {number} v   validated (1/0)
+ * A method's partial returned control-flow intent.
+ * @typedef {Object} MethodEffect
+ * @property {boolean} [children] recurse into the TSS node's children
+ * @property {boolean} [repeat] repeat the full method lifecycle
+ * @property {*} [data] model data for child recursion
  */
+
+/**
+ * The complete handler-normalized method effect.
+ * @typedef {Object} ViewEffect
+ * @property {boolean} children recurse into the TSS node's children
+ * @property {boolean} repeat repeat the full method lifecycle
+ * @property {*} data model data for child recursion, or undefined for `v.m`
+ */
+
+/** Retained published decoder-ring name for the returned effect shape. @typedef {ViewEffect} ViewIO */
 
 /**
  * The view object `v` threaded through the handler/method pipeline,
@@ -361,25 +371,26 @@
  * @property {?(TssNode[])} tss   full parsed TSS tree
  * @property {?TssNode} t         current method TSS node
  * @property {*} r                result from handleChildren
- * @property {ViewIO} io          control flags
  * @property {Object} [_]         injected lodash subset (DI; present after create)
  */
 
 /**
  * A TSS method (verb) contract — `methods/*` export `{ jTorm<Name>: Method }`.
  * The handler runs `data` (optional hook, replacing the default data-parser pass)
- * → `validate` → `handle`. `handle` is **optional**: it runs only when it is a
+ * → `validate` → `handle`, then normalizes the returned MethodEffect. `handle`
+ * is **optional**: it runs only when it is a
  * function, so a data-only verb (e.g. `data-method`: `validate` + `data`, no
  * `handle`) is valid. On a `validate` MISS the handler decides child handling: a
  * `gate` verb fails CLOSED (children skipped), any other verb is a pass-through
- * (children still render).
+ * (children still render). Missing/malformed controls never repeat and a gate
+ * defaults closed; only own boolean `children`/`repeat` fields are honored.
  * @typedef {Object} Method
  * @property {string} [alias]                                                       alternate name
  * @property {number} [gate]                                                        gate flag — a validate MISS fails CLOSED (skip children); else a miss is a pass-through
  * @property {string[]} [params]                                                    declared parameter names
  * @property {(v: ViewModel) => (boolean|number|Promise<boolean|number>)} validate  gate run before handle
- * @property {(v: ViewModel) => (void|Promise<void>)} [data]                        optional data hook (replaces the default data-parser pass)
- * @property {(v: ViewModel) => (void|Promise<void>)} [handle]                      apply the transform (runs only when a function)
+ * @property {(v: ViewModel, preparedData?: *) => (void|MethodEffect|Promise<void|MethodEffect>)} [data] optional data hook (replaces the default data-parser pass)
+ * @property {(v: ViewModel) => (MethodEffect|Promise<MethodEffect>)} [handle]       apply the transform (runs only when a function)
  */
 
 module.exports = {};
