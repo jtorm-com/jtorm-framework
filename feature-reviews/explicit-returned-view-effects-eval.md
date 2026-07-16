@@ -5,7 +5,8 @@
 **Started:** `2026-07-16T06:58:27Z`
 **Completed:** `2026-07-16T08:39:25Z`
 **Status:** COMPLETED
-**Mode:** Pre-PR feature evaluation
+**Mode:** Post-merge feature evaluation
+**Delivery:** PR #49 head `caa5408`, merged into `dev` as `0600c4a`
 
 ## Scope and Ownership
 
@@ -261,11 +262,11 @@ published.
   absent from the installed ai-config checkout; the primary workflow and report
   requirements were applied directly.
 - `batch-simulator` is not available in this Codex session. Fresh focused/full
-  execution, package dry-runs, and the eventual current-head PR Codex review are
-  the available independent gates.
+  execution, package dry-runs, and the subsequently clean current-head PR Codex
+  review supplied the available independent gates.
 - First-head Codex review supplied one valid source-walker finding, reproduced
-  and fixed red-first. A new current-head review remains required after the
-  follow-up commit.
+  and fixed red-first. Current-head reviews at `caa5408` found no major issues,
+  CI passed, and PR #49 merged into `dev` as `0600c4a`.
 
 ## Documentation
 

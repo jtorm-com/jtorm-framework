@@ -1,27 +1,27 @@
 # Feature Development: Explicit Returned View Effects
 
-**Status:** IN_PROGRESS
+**Status:** COMPLETED
 **Claimed:** 2026-07-16T06:58:27Z
 **Agent:** Codex (GPT-5)
-**Current Mode:** External Review
+**Current Mode:** Complete - Merged as PR #49
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Documentation and Delivery
-**Current Mode:** External Review
-**Next Action:** Commit/push the first-head Codex source-walker fix, reply/resolve its thread, and request review on the new head.
+**Last Completed Mode:** Delivery (PR #49 merged into `dev`)
+**Current Mode:** Complete
+**Next Action:** None; PR #49 merged with green CI and clean current-head Codex review.
 **Files Created:**
 - `feature-reviews/explicit-returned-view-effects.md` - Feature-dev state and implementation spec.
 
 **Files Modified:** Handler/view/type contracts, all 23 methods, UI compiler and host wiring, package manifests, focused/source tests, canonical docs, and the selected architecture review/backlog.
 **Tests Written:** Finite no-return regression in `test/handlers/handler.test.js`.
-**Open Issues:** None. Review found and fixed malformed/inherited control fields being truthy-coerced instead of using safe defaults.
+**Open Issues:** None. Local review findings and the first-head Codex source-walker finding were fixed red-first.
 **Design Decisions Made:** Returned method intents normalize to a complete handler-owned effect; gate defaults close; repeat defaults false and is capped at 100; prepared synthesized data still passes through custom method data hooks; actual verbs execute only through handler dispatch; `ViewModel.io` is removed while `ViewIO` remains an exported effect-shape name.
 
 **Context for Next Session:**
-Task selected from `feature-reviews/framework-architecture-review-2026-07-14.md`: normalize `v.io` to an explicit `{children, repeat, data}` returned-effect contract, unify dispatch, migrate all writers, preserve locked behavior, and complete publication/PR gates.
+PR #49 merged head `caa5408` into `dev` as `0600c4a` after green CI and clean current-head Codex review. The selected P2 task and all delivery gates are complete; the remaining architecture backlog contains only independent P3 items.
 
 ---
 
@@ -87,7 +87,8 @@ Task selected from `feature-reviews/framework-architecture-review-2026-07-14.md`
 - [x] Feature branch pushed
 - [x] Ready PR #49 opened into `dev`
 - [x] `@codex review` requested
-- [ ] Current-head Codex review polled to outcome (do not merge)
+- [x] Current-head Codex review polled clean at `caa5408`
+- [x] PR #49 merged by the maintainer into `dev` as `0600c4a`
 
 ## Research Summary
 
@@ -307,7 +308,7 @@ None.
 - [x] Normal, alias, prepared/synthesized, gate, event, repeat, unknown, child-data, lexical-scope, and zero-match behavior is covered and green.
 - [x] Focused handler/method/compiler suites, `npm run typecheck`, exact `npm test`, publication dry-runs for all touched packages, source guards, and `git diff --check` pass.
 - [x] Required architecture/refactor/security/tech-debt/production reviews reach 10/10 in all ten mandated dimensions and a fresh verification pass finds no issue.
-- [ ] Documentation/backlog/evaluation are current; a conventional commit is pushed; a ready PR targets `dev`; current-head `@codex review` is requested; nothing is merged.
+- [x] Documentation/backlog/evaluation are current; conventional commits were pushed; ready PR #49 targeted `dev`; current-head Codex review was clean; the maintainer subsequently merged it.
 
 ### Approval
 
@@ -448,5 +449,6 @@ verification evidence, review limitations, and delivery conditions; see
 differential security review.
 
 First-head Codex review at `2859ccd` produced one valid P2 source-walker
-finding. It was reproduced red-first, fixed, and fully reverified; clean review
-must now be obtained against the follow-up head.
+finding. It was reproduced red-first, fixed, and fully reverified. Current-head
+Codex reviews at `caa5408` were clean, CI passed, and the maintainer merged PR
+#49 into `dev` as `0600c4a`.

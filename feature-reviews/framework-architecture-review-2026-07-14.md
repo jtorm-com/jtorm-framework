@@ -13,9 +13,9 @@
 > `@jtorm/if-method@1.0.3`, and wire the model into both production host composition
 > roots before either host adopts the new method version.
 >
-> **Backlog update — 2026-07-16 (`dev` base `4bfab8f`):** PR #46 completed the
-> UI-closure manifest and PR #47 completed inline JSON-LD. The explicit-effect
-> change closes the remaining P2 control-flow item: all runtime methods return
+> **Backlog update — 2026-07-16 (`dev` at `0600c4a`):** PR #46 completed the
+> UI-closure manifest, PR #47 completed inline JSON-LD, and PR #49 completed the
+> remaining P2 control-flow item. All runtime methods now return
 > `{children, repeat, data}`, `handler.dispatch()` owns normal/alias/synthesized
 > lifecycle policy, missing effects cannot repeat, and explicit repeats are capped.
 
@@ -156,7 +156,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P1** | Compile bindings onto AST nodes | ✅ Done — PR #44 | Eliminates per-render re-parse; large perf win | M |
 | **P2** | Precompile/manifest step for UI closures | ✅ Done — PR #46 | Collapses 27 static fetches→1 cold/0 warm; exact dynamic edges stay on the existing path | L |
 | **P2** | Emit inline JSON-LD from typed model | ✅ Done — PR #47 | Makes the headline SEO claim true | M |
-| **P2** | Normalize `v.io` → returned effect object | ✅ Done — explicit-effect change | Deletes the infinite-loop trap; makes dispatch an invariant | M |
+| **P2** | Normalize `v.io` → returned effect object | ✅ Done — PR #49 | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | Queued | 4-way duplication; bundle + maintainability | M |
 | **P3** | Replace the parser (tokenizer + recursive descent) | Queued | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | Queued | Info-disclosure + dead weight | S |
