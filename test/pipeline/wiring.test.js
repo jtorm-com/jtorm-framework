@@ -3,13 +3,17 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { WIRED_METHODS } = require('../helpers/engine.js');
+const { WIRED_METHODS, WIRED_PLUGINS } = require('../helpers/engine.js');
 const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
 const { jTormDataParser } = require('../../src/parsers/data-parser/src/data-parser.js');
 const { jTormIfMethod } = require('../../src/methods/if-method/src/if-method.js');
 const { jTormRegexPolicyModel } = require('../../src/models/regex-policy-model/src/regex-policy-model.js');
+const { jTormEventModel } = require('../../src/models/event-model/src/event-model.js');
+const { jTormJsonLdModel } = require('../../src/models/json-ld-model/src/json-ld-model.js');
+const { jTormJsonLdPlugin } = require('../../src/plugins/json-ld-plugin/src/json-ld-plugin.js');
+const { jTormUiCachePlugin } = require('../../src/plugins/ui-cache-plugin/src/ui-cache-plugin.js');
 
 // DI-drift guard: every src/methods/*-method must be either wired by the harness
 // or explicitly deferred. A newly-added method fails here until it is accounted
@@ -47,4 +51,14 @@ test('ui verb is wired to resolver/compiler models before facade configuration',
 
 test('if verb is wired to the bounded regex policy model', () => {
   assert.equal(jTormIfMethod.regexPolicyModel, jTormRegexPolicyModel);
+});
+
+test('inline JSON-LD is DI-wired between render effects and ui-cache', () => {
+  assert.ok(WIRED_PLUGINS.includes(jTormJsonLdPlugin));
+  assert.equal(jTormJsonLdPlugin.jsonLdModel, jTormJsonLdModel);
+
+  const plugins = jTormEventModel.event.after.view;
+  assert.ok(plugins.includes(jTormJsonLdPlugin));
+  assert.ok(plugins.indexOf(jTormJsonLdPlugin) < plugins.indexOf(jTormUiCachePlugin));
+  assert.equal(jTormJsonLdPlugin.event.after.view.weight, 50);
 });

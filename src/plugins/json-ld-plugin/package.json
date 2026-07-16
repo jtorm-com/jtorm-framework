@@ -1,0 +1,20 @@
+{
+  "name": "@jtorm/json-ld-plugin",
+  "description": "jTorm inline JSON-LD document lifecycle plugin",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "main": "src/json-ld-plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm-framework.git",
+    "directory": "src/plugins/json-ld-plugin"
+  },
+  "dependencies": {
+    "@jtorm/json-ld-model": "^1.0.0",
+    "@jtorm/types": "^1.1.0"
+  }
+}
