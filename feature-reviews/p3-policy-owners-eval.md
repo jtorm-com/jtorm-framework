@@ -5,8 +5,8 @@
 **Started:** `2026-07-16T10:21:34Z`
 **Completed:** `2026-07-16T11:37:52Z`
 **Status:** COMPLETED
-**Mode:** Pre-PR feature evaluation
-**Delivery:** PR #51 ready into `dev`; implementation head `3183a49` passed CI and Codex review
+**Mode:** Post-merge feature evaluation
+**Delivery:** PR #51 head `cbe470a`, merged into `dev` as `ee548c9`
 
 ## Scope and Ownership
 
@@ -187,7 +187,7 @@ Release order:
 | Full development audit | Pre-existing pinned lodash advisory; lockfile unchanged and affected APIs unused |
 | Package publication dry-runs | 12/12 PASS; 3 intended files each |
 | `git diff --check` | PASS |
-| PR #51 implementation head | CI PASS; Codex found no major issue on `3183a49`; no review threads |
+| PR #51 current head | CI PASS; Codex found no major issue on `cbe470a`; no review threads; merged as `ee548c9` |
 
 ## Quality Score
 
@@ -215,8 +215,8 @@ Release order:
   was applied directly.
 - External production host composition is outside this repository. Package minima/docs, the local
   host harness, publication dry-runs, CI, and current-head Codex review are the available gates.
-- This evaluation/ledger finalization is a documentation-only follow-up to the clean implementation
-  head; repository policy requires that final head to receive the same CI/Codex gate before handoff.
+- Implementation head `3183a49` and final documentation head `cbe470a` both received clean Codex
+  reviews with green CI; the maintainer merged PR #51 into `dev` as `ee548c9`.
 
 ## Documentation
 
