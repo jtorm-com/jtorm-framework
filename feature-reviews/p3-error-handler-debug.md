@@ -1,20 +1,20 @@
 # Feature Development: P3 Error-Handler Debug Dump
 
-**Status:** READY_PR — leave unmerged
+**Status:** COMPLETED
 **Claimed:** 2026-07-16T18:13:35Z
 **Agent:** Codex
-**Current Mode:** Delivery — commit and ready PR next
+**Current Mode:** Complete — merged as PR #53
 **Branch:** `feature/p3-error-handler-debug`
 **Base:** `dev` at `c422140`
-**PR:** #53 into `dev` (ready, unmerged)
+**PR:** #53 head `5b9ce89`, merged into `dev` as `9902390`
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Delivery — implementation head green and clean
-**Current Mode:** Delivery
-**Next Action:** Commit this completion record and revalidate its record-only head before handoff; maintainer owns merge.
+**Last Completed Mode:** Delivery — PR #53 merged into `dev`
+**Current Mode:** Complete
+**Next Action:** None; PR #53 merged after green CI and clean current-head Codex review.
 **Files Created:**
 - `feature-reviews/p3-error-handler-debug.md` — research, specification, threat model, and checkpoints.
 - `feature-reviews/p3-error-handler-debug-eval.md` — completion-evidence scaffold.
@@ -28,7 +28,7 @@
 - The full-pipeline harness restores `debug = false` before every render to enforce singleton isolation.
 
 **Context for Next Session:**
-The clean feature branch was created directly from current `dev`. Research and the security-scoped plan gate are complete. The authorized implementation is intentionally one runtime flag/guard plus test-harness reset, red-first tests, obsolete pipeline suppression removal, a package patch bump, and records. The parser rewrite is explicitly excluded.
+PR #53 final head `5b9ce89` merged into `dev` as `9902390` after green CI and clean current-head Codex review. The error-handler privacy slice and all delivery gates are complete; the remaining architecture backlog item is the independent TSS parser replacement.
 
 ---
 
@@ -50,7 +50,7 @@ The clean feature branch was created directly from current `dev`. Research and t
 - [x] Red tests written and observed failing for the missing safe default/reset behavior (8 pass, 4 expected fail).
 - [x] Runtime debug flag implemented.
 - [x] Singleton resets and obsolete pipeline suppressions updated.
-- [x] Version and package/feature/backlog records updated; final PR/ledger details remain after review.
+- [x] Version and package/feature/backlog records updated, including final PR and review-ledger evidence.
 
 ### Test Mode
 - [x] Focused tests passing (84/84).
@@ -72,9 +72,9 @@ The clean feature branch was created directly from current `dev`. Research and t
 ### Delivery Mode
 - [x] Commit and push task-specific changes.
 - [x] Ready PR #53 opened into `dev`.
-- [x] CI green on implementation head `644728f`.
-- [x] Codex found no major issue on implementation head `644728f`; completion-record head will be re-requested before handoff.
-- [x] PR left open and unmerged.
+- [x] CI green on final head `5b9ce89`.
+- [x] Codex found no major issue on final head `5b9ce89`; zero review threads.
+- [x] Maintainer merged PR #53 into `dev` as `9902390`.
 
 ---
 
@@ -303,7 +303,7 @@ Full PASTA is not triggered: this change removes the default PII-to-log flow, ad
 - [x] All suppression-only pipeline `console.log` replacements are removed.
 - [x] `@jtorm/error-handler` is documented and versioned `1.0.2`.
 - [x] Focused tests, exact full suite, typecheck, dry-run, source guards, review gates, and diff check pass.
-- [x] Ready PR targets `dev`, implementation-head CI/Codex are clean, and the PR remains open/unmerged; the record-only head is revalidated before handoff.
+- [x] Ready PR #53 targeted `dev`; final-head CI/Codex were clean; the maintainer subsequently merged it as `9902390`.
 
 ## Plan Quality Gate and Self-Review
 
