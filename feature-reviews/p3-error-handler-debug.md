@@ -1,11 +1,12 @@
 # Feature Development: P3 Error-Handler Debug Dump
 
-**Status:** LOCAL_GATES_COMPLETE — delivery pending
+**Status:** PR_OPEN — CI and current-head review pending
 **Claimed:** 2026-07-16T18:13:35Z
 **Agent:** Codex
 **Current Mode:** Delivery — commit and ready PR next
 **Branch:** `feature/p3-error-handler-debug`
 **Base:** `dev` at `c422140`
+**PR:** #53 into `dev` (ready, unmerged)
 
 ---
 
@@ -13,7 +14,7 @@
 
 **Last Completed Mode:** Test and scoped review
 **Current Mode:** Delivery
-**Next Action:** Commit the verified diff, open a ready PR into `dev`, and iterate until CI and Codex are clean on the current head.
+**Next Action:** Push the PR-record update, then iterate until CI and Codex are clean on the resulting current head.
 **Files Created:**
 - `feature-reviews/p3-error-handler-debug.md` — research, specification, threat model, and checkpoints.
 - `feature-reviews/p3-error-handler-debug-eval.md` — completion-evidence scaffold.
@@ -69,8 +70,8 @@ The clean feature branch was created directly from current `dev`. Research and t
 - [x] 100/100 feature evaluation and fresh verification.
 
 ### Delivery Mode
-- [ ] Commit and push task-specific changes.
-- [ ] Ready PR opened into `dev`.
+- [x] Commit and push task-specific changes.
+- [x] Ready PR #53 opened into `dev`.
 - [ ] CI green.
 - [ ] Clean Codex review on current head.
 - [ ] PR left unmerged.

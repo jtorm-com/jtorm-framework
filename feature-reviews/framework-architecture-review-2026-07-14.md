@@ -28,7 +28,7 @@
 > **Backlog update — 2026-07-16 (`feature/p3-error-handler-debug` from `dev` at `c422140`):**
 > the P3 error-handler privacy slice has completed local gates: diagnostics default off, only literal
 > `debug === true` retains the historical dump, disabled handling does not observe the view or need
-> injected `util`, and the render harness resets the mutable flag. Ready-PR delivery is in progress;
+> injected `util`, and the render harness resets the mutable flag. Ready PR #53 is open into `dev`;
 > parser replacement remains the next independent P3 task.
 
 ---
@@ -171,7 +171,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P2** | Normalize `v.io` → returned effect object | ✅ Done — PR #49 | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | ✅ Done — PR #51 | 4-way duplication; bundle + maintainability | M |
 | **P3** | Replace the parser (tokenizer + recursive descent) | Queued | Unblocks all future DSL work + real diagnostics | L |
-| **P3** | Move `error-handler` dump behind a debug flag | Local gates complete — `feature/p3-error-handler-debug` | Info-disclosure + dead weight | S |
+| **P3** | Move `error-handler` dump behind a debug flag | PR #53 — CI/review pending | Info-disclosure + dead weight | S |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.
