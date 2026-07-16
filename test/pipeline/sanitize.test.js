@@ -82,15 +82,12 @@ test('inner{h: <data>} sanitizes ONCE for the whole operation, not per matched e
 // matched element, so a zero-match throws "<sel> not found" before the sanitizer runs.
 test('zero-match insert{h:} surfaces the not-found drift error, not a sanitizer error', async () => {
   setSanitize(() => { throw new Error('sanitizer exploded'); });
-  const log = console.log;
-  console.log = () => {}; // silence the error-handler pre-throw v dump
   try {
     await assert.rejects(
       render('<body><div>x</div></body>', 'span->inner { h: html; }', { html: '<b>ok</b>' }),
       /not found/i
     );
   } finally {
-    console.log = log;
     setSanitize(null);
   }
 });
@@ -178,8 +175,6 @@ test('zero-match remaining raw verbs surface not-found drift errors before sanit
     "span->swap { s: 'article'; h: html; }",
     "span->replace { h: html; s: '.w'; }"
   ];
-  const log = console.log;
-  console.log = () => {};
   try {
     for (const tss of cases) {
       let calls = 0;
@@ -191,7 +186,6 @@ test('zero-match remaining raw verbs surface not-found drift errors before sanit
       assert.equal(calls, 0, tss + ' must not sanitize before target resolution');
     }
   } finally {
-    console.log = log;
     setSanitize(null);
   }
 });
@@ -220,8 +214,6 @@ test('get{h} fetched body routes through the injected host sanitizer', async () 
 // get{h} target would mask a drifted (zero-match) selector behind a sanitizer error.
 test('zero-match get{h} surfaces the not-found drift error, not a sanitizer error', async () => {
   setSanitize(() => { throw new Error('sanitizer exploded'); });
-  const log = console.log;
-  console.log = () => {};
   try {
     await assert.rejects(
       render(
@@ -234,7 +226,6 @@ test('zero-match get{h} surfaces the not-found drift error, not a sanitizer erro
       /not found/i
     );
   } finally {
-    console.log = log;
     setSanitize(null);
   }
 });

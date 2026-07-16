@@ -3,7 +3,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { reset, WIRED_METHODS, WIRED_PLUGINS } = require('../helpers/engine.js');
+const { render, reset, WIRED_METHODS, WIRED_PLUGINS } = require('../helpers/engine.js');
+const { jTormErrorHandler } = require('../../src/handlers/error-handler/src/error-handler.js');
 const { jTormUiMethod } = require('../../src/methods/ui-method/src/ui-method.js');
 const { jTormUiResolverModel } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
 const { jTormUiCompilerModel } = require('../../src/models/ui-compiler-model/src/ui-compiler-model.js');
@@ -112,6 +113,21 @@ test('harness reset restores the complete asset-policy injection graph', () => {
   assert.equal(jTormJsPlugin.uiResolverModel, jTormUiResolverModel);
   assert.equal(jTormCssMethod.cssPlugin, jTormCssPlugin);
   assert.equal(jTormJsMethod.jsPlugin, jTormJsPlugin);
+});
+
+test('repeated renders cannot inherit enabled error diagnostics', async () => {
+  const values = [];
+  try {
+    jTormErrorHandler.debug = true;
+    await render('<body><p>x</p></body>', '', {});
+    values.push(jTormErrorHandler.debug);
+    jTormErrorHandler.debug = true;
+    await render('<body><p>y</p></body>', '', {});
+    values.push(jTormErrorHandler.debug);
+  } finally {
+    jTormErrorHandler.debug = false;
+  }
+  assert.deepEqual(values, [false, false]);
 });
 
 test('inline JSON-LD is DI-wired between render effects and ui-cache', () => {

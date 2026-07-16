@@ -233,6 +233,7 @@ const freshEvents = () => ({
 
 /** Reset the mutable state of the WIRED singletons between boils. */
 function reset(jsonLd = 1) {
+    jTormErrorHandler.debug = false;
     jTormRenderContextModel.max = 128;
     jTormAssetPluginModel.renderContextModel = jTormRenderContextModel;
     jTormRequestModel.renderContextModel = jTormUiManifestModel.renderContextModel = jTormLayerModel.renderContextModel = jTormUiCacheModel.renderContextModel = jTormRenderContextModel;

@@ -132,45 +132,27 @@ test('ui @e.div content (replacable slot) escapes an untrusted html field by def
 // emit a live sibling. The public safe path must throw, not silently emit unescaped.
 // (Shipped raw-text uis use rawcontent's raw h:, not t:; this guards a direct footgun.)
 test('inner{t: <data>} on a raw-text element (script) fails closed (cannot escape)', async () => {
-  const log = console.log;
-  console.log = () => {}; // silence the error-handler's pre-throw v dump
-  try {
-    await assert.rejects(
-      render('<body><script></script></body>', 'script->inner { t: code; }', { code: '</script><img src=x onerror=1>' }),
-      /raw-text/i
-    );
-  } finally {
-    console.log = log;
-  }
+  await assert.rejects(
+    render('<body><script></script></body>', 'script->inner { t: code; }', { code: '</script><img src=x onerror=1>' }),
+    /raw-text/i
+  );
 });
 
 test('append{t: <data>} into a raw-text element (style) fails closed', async () => {
-  const log = console.log;
-  console.log = () => {};
-  try {
-    await assert.rejects(
-      render('<body><style></style></body>', 'style->append { t: css; }', { css: '</style><script>alert(1)</script>' }),
-      /raw-text/i
-    );
-  } finally {
-    console.log = log;
-  }
+  await assert.rejects(
+    render('<body><style></style></body>', 'style->append { t: css; }', { css: '</style><script>alert(1)</script>' }),
+    /raw-text/i
+  );
 });
 
 // Codex PR #26 P1 (round 2): the guard must key on the NORMALIZED position, not the
 // short mode code — insert also accepts full DOM positions (m: 'beforeend'), which are
 // inside-writes and must fail closed too.
 test('t: fails closed with a full DOM position too (m: beforeend into raw-text)', async () => {
-  const log = console.log;
-  console.log = () => {};
-  try {
-    await assert.rejects(
-      render('<body><script></script></body>', "script->insert { m: 'beforeend'; t: code; }", { code: '</script><img src=x onerror=1>' }),
-      /raw-text/i
-    );
-  } finally {
-    console.log = log;
-  }
+  await assert.rejects(
+    render('<body><script></script></body>', "script->insert { m: 'beforeend'; t: code; }", { code: '</script><img src=x onerror=1>' }),
+    /raw-text/i
+  );
 });
 
 // Precision: an OUTSIDE position (beforebegin writes into the PARENT, not the raw-text
