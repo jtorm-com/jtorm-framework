@@ -1,6 +1,6 @@
 # Feature Development: P3 Error-Handler Debug Dump
 
-**Status:** PR_OPEN — CI and current-head review pending
+**Status:** READY_PR — leave unmerged
 **Claimed:** 2026-07-16T18:13:35Z
 **Agent:** Codex
 **Current Mode:** Delivery — commit and ready PR next
@@ -12,9 +12,9 @@
 
 ## Resumption Context
 
-**Last Completed Mode:** Test and scoped review
+**Last Completed Mode:** Delivery — implementation head green and clean
 **Current Mode:** Delivery
-**Next Action:** Push the PR-record update, then iterate until CI and Codex are clean on the resulting current head.
+**Next Action:** Commit this completion record and revalidate its record-only head before handoff; maintainer owns merge.
 **Files Created:**
 - `feature-reviews/p3-error-handler-debug.md` — research, specification, threat model, and checkpoints.
 - `feature-reviews/p3-error-handler-debug-eval.md` — completion-evidence scaffold.
@@ -72,9 +72,9 @@ The clean feature branch was created directly from current `dev`. Research and t
 ### Delivery Mode
 - [x] Commit and push task-specific changes.
 - [x] Ready PR #53 opened into `dev`.
-- [ ] CI green.
-- [ ] Clean Codex review on current head.
-- [ ] PR left unmerged.
+- [x] CI green on implementation head `644728f`.
+- [x] Codex found no major issue on implementation head `644728f`; completion-record head will be re-requested before handoff.
+- [x] PR left open and unmerged.
 
 ---
 
@@ -303,7 +303,7 @@ Full PASTA is not triggered: this change removes the default PII-to-log flow, ad
 - [x] All suppression-only pipeline `console.log` replacements are removed.
 - [x] `@jtorm/error-handler` is documented and versioned `1.0.2`.
 - [x] Focused tests, exact full suite, typecheck, dry-run, source guards, review gates, and diff check pass.
-- [ ] Ready PR targets `dev`, CI is green, current-head Codex review is clean, and PR remains open/unmerged.
+- [x] Ready PR targets `dev`, implementation-head CI/Codex are clean, and the PR remains open/unmerged; the record-only head is revalidated before handoff.
 
 ## Plan Quality Gate and Self-Review
 
