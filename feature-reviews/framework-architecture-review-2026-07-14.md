@@ -32,12 +32,12 @@
 > and clean Codex review before the maintainer merged it into `dev`;
 > parser replacement remains the next independent P3 task.
 >
-> **Backlog update — 2026-07-16 (`agent/p3-tss-parser-rewrite` from merged PR #54 / `dev`
+> **Backlog update — 2026-07-16 (PR #55 from merged PR #54 / `dev`
 > at `6e352fa`):** the parser P3 is locally complete and in delivery. The active package is now a
 > bounded tokenizer plus recursive-descent parser with located diagnostics, exact valid v1 AST
 > compatibility against a frozen oracle and all 257 shipped TSS files, immutable resource ceilings,
 > and a documented `2.0.0` migration/rollback. Local gates are 579/579 plus a clean 200,000-case
-> differential; the ready PR/CI/current-head Codex review are tracked in the feature record.
+> differential; ready PR #55 targets `dev`, with CI/current-head Codex review tracked in the feature record.
 
 ---
 
@@ -178,7 +178,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P2** | Emit inline JSON-LD from typed model | ✅ Done — PR #47 | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | ✅ Done — PR #49 | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | ✅ Done — PR #51 | 4-way duplication; bundle + maintainability | M |
-| **P3** | Replace the parser (tokenizer + recursive descent) | In delivery — `agent/p3-tss-parser-rewrite` | Unblocks all future DSL work + real diagnostics | L |
+| **P3** | Replace the parser (tokenizer + recursive descent) | In review — PR #55 | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | ✅ Done — PR #53 | Info-disclosure + dead weight | S |
 
 ### Comparable projects worth studying

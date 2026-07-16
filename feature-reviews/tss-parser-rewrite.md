@@ -3,15 +3,15 @@
 **Status:** IN_PROGRESS
 **Claimed:** 2026-07-16T19:38:23Z
 **Agent:** Codex
-**Current Mode:** Review — local 100/100 complete; staged and delivery gates remain
+**Current Mode:** Delivery — ready PR #55; CI and current-head Codex review remain
 
 ---
 
 ## Resumption Context
 
 **Last Completed Mode:** Design
-**Current Mode:** Review
-**Next Action:** Run the exact staged debt/finish gate, commit, update the architecture backlog with the PR number, and complete CI/current-head Codex delivery
+**Current Mode:** Delivery
+**Next Action:** Poll PR #55 CI, request Codex review, resolve any valid finding red-first, and leave the clean PR unmerged
 **Files Created:** specification/security records, frozen oracle, and differential/error/resource suites
 **Files Modified:** parser package/docs plus direct-consumer propagation tests
 **Tests Written:** red-first diagnostics, offset-collision/method-layout compatibility, 260 interleavings, 768 combinatorial forms, 4,096 seeded nested forms, resource ceilings, and consumer propagation
@@ -78,10 +78,10 @@ PR #54 was confirmed merged into `dev`; local `dev` was fast-forwarded and the f
 - [x] Architecture backlog updated
 
 ### Delivery Mode
-- [ ] Ready PR opened into `dev`
+- [x] Ready PR opened into `dev` (#55)
 - [ ] CI green at current head
 - [ ] Clean Codex review at current head
-- [ ] PR left unmerged
+- [x] PR left unmerged
 
 ---
 
