@@ -1,17 +1,17 @@
 # Feature Development: TSS Parser Tokenizer + Recursive Descent Rewrite
 
-**Status:** IN_PROGRESS
+**Status:** COMPLETE
 **Claimed:** 2026-07-16T19:38:23Z
 **Agent:** Codex
-**Current Mode:** Delivery — ready PR #55; CI and current-head Codex review remain
+**Current Mode:** Complete — PR #55 merged into `dev` as `ccff152`
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Design
-**Current Mode:** Delivery
-**Next Action:** Poll PR #55 CI, request Codex review, resolve any valid finding red-first, and leave the clean PR unmerged
+**Last Completed Mode:** Delivery
+**Current Mode:** Complete
+**Next Action:** None — the architecture backlog records P3 complete
 **Files Created:** specification/security records, frozen oracle, and differential/error/resource suites
 **Files Modified:** parser package/docs plus direct-consumer propagation tests
 **Tests Written:** red-first diagnostics, offset-collision/method-layout compatibility, 260 interleavings, 768 combinatorial forms, 4,096 seeded nested forms, CI-scale 200,000-case streaming differential, resource ceilings, browser artifact parity/size, and consumer propagation
@@ -24,8 +24,8 @@ canonical source entry; direct `<script>` consumers receive the same singleton a
 `globalThis.jTormTSSParser`. Terser is build-only and does not change the
 zero-runtime-dependency contract.
 
-**Context for Next Session:**
-PR #54 was confirmed merged into `dev`; local `dev` was fast-forwarded and the feature branch was created at `6e352fa`. Research, focused green baseline, specification, threat model, two-round adversarial review, plan quality gate, and design-persona gate are complete. The exact v1 source is frozen at SHA-256 `1a597fe542048ba719d277341ebe840a730b2f2c1152ac92b49821ec19648c27`. Differential characterization passes for 260 interleavings and all 257 checked-in TSS files. The 12-test replacement suite was observed fully red before production edits.
+**Completion Context:**
+PR #55 final head `a5c31fc` passed CI and a clean current-head Codex review, then the maintainer merged it into `dev` as `ccff152` on 2026-07-17. The exact v1 source remains frozen at SHA-256 `1a597fe542048ba719d277341ebe840a730b2f2c1152ac92b49821ec19648c27`; differential characterization covers 260 interleavings and all 257 checked-in TSS files.
 
 ---
 
@@ -85,9 +85,9 @@ PR #54 was confirmed merged into `dev`; local `dev` was fast-forwarded and the f
 
 ### Delivery Mode
 - [x] Ready PR opened into `dev` (#55)
-- [ ] CI green at current head
-- [ ] Clean Codex review at current head
-- [x] PR left unmerged
+- [x] CI green at final head `a5c31fc`
+- [x] Clean Codex review at final head `a5c31fc`
+- [x] PR left unmerged for maintainer handoff, then merged as `ccff152`
 
 ---
 
@@ -516,7 +516,7 @@ Full PASTA is not triggered because the new boundary is build/publication toolin
 - **Assumptions:** checked-in TSS represents the production v1 syntax envelope; TSS remains trusted author input; external hosts call `config()` before data-parser initialization; repository evidence finds no direct consumer of algorithm-specific helper return values beyond required name/callability and writable state.
 - **Resolved uncertainties:** comment-before-quote/token-concatenation, dual-quote whitespace normalization, helper behavior, custom quote arrays, and declaration interleavings are pinned directly from the oracle; structurally malformed-v1 tree outputs are not treated as valid merely because v1 failed to throw.
 - **Stakeholders:** package/framework maintainer (product and release authority), external TSS authors/hosts (compatibility users), Codex review (quality gate), and CI (mechanical gate). The user authorization supplies decisions and directs autonomous execution; material decisions and evidence stay in this shared spec/evaluation record.
-- **Definition of Done:** all success criteria pass, no valid-output drift or unresolved review finding remains, package/docs/records are complete, ready PR targets `dev`, CI and current-head Codex review are clean, and the PR is left unmerged.
+- **Definition of Done:** all success criteria pass, no valid-output drift or unresolved review finding remains, package/docs/records are complete, ready PR targets `dev`, CI and current-head Codex review are clean, and the PR is left unmerged at agent handoff.
 
 ## Success Criteria
 
@@ -531,8 +531,8 @@ Full PASTA is not triggered because the new boundary is build/publication toolin
 - [x] `@jtorm/tss-parser` is documented and versioned `2.0.0`; package dry-run contains only intended files.
 - [x] Prepack deterministically emits the licensed, browser-loadable singleton under
   7 KiB gzip with exact 257-file parity and no CommonJS/package regression.
-- [ ] All requested tests, static/security/review gates, CI, and clean current-head Codex review pass.
-- [x] Ready PR targets `dev` and remains unmerged.
+- [x] All requested tests, static/security/review gates, CI, and clean current-head Codex review pass.
+- [x] Ready PR targeted `dev` and remained unmerged until maintainer merge.
 
 ## Open Questions
 

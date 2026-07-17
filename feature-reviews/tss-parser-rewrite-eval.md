@@ -1,8 +1,8 @@
 # TSS Parser Rewrite — Evaluation Record
 
 **Date:** 2026-07-17
-**Branch:** `agent/p3-tss-parser-rewrite` from merged PR #54 / `dev` `6e352fa`
-**Status:** READY PR #55 — local gates clean; external delivery gates tracked on the PR
+**Branch:** `agent/p3-tss-parser-rewrite` from merged PR #54 / `dev` `6e352fa`; merged as `ccff152`
+**Status:** MERGED PR #55 — final head `a5c31fc` passed CI and clean current-head Codex review
 
 ## Outcome
 
@@ -35,12 +35,13 @@ An in-memory instrumentation probe found 55 of the 257 checked-in files enter th
   architecture/spec/security/evaluation/agent records. No adjacent runtime source changed.
 - **Entry points traced:** `config()`, `handle()`, `view-model.create() → handle()`, `tss-model.get() → handle() → identity cache cleanup/retry`, and manifest `compile() → lock/snapshot → handle() → finally restore`.
 - **Junction questions:** no nullable/void/async authorization/count-modify/token/env-fallback junction exists in synchronous parsing. The affected async callers await their parse path, preserve error identity, and use existing identity/lock controls; parser failure cannot be mistaken for success or leave a partial AST.
-- **PR comments:** ready PR #55 is open into `dev`. Current-head review produced
+- **PR comments:** PR #55 merged into `dev` after final-head CI and Codex gates passed. Review produced
   five accepted red-first corrections (runtime-consumer ranges, the manifest-compiler
   range, stray top-level terminator, ES2015 intrinsic use, and multi-character pair
   offsets). Two algorithm-helper-only comments were resolved as
   outside the approved major-version behavior contract after README clarification;
-  every thread has an evidence-backed reply.
+  every thread has an evidence-backed reply. The final current-head pass reported
+  no major issues on `a5c31fc`.
 - **Ratchet/docs:** source-ratchet review converged. This repository has no `FEATURES.md`, `docs/features`, frontend action catalog, security STRIDE directory, or feature-review progress index; the project-specific parser README, feature/evaluation/security records, AGENTS contract, architecture backlog, and outcome ledger are the applicable documentation owners.
 
 ## Red-first ledger
@@ -196,8 +197,8 @@ Fresh verification re-read every changed runtime/test file after the final adver
 | tech-debt-ratchet | PASS | Exact final staged payload reports no new debt pattern |
 | production-readiness | PASS | Limits/latency/RSS/package/rollout evidence; accepted synchronous and size residuals documented |
 | Feature evaluation / verification | PASS | 94/100; no local blocker, with size/compatibility complexity scored explicitly |
-| CI/current-head Codex | PR GATE | The final current-head result must be green/clean; PR remains unmerged |
+| CI/current-head Codex | PASS | GitHub Actions passed and Codex reported no major issues on final head `a5c31fc`; PR #55 merged as `ccff152` |
 
 ## Current judgment
 
-No known compatibility, security, privacy, or production-resource blocker remains unresolved locally. The parser is materially larger than v1 even after minification; that accepted maintainability/distribution cost is explicit above. The exact staged debt gate and ledger/backlog reconciliation are complete. GitHub records the required final green CI and clean current-head Codex gate; PR #55 remains unmerged.
+No known compatibility, security, privacy, or production-resource blocker remains unresolved. The parser is materially larger than v1 even after minification; that accepted maintainability/distribution cost is explicit above. The exact staged debt gate and ledger/backlog reconciliation are complete. GitHub records the required final green CI and clean current-head Codex gate; PR #55 is merged into `dev` as `ccff152`.
