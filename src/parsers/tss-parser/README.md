@@ -14,9 +14,11 @@ The package exports the mutable CommonJS singleton `jTormTSSParser`. Configure
 it before initializing consumers such as `@jtorm/data-parser`.
 
 Historical algorithm-helper names remain callable because they are part of the
-published singleton surface. They are compatibility adapters for trusted hosts,
-not the active parse entry point; the hard source/token/depth/node/declaration
-ceilings apply to `handle()`.
+published singleton surface. They are surface adapters for trusted hosts, not an
+alternate supported parser API: `handle()` owns exact valid-TSS output and the hard
+source/token/depth/node/declaration ceilings. Characterized helper calls remain
+compatible, but uncharacterized algorithm-specific edge behavior may differ in this
+major release.
 
 ## Basic use
 
@@ -233,10 +235,17 @@ config validation, and diagnostics are new:
 
 1. Run existing TSS through the v1/v2 compatibility suite.
 2. Fix malformed assets that v1 silently dropped or misparsed.
-3. Install and inject `@jtorm/tss-parser@2.0.0`.
+3. Install and inject `@jtorm/tss-parser@2.0.0`. Published hosts using the direct
+   consumers should adopt `@jtorm/tss-model@1.0.6`, `@jtorm/data-parser@1.0.4`,
+   and `@jtorm/attrs-method@1.0.4` where applicable; those releases require parser 2.x.
 4. Keep calling `config()` before data-parser initialization.
 5. Browser hosts may instead load the exact-version `tss-parser.min.js` CDN path and
    inject `globalThis.jTormTSSParser`; pin the full package version for rollback.
+
+Hosts that called historical rewrite-stage helpers as alternate parsers should move
+those calls to `handle()`. Their names, signatures, writable side effects, and
+characterized behavior remain available, but uncharacterized algorithm-stage edge
+semantics are not a v2 compatibility promise.
 
 Quoted structural delimiters now remain literal instead of corrupting brace or
 header offsets. This includes a quoted declaration terminator inside method
@@ -248,6 +257,8 @@ single-code-unit offset/regex assumptions did not provide a stable AST baseline,
 so equivalent sources may intentionally differ when adopting those extensions.
 
 There is no runtime dual-parser mode and no data or AST migration. To roll back,
-pin external consumers to `@jtorm/tss-parser@1.0.0`; source-composed hosts
-revert the parser change and rebuild any manifests with the prior toolchain
-label. Browser hosts switch their version-pinned CDN URL to the prior tested build.
+pin `@jtorm/tss-parser@1.0.0` plus the prior direct-consumer releases
+(`tss-model@1.0.5`, `data-parser@1.0.3`, and `attrs-method@1.0.3`) where used.
+Source-composed hosts revert the parser/metadata change and rebuild any manifests
+with the prior toolchain label. Browser hosts switch their version-pinned CDN URL
+to the prior tested build.

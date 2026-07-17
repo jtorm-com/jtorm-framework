@@ -148,7 +148,10 @@ test('coordinated package releases declare their policy owners and dependency mi
     'src/models/ui-cache-model': '1.0.5',
     'src/models/data-model': '1.0.5',
     'src/models/html-model': '1.0.5',
-    'src/models/tss-model': '1.0.5',
+    'src/models/tss-model': '1.0.6',
+    'src/parsers/tss-parser': '2.0.0',
+    'src/parsers/data-parser': '1.0.4',
+    'src/methods/attrs-method': '1.0.4',
     'src/plugins/css-plugin': '1.0.5',
     'src/plugins/js-plugin': '1.0.5'
   };
@@ -163,7 +166,13 @@ test('coordinated package releases declare their policy owners and dependency mi
     'src/models/ui-cache-model': {'@jtorm/render-context-model': '^1.0.0'},
     'src/models/data-model': {'@jtorm/promise-cache-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'},
     'src/models/html-model': {'@jtorm/promise-cache-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'},
-    'src/models/tss-model': {'@jtorm/promise-cache-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'},
+    'src/models/tss-model': {
+      '@jtorm/promise-cache-model': '^1.0.0',
+      '@jtorm/request-model': '^1.1.4',
+      '@jtorm/tss-parser': '^2.0.0'
+    },
+    'src/parsers/data-parser': {'@jtorm/tss-parser': '^2.0.0'},
+    'src/methods/attrs-method': {'@jtorm/tss-parser': '^2.0.0'},
     'src/plugins/css-plugin': {'@jtorm/asset-plugin-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'},
     'src/plugins/js-plugin': {'@jtorm/asset-plugin-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'}
   };

@@ -39,7 +39,9 @@
 > and a documented `2.0.0` migration/rollback. An exact-pinned Terser prepack also emits the same
 > singleton as a classic browser script (16,575 raw / 6,120 gzip-9 bytes on the recorded Node 25 toolchain; 6,115 on CI LTS zlib). Local gates are 582/582;
 > PR CI now streams the full 200,000-case differential at 167 MiB peak RSS. Ready PR #55 targets
-> `dev`, with CI/current-head Codex review tracked in the feature record.
+> `dev`. Direct consumer metadata is patch-bumped to require parser `^2.0.0` after
+> current-head review proved `^1.0.0` would strand normal installs on v1; CI and the
+> next current-head Codex review are tracked in the feature record.
 
 ---
 

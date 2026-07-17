@@ -10,7 +10,7 @@
 The repository is large, so this review used the skill's surgical strategy:
 the parser implementation, its package/config surface, frozen oracle, parser
 tests, browser build/package metadata, four direct production/build consumers,
-and changed propagation tests
+changed propagation tests, and the direct-consumer package graph
 were reviewed deeply. Documentation and ledger changes were checked for
 security-contract consistency. No unrelated framework subsystem was audited.
 
@@ -96,6 +96,7 @@ radius; the README pins both package version and SHA-384 SRI.
 | Minifier drift changes public names or AST behavior | Exact Terser `5.49.0`, no property mangling, deterministic double build, exact singleton/regex/diagnostic/custom-config and 257-file parity | Mitigated |
 | CDN artifact is replaced in transit/origin | Exact-version URL and tested SHA-384 SRI in browser instructions; self-hosting remains available | Mitigated |
 | Browser build gains hidden runtime loading | Generated-output guards reject `require()` and source maps; canonical source has no dynamic load/eval/network path; Semgrep/package review applies | Mitigated |
+| Published dependents silently retain parser v1 | All three direct metadata edges require parser `^2.0.0`; patch versions and package dry-runs are source-guarded | Fixed |
 
 ## Findings
 
@@ -227,6 +228,21 @@ PR CI test step.
 **Evidence:** 200,000 cases pass in about 34 seconds with zero drift; measured peak
 RSS falls to 167 MiB, and CI now executes that exact scale.
 
+### Fixed — MEDIUM: direct consumer ranges would strand normal installs on parser v1
+
+**Mapping:** OWASP A08:2021 (Software and Data Integrity Failures), CWE-1104
+**Location:** `tss-model`, `data-parser`, and `attrs-method` package metadata
+**Attack/failure:** The parser package was prepared as `2.0.0`, but each direct
+published consumer still declared parser `^1.0.0`. Installing those consumers
+normally could therefore resolve the unbounded v1 parser despite this feature's
+release and documentation, creating version-dependent security/resource behavior.
+**Fix:** Patch-bump the metadata-only consumers to `tss-model@1.0.6`,
+`data-parser@1.0.4`, and `attrs-method@1.0.4`, each requiring parser `^2.0.0`.
+No runtime source or DI owner changes.
+**Evidence:** the package contract test was observed red on the old versions/ranges;
+it and the coordinated-release source guard now pass, and all three package dry-runs
+contain only their existing README, metadata, and runtime source.
+
 No critical, high, medium, or low finding remains open.
 
 ## Security properties checked
@@ -279,6 +295,7 @@ No critical, high, medium, or low finding remains open.
 - View, fetched-cache retry, and manifest compiler propagation/restoration tests
 - Deterministic browser build, public-surface/diagnostic/custom/full-corpus parity,
   gzip budget, SRI, license, and four-file package dry-run
+- Direct-consumer exact version/range source guards and three three-file dry-runs
 - Exact 582-test repository suite, typecheck, zero-vulnerability dependency audit,
   package dry-run, syntax, Semgrep (68+22 rules, zero findings), and diff hygiene
 

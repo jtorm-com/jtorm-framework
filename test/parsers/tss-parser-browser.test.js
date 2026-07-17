@@ -40,6 +40,12 @@ function build() {
 
 test('package declares a build-only classic-browser artifact without remapping CommonJS', () => {
   const root = pkg(repo), parser = pkg(dir);
+  const consumers = [
+    ['src/models/tss-model', '@jtorm/tss-model', '1.0.6'],
+    ['src/parsers/data-parser', '@jtorm/data-parser', '1.0.4'],
+    ['src/methods/attrs-method', '@jtorm/attrs-method', '1.0.4']
+  ];
+  assert.equal(parser.version, '2.0.0');
   assert.equal(parser.main, 'src/tss-parser.js');
   assert.equal(Object.hasOwn(parser, 'browser'), false);
   assert.equal(parser.unpkg, 'tss-parser.min.js');
@@ -51,6 +57,12 @@ test('package declares a build-only classic-browser artifact without remapping C
   assert.deepEqual(parser.dependencies, {});
   assert.equal(parser.devDependencies.terser, '5.49.0');
   assert.equal(root.devDependencies.terser, '5.49.0');
+  for (const [relative, name, version] of consumers) {
+    const consumer = pkg(path.join(repo, relative));
+    assert.equal(consumer.name, name);
+    assert.equal(consumer.version, version);
+    assert.equal(consumer.dependencies['@jtorm/tss-parser'], '^2.0.0');
+  }
 });
 
 test('Terser build is deterministic, licensed, bounded, and browser-compatible', t => {

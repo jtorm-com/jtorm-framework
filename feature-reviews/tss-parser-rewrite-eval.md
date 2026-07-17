@@ -14,6 +14,12 @@ users receive the same singleton at `globalThis.jTormTSSParser`. The output is
 deterministic, SRI-pinned in the README, and independently checked against the full
 257-file corpus; Terser remains build-only and runtime dependencies stay empty.
 
+The coordinated npm seam now also patch-releases the three direct metadata consumers:
+`tss-model@1.0.6`, `data-parser@1.0.4`, and `attrs-method@1.0.4` require
+`@jtorm/tss-parser@^2.0.0`. A current-head Codex finding and red-first package test
+proved that leaving `^1.0.0` would make ordinary installs continue resolving v1.
+No adjacent runtime source changed.
+
 Compatibility-sensitive one-character interleavings are handled after parsing by one bounded method-lowering layout and an implicit piece rope. This phase is gated to nested declaration/child or document-root offset-collision shapes, scans the layout once for legacy coordinates, never retokenizes/re-enters the grammar/fixed-point rescans, and does not execute the frozen engine. Non-interleaved inputs return the direct recursive-descent AST.
 
 An in-memory instrumentation probe found 55 of the 257 checked-in files enter the conservative compatibility gate, while none currently produce a different tree from the direct path. The phase remains required by the explicit external-valid-input contract: minimized quote-free sources and the generated matrices do produce different v1 outputs. Tightening the syntactic gate further would add another unproven classifier and is not required for measured corpus performance.
@@ -24,8 +30,8 @@ An in-memory instrumentation probe found 55 of the 257 checked-in files enter th
 - **Feature map:** runtime parser package and README; generated browser publication
   metadata plus root build dependency/lock; test-only oracle/differential/error/
   resource/browser guards; direct view/fetched-TSS/build-compiler propagation tests;
-  CI differential scale; architecture/spec/security/evaluation/agent records. No
-  adjacent runtime package changed.
+  CI differential scale; three direct-consumer package metadata seams;
+  architecture/spec/security/evaluation/agent records. No adjacent runtime source changed.
 - **Entry points traced:** `config()`, `handle()`, `view-model.create() → handle()`, `tss-model.get() → handle() → identity cache cleanup/retry`, and manifest `compile() → lock/snapshot → handle() → finally restore`.
 - **Junction questions:** no nullable/void/async authorization/count-modify/token/env-fallback junction exists in synchronous parsing. The affected async callers await their parse path, preserve error identity, and use existing identity/lock controls; parser failure cannot be mistaken for success or leave a partial AST.
 - **PR comments:** ready PR #55 is open into `dev`; no review thread existed at publication. The local cross-model specification, implementation, and final-diff reviews are recorded below.
@@ -45,6 +51,7 @@ An in-memory instrumentation probe found 55 of the 257 checked-in files enter th
 | Exact gzip length was treated as cross-toolchain identity | CI produced 6,115 bytes from the same 16,575-byte/SRI artifact versus local Node 25 zlib's 6,120 | Exact raw bytes and SRI lock the artifact; README pins the measured toolchain figure and every zlib must satisfy the portable 7 KiB ratchet |
 | Extended differential was manual and array-backed | Final adversarial review found CI ran 4,096 cases while the cited 200,000-case run peaked near 1.4 GiB | PR CI selects 200,000; streamed comparison preserves the frozen digest and passes at 167 MiB peak RSS |
 | Multiline diagnostics depended on a mirrored test helper | Skeptic review showed a shared location bug could pass both implementation and helper | Hard-coded LF/CRLF/CR/U+2028/U+2029/comment positions plus the exact source-limit CRLF boundary pass |
+| Parser 2.x was unreachable through direct consumer ranges | Current-head Codex found all three published direct consumers still declared `^1.0.0`; the package test failed at `tss-model@1.0.5 !== 1.0.6` | Patch-bumped consumer metadata requires `^2.0.0`; focused package/source guards and three dry-runs pass |
 
 ## Compatibility evidence
 
@@ -97,7 +104,10 @@ Thirty maximum-source parses measured v2 p50 34.184 ms, p95 71.905 ms, and max 7
 - Runtime source and generated browser code contain no `require()`, runtime third-party
   dependency, dynamic load, `eval`, logging, or handwritten TypeScript/declaration
   file. Terser is an exact-pinned build-only dependency.
-- `npm pack --dry-run --json` reports `@jtorm/tss-parser@2.0.0`, 19,541-byte tarball / 67,513-byte unpacked, with exactly `README.md`, `package.json`, `src/tss-parser.js`, and generated `tss-parser.min.js`; tests/oracle/build dependency code do not ship.
+- `npm pack --dry-run --json` reports `@jtorm/tss-parser@2.0.0`, 19,835-byte tarball / 68,266-byte unpacked, with exactly `README.md`, `package.json`, `src/tss-parser.js`, and generated `tss-parser.min.js`; tests/oracle/build dependency code do not ship.
+- Direct-consumer dry-runs report three-file packages: `tss-model@1.0.6`
+  (1,227-byte tarball), `data-parser@1.0.4` (3,111 bytes), and
+  `attrs-method@1.0.4` (1,705 bytes), each with parser `^2.0.0` metadata.
 - Package major version, malformed-input migration, lower-only limits, rollback pin, and no-dual-parser policy are documented.
 - `main` remains `src/tss-parser.js`; `unpkg`/`jsdelivr` select the generated classic
   script without a bundler `browser` remap. The README exact-version CDN example's
@@ -116,15 +126,16 @@ publication. The applicable reset/retry/build boundaries have one owner each:
 | A fetched parser rejection remains retryable and cannot delete a newer cache identity | `tss-model` promise cache | Existing identity-checked rejection cleanup remains unchanged; located-error retry is covered |
 | Build-time parser failure cannot poison shared compiler collaborators | UI manifest compiler lock/snapshot owner | Existing overlap lock and `finally` restoration remain unchanged; identity/position/restoration is covered |
 | Package build cannot silently expose a different parser | package prepack + exact Terser command | Double-build bytes, SRI, public surface, diagnostics, custom config, full corpus, size, and package allowlist are covered |
+| Normal dependent installation must select parser v2 | direct-consumer package metadata | Red-first exact version/range assertions plus coordinated release source guard and dry-runs cover all three direct edges |
 
 The failure-before-publication, failure-during-parse, retry, overlap, stale-state, and reset paths therefore have explicit tests. Post-side-effect bookkeeping, cancellation, second-worker, recovery, and durable replay rows are N/A because parsing has no side effect or durable state.
 
 ## Formal review outcomes
 
-- **review-router — PASS.** The 21-file branch scope routes to test/source-ratchet and refactor review; the user-mandated architecture, differential security, tech-debt, production, and large-diff adversarial gates were added. API, frontend, database, infrastructure, privacy-processing, AI, payments, queues, and growth domain reviews are otherwise N/A.
+- **review-router — PASS.** The 25-file branch scope routes to test/source-ratchet and refactor review; the user-mandated architecture, differential security, tech-debt, production, and large-diff adversarial gates were added. API, frontend, database, infrastructure, privacy-processing, AI, payments, queues, and growth domain reviews are otherwise N/A.
 - **review-architecture — PASS.** `config → validate → atomic publish` and `source → normalize/tokenize → recursive descent → optional bounded compatibility projection → atomic publish` retain one runtime package owner, zero runtime imports, the public singleton, and the `{s,m,p,c}` boundary. View, fetched-cache, and compiler propagation terminate in the existing owners. Exact Terser and optional CDN delivery are separately modeled build/publication boundaries with deterministic parity and rollback controls.
-- **differential-review — PASS.** The security record traces the transitive render/build blast radius and closes eight findings (two high, six medium). Semgrep, zero-vulnerability audit, frozen-oracle integrity, publication exclusion, resource ceilings, CI-scale differential, and consumer propagation are clean. The installed skill's four referenced supplemental files were absent and that coverage limit is recorded rather than implied.
-- **review-refactor — PASS.** Valid behavior is independently frozen; malformed/config narrowing is a documented major-version contract; no export, runtime dependency, adjacent production package, suppression, or speculative abstraction was added. One exact build-only dependency produces the required browser artifact. Historical helpers remain only because they are a locked published surface. The direct parser is linear in source/tokens and the bounded compatibility path is `O(nodes log nodes)`.
+- **differential-review — PASS.** The security record traces the transitive render/build/package blast radius and closes nine findings (two high, seven medium). Semgrep, zero-vulnerability audit, frozen-oracle integrity, publication exclusion, resource ceilings, CI-scale differential, package resolution, and consumer propagation are clean. The installed skill's four referenced supplemental files were absent and that coverage limit is recorded rather than implied.
+- **review-refactor — PASS.** Valid behavior is independently frozen; malformed/config narrowing is a documented major-version contract; no export, runtime dependency, adjacent runtime source, suppression, or speculative abstraction was added. One exact build-only dependency produces the required browser artifact. Three direct-consumer metadata packages are patch-bumped solely so normal resolution adopts parser 2.x. Historical helpers remain only because they are a locked published surface. The direct parser is linear in source/tokens and the bounded compatibility path is `O(nodes log nodes)`.
 - **review-privacy — PASS / applicability N/A.** Source is transient trusted framework text, no personal-data field or data store is added, and errors contain only fixed text plus numeric position. No source excerpt, value, logging, retention, transfer, moderation, audit, consent, or erasure path changes; all privacy/compliance checklist items are consequently N/A for this diff.
 - **source-ratchet-review — PASS.** Complete-file SHA-256 plus mutate/append/truncate controls dominate oracle drift; package enumeration proves exclusion. A separate gzip dominating invariant has a deterministic incompressible over-budget control. Neither guard parses callable aliases, so the alias provenance matrix is out of scope.
 - **production-readiness — PASS.** Exact hard ceilings, measured latency/RSS,
@@ -156,16 +167,16 @@ Fresh verification re-read every changed runtime/test file after the final adver
 
 | Gate | Status | Evidence / remaining action |
 |---|---|---|
-| Focused differential/parser/resource/consumers | PASS | 105/105 after final browser, CI-streaming, location, and ratchet controls |
+| Focused differential/parser/resource/consumers | PASS | 110/110 including final browser, package-policy, CI-streaming, location, and ratchet controls |
 | Exact `npm test` | PASS | 582/582 on the reviewed candidate |
 | `npm run typecheck` | PASS | `tsc -p jsconfig.json` clean |
-| Package dry-run | PASS | Four intended files; 19,541-byte tarball / 67,513-byte unpacked |
+| Package dry-run | PASS | Parser four-file dry-run plus three direct-consumer three-file dry-runs; exact sizes recorded above |
 | Source/oracle guards | PASS | Oracle hash controls, unchanged snapshot, no imports/types, and 10 KiB production ratchet pass |
-| Semgrep | PASS | 68 JavaScript rules on nine targets plus 22 security-audit rules on four targets; zero findings |
+| Semgrep | PASS | 68 JavaScript rules on ten targets plus 22 security-audit rules on four targets; zero findings |
 | `git diff --check` / syntax | PASS | Diff hygiene and all changed JavaScript syntax clean |
 | review-router | PASS | Routed review plus explicit user-mandated gates complete |
 | review-architecture | PASS | Locked package/DI/AST/consumer boundaries and traced flows retained |
-| differential-review | PASS | Security record has eight fixed findings and no open finding |
+| differential-review | PASS | Security record has nine fixed findings and no open finding |
 | review-refactor | PASS | Behavior, scope, complexity, and publication checks clean |
 | review-privacy | PASS / N/A | No PII, data processing, retention, logging, or transfer change |
 | source-ratchet-review | PASS | Oracle and gzip dominating invariants converge with negative controls |

@@ -181,6 +181,9 @@ TSS authors and host maintainers depend on `@jtorm/tss-parser` for every inline,
     the CommonJS export, while direct CDN/script users opt into the global build.
 25. Terser and its transitive packages are development/build dependencies only.
     `dependencies` remains empty and the published runtime executes with zero imports.
+26. Published direct consumers that declare `@jtorm/tss-parser` must require
+    `^2.0.0` so normal package resolution actually adopts the replacement. Only their
+    package metadata changes, with patch bumps; injected runtime source remains unchanged.
 
 ### Grammar and AST Contract
 
@@ -262,13 +265,14 @@ Defaults are hard ceilings, not suggestions: configuration may lower but never r
 | `src/parsers/tss-parser/tss-parser.min.js` | Generated prepack browser-global artifact; gitignored | Medium — direct script/CDN entry |
 | `src/parsers/tss-parser/README.md` | Grammar, config, diagnostics, bounds, migration/rollback | Low |
 | Root `package.json` / `package-lock.json` | Pin build-only Terser for repository verification | Low |
+| `tss-model`, `data-parser`, `attrs-method` package metadata | Require parser `^2.0.0`; patch versions to `1.0.6`, `1.0.4`, `1.0.4` | Medium — coordinated npm adoption seam proven by review/test |
 | `test/fixtures/tss-parser-oracle.js` | Add frozen v1.0.0 implementation for tests only | Low — intentionally legacy, never packaged/runtime |
 | `test/parsers/tss-parser.test.js` | Expand public, grammar, diagnostic, and limit tests | Medium |
 | `test/parsers/tss-parser-differential.test.js` | Add curated/generated/full-corpus oracle comparison | Medium |
 | `test/parsers/tss-parser-browser.test.js` | Build reproducibility, package metadata, browser-global execution, and corpus parity | Medium |
 | `test/fixtures/tss-snapshot.json` | Verification only; no content change permitted | High compatibility sentinel |
 | `AGENTS.md` | Retain the DEBUNKED/do-not-edit warning for the frozen oracle, forbid restoring its arithmetic to production, and reconcile the current 257 count | Medium — canonical reviewer contract |
-| `tooling/ui-manifest-compiler` and direct parser consumers | Verification only; no source/package change unless a failing seam test proves need | High compatibility boundary |
+| `tooling/ui-manifest-compiler` and direct parser consumers | Runtime source verification only; direct-consumer package ranges change after a failing publication-seam test | High compatibility boundary |
 | `src/handlers/handler-wrapper` | Verification only for inherited-selector/cached-AST behavior | Medium downstream mutation boundary |
 | `feature-reviews/tss-parser-rewrite*.md` | Spec, evaluation, and security evidence | Low |
 | `feature-reviews/framework-architecture-review-2026-07-14.md` | Reconcile stale 252 references to 257 and mark P3 complete with PR/current-head evidence | Low |
@@ -457,11 +461,11 @@ Full PASTA is not triggered because the new boundary is build/publication toolin
 
 | Item | Answer |
 |---|---|
-| Code rollback | In-repo/source-DI adoption reverts the feature PR/commit; external npm adoption pins `@jtorm/tss-parser@1.0.0`. Browser hosts change their version-pinned CDN URL with the same rollback. No feature flag or state migration. |
+| Code rollback | In-repo/source-DI adoption reverts the feature PR/commit. External npm adoption pins `@jtorm/tss-parser@1.0.0` and the prior direct-consumer metadata releases (`tss-model@1.0.5`, `data-parser@1.0.3`, `attrs-method@1.0.3`) where used. Browser hosts change their version-pinned CDN URL. No feature flag or state migration. |
 | Schema rollback | N/A — AST wire shape and manifest schema are unchanged; no database/schema. |
 | Data rollback | N/A — parser writes no durable data. Existing content-addressed manifests remain valid because valid AST JSON is identical. |
 | Auto-rollback trigger | CI/differential/snapshot/Codex failure blocks PR. After release, any valid-input AST/hash drift or legitimate default-limit rejection triggers immediate pin to `1.0.0`. |
-| Manual rollback runbook | External hosts restore the lockfile/parser pin to `1.0.0`; source-composed hosts revert the parser/AGENTS/tests/docs commit together; rebuild manifests with the prior toolchain label if needed and redeploy. |
+| Manual rollback runbook | External hosts restore the lockfile/parser pin to `1.0.0` and prior direct-consumer versions; source-composed hosts revert the parser/metadata/AGENTS/tests/docs commits together; rebuild manifests with the prior toolchain label if needed and redeploy. |
 | Last rollback drill | Static package-pin/manifest compatibility drill in this feature; package is not published or deployed by this task. |
 
 ## Migration and SemVer
@@ -470,14 +474,19 @@ Full PASTA is not triggered because the new boundary is build/publication toolin
 - Because v2 is not yet published, the browser artifact joins the same planned
   `2.0.0` release rather than causing another version bump. Later changes to its
   global/export behavior follow normal SemVer.
-- Existing `^1.0.0` dependents do not auto-adopt v2. Hosts explicitly install/inject `2.0.0` after their compatibility run. Existing dependent metadata remains untouched unless a failing local seam test proves a source change is required; runtime code has no package import edge.
+- A red-first publication-seam test proved existing `^1.0.0` metadata would keep
+  normal installs on v1. Coordinated patch releases require parser `^2.0.0`:
+  `tss-model@1.0.6`, `data-parser@1.0.4`, and `attrs-method@1.0.4`. Their runtime
+  source and DI wiring do not change.
 - Hosts call `config()` before `dataParser.init()` exactly as today. New limits default to immutable hard ceilings and may only be lowered.
 - Hosts or manifest builds that record a `toolchain.tssParser` fingerprint report `2.0.0` when adopting it; the manifest wire version and existing packs do not change.
 - Malformed assets that were silently dropped/misparsed may now reject with a located native error. Fix the source; do not catch-and-fallback to v1 parsing.
 - `quotes` keeps v1 surface semantics: string or documented array values remain stored unchanged in `c.quotes`, and compatibility regexes remain byte-observable as before. The tokenizer additionally derives the configured quote delimiters locally; adjacent data/if binding grammar is neither normalized nor rewritten in this task.
 - Unknown top-level config metadata remains ignored. Invalid known separator/quote/limit values now throw and are part of the explicit major-version migration.
 - Multi-character delimiters and regex-metacharacter separators use v2 literal semantics; v1's single-unit/raw-regex behavior is not an oracle-compatible profile.
-- Rollback is an exact parser pin/revert; no consumer package downgrade, AST migration, cache flush, database action, or compatibility shim is required.
+- Rollback is an exact parser/source revert plus the prior direct-consumer metadata
+  versions where npm ranges are used; no AST migration, cache flush, database action,
+  or compatibility shim is required.
 - Browser hosts load `tss-parser.min.js` through an exact-version CDN URL and use
   `globalThis.jTormTSSParser`. A rollback changes that version pin; after publication,
   neither the generated path nor global singleton may be removed.
@@ -516,7 +525,8 @@ Full PASTA is not triggered because the new boundary is build/publication toolin
 - [x] Diagnostics provide native class/message and original line/column/offset without source excerpts, including after multi-line comments, collapsed whitespace, and CRLF.
 - [x] Source/token/depth/node/declaration exact-bound and over-bound tests pass; no unbounded chain recursion/rescan remains.
 - [x] Every pre-existing singleton key/export and known mutable reset/snapshot field is preserved.
-- [x] No runtime import/dependency, adjacent package change, handwritten TS/d.ts, or parser-scope leak is introduced.
+- [x] No runtime import/dependency, adjacent runtime source change, handwritten TS/d.ts,
+  or parser-scope leak is introduced; the required direct-consumer metadata seam is patch-bumped.
 - [x] `@jtorm/tss-parser` is documented and versioned `2.0.0`; package dry-run contains only intended files.
 - [x] Prepack deterministically emits the licensed, browser-loadable singleton under
   7 KiB gzip with exact 257-file parity and no CommonJS/package regression.
