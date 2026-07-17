@@ -16,8 +16,11 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   Do **not** use `node --test test/` — it mis-resolves the directory on this Node.
 - `npm run typecheck` → `tsc -p jsconfig.json` (JSDoc types; `checkJs` scoped to `src/types/src/types.js`
   + `view-model.js`). No Biome/ESLint/Knip in this repo.
-- **`@jtorm/types`** has the repo's only build step: a `prepack` runs `tsc --emitDeclarationOnly` to
+- **`@jtorm/types`** has the repo's only declaration build: a `prepack` runs `tsc --emitDeclarationOnly` to
   generate its published `.d.ts` from the JSDoc (gitignored artifact; `typescript` is its devDep).
+- **`@jtorm/tss-parser`** has a production-browser build: its `prepack` runs the exact pinned Terser
+  version over canonical CommonJS source and emits a gitignored `tss-parser.min.js` classic script.
+  CommonJS `main` stays unchanged; direct browser loading exposes `globalThis.jTormTSSParser`.
 - Full-pipeline harness: `test/helpers/engine.js`
   (`render(html,tss,data,url,fixtures,c,manifests,warm,options)`), goldens in `test/pipeline/`. The
   optional final arguments prepare UI manifests, expose transport request/byte metrics, and let
@@ -32,6 +35,8 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   `dependencies` declare the `@jtorm/*` wiring — and DI'd libs, e.g. `view-model` → `lodash` — as
   metadata, not `require()` edges.) **`@jtorm/types`** is a new **type-only** entry there: JSDoc + a
   generated `.d.ts`, zero runtime code, so its `ViewModel` typedef resolves for TypeScript consumers.
+  The parser's generated browser artifact is build output, preserves the same singleton, and adds no
+  runtime dependency or import.
 - **Pure JS only — never add *hand-written* `.ts`/`.d.ts`.** Types are JSDoc validated by
   `jsconfig.json`. Sole exception: **`@jtorm/types`** publishes a `.d.ts` **generated** from its JSDoc
   at `prepack` (`tsc --emitDeclarationOnly`; gitignored build artifact, never authored by hand) so
@@ -72,8 +77,14 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
 
 ## Known non-issues — do NOT flag these as bugs
 - **TSS requires a trailing `;`** on the final property — by design (a final property without it is dropped).
-- **`tss-parser` arithmetic is correct** — the brace `i <= ps.length` and the whitespace/offset code
-  were reviewed and **DEBUNKED**; "fixing" them corrupts 190/252 fixtures. Do not touch.
+- **The frozen v1 `tss-parser` oracle arithmetic is historical evidence** — the brace
+  `i <= ps.length` and whitespace/offset code in `test/fixtures/tss-parser-oracle.js` were reviewed
+  and piecemeal fixes were **DEBUNKED**; changing them corrupts the compatibility baseline. Do not
+  edit that oracle or restore its fixed-point parser to production. The active v2 parser is the
+  bounded tokenizer/recursive-descent implementation, locked against all 257 `src/**/*.tss` files.
+  To preserve valid offset-era ASTs exactly, parsed one-character interleavings may enter one
+  bounded compatibility-layout/blanking pass; it never executes, reparses, or fixed-point rescans
+  the oracle/source.
 - **Zero-match contract** — transform verbs (`attr`/`attrs`/`insert`/`text`/`move`/`swap`/`remove`…)
   **throw loud** via `error-handler` on zero matches: that is the upgrade-safe drift detector, not a
   bug. `if`/`->else`/`each` are control flow; optional target = `->if(el: X)->verb`.

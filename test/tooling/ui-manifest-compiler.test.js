@@ -560,6 +560,45 @@ test('compiler unlocks collaborators when restoration itself fails', async () =>
   }
 });
 
+test('compiler preserves parser error identity, positions, and singleton restoration', async () => {
+  wire();
+  const original = TEXT['/child.tss'];
+  const parser = Object.create(tssParser);
+  const tree = [{ sentinel: 1 }], pairs = [{ sentinel: 2 }], source = 'sentinel';
+  let observed;
+  parser.tree = tree;
+  parser.pairs = pairs;
+  parser.tss = source;
+  parser.handle = function (value) {
+    try {
+      return tssParser.handle.call(this, value);
+    } catch (error) {
+      observed = error;
+      throw error;
+    }
+  };
+  const cfg = config();
+  cfg.tssParser = parser;
+  TEXT['/child.tss'] = 'child{';
+
+  try {
+    await assert.rejects(
+      () => compiler.compile(cfg),
+      error => {
+        assert.strictEqual(error, observed);
+        assert.deepEqual([error.line, error.column, error.offset], [1, 6, 5]);
+        return true;
+      }
+    );
+    assert.strictEqual(parser.tree, tree);
+    assert.strictEqual(parser.pairs, pairs);
+    assert.equal(parser.tss, source);
+  } finally {
+    TEXT['/child.tss'] = original;
+    compiler.active.clear();
+  }
+});
+
 test('writer atomically no-clobbers identical and conflicting concurrent output', async () => {
   wire();
   const result = await compiler.compile(config());

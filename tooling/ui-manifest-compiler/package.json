@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/ui-manifest-compiler",
   "description": "Deterministic static UI closure manifest compiler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@jtorm/data-parser": "^1.0.3",
-    "@jtorm/tss-parser": "^1.0.0",
+    "@jtorm/tss-parser": "^2.0.0",
     "@jtorm/types": "^1.1.0",
     "@jtorm/ui-manifest-model": "^1.0.0",
     "@jtorm/ui-resolver-model": "^1.0.0"

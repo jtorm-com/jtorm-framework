@@ -31,6 +31,19 @@
 > injected `util`, and the render harness resets the mutable flag. Final head `5b9ce89` passed CI
 > and clean Codex review before the maintainer merged it into `dev`;
 > parser replacement remains the next independent P3 task.
+>
+> **Backlog update — 2026-07-16 (PR #55 from merged PR #54 / `dev`
+> at `6e352fa`):** the parser P3 is locally complete and in delivery. The active package is now a
+> bounded tokenizer plus recursive-descent parser with located diagnostics, exact valid v1 AST
+> compatibility against a frozen oracle and all 257 shipped TSS files, immutable resource ceilings,
+> and a documented `2.0.0` migration/rollback. An exact-pinned Terser prepack also emits the same
+> singleton as a classic browser script (16,684 raw / 6,147 gzip-9 bytes on the recorded Node 25 toolchain; CI enforces a portable 7 KiB ratchet). Local gates are 582/582;
+> PR CI now streams the full 200,000-case differential at 167 MiB peak RSS. Ready PR #55 targets
+> `dev`. All four published direct-consumer metadata edges are patch-bumped to require parser `^2.0.0` after
+> current-head review proved `^1.0.0` would strand normal installs on v1. Later
+> review also pinned top-level stray-terminator diagnostics and removed the lone
+> ES2022 intrinsic from the ES2015 classic runtime; final CI/current-head Codex
+> status is tracked on the unmerged PR.
 
 ---
 
@@ -81,7 +94,7 @@ Live in production on a Magento store via a Node host engine.
 
 ### Weaknesses (ranked, whole-framework)
 
-1. **The TSS parser is an unmaintainable black box** (`tss-parser.js`, 335 LOC). It's not a tokenizer or a grammar — it's a **fixed-point string-rewriting system**: `->` chains are desugared by splicing the source string and re-scanning from scratch (one full O(L) rescan per chain segment); parsed regions are blanked with generated whitespace pads; pair-matching is O(P²) with recursion depth = brace-pair count. **Zero diagnostics** — no line/col anywhere; malformed input silently drops or throws a raw `TypeError`. Contains a dead 14-line `find()` (zero callers, couldn't work post-`clean`) and a misnamed `sortPairs`. The project's own CLAUDE.md forbids touching the arithmetic; only the 252-file hash snapshot makes any edit survivable. This is the single largest rebuild-justifying component: Pillar A's whole future (error messages, source maps, new syntax) is hostage to a parser nobody can safely change. **Legibility grade: D.**
+1. **✅ Addressed 2026-07-17 — the former TSS parser black box.** The fixed-point string-rewriting engine is frozen as a source-hashed test-only oracle and is absent from the package. Production now uses a bounded literal tokenizer and recursive-descent grammar with original UTF-16 line/column/offset diagnostics, iterative method chains, and source/token/depth/node/declaration ceilings. Exact `{s,m,p,c}` behavior is differential-tested over generated matrices and all 257 shipped TSS files. Offset-era one-character interleavings use one bounded post-parse virtual-layout projection rather than executing or re-entering the old parser; ordinary inputs return the direct grammar AST. The published helper/singleton surface remains intact for external hosts. The original approximately-300-LOC/same-gzip estimate was not met: under one Terser browser wrapper v1 is 5,197 raw / 1,826 gzip-9 bytes and v2 is 16,684 / 6,147 on the recorded Node 25 zlib toolchain. The extra 4,321 measured gzip bytes are the explicit cost of exact valid-output projection, diagnostics, literal custom syntax, and resource policy; exact artifact bytes/SRI plus a portable 7 KiB ratchet cover zlib-version variance. **Legibility grade: B** (the direct grammar is clear; the exact-output projection remains deliberately intricate but isolated, bounded, measured, and characterized).
 2. **Cold-render fetch waterfall — the biggest unpriced runtime cost.** One cold `Product.default` render = **28 sequential HTTP GETs** (17 TSS + 10 HTML shells + 1 JSON), a **~12-deep dependency chain**, because each composition hop's children are only discoverable after the parent's TSS arrives and the handler awaits each rule serially (handler.js:37-110). ~18 KB raw / ~3 KB gz of content delivered as 28 files. SSR amortizes via singleton caches (warm = 0 fetches); a browser SPA cold page pays it in full — ~250 ms chain latency minimum at 20 ms RTT. No manifest, no bundle, no prefetch, no sibling-parallelism. A build step the architecture refuses on principle would collapse 28→1 (≈40–50× request reduction).
 3. **"SEO for free" is ~15% delivered.** The framework consumes schema.org shapes but emits none. The `.jsonld` alternate link (head-id.tss:24-40) points at an *externally* served document most crawlers won't treat as page markup. Emitting `<script type="application/ld+json">` from the already-typed model would be nearly free and is absent.
 4. **Three open data→sink security gaps** (see §Security).
@@ -130,7 +143,7 @@ Also noted, lower priority: `error-handler` `console.log`s every populated `v` f
 **Would I keep the overall architecture? Mostly yes — keep the *contracts*, replace the *parser* and add a *build step*.** The `{s,m,p,c}` node shape, declarative `gate` flag with handler-side fail-closed, the single `set()` zero-match chokepoint, element-ref scoping, promise-caching, `@type`-dispatch, and DI-everything isomorphism are all correct and battle-tested. They are the spec a rewrite should target.
 
 ### Templating approach
-**Keep TSS-as-CSS-like-selectors + verbs** — it's the differentiator and the upgrade-safety story depends on out-of-band selection. But **replace the parser** with a ~300-LOC hand-written tokenizer + recursive-descent with position tracking: same gzip size, real line/col errors, no string-rewrite passes, no P-deep recursion, chain nesting becomes a grammar production. The 252-file snapshot is a ready-made conformance suite for the migration. **Do not** adopt signals/tagged-templates/JSX — they re-introduce the template/data coupling jTorm exists to remove.
+**Keep TSS-as-CSS-like-selectors + verbs** — it's the differentiator and the upgrade-safety story depends on out-of-band selection. **Implemented:** the active parser is a hand-written tokenizer plus recursive descent with position tracking, real line/column errors, bounded recursion/resources, and chain nesting as a grammar production. The 257-file snapshot plus frozen differential oracle are the conformance suite. Exact offset-era output requires a bounded post-parse projection for a narrow interleaving class, documented in the parser feature record. **Do not** adopt signals/tagged-templates/JSX — they re-introduce the template/data coupling jTorm exists to remove.
 
 ### Data/model layer
 - **Compile bindings once** onto AST nodes (the AST is already cached); render-time becomes pure evaluation. Biggest cheap perf win.
@@ -171,7 +184,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P2** | Emit inline JSON-LD from typed model | ✅ Done — PR #47 | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | ✅ Done — PR #49 | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | ✅ Done — PR #51 | 4-way duplication; bundle + maintainability | M |
-| **P3** | Replace the parser (tokenizer + recursive descent) | Queued | Unblocks all future DSL work + real diagnostics | L |
+| **P3** | Replace the parser (tokenizer + recursive descent) | In review — PR #55 | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | ✅ Done — PR #53 | Info-disclosure + dead weight | S |
 
 ### Comparable projects worth studying
