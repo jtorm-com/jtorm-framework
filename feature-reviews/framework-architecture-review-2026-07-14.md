@@ -51,8 +51,8 @@
 > projects direct wrapper children per invocation instead of rewriting cached selectors,
 > while an enumerable live accessor keeps the intentional source-owned compiled-binding
 > cache on `node.b`. Red-first sequential reuse, same-identity interleaving, all wrapper
-> failure phases, and each/insert/wrap/get/UI compatibility tests pass. Delivery PR is
-> pending; the change remains unmerged until current-head CI and Codex review are clean.
+> failure phases, and each/insert/wrap/get/UI compatibility tests pass. Ready PR #57
+> targets `dev`; the change remains unmerged until current-head CI and Codex review are clean.
 
 ---
 
@@ -109,7 +109,7 @@ Live in production on a Magento store via a Node host engine.
 4. **Three open data→sink security gaps** (see §Security).
 5. **Unknown verbs pass silently** (handler.js:95-98). A typo'd method name renders its children and drops the transform with **no signal** — while a typo'd *selector* throws loud. The core promise ("drift is detected loudly") has a hole exactly one token wide. Cheap fix: registry-membership check when `t.m` is truthy.
 6. **✅ Closed 2026-07-16 — the former `v.io` implicit-replacement infinite-loop trap.** The view model no longer owns mutable control flags; all 23 methods return effect intents and the handler normalizes missing effects to `repeat:false`. Explicit repeat re-runs the full lifecycle, re-resolves rewritten nodes, and throws at 100 executions. A failing-test-first sentinel proves a method that returns nothing runs once.
-7. **🔄 Addressed on the unmerged follow-up branch — the former `handler-wrapper` cached-AST write.** The wrapper replaces `t2[k].s = 'body'` with one invocation-local direct-child projection after the before event. Source `{s,m,p,c}` stays stable across sequential, explicitly interleaved, successful, and failed renders; nested identities and parser inheritance remain untouched. A live enumerable projected `b` accessor forwards only the intentional syntax cache to its source node, preserving cold install, warm identity, and raw-declaration/grammar invalidation. Work is non-recursive `O(d)` time/transient space for `d` direct children and `O(q*d)` for `q` active calls, with no wrapper-owned retained state. The package-only `1.0.6` patch is ready for PR delivery and remains unmerged pending the required current-head gates.
+7. **🔄 Addressed by ready, unmerged PR #57 — the former `handler-wrapper` cached-AST write.** The wrapper replaces `t2[k].s = 'body'` with one invocation-local direct-child projection after the before event. Source `{s,m,p,c}` stays stable across sequential, explicitly interleaved, successful, and failed renders; nested identities and parser inheritance remain untouched. A live enumerable projected `b` accessor forwards only the intentional syntax cache to its source node, preserving cold install, warm identity, and raw-declaration/grammar invalidation. Work is non-recursive `O(d)` time/transient space for `d` direct children and `O(q*d)` for `q` active calls, with no wrapper-owned retained state. The package-only `1.0.6` patch remains unmerged pending the required current-head gates.
 8. **✅ Closed 2026-07-16 — internal lifecycle bypasses.** attrs, each, move, and UI compiler `di` build complete synthetic nodes and call injected `handler.dispatch()` with prepared data; mediatarget asks mediaquery's pure match helper instead of invoking a verb. Data hooks, validation, fail-closed gates, aliases, unknown errors, and before/after events are now dispatch invariants.
 9. **Binding re-parse per node per render** (handler.js:73; data-parser has no cache). The AST is cached but every binding string is re-regexed and re-split on every render. Cheapest large perf win available: compile bindings onto the AST node once.
 10. **DRY debt from the isolation retrofit.** 5 near-identical `context(v)` walks, 4 `state(v)` copies, 3 near-clone fetch models (tss/data/html, ~85% identical), 2 near-clone css/js plugins (~90% identical). Every isolation fix had to be applied in ≥4 places — the slice history shows exactly that. Directly against the CLAUDE.md DRY/smallest-bundle mandate.
@@ -195,7 +195,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | ✅ Done — PR #51 | 4-way duplication; bundle + maintainability | M |
 | **P3** | Replace the parser (tokenizer + recursive descent) | ✅ Done — PR #55 | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | ✅ Done — PR #53 | Info-disclosure + dead weight | S |
-| **P3** | Eliminate `handler-wrapper` cached-AST selector mutation | 🔄 Ready on feature branch; PR pending | Makes cached trees safe across sequential/interleaved/tenant renders without undoing parser inheritance | M |
+| **P3** | Eliminate `handler-wrapper` cached-AST selector mutation | 🔄 Ready — PR #57 | Makes cached trees safe across sequential/interleaved/tenant renders without undoing parser inheritance | M |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.

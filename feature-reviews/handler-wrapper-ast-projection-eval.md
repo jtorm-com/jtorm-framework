@@ -3,14 +3,14 @@
 **Branch:** `agent/eliminate-handler-wrapper-ast-mutation`
 **Base:** `dev` at `4dd7e3a53b01fca24ab30e9c121783035e4681c5`
 **Started:** 2026-07-17
-**Status:** LOCAL GATES COMPLETE — DELIVERY PENDING
-**PR:** pending
+**Status:** GITHUB GATES PENDING
+**PR:** [#57](https://github.com/jtorm-com/jtorm-framework/pull/57) — ready, open into `dev`, unmerged
 
 ## Resumption Context
 
 **Last Completed Phase:** Local verification and scoped review
-**Next Action:** Pass the exact staged tech-debt ratchet, commit/push, open a ready
-PR into `dev`, then obtain green current-head CI and Codex review.
+**Next Action:** Push the record-only delivery commit, then obtain green CI and a
+clean Codex review against that one current head.
 **Issues Found (not yet fixed):** None.
 **Accepted Findings Fixed:** Specification review fixed entry-time child capture,
 `node.b` live forwarding, projection non-retention wording, concurrent allocation
@@ -183,8 +183,8 @@ ordinary-source-`b` descriptor assertions were added.
 
 ## Delivery
 
-- Implementation commit: pending.
-- Ready PR into `dev`: pending.
+- Implementation commit: `820fe75` (`fix: preserve cached AST selectors in wrappers`).
+- Ready PR into `dev`: [#57](https://github.com/jtorm-com/jtorm-framework/pull/57), confirmed open/non-draft/mergeable.
 - GitHub Actions current-head result: pending.
 - Codex current-head review: pending.
 - Merge: prohibited by task; the PR will remain open and unmerged.

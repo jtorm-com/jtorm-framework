@@ -1,6 +1,6 @@
 # Feature Development: Handler-wrapper AST projection
 
-**Status:** DELIVERY_PENDING
+**Status:** GITHUB_GATES_PENDING
 **Claimed:** 2026-07-17T12:50:00Z
 **Agent:** Codex `/root`
 **Current Mode:** Documentation and Publication
@@ -11,7 +11,7 @@
 
 **Last Completed Mode:** Review
 **Current Mode:** Documentation and Publication
-**Next Action:** Run the exact staged tech-debt ratchet, commit/push, open the ready PR, then converge current-head CI and Codex review.
+**Next Action:** Push the record-only PR #57 delivery commit, then converge CI and Codex review against that current head.
 **Files Created:** Feature specification/evaluation/security records and `test/pipeline/cached-tss-reuse.test.js`
 **Files Modified:** `@jtorm/handler-wrapper` source/README/package, handler-wrapper and each/insert/wrap tests, architecture backlog, and review ledger
 **Tests Written:** 10 red regression/characterization tests across five focused files (plus one new cached-reuse file)
@@ -383,7 +383,7 @@ The feature-dev test personas were applied with repository adaptations: `tdd-gui
 
 ### Documentation and Publication
 - [x] Required feature/evaluation/security/backlog/ledger records updated locally
-- [ ] Ready PR opened into `dev`
+- [x] Ready PR #57 opened into `dev`
 - [ ] CI green
 - [ ] Current-head Codex review clean
 - [ ] PR left unmerged
