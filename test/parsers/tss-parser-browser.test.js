@@ -43,7 +43,8 @@ test('package declares a build-only classic-browser artifact without remapping C
   const consumers = [
     ['src/models/tss-model', '@jtorm/tss-model', '1.0.6'],
     ['src/parsers/data-parser', '@jtorm/data-parser', '1.0.4'],
-    ['src/methods/attrs-method', '@jtorm/attrs-method', '1.0.4']
+    ['src/methods/attrs-method', '@jtorm/attrs-method', '1.0.4'],
+    ['tooling/ui-manifest-compiler', '@jtorm/ui-manifest-compiler', '1.0.1']
   ];
   assert.equal(parser.version, '2.0.0');
   assert.equal(parser.main, 'src/tss-parser.js');
@@ -74,9 +75,9 @@ test('Terser build is deterministic, licensed, bounded, and browser-compatible',
   const integrity = 'sha384-' + crypto.createHash('sha384').update(first).digest('base64');
   const readme = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
   assert.ok(readme.includes(integrity));
-  assert.match(readme, /16,678 raw bytes[\s\S]*6,136 bytes at gzip level 9/);
+  assert.match(readme, /16,684 raw bytes[\s\S]*6,147 bytes at gzip level 9/);
   const compressed = zlib.gzipSync(first, { level: 9 });
-  assert.equal(first.length, 16678);
+  assert.equal(first.length, 16684);
   const withinBudget = value => zlib.gzipSync(value, { level: 9 }).length <= 7168;
   assert.ok(
     compressed.length <= 7168 && withinBudget(first),

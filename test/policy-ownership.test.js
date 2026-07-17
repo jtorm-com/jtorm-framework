@@ -152,6 +152,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     'src/parsers/tss-parser': '2.0.0',
     'src/parsers/data-parser': '1.0.4',
     'src/methods/attrs-method': '1.0.4',
+    'tooling/ui-manifest-compiler': '1.0.1',
     'src/plugins/css-plugin': '1.0.5',
     'src/plugins/js-plugin': '1.0.5'
   };
@@ -173,6 +174,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     },
     'src/parsers/data-parser': {'@jtorm/tss-parser': '^2.0.0'},
     'src/methods/attrs-method': {'@jtorm/tss-parser': '^2.0.0'},
+    'tooling/ui-manifest-compiler': {'@jtorm/tss-parser': '^2.0.0'},
     'src/plugins/css-plugin': {'@jtorm/asset-plugin-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'},
     'src/plugins/js-plugin': {'@jtorm/asset-plugin-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'}
   };

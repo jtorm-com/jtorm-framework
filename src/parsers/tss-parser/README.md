@@ -56,7 +56,7 @@ prepack generates a separate classic script with Terser:
 ```html
 <script
   src="https://cdn.jsdelivr.net/npm/@jtorm/tss-parser@2.0.0/tss-parser.min.js"
-  integrity="sha384-9sLlIh3YH7yAaxLXoGKfbMphwMbQtGuJLnSTe8N89kGi/4TsheHQV6kPLE/KZRZL"
+  integrity="sha384-bj+u9CwsVsdF1kJDrratLrcQ/eM8XYLfdxoVmbJ8djLtJ0A5q5pufqnYwDrJ3Amo"
   crossorigin="anonymous"></script>
 <script>
   globalThis.jTormTSSParser.config({});
@@ -74,8 +74,8 @@ as `Object.hasOwn`.
 
 `npm run build` emits the gitignored `tss-parser.min.js`; `npm pack` and publish run
 the build through `prepack`. Terser is pinned as a development dependency and no
-minifier code ships or executes at runtime. The current artifact is 16,678 raw bytes
-and, measured with Node v25.5.0 zlib, 6,136 bytes at gzip level 9, with a portable
+minifier code ships or executes at runtime. The current artifact is 16,684 raw bytes
+and, measured with Node v25.5.0 zlib, 6,147 bytes at gzip level 9, with a portable
 7 KiB gzip ratchet.
 
 Rules keep source order. A nested selectorless rule or method inherits the
@@ -226,7 +226,8 @@ source excerpts or declaration values.
 
 `tree`, `pairs`, and `tss` are emptied on failure, so no partial parse state is published.
 On success, `tree`, `pairs`, and normalized `tss` remain writable singleton
-state for existing reset/snapshot hosts.
+state for existing reset/snapshot hosts. Pair offsets advance across the complete
+configured delimiter, including multi-character syntax.
 
 ## Version 2 migration
 
@@ -242,7 +243,8 @@ config validation, and diagnostics are new:
 2. Fix malformed assets that v1 silently dropped or misparsed.
 3. Install and inject `@jtorm/tss-parser@2.0.0`. Published hosts using the direct
    consumers should adopt `@jtorm/tss-model@1.0.6`, `@jtorm/data-parser@1.0.4`,
-   and `@jtorm/attrs-method@1.0.4` where applicable; those releases require parser 2.x.
+   `@jtorm/attrs-method@1.0.4`, and `@jtorm/ui-manifest-compiler@1.0.1` where
+   applicable; those releases require parser 2.x.
 4. Keep calling `config()` before data-parser initialization.
 5. Browser hosts may instead load the exact-version `tss-parser.min.js` CDN path and
    inject `globalThis.jTormTSSParser`; pin the full package version for rollback.
@@ -263,7 +265,8 @@ so equivalent sources may intentionally differ when adopting those extensions.
 
 There is no runtime dual-parser mode and no data or AST migration. To roll back,
 pin `@jtorm/tss-parser@1.0.0` plus the prior direct-consumer releases
-(`tss-model@1.0.5`, `data-parser@1.0.3`, and `attrs-method@1.0.3`) where used.
+(`tss-model@1.0.5`, `data-parser@1.0.3`, `attrs-method@1.0.3`, and
+`ui-manifest-compiler@1.0.0`) where used.
 Source-composed hosts revert the parser/metadata change and rebuild any manifests
 with the prior toolchain label. Browser hosts switch their version-pinned CDN URL
 to the prior tested build.

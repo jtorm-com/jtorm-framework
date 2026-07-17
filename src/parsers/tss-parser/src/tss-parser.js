@@ -214,7 +214,8 @@ function tokenize(parser, source) {
         {t: METHOD, v: parser.c.methodSeparator}
     ].sort((a, b) => b.v.length - a.v.length);
     const tokens = [];
-    let i = 0, start = 0, quote = false, quoteOffset = 0, boundary = -1;
+    let i = 0, start = 0, quote = false, quoteOffset = 0;
+    let boundary = -1, boundaryEnd = 0;
 
     function add(type, from, to) {
         if (from === to)
@@ -230,11 +231,12 @@ function tokenize(parser, source) {
             n: from,
             z: to,
             o: offset,
-            f: boundary > 0 ? boundary + 1 : 0
+            f: boundary > 0 ? boundaryEnd : 0
         });
-        if (type === OPEN || type === CLOSE || type === PE)
-            boundary = from
-        ;
+        if (type === OPEN || type === CLOSE || type === PE) {
+            boundary = from;
+            boundaryEnd = to;
+        }
     }
 
     while (i < text.length) {

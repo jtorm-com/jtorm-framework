@@ -160,7 +160,7 @@ TSS authors and host maintainers depend on `@jtorm/tss-parser` for every inline,
 13. `handle()` accepts only strings. Configuration/input type failures use explicit `TypeError`; malformed grammar uses `SyntaxError`; resource-bound failures use `RangeError`.
 14. Every source-derived parser error message ends with `at line <L>, column <C>` and exposes numeric `line`, `column`, and `offset` properties. Diagnostics do not echo declaration values or the full source; native error class plus message identifies the condition without minting a large machine-code taxonomy.
 15. Every existing enumerable singleton method/property name remains present. Documented/directly consumed behavior (`c`, all compatibility regex source/flags, `config()`, `handle()`, `quotes()`, and writable reset state) is exact. Legacy algorithm-helper signatures and representative v1 behavior are characterized before replacement; they remain trusted-host compatibility adapters outside `handle()`'s resource contract, and no key, callable signature, characterized result, or side effect may become a hollow/deprecated stub.
-16. `tree`, `pairs`, and `tss` remain writable state fields after a parse, may be reset externally, and can be snapshotted/restored by the UI manifest compiler without affecting subsequent parses.
+16. `tree`, `pairs`, and `tss` remain writable state fields after a parse, may be reset externally, and can be snapshotted/restored by the UI manifest compiler without affecting subsequent parses. Public pair offsets remain oracle-exact for one-character syntax, including the locked source-offset-zero collision; for multi-character syntax, `pairs[].from` advances past the complete preceding structural delimiter rather than landing inside it.
 17. The scanner processes original source directly. Every emitted token retains its normalized range and original UTF-16 start offset; diagnostics derive line/column from that original source position. Comment removal and whitespace collapse therefore cannot shift later diagnostics. Legacy whitespace protection for both single- and double-quoted runs remains separately characterized from the configured tokenizer quote set.
 18. `config()` continues to create `c`/`regexes` before `dataParser.init()`. For v1-compatible configurations, every compatibility regex retains its v1 source/flags, especially `regexes.quotes`, because consumer grammar/cache keys observe them even though the active parser does not.
 19. All transient scanner/parser state (cursor, line starts, token buffer, stacks, counters, diagnostic context) is call-local. The singleton mutates only the legacy `tree`, `pairs`, `tss`, `c`, `regexes`, and configured limit fields known to reset/snapshot callers.
@@ -265,7 +265,7 @@ Defaults are hard ceilings, not suggestions: configuration may lower but never r
 | `src/parsers/tss-parser/tss-parser.min.js` | Generated prepack browser-global artifact; gitignored | Medium — direct script/CDN entry |
 | `src/parsers/tss-parser/README.md` | Grammar, config, diagnostics, bounds, migration/rollback | Low |
 | Root `package.json` / `package-lock.json` | Pin build-only Terser for repository verification | Low |
-| `tss-model`, `data-parser`, `attrs-method` package metadata | Require parser `^2.0.0`; patch versions to `1.0.6`, `1.0.4`, `1.0.4` | Medium — coordinated npm adoption seam proven by review/test |
+| `tss-model`, `data-parser`, `attrs-method`, `ui-manifest-compiler` package metadata | Require parser `^2.0.0`; patch versions to `1.0.6`, `1.0.4`, `1.0.4`, `1.0.1` | Medium — coordinated npm adoption seam proven by review/test |
 | `test/fixtures/tss-parser-oracle.js` | Add frozen v1.0.0 implementation for tests only | Low — intentionally legacy, never packaged/runtime |
 | `test/parsers/tss-parser.test.js` | Expand public, grammar, diagnostic, and limit tests | Medium |
 | `test/parsers/tss-parser-differential.test.js` | Add curated/generated/full-corpus oracle comparison | Medium |
@@ -285,7 +285,7 @@ Defaults are hard ceilings, not suggestions: configuration may lower but never r
 - **Test/build dependencies:** Node built-ins, the local frozen oracle, and an exact
   build-only Terser pin. No Terser code is reachable from the runtime package entry or
   emitted browser artifact.
-- **Direct dependents:** `view-model`, `tss-model`, `data-parser`, `attrs-method`, transitive `if-method`, and build-only `ui-manifest-compiler`; none is planned to change.
+- **Direct dependents:** `view-model`, `tss-model`, `data-parser`, `attrs-method`, transitive `if-method`, and build-only `ui-manifest-compiler`; runtime source remains unchanged while every declared parser package edge is coordinated.
 - **Blocks:** future TSS diagnostics/source-map/DSL evolution; no current code item is coupled to delivery.
 
 ## Public API Contract
@@ -461,7 +461,7 @@ Full PASTA is not triggered because the new boundary is build/publication toolin
 
 | Item | Answer |
 |---|---|
-| Code rollback | In-repo/source-DI adoption reverts the feature PR/commit. External npm adoption pins `@jtorm/tss-parser@1.0.0` and the prior direct-consumer metadata releases (`tss-model@1.0.5`, `data-parser@1.0.3`, `attrs-method@1.0.3`) where used. Browser hosts change their version-pinned CDN URL. No feature flag or state migration. |
+| Code rollback | In-repo/source-DI adoption reverts the feature PR/commit. External npm adoption pins `@jtorm/tss-parser@1.0.0` and the prior direct-consumer metadata releases (`tss-model@1.0.5`, `data-parser@1.0.3`, `attrs-method@1.0.3`, `ui-manifest-compiler@1.0.0`) where used. Browser hosts change their version-pinned CDN URL. No feature flag or state migration. |
 | Schema rollback | N/A — AST wire shape and manifest schema are unchanged; no database/schema. |
 | Data rollback | N/A — parser writes no durable data. Existing content-addressed manifests remain valid because valid AST JSON is identical. |
 | Auto-rollback trigger | CI/differential/snapshot/Codex failure blocks PR. After release, any valid-input AST/hash drift or legitimate default-limit rejection triggers immediate pin to `1.0.0`. |
@@ -476,7 +476,8 @@ Full PASTA is not triggered because the new boundary is build/publication toolin
   global/export behavior follow normal SemVer.
 - A red-first publication-seam test proved existing `^1.0.0` metadata would keep
   normal installs on v1. Coordinated patch releases require parser `^2.0.0`:
-  `tss-model@1.0.6`, `data-parser@1.0.4`, and `attrs-method@1.0.4`. Their runtime
+  `tss-model@1.0.6`, `data-parser@1.0.4`, `attrs-method@1.0.4`, and
+  `ui-manifest-compiler@1.0.1`. Their runtime
   source and DI wiring do not change.
 - Hosts call `config()` before `dataParser.init()` exactly as today. New limits default to immutable hard ceilings and may only be lowered.
 - Hosts or manifest builds that record a `toolchain.tssParser` fingerprint report `2.0.0` when adopting it; the manifest wire version and existing packs do not change.
@@ -577,7 +578,7 @@ Resource review of that exact projection then found the former 8,192-node ceilin
 
 The final implementation review challenged that compatibility cost directly. Under
 the same Terser/browser wrapper, v1 is 5,197 raw / 1,826 gzip-9 bytes and v2 is
-16,678 / 6,136 bytes: about 3.21× raw and 3.36× compressed, or 4,310 additional
+16,684 / 6,147 bytes: about 3.21× raw and 3.37× compressed, or 4,321 additional
 gzip bytes. Lead judgment retained the projection because minimized grammar-valid
 inputs demonstrably drift without it; the cost is now an explicit trade-off rather
 than the architecture review's original same-gzip estimate.
@@ -598,6 +599,12 @@ top-level property terminator before a later rule now reports the first stray to
 instead of becoming selector text, and lower-limit config in the classic build now
 works in an ES2015 realm with `Object.hasOwn` removed. Neither correction changes a
 valid oracle AST or the package/runtime ownership model.
+
+A later current-head pass found the remaining publication/extension seams. Token
+metadata now advances `pairs[].from` across the full preceding multi-character
+delimiter while retaining the one-character legacy collision rule, and the published
+manifest compiler joins the coordinated parser-2 package ranges. Both were pinned
+red-first and leave injected runtime source unchanged.
 
 ## Approval
 

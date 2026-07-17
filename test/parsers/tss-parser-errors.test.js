@@ -241,6 +241,11 @@ test('multi-character configured syntax uses longest literal matches', () => {
       c: [{ s: 'child', m: false, p: { x: '2' }, c: [] }]
     }]
   );
+  p.handle('a{{x::1;;b{{y::2;;}}}}');
+  assert.deepEqual(p.pairs, [
+    { from: 0, open: 1, close: 20 },
+    { from: 9, open: 10, close: 18, parent: 0 }
+  ]);
 });
 
 test('configured syntax is literal even when published regexes need escaping', () => {

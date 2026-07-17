@@ -96,9 +96,11 @@ radius; the README pins both package version and SHA-384 SRI.
 | Minifier drift changes public names or AST behavior | Exact Terser `5.49.0`, no property mangling, deterministic double build, exact singleton/regex/diagnostic/custom-config and 257-file parity | Mitigated |
 | CDN artifact is replaced in transit/origin | Exact-version URL and tested SHA-384 SRI in browser instructions; self-hosting remains available | Mitigated |
 | Browser build gains hidden runtime loading | Generated-output guards reject `require()` and source maps; canonical source has no dynamic load/eval/network path; Semgrep/package review applies | Mitigated |
-| Published dependents silently retain parser v1 | All three direct metadata edges require parser `^2.0.0`; patch versions and package dry-runs are source-guarded | Fixed |
+| Published dependents silently retain parser v1 | All four declared direct metadata edges require parser `^2.0.0`; patch versions and package dry-runs are source-guarded | Fixed |
 | Stray top-level declarations become selectors | A property terminator before the next rule fails at the first stray source position | Fixed |
 | ES2015 browser lacks a newer intrinsic | Browser parity runs after deleting `Object.hasOwn`; config limits still validate and apply | Fixed |
+| Multi-character pair offsets land inside delimiters | Pair-state tests require the full preceding delimiter end while retaining legacy one-character collision coordinates | Fixed |
+| Manifest compiler install can select parser v1 | Compiler `1.0.1` directly requires parser `^2.0.0`; full package graph guard and dry-run cover it | Fixed |
 
 ## Findings
 
@@ -272,6 +274,36 @@ supported browser could load and parse with the artifact yet throw a plain
 removed from its VM realm; deterministic build, lower-limit config, and full
 browser/CommonJS parity now pass in that realm.
 
+### Fixed — MEDIUM: multi-character syntax exposed partial-delimiter pair offsets
+
+**Mapping:** CWE-682 (Incorrect Calculation)
+**Location:** `src/parsers/tss-parser/src/tss-parser.js`, tokenizer boundary metadata
+**Attack/failure:** The v2 literal grammar supports multi-character structural
+delimiters, but the compatibility coordinate always advanced one code unit from
+the prior delimiter start. For `propertyEnd: ';;'`, a nested rule's public
+`pairs[].from` therefore pointed at the second semicolon even though its AST was
+correct, corrupting span consumers and historical helper state.
+**Fix:** Track both prior delimiter start and end. Use the full end when the start
+is positive, while retaining the locked `from = 0` collision behavior at source
+offset zero and therefore every one-character oracle coordinate.
+**Evidence:** the reviewer witness failed red at child `from: 8` versus expected
+`9`; exact pair state now passes, and the 200,000-case valid AST differential stays
+JSON-identical.
+
+### Fixed — MEDIUM: manifest compiler metadata could still install parser v1
+
+**Mapping:** OWASP A08:2021 (Software and Data Integrity Failures), CWE-1104
+**Location:** `tooling/ui-manifest-compiler/package.json`
+**Attack/failure:** The first package propagation pass covered three runtime
+consumers but missed the published build-only compiler's direct `^1.0.0` edge. A
+normal compiler install could therefore load the unbounded parser for host config
+and bypass v2 diagnostics/resource policy.
+**Fix:** Patch-release `@jtorm/ui-manifest-compiler@1.0.1` with parser `^2.0.0`
+and include it in both exact package graph ratchets.
+**Evidence:** browser/package and coordinated-release guards were observed red on
+compiler `1.0.0`/parser `^1.0.0`; they now pass, and the six-file compiler dry-run
+reports the intended metadata with no runtime source change.
+
 No critical, high, medium, or low finding remains open.
 
 ## Security properties checked
@@ -325,7 +357,8 @@ No critical, high, medium, or low finding remains open.
 - View, fetched-cache retry, and manifest compiler propagation/restoration tests
 - Deterministic browser build, public-surface/diagnostic/custom/full-corpus parity,
   gzip budget, SRI, license, and four-file package dry-run
-- Direct-consumer exact version/range source guards and three three-file dry-runs
+- Direct-consumer exact version/range source guards, three three-file runtime
+  consumer dry-runs, and the six-file manifest compiler dry-run
 - Exact 582-test repository suite, typecheck, zero-vulnerability dependency audit,
   package dry-run, syntax, Semgrep (68+22 rules, zero findings), and diff hygiene
 
