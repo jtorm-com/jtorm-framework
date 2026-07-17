@@ -42,6 +42,7 @@ An in-memory instrumentation probe found 55 of the 257 checked-in files enter th
 | Compatibility projection exceeded isolate budget at 8,192 nodes | Dense method/interleaving measurement exceeded 128 MiB | Non-interleaved bypass, 4,096-node ceiling, and logarithmic parent lookup; witness is about 83 MiB / 0.18 s |
 | Compatibility parent discovery was quadratic | Review traced a nested scan over prior frames despite an O(nodes log nodes) claim | Coordinate-compressed Fenwick predecessor lookup preserves exact parents and reduces the same witness from about 0.9 s to 0.18 s |
 | Browser artifact/build contract was absent | 2/2 browser publication tests failed: no CDN fields/build script and `npm run build` exited missing-script | Exact Terser build, metadata, deterministic/SRI/size guards, classic-script execution, and 257-file parity pass |
+| Exact gzip length was treated as cross-toolchain identity | CI produced 6,115 bytes from the same 16,575-byte/SRI artifact versus local Node 25 zlib's 6,120 | Exact raw bytes and SRI lock the artifact; README pins the measured toolchain figure and every zlib must satisfy the portable 7 KiB ratchet |
 | Extended differential was manual and array-backed | Final adversarial review found CI ran 4,096 cases while the cited 200,000-case run peaked near 1.4 GiB | PR CI selects 200,000; streamed comparison preserves the frozen digest and passes at 167 MiB peak RSS |
 | Multiline diagnostics depended on a mirrored test helper | Skeptic review showed a shared location bug could pass both implementation and helper | Hard-coded LF/CRLF/CR/U+2028/U+2029/comment positions plus the exact source-limit CRLF boundary pass |
 
@@ -72,7 +73,7 @@ Measured on Node v25.5.0 in this workspace. RSS values are `/usr/bin/time -f %M`
 | 16,384 declarations | about 0.13 s / 68.4 MiB; exact/over test passes |
 | Near-node-ceiling method/interleaving | about 0.18 s / 83.4 MiB; 5 s test timeout |
 | Production source | 40,509 raw bytes / 9,046 gzip-9 bytes; 10 KiB ratchet |
-| Browser artifact | 16,575 minified bytes / 6,120 gzip-9 bytes / 5,574 Brotli-11 bytes; 7 KiB gzip ratchet |
+| Browser artifact | 16,575 minified bytes / 6,120 gzip-9 bytes / 5,574 Brotli-11 bytes on Node v25.5.0; CI LTS zlib emits 6,115 gzip bytes; portable 7 KiB ratchet |
 | Frozen v1 under same browser wrapper | 5,197 minified bytes / 1,826 gzip-9 bytes / 1,666 Brotli-11 bytes |
 
 The browser artifact is therefore about 3.2× v1 raw and 3.35× v1 gzip, an
@@ -96,7 +97,7 @@ Thirty maximum-source parses measured v2 p50 34.184 ms, p95 71.905 ms, and max 7
 - Runtime source and generated browser code contain no `require()`, runtime third-party
   dependency, dynamic load, `eval`, logging, or handwritten TypeScript/declaration
   file. Terser is an exact-pinned build-only dependency.
-- `npm pack --dry-run --json` reports `@jtorm/tss-parser@2.0.0`, 19,511-byte tarball / 67,470-byte unpacked, with exactly `README.md`, `package.json`, `src/tss-parser.js`, and generated `tss-parser.min.js`; tests/oracle/build dependency code do not ship.
+- `npm pack --dry-run --json` reports `@jtorm/tss-parser@2.0.0`, 19,541-byte tarball / 67,513-byte unpacked, with exactly `README.md`, `package.json`, `src/tss-parser.js`, and generated `tss-parser.min.js`; tests/oracle/build dependency code do not ship.
 - Package major version, malformed-input migration, lower-only limits, rollback pin, and no-dual-parser policy are documented.
 - `main` remains `src/tss-parser.js`; `unpkg`/`jsdelivr` select the generated classic
   script without a bundler `browser` remap. The README exact-version CDN example's
@@ -131,7 +132,7 @@ The failure-before-publication, failure-during-parse, retry, overlap, stale-stat
   retry/restoration behavior, major-version rollout, rollback pin, and synchronous-host
   residual risk are documented. There is no schema, infrastructure, service, queue,
   or deployment-order operation.
-- **cross-model adversarial review — PASS.** The final skeptic/architect/minimalist pass found no parser-output defect; the skeptic independently reported about 850,000 both-accepted cases with zero drift. CI-scale differential enforcement/memory, independent location anchors, and exact browser-size guards were fixed. Removing the compatibility phase remains rejected because it violates explicit exact valid-output compatibility. A stale-model lodash non-existence finding was retracted against live registry/integrity/audit/install evidence.
+- **cross-model adversarial review — PASS.** The final skeptic/architect/minimalist pass found no parser-output defect; the skeptic independently reported about 850,000 both-accepted cases with zero drift. CI-scale differential enforcement/memory, independent location anchors, exact raw/SRI guards, documented local gzip measurement, and a portable gzip ratchet were fixed. Removing the compatibility phase remains rejected because it violates explicit exact valid-output compatibility. A stale-model lodash non-existence finding was retracted against live registry/integrity/audit/install evidence.
 
 ## Feature evaluation score
 
@@ -158,7 +159,7 @@ Fresh verification re-read every changed runtime/test file after the final adver
 | Focused differential/parser/resource/consumers | PASS | 105/105 after final browser, CI-streaming, location, and ratchet controls |
 | Exact `npm test` | PASS | 582/582 on the reviewed candidate |
 | `npm run typecheck` | PASS | `tsc -p jsconfig.json` clean |
-| Package dry-run | PASS | Four intended files; 19,511-byte tarball / 67,470-byte unpacked |
+| Package dry-run | PASS | Four intended files; 19,541-byte tarball / 67,513-byte unpacked |
 | Source/oracle guards | PASS | Oracle hash controls, unchanged snapshot, no imports/types, and 10 KiB production ratchet pass |
 | Semgrep | PASS | 68 JavaScript rules on nine targets plus 22 security-audit rules on four targets; zero findings |
 | `git diff --check` / syntax | PASS | Diff hygiene and all changed JavaScript syntax clean |
@@ -168,7 +169,7 @@ Fresh verification re-read every changed runtime/test file after the final adver
 | review-refactor | PASS | Behavior, scope, complexity, and publication checks clean |
 | review-privacy | PASS / N/A | No PII, data processing, retention, logging, or transfer change |
 | source-ratchet-review | PASS | Oracle and gzip dominating invariants converge with negative controls |
-| adversarial-review | PASS | Three final lenses; accepted CI/memory/location/size guards fixed, false high retracted |
+| adversarial-review | PASS | Three final lenses; accepted CI/memory/location/raw-SRI/gzip-budget guards fixed, false high retracted |
 | tech-debt-ratchet | PASS | Exact final staged payload reports no new debt pattern |
 | production-readiness | PASS | Limits/latency/RSS/package/rollout evidence; accepted synchronous and size residuals documented |
 | Feature evaluation / verification | PASS | 94/100; no local blocker, with size/compatibility complexity scored explicitly |

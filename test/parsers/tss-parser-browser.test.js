@@ -60,13 +60,14 @@ test('Terser build is deterministic, licensed, bounded, and browser-compatible',
   assert.match(first.toString('utf8', 0, 160), /\/\*! \(c\) jTorm/);
   assert.doesNotMatch(first.toString(), /sourceMappingURL|\brequire\s*\(/);
   const integrity = 'sha384-' + crypto.createHash('sha384').update(first).digest('base64');
-  assert.ok(fs.readFileSync(path.join(dir, 'README.md'), 'utf8').includes(integrity));
+  const readme = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
+  assert.ok(readme.includes(integrity));
+  assert.match(readme, /16,575 raw bytes[\s\S]*6,120 bytes at gzip level 9/);
   const compressed = zlib.gzipSync(first, { level: 9 });
   assert.equal(first.length, 16575);
-  assert.equal(compressed.length, 6120);
   const withinBudget = value => zlib.gzipSync(value, { level: 9 }).length <= 7168;
   assert.ok(
-    withinBudget(first),
+    compressed.length <= 7168 && withinBudget(first),
     'browser parser exceeds 7 KiB gzip-9'
   );
   const noise = Buffer.alloc(16384);

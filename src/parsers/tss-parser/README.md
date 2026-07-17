@@ -70,7 +70,8 @@ continue using `require('@jtorm/tss-parser')` unchanged.
 `npm run build` emits the gitignored `tss-parser.min.js`; `npm pack` and publish run
 the build through `prepack`. Terser is pinned as a development dependency and no
 minifier code ships or executes at runtime. The current artifact is 16,575 raw bytes
-and 6,120 bytes at gzip level 9, with a 7 KiB gzip ratchet.
+and, measured with Node v25.5.0 zlib, 6,120 bytes at gzip level 9, with a portable
+7 KiB gzip ratchet.
 
 Rules keep source order. A nested selectorless rule or method inherits the
 nearest truthy parent selector. Shorthand properties are inserted before block

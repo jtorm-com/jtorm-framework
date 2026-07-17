@@ -578,7 +578,8 @@ that the cited 200,000-case run was manual and array-backed, and that multiline 
 tests depended too heavily on a mirrored helper. PR CI now selects 200,000 cases; streaming
 reduced measured peak RSS from about 1.4 GiB to 167 MiB; hard-coded LF/CRLF/CR/U+2028/
 U+2029/comment anchors and the exact CRLF source-limit boundary are independent. Browser
-tests also pin the documented raw/gzip byte counts. A stale-model claim that
+tests pin exact raw bytes/SRI plus the documented local gzip figure and enforce a
+portable 7 KiB gzip budget. A stale-model claim that
 `lodash@4.18.1` did not exist was retracted after live registry publication/integrity,
 clean-audit, installation, and focused-test evidence. The synthesized verdict is **PASS**.
 
