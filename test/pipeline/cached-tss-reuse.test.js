@@ -33,6 +33,7 @@ async function trees() {
   tm.promiseCacheModel = pm;
   tm.tssParser = makeTssParser();
   tm.requestModel = {
+    cacheKey: u => String(u),
     get: () => ({ text: async () => { fetches++; return source; } })
   };
   const cached = await tm.get('/shared.tss');

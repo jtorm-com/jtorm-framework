@@ -35,6 +35,10 @@ The descriptor `hash` is trusted deployment metadata and must not be copied from
 The model validates received text, schema, structure, per-value hashes, and computed = declared =
 expected SHA-256 before installing an index. Installation is atomic on the topmost render context.
 Pack promises use the request model's policy-aware cache key and a bounded 32-entry LRU.
+When that request key is unscoped, each render root reacquires and validates its pack without
+touching the cross-render promise cache. Repeated `prepare()` calls on that same root still reuse
+the root-local prepared promise/index; this bypass does not change atomic installation,
+supersession, validation, digest, or acquisition classification.
 Manifests are public static assets: they must never contain PII, credentials, secrets, or request-,
 tenant-, model-, DOM-, or user-derived state. The trusted compiler/source-adapter boundary owns
 that exclusion; the runtime validates structure and integrity, not data classification.
@@ -53,6 +57,5 @@ getMethod.manifest = manifest;
 ```
 
 Removing the `prepare()` call and the optional `getMethod.manifest` injection restores the legacy
-waterfall without changing asset URLs. For this patch release, publish the render-context and
-promise-cache owners first, then `@jtorm/request-model@1.1.4`, then the asset owner, this package,
-and the remaining consumers.
+waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.0.1` and
+`@jtorm/request-model@1.1.5` before this package and the fetch/UI cache consumers.

@@ -86,6 +86,7 @@ test('shared render, promise-cache, and asset policies are host-injected once', 
   for (const model of [jTormDataModel, jTormHtmlModel, jTormTssModel, jTormUiManifestModel])
     assert.equal(model.promiseCacheModel, jTormPromiseCacheModel)
   ;
+  assert.equal(jTormUiCacheModel.requestModel, jTormRequestModel);
   assert.equal(jTormAssetPluginModel.renderContextModel, jTormRenderContextModel);
   assert.equal(jTormCssPlugin.assetPluginModel, jTormAssetPluginModel);
   assert.equal(jTormJsPlugin.assetPluginModel, jTormAssetPluginModel);
@@ -97,6 +98,7 @@ test('harness reset restores the complete asset-policy injection graph', () => {
   jTormCssPlugin.assetPluginModel = jTormJsPlugin.assetPluginModel = bad;
   jTormCssPlugin.cssMethod = jTormJsPlugin.jsMethod = bad;
   jTormCssPlugin.requestModel = jTormJsPlugin.requestModel = bad;
+  jTormUiCacheModel.requestModel = bad;
   jTormCssPlugin.uiResolverModel = jTormJsPlugin.uiResolverModel = bad;
   jTormCssMethod.cssPlugin = jTormJsMethod.jsPlugin = bad;
 
@@ -109,6 +111,7 @@ test('harness reset restores the complete asset-policy injection graph', () => {
   assert.equal(jTormJsPlugin.jsMethod, jTormJsMethod);
   assert.equal(jTormCssPlugin.requestModel, jTormRequestModel);
   assert.equal(jTormJsPlugin.requestModel, jTormRequestModel);
+  assert.equal(jTormUiCacheModel.requestModel, jTormRequestModel);
   assert.equal(jTormCssPlugin.uiResolverModel, jTormUiResolverModel);
   assert.equal(jTormJsPlugin.uiResolverModel, jTormUiResolverModel);
   assert.equal(jTormCssMethod.cssPlugin, jTormCssPlugin);

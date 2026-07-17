@@ -169,6 +169,7 @@ jTormInsertMethod.handlerWrapper = jTormEachMethod.handlerWrapper = jTormWrapMet
 jTormDataModel.requestModel = jTormHtmlModel.requestModel = jTormTssModel.requestModel = jTormRequestModel;
 jTormTssModel.tssParser = jTormTSSParser;
 jTormUiManifestModel.requestModel = jTormRequestModel;
+jTormUiCacheModel.requestModel = jTormRequestModel;
 jTormUiManifestModel.digest = async bytes => new Uint8Array(
     createHash('sha256').update(bytes).digest()
 );
@@ -232,7 +233,7 @@ const freshEvents = () => ({
 });
 
 /** Reset the mutable state of the WIRED singletons between boils. */
-function reset(jsonLd = 1) {
+function reset(jsonLd = 1, reuseSharedCaches = 0) {
     jTormErrorHandler.debug = false;
     jTormRenderContextModel.max = 128;
     jTormAssetPluginModel.renderContextModel = jTormRenderContextModel;
@@ -251,10 +252,12 @@ function reset(jsonLd = 1) {
     jTormTSSParser.pairs = [];
     jTormTSSParser.tss = '';
     jTormLanguageModel.data = {};
-    jTormDataModel.c = new Map(); // fetch-model caches (bounded-LRU singletons)
-    jTormHtmlModel.c = new Map();
-    jTormTssModel.c = new Map();
-    jTormUiManifestModel.c = new Map();
+    if (!reuseSharedCaches) {
+        jTormDataModel.c = new Map(); // fetch-model caches (bounded-LRU singletons)
+        jTormHtmlModel.c = new Map();
+        jTormTssModel.c = new Map();
+        jTormUiManifestModel.c = new Map();
+    }
     jTormUiManifestModel.max = 32;
     jTormUiManifestModel.maxText = 1048576;
     jTormUiManifestModel.maxValues = 262144;
@@ -266,13 +269,16 @@ function reset(jsonLd = 1) {
     jTormJsonLdModel.maxDepth = 128;
     jTormJsonLdPlugin.jsonLdModel = jTormJsonLdModel;
     jTormUiManifestModel.requestModel = jTormRequestModel;
+    jTormUiCacheModel.requestModel = jTormRequestModel;
     jTormUiManifestModel.digest = async bytes => new Uint8Array(
         createHash('sha256').update(bytes).digest()
     );
     jTormGetMethod.manifest = jTormUiManifestModel;
     jTormUiMethod.cache = {};          // resolved-component cache (singleton)
-    jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache (nested store)
-    jTormUiCacheModel.order = new Map(); // LRU recency tracker parallel to cache
+    if (!reuseSharedCaches) {
+        jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache (nested store)
+        jTormUiCacheModel.order = new Map(); // LRU recency tracker parallel to cache
+    }
     jTormUiCacheModel.updated = 0;
     jTormLayerModel.layers = {};       // stashed deferred fragments (per layer id)
     jTormLayerModel.event = { before: { iteration: [] }, after: { iteration: [], view: [] } }; // registered ids per phase
@@ -340,10 +346,10 @@ function fixtureTransport(fixtures, metrics) {
  *
  * @param {string} [url] document URL (jsdom origin); some flows need an absolute base.
  * @param {object|null} [fixtures] { url: {json?, text?} } map → injected fetch transport for `get`.
- * @param {number} [c] create-doc mode: `0` live SPA/PWA document, `1` detached SSR document.
+ * @param {number|object} [c] create-doc mode, or an explicit render context.
  * @param {{url:string,hash:string,mode:'required'|'optional'}[]|null} [manifests] ordered UI packs prepared after root creation and before events/handler.
  * @param {number} [warm] when truthy, repeat prepare on the same root and report its request delta.
- * @param {{jsonLd?:boolean}|null} [options] harness plugin switches; JSON-LD is registered unless explicitly false.
+ * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
  * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
  */
 async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0, options = null) {
@@ -357,7 +363,7 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
         handlerDepth: 0
     };
     jTormDocumentModel.windowModel = window;
-    reset(!options || options.jsonLd !== false);
+    reset(!options || options.jsonLd !== false, options && options.reuseSharedCaches);
     const handle = jTormHandler.handle;
     jTormHandler.handle = async function (...args) {
         metrics.depth++;
@@ -373,7 +379,13 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     jTormRequestModel.transport = fixtureTransport(fixtures || {}, metrics);
 
     try {
-        const v = await jTormViewModel.create(html, tss, data, c);
+        const context = c && typeof c === 'object' ? c : {
+            c: c,
+            s: null,
+            a: null,
+            request: {origin: new URL(url).origin}
+        };
+        const v = await jTormViewModel.create(html, tss, data, context);
         if (manifests) {
             await jTormUiManifestModel.prepare(manifests, v.c);
             if (warm) {

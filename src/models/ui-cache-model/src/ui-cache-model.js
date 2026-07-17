@@ -7,6 +7,7 @@ module.exports = {
     jTormUiCacheModel: {
         // DI
         // renderContextModel
+        // requestModel
         // saveModel
 
         cache: {},// exported nested store {l:{id:{c:d}}} the host persists via saveModel — the source of truth
@@ -20,7 +21,7 @@ module.exports = {
         },
 
         context: function (v) {
-            return this.renderContextModel.context(v);
+            return this.renderContextModel.cacheContext(v);
         },
 
         state: function (v) {
@@ -31,32 +32,37 @@ module.exports = {
             return l + this.sep + id + this.sep + c;
         },
 
+        part: function (v) {
+            if (v != null && !['string', 'number', 'boolean', 'bigint'].includes(typeof v))
+                return false
+            ;
+
+            return String(v).indexOf(this.sep) === -1;
+        },
+
         tenant: function (v) {
-            const c = this.context(v), r = c && c.request;
+            let c, t;
 
-            if (c && c.tenant != null)
-                return String(c.tenant)
-            ;
+            try {
+                c = this.context(v);
+                if (!c && v != null)
+                    return ''
+                ;
+                if (!this.requestModel || typeof this.requestModel.discriminator !== 'function')
+                    return ''
+                ;
+                t = this.requestModel.discriminator(c);
+            } catch (e) {
+                return '';
+            }
 
-            if (r && r.tenant != null)
-                return String(r.tenant)
-            ;
-
-            if (r && r.origin != null)
-                return String(r.origin)
-            ;
-
-            if (r && r.base != null)
-                return String(r.base)
-            ;
-
-            return '';
+            return typeof t === 'string' && t.indexOf(this.sep) === -1 ? t : '';
         },
 
         scope: function (v, c) {
             const t = this.tenant(v);
 
-            return t ? t + this.sep + c : c;
+            return t && this.part(c) ? t + this.sep + c : undefined;
         },
 
         init: async function () {
@@ -66,7 +72,9 @@ module.exports = {
             this.order = new Map();
             this.updated = 0;// a reloaded cache is clean — never carry a stale dirty flag into the next save()
 
-            if (this.saveModel && (o = this.saveModel.get())) {// reload the persisted nested cache, rebuilding recency and bounding to max
+            if (this.saveModel && Object.prototype.hasOwnProperty.call(this.saveModel, 'uiCacheScoped')
+                && this.saveModel.uiCacheScoped === true
+                && (o = this.saveModel.get())) {// reload an explicitly migrated scoped store, rebuilding recency and bounding to max
                 for (l in o)
                     for (id in o[l])
                         for (c in o[l][id])
@@ -77,7 +85,15 @@ module.exports = {
 
         get: async function (v, l, id, c) {
             const s = this;
+
+            if (!s.part(l) || !s.part(id))
+                return null
+            ;
             c = s.scope(v, c);
+
+            if (c === undefined)
+                return null
+            ;
 
             if (s.cache[l] && s.cache[l][id] && s.cache[l][id][c] !== undefined) {// hit: bump recency (Map keeps insertion order)
                 const k = s.key(l, id, c);
@@ -90,7 +106,14 @@ module.exports = {
         },
 
         set: function (v, l, id, c, d) {
+            if (!this.part(l) || !this.part(id))
+                return
+            ;
             c = this.scope(v, c);
+
+            if (c === undefined)
+                return
+            ;
 
             if (!this.cache[l] || !this.cache[l][id] || this.cache[l][id][c] === undefined) {// write-once per (l,id,c)
                 this.put(l, id, c, d);
@@ -99,8 +122,15 @@ module.exports = {
         },
 
         put: function (l, id, c, d) {// write the nested entry, track recency, LRU-evict; shared by set() and init()
-            const s = this, k = s.key(l, id, c);
+            const s = this;
             let e, o;
+
+            if (!s.part(l) || !s.part(id) || typeof c !== 'string'
+                || c.indexOf(s.sep) <= 0 || c.indexOf(s.sep, c.indexOf(s.sep) + 1) !== -1)
+                return
+            ;
+
+            const k = s.key(l, id, c);
 
             if (!s.cache[l]) s.cache[l] = {};
             if (!s.cache[l][id]) s.cache[l][id] = {};
@@ -129,6 +159,10 @@ module.exports = {
         },
 
         save: async function (v) {
+            if (!this.tenant(v))
+                return
+            ;
+
             const s = this.state(v);
 
             if (this.saveModel && s.updated)// persist the nested cache unchanged (shape identical to the pre-LRU model)

@@ -34,8 +34,9 @@ test('get-method fetches multi-t artifacts through the real tss/request path in 
         : { ok: false, status: 404, text: async () => '' };
     };
 
-    const a = await gm.get('tss', ['/a.tss', '/b.tss']);
-    const b = await gm.get('tss', ['/a.tss', '/b.tss']);
+    const c = {request: {tenant: 'test'}};
+    const a = await gm.get('tss', ['/a.tss', '/b.tss'], c);
+    const b = await gm.get('tss', ['/a.tss', '/b.tss'], c);
 
     assert.deepEqual(a.map(t => t.s), ['a', 'b']);
     assert.deepEqual(b.map(t => t.s), ['a', 'b']);

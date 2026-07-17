@@ -4,7 +4,13 @@
 module.exports = {
     jTormPromiseCacheModel: {
         get: function (o, q, x) {
-            let p = o.c.get(q), k;
+            let p, k;
+
+            if (q === undefined)
+                return x.load()
+            ;
+
+            p = o.c.get(q);
 
             if (p !== undefined) {
                 o.c.delete(q);

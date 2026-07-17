@@ -29,6 +29,21 @@ test('rejects malformed and cyclic context chains', () => {
   assert.equal(cm.context(a), null);
 });
 
+test('cache resolution requires own view and parent links without changing normal resolution', () => {
+  const root = Object.assign(Object.create(null), {tenant: 'root'});
+  const ownParent = {p: root};
+  const inheritedParent = Object.create({p: root});
+  const ownView = {c: ownParent};
+  const inheritedView = Object.create({c: root});
+
+  assert.strictEqual(cm.cacheContext(ownParent), root);
+  assert.strictEqual(cm.cacheContext(ownView), root);
+  assert.strictEqual(cm.context(inheritedParent), root);
+  assert.strictEqual(cm.context(inheritedView), root);
+  assert.equal(cm.cacheContext(inheritedParent), null);
+  assert.equal(cm.cacheContext(inheritedView), null);
+});
+
 test('root-only context stays valid with a degenerate configured maximum', () => {
   const root = {};
   cm.max = 0;
