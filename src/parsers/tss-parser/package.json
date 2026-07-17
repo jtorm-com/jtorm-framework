@@ -8,10 +8,23 @@
   },
   "keywords": [],
   "main": "src/tss-parser.js",
+  "unpkg": "tss-parser.min.js",
+  "jsdelivr": "tss-parser.min.js",
+  "files": [
+    "src/tss-parser.js",
+    "tss-parser.min.js"
+  ],
+  "scripts": {
+    "build": "terser src/tss-parser.js --compress passes=2 --mangle --toplevel --ecma 2015 --enclose \"module:({set exports(value){globalThis.jTormTSSParser=value.jTormTSSParser}})\" --output tss-parser.min.js",
+    "prepack": "npm run build"
+  },
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/parsers/tss-parser"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "terser": "5.49.0"
+  }
 }

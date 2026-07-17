@@ -16,8 +16,11 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   Do **not** use `node --test test/` — it mis-resolves the directory on this Node.
 - `npm run typecheck` → `tsc -p jsconfig.json` (JSDoc types; `checkJs` scoped to `src/types/src/types.js`
   + `view-model.js`). No Biome/ESLint/Knip in this repo.
-- **`@jtorm/types`** has the repo's only build step: a `prepack` runs `tsc --emitDeclarationOnly` to
+- **`@jtorm/types`** has the repo's only declaration build: a `prepack` runs `tsc --emitDeclarationOnly` to
   generate its published `.d.ts` from the JSDoc (gitignored artifact; `typescript` is its devDep).
+- **`@jtorm/tss-parser`** has a production-browser build: its `prepack` runs the exact pinned Terser
+  version over canonical CommonJS source and emits a gitignored `tss-parser.min.js` classic script.
+  CommonJS `main` stays unchanged; direct browser loading exposes `globalThis.jTormTSSParser`.
 - Full-pipeline harness: `test/helpers/engine.js`
   (`render(html,tss,data,url,fixtures,c,manifests,warm,options)`), goldens in `test/pipeline/`. The
   optional final arguments prepare UI manifests, expose transport request/byte metrics, and let
@@ -32,6 +35,8 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   `dependencies` declare the `@jtorm/*` wiring — and DI'd libs, e.g. `view-model` → `lodash` — as
   metadata, not `require()` edges.) **`@jtorm/types`** is a new **type-only** entry there: JSDoc + a
   generated `.d.ts`, zero runtime code, so its `ViewModel` typedef resolves for TypeScript consumers.
+  The parser's generated browser artifact is build output, preserves the same singleton, and adds no
+  runtime dependency or import.
 - **Pure JS only — never add *hand-written* `.ts`/`.d.ts`.** Types are JSDoc validated by
   `jsconfig.json`. Sole exception: **`@jtorm/types`** publishes a `.d.ts` **generated** from its JSDoc
   at `prepack` (`tsc --emitDeclarationOnly`; gitignored build artifact, never authored by hand) so

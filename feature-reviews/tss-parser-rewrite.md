@@ -14,9 +14,15 @@
 **Next Action:** Poll PR #55 CI, request Codex review, resolve any valid finding red-first, and leave the clean PR unmerged
 **Files Created:** specification/security records, frozen oracle, and differential/error/resource suites
 **Files Modified:** parser package/docs plus direct-consumer propagation tests
-**Tests Written:** red-first diagnostics, offset-collision/method-layout compatibility, 260 interleavings, 768 combinatorial forms, 4,096 seeded nested forms, resource ceilings, and consumer propagation
-**Issues Found (not yet fixed):** None. Adversarial compatibility and resource findings are fixed and the 200,000-case independent differential reports zero drift
+**Tests Written:** red-first diagnostics, offset-collision/method-layout compatibility, 260 interleavings, 768 combinatorial forms, 4,096 seeded nested forms, CI-scale 200,000-case streaming differential, resource ceilings, browser artifact parity/size, and consumer propagation
+**Issues Found (not yet fixed):** None. Adversarial compatibility, resource, diagnostic-oracle, and CI-enforcement findings are fixed
 **Design Decisions Made:** Branch `agent/p3-tss-parser-rewrite` starts from current `origin/dev` at merged PR #54 commit `6e352fa`; approved specification below is normative
+
+**Delivery Amendment — 2026-07-17:** The package also publishes a deterministic,
+Terser-minified browser-global build. The existing CommonJS `main` remains the
+canonical source entry; direct `<script>` consumers receive the same singleton as
+`globalThis.jTormTSSParser`. Terser is build-only and does not change the
+zero-runtime-dependency contract.
 
 **Context for Next Session:**
 PR #54 was confirmed merged into `dev`; local `dev` was fast-forwarded and the feature branch was created at `6e352fa`. Research, focused green baseline, specification, threat model, two-round adversarial review, plan quality gate, and design-persona gate are complete. The exact v1 source is frozen at SHA-256 `1a597fe542048ba719d277341ebe840a730b2f2c1152ac92b49821ec19648c27`. Differential characterization passes for 260 interleavings and all 257 checked-in TSS files. The 12-test replacement suite was observed fully red before production edits.
@@ -68,7 +74,7 @@ PR #54 was confirmed merged into `dev`; local `dev` was fast-forwarded and the f
 - [x] review-refactor: PASS
 - [x] tech-debt-ratchet: PASS
 - [x] production-readiness: PASS
-- [x] 100/100 code quality
+- [x] 94/100 final evaluation with accepted size/compatibility-complexity costs
 - [x] Verification loop passed
 
 ### Documentation Mode
@@ -120,14 +126,19 @@ TSS authors and host maintainers depend on `@jtorm/tss-parser` for every inline,
 - Freeze the current implementation as a test-only differential oracle; expand curated, generated, custom-config, full-corpus, surface, malformed-input, and resource characterization before switching production code.
 - Keep the existing 257-entry `src/**/*.tss` snapshot file byte-for-byte/JSON-compatible.
 - Major-bump and document `@jtorm/tss-parser`; update feature, evaluation, security, review-ledger, architecture-backlog, and canonical reviewer-contract records.
+- Generate a deterministic production browser artifact during package build/prepack,
+  expose it through CDN metadata, and verify that it preserves the CommonJS singleton
+  surface and all 257 checked-in AST outputs.
 
 ### Out of Scope (Non-Goals)
 
 - No change to data-parser binding syntax, compilation, evaluation, or quote-removal grammar.
 - No change to handler dispatch/traversal, selector scoping, fetched-component scope, zero-match behavior, methods, models, UI resolution/compilation, or manifest wire format.
-- No new TSS verb, selector syntax, declaration value semantics, AST field, source-map payload, runtime import, dependency, package, TypeScript source, or handwritten declaration file.
+- No new TSS verb, selector syntax, declaration value semantics, AST field, source-map payload, runtime import/dependency, package, TypeScript source, or handwritten declaration file.
 - No edit-in-place to the legacy `i <= ps.length`, pair, whitespace-padding, brace, or offset arithmetic; the old implementation moves intact to a test-only oracle and leaves the production path.
 - No runtime dual-parser flag or compatibility fallback. Rollback is package/commit pinning, not shipping both engines.
+- No replacement of the CommonJS entry, bundler-only `browser` remap, handwritten
+  minified source, source map, runtime minifier, or runtime Terser dependency.
 - No package publication, downstream host deployment, or PR merge in this task.
 
 ## Requirements
@@ -154,6 +165,22 @@ TSS authors and host maintainers depend on `@jtorm/tss-parser` for every inline,
 18. `config()` continues to create `c`/`regexes` before `dataParser.init()`. For v1-compatible configurations, every compatibility regex retains its v1 source/flags, especially `regexes.quotes`, because consumer grammar/cache keys observe them even though the active parser does not.
 19. All transient scanner/parser state (cursor, line starts, token buffer, stacks, counters, diagnostic context) is call-local. The singleton mutates only the legacy `tree`, `pairs`, `tss`, `c`, `regexes`, and configured limit fields known to reset/snapshot callers.
 20. `handle()` publishes the completed AST atomically. On syntax/resource failure, `tree`, `pairs`, and `tss` are empty rather than partially parsed; fetched-model rejection still evicts through the existing promise-cache path, and original error identity plus position fields propagate through view/model/compiler callers.
+21. `main: src/tss-parser.js` remains unchanged. Package build/prepack generates
+    `tss-parser.min.js` as a classic browser script; evaluating it without
+    CommonJS globals publishes the parser singleton at `globalThis.jTormTSSParser`.
+22. The browser singleton has the same enumerable key order, configuration/reset
+    behavior, diagnostics, limits, and JSON output as the canonical CommonJS source.
+    Property mangling is forbidden because public and injected singleton fields are
+    string-addressable compatibility surface.
+23. The artifact is reproducible byte-for-byte from the checked-in source using an
+    exact Terser version and checked-in build options. It retains the project license
+    banner, contains no source map or runtime loader/import, and is generated rather
+    than hand-edited. The exact-version CDN example carries a tested SHA-384 SRI value.
+24. `unpkg` and `jsdelivr` metadata point to the browser artifact. No package
+    `browser` replacement field is added: browser bundlers must continue resolving
+    the CommonJS export, while direct CDN/script users opt into the global build.
+25. Terser and its transitive packages are development/build dependencies only.
+    `dependencies` remains empty and the published runtime executes with zero imports.
 
 ### Grammar and AST Contract
 
@@ -217,7 +244,10 @@ Defaults are hard ceilings, not suggestions: configuration may lower but never r
 - **Compatibility:** exact valid-output differential equality, unchanged golden hashes, no removed singleton key/export/package, and no downstream package edit unless a failing compatibility test proves a seam change.
 - **Security:** deterministic bounded parsing; no `eval`, dynamic code loading, runtime imports, source excerpt leakage, or unbounded input-controlled recursion/loop.
 - **Performance:** linear normalization/tokenization phases plus one grammar pass; the longest checked-in fixture and synthetic near-limit cases complete without fixed-point growth.
-- **Bundle budget:** production source is measured at 9,037 bytes gzip level 9 and ratcheted at 10 KiB; the test oracle and characterization never ship.
+- **Bundle budget:** canonical production source remains ratcheted at 10 KiB gzip-9;
+  the generated browser artifact is independently ratcheted at 7 KiB gzip-9 and is
+  the deployable browser-size measure. The test oracle, build tooling, tests, and
+  characterization never ship.
 - **Maintainability:** explicit token types and grammar phases; functions kept cohesive and shallow; legacy implementation present only in the test oracle.
 - **Type safety:** pure strict-mode JavaScript/JSDoc conventions; no handwritten `.ts`/`.d.ts`; existing type package remains unchanged because `{s,m,p,c}` is unchanged.
 - **Testability:** deterministic fixtures/generation, singleton reset after every config/state mutation, exact-bound and over-bound witnesses, and source-position assertions.
@@ -229,10 +259,13 @@ Defaults are hard ceilings, not suggestions: configuration may lower but never r
 |---|---|---:|
 | `src/parsers/tss-parser/src/tss-parser.js` | Replace active engine; retain singleton surface | High — framework-wide DSL compatibility and synchronous resource boundary |
 | `src/parsers/tss-parser/package.json` | Major version `1.0.0` → `2.0.0` | Low |
+| `src/parsers/tss-parser/tss-parser.min.js` | Generated prepack browser-global artifact; gitignored | Medium — direct script/CDN entry |
 | `src/parsers/tss-parser/README.md` | Grammar, config, diagnostics, bounds, migration/rollback | Low |
+| Root `package.json` / `package-lock.json` | Pin build-only Terser for repository verification | Low |
 | `test/fixtures/tss-parser-oracle.js` | Add frozen v1.0.0 implementation for tests only | Low — intentionally legacy, never packaged/runtime |
 | `test/parsers/tss-parser.test.js` | Expand public, grammar, diagnostic, and limit tests | Medium |
 | `test/parsers/tss-parser-differential.test.js` | Add curated/generated/full-corpus oracle comparison | Medium |
+| `test/parsers/tss-parser-browser.test.js` | Build reproducibility, package metadata, browser-global execution, and corpus parity | Medium |
 | `test/fixtures/tss-snapshot.json` | Verification only; no content change permitted | High compatibility sentinel |
 | `AGENTS.md` | Retain the DEBUNKED/do-not-edit warning for the frozen oracle, forbid restoring its arithmetic to production, and reconcile the current 257 count | Medium — canonical reviewer contract |
 | `tooling/ui-manifest-compiler` and direct parser consumers | Verification only; no source/package change unless a failing seam test proves need | High compatibility boundary |
@@ -245,7 +278,9 @@ Defaults are hard ceilings, not suggestions: configuration may lower but never r
 
 - **Depends on:** PR #54 merged; branch starts at `dev` commit `6e352fa`.
 - **Runtime dependencies:** none; production source remains import-free and package `dependencies` remains `{}`.
-- **Test dependencies:** Node built-ins and the local frozen oracle only.
+- **Test/build dependencies:** Node built-ins, the local frozen oracle, and an exact
+  build-only Terser pin. No Terser code is reachable from the runtime package entry or
+  emitted browser artifact.
 - **Direct dependents:** `view-model`, `tss-model`, `data-parser`, `attrs-method`, transitive `if-method`, and build-only `ui-manifest-compiler`; none is planned to change.
 - **Blocks:** future TSS diagnostics/source-map/DSL evolution; no current code item is coupled to delivery.
 
@@ -292,7 +327,7 @@ As in v1, `config()` lazily adds `regexes`; v2 also adds the effective lower-onl
 1. Copy the exact v1.0.0 source into a clearly test-only oracle before editing production and pin that fixture's source hash so future arithmetic edits fail loud.
 2. Add characterization for all listed syntax/surface/helper behaviors and confirm structurally valid v1 compatibility cases pass against the old implementation. Pin duplicate-key first-position/last-value behavior, dual-quote whitespace, lazy key/config ordering, and representative legacy helper signatures/results explicitly.
 3. Add diagnostics/resource tests and observe them fail against the old implementation before production replacement.
-4. Compare the new parser and oracle by deep equality over curated cases, deterministic combinatorial structurally-valid cases, string/array custom quote configurations, the interleaving matrix, 4,096 seeded nested/interleaved forms, and all 257 checked-in TSS files. Generated expected values come from the frozen oracle, never from a guessed re-description of offset arithmetic; independently run a 200,000-case adversarial differential before review completion.
+4. Compare the new parser and oracle by deep equality over curated cases, deterministic combinatorial structurally-valid cases, string/array custom quote configurations, the interleaving matrix, 4,096 seeded nested/interleaved forms, and all 257 checked-in TSS files. Generated expected values come from the frozen oracle, never from a guessed re-description of offset arithmetic; PR CI runs the same deterministic generator at 200,000 streamed cases.
 5. Independently retain the existing per-file SHA-256 snapshot gate and assert the golden key count/file set remains 257.
 6. Keep structurally malformed-input expectations separate from valid-output differential tests using the objective balance/termination rules above. Pin old silent/garbage witnesses (unclosed block/comment/quote and stray close) as red-first located-error cases; no structurally valid oracle output may drift.
 7. Keep oracle differential cases deliberately small (at most depth 32 and 1,024 nodes); exact/over resource-bound tests use direct expected behavior and never drive the unbounded oracle near pathological limits.
@@ -309,9 +344,15 @@ inline/fetched/build-time TSS source ─────┼─> bounded tokenizer/pa
 test-only frozen oracle ─ differential ───┘          └─ malformed/over-limit ─> located error
                                                         │
 AST ─> view/tss model cache or manifest compiler ─> existing handler traversal (unchanged)
+
+canonical CommonJS source ─> exact lock + Terser CLI ─> generated classic script
+                                      build boundary              │
+                                    deterministic parity          v
+                                                      package/CDN ─> browser global
+                                                                    (exact version + SRI)
 ```
 
-TSS is authored/trusted framework input, but fetched asset corruption, deployment drift, or a host exposing parser input can still present adversarial size/shape. This change adds no network fetch, identity, persistence, PII, endpoint, queue, database, cryptography, or third-party boundary. The production/test boundary is explicit: the legacy oracle is never shipped.
+TSS is authored/trusted framework input, but fetched asset corruption, deployment drift, or a host exposing parser input can still present adversarial size/shape. The runtime parser adds no network fetch, identity, persistence, PII, endpoint, queue, database, cryptography, or third-party boundary. Publication does add one build-time supply-chain boundary at exact-pinned Terser and, for hosts choosing the documented CDN path, one delivery boundary at the package CDN. Deterministic builds, lock integrity, full canonical/browser parity, exact-version URLs, and tested SRI bound those paths. The production/test boundary is explicit: the legacy oracle is never shipped.
 
 ### Assets and actors
 
@@ -320,20 +361,24 @@ TSS is authored/trusted framework input, but fetched asset corruption, deploymen
 | Valid TSS → AST mapping | Integrity-critical public framework contract |
 | Render/build availability | Availability-critical synchronous work |
 | Parser diagnostics | Internal metadata; must not copy source values |
+| Generated browser artifact | Executable public release artifact; must be reproducible from canonical source |
+| Build lock and Terser package | Build-time supply-chain input; never loaded by parser runtime |
 | Host syntax/limit config | Trusted mutable singleton configuration |
 | Framework/UI author | Supplies valid static TSS and custom syntax |
 | Broken/compromised asset source | Can supply malformed, deeply nested, or oversized TSS to an existing host fetch path |
+| Package publisher/build host | Generates and inspects the browser artifact before publication |
+| Compromised registry/CDN path | Can attempt build-tool or delivered-artifact substitution |
 | External package consumer | Can call any enumerable singleton property and mutate reset fields |
 
 ### STRIDE
 
 | Category | Status | Control / verification |
 |---|---|---|
-| Spoofing | N/A | Parser performs no identity/authentication decision and creates no principal. |
-| Tampering | Mitigated | Exact oracle/snapshot equality protects valid AST integrity; malformed structure fails at the first located inconsistency instead of producing a partial tree. |
+| Spoofing | Mitigated / runtime N/A | Parser creates no principal. Browser instructions pin the package origin/version and SRI so a substituted delivery does not execute silently. |
+| Tampering | Mitigated | Exact oracle/snapshot equality protects valid AST integrity. Exact Terser/lock integrity, deterministic bytes, canonical/browser parity, and SRI protect the generated artifact and delivery path. |
 | Repudiation | N/A | No durable action/audit event is introduced; deterministic code/location makes host logs attributable without source content. |
-| Information Disclosure | Mitigated | Diagnostics contain native class/message and position, never a source excerpt/value; no new logging or external sink. |
-| Denial of Service | Mitigated | Source/token/depth/node/declaration caps, iterative chain construction, bounded recursive descent, linear scan/grammar passes, and gated logarithmic piece operations replace fixed-point rescans/pair recursion. |
+| Information Disclosure | Mitigated | Diagnostics contain native class/message and position, never a source excerpt/value; no new logging or source map is emitted. |
+| Denial of Service | Mitigated | Source/token/depth/node/declaration caps, iterative chain construction, bounded recursive descent, linear scan/grammar passes, and gated logarithmic piece operations replace fixed-point rescans/pair recursion. A build/CDN outage blocks only publication or that optional script load, not installed CommonJS runtime. |
 | Elevation of Privilege | N/A | Parser executes no source, loads no module, grants no method authority, and leaves handler registry checks unchanged. |
 
 ### Attack tree
@@ -348,12 +393,13 @@ OR
 ├── huge declaration set                 → declaration cap
 ├── malformed quote/comment/block        → single-pass located rejection
 ├── regex catastrophic backtracking      → active parser uses hand-written scans
-└── valid-source semantic drift           → oracle + 257 snapshots + consumer tests
+├── valid-source semantic drift           → oracle + 257 snapshots + consumer tests
+└── substituted/minified browser bytes    → exact lock + reproducibility + parity + SRI
 ```
 
 ### Threat-model depth and residual risk
 
-Full PASTA is not triggered because no high-value identity/payment/PII flow or new trust boundary is added. Residual risk: parsing the maximum allowed 128 KiB remains synchronous CPU/memory work, and an external host can expose trusted-author syntax to untrusted callers. Production-readiness measurement rejected the originally proposed 1 MiB ceiling (about 180 MiB peak RSS), then lowered the node ceiling again after the exact compatibility layout exposed a denser adversarial shape. The final 128 KiB/32,768-token/4,096-node/16,384-declaration ceilings peak at about 66–76 MiB for direct hard-bound shapes and about 83 MiB/0.18 s for the near-node-ceiling method/interleaving witness, versus a 5,359-byte/74-node/73-declaration corpus maximum. Hard ceilings cannot be raised through config; host-level request/fetch controls remain outside this package. Re-evaluate if TSS becomes direct untrusted user input or gains executable semantics.
+Full PASTA is not triggered because the new boundary is build/publication tooling, not a high-value identity/payment/PII flow or new runtime authority. Residual risk: the exact Terser release and its ten-package transitive tree are trusted while generating release bytes, and an exact-version CDN can still become unavailable; lock integrity, clean audit, reproducibility, parity, SRI, and self-hosting/rollback reduce but do not eliminate those external risks. Parsing the maximum allowed 128 KiB remains synchronous CPU/memory work, and an external host can expose trusted-author syntax to untrusted callers. Production-readiness measurement rejected the originally proposed 1 MiB ceiling (about 180 MiB peak RSS), then lowered the node ceiling again after the exact compatibility layout exposed a denser adversarial shape. The final 128 KiB/32,768-token/4,096-node/16,384-declaration ceilings peak at about 66–76 MiB for direct hard-bound shapes and about 83 MiB/0.18 s for the near-node-ceiling method/interleaving witness, versus a 5,359-byte/74-node/73-declaration corpus maximum. Hard ceilings cannot be raised through config; host-level request/fetch controls remain outside this package. Re-evaluate if TSS becomes direct untrusted user input or gains executable semantics.
 
 ## Risk Assessment
 
@@ -365,7 +411,8 @@ Full PASTA is not triggered because no high-value identity/payment/PII flow or n
 | 4 | New diagnostics leak source data | Low | Medium | Security reviewer | Native class/message plus line/column/offset only; no excerpts; adversarial security review. |
 | 5 | Recursive descent overflows or scanner becomes superlinear | Medium | High | Parser implementer | Depth 128, iterative chains, source/token caps, complexity witnesses, source review for rescans/backtracking. |
 | 6 | Singleton helper/state compatibility breaks tooling | Medium | High | Parser implementer | Required-key/type/reset tests plus UI manifest compiler success/failure restoration suites. |
-| 7 | Test-only oracle accidentally ships | Low | Medium | Release reviewer | Oracle resides under `test/fixtures`; package dry-run must list only README/package/source. |
+| 7 | Test-only oracle or build tooling accidentally ships | Low | Medium | Release reviewer | Oracle/tooling remain outside the package; dry-run permits only README, package metadata, canonical source, and generated browser artifact. |
+| 8 | Compromised or drifting minifier changes published code | Low | High | Release reviewer | Exact Terser pin + lock integrity, deterministic double build, canonical/browser surface and 257-file parity, license/source guards, audit, and dry-run inspection. |
 
 ## Trade-offs Considered
 
@@ -381,24 +428,36 @@ Full PASTA is not triggered because no high-value identity/payment/PII flow or n
 | Preserve interleaved declaration outputs by bounded layout projection | Reject interleaving; rerun the old rewrite; approximate original spans; parse all declarations naturally | The locked v1 output remains normative. A frozen permutation fixture plus adversarial offset-collision/method cases make the ugly contract explicit; one lowering pass and an implicit rope compose legacy coordinates without fixed-point rescans or quadratic source copies. |
 | Longest literal custom delimiter match | Restrict all syntax to one character; regex-driven custom syntax | Preserves and improves configured syntax without regex metacharacter hazards; deterministic precedence handles prefixes. |
 | No production feature flag | Ship old/new toggle; auto-fallback on error | A fallback doubles attack/maintenance surface and can silently accept malformed source; package pin/revert is clean rollback. |
+| Separate browser global generated by Terser | Replace `main`; add a bundler `browser` remap; ask every host to bundle; check in hand-minified source | Preserves the CommonJS contract while giving direct script/CDN users a production artifact; generated output cannot drift silently from source. |
 
 ## Blast Radius
 
 | Dimension | Answer |
 |---|---|
-| Direct dependencies | Trusted syntax config and TSS strings only; no runtime package/import/service dependency. |
-| Direct dependents | `view-model`, `tss-model`, `data-parser`, `attrs-method`, transitive `if-method`, handler-wrapper/cached AST traversal, UI manifest compiler, and external hosts using the singleton. |
-| Cascade on outage | A parser exception rejects creation/fetch/manifest compilation for the current TSS asset; no partial AST reaches traversal. |
-| Cascade on slow | Parsing is synchronous, so pathological work can block the current event loop; measured linear scan/grammar phases, gated piece operations, and hard caps bound that delay. |
-| Cascade on bad data | Malformed TSS stops at parser with location; valid AST continues through existing caches/handler unchanged; no durable mutation. |
+| Direct dependencies | Runtime: trusted syntax config and TSS strings only, with no package/import/service dependency. Publication: exact Terser `5.49.0` plus its ten locked transitives. Optional browser delivery: exact-version jsDelivr/unpkg or a self-hosted copy. |
+| Direct dependents | `view-model`, `tss-model`, `data-parser`, `attrs-method`, transitive `if-method`, handler-wrapper/cached AST traversal, UI manifest compiler, external CommonJS hosts, and direct browser-global hosts. |
+| Cascade on outage | A parser exception rejects creation/fetch/manifest compilation for the current TSS asset; no partial AST reaches traversal. A Terser outage blocks a new package build only. A CDN outage prevents that optional script load; installed CommonJS and self-hosted copies remain unaffected. |
+| Cascade on slow | Parsing is synchronous, so pathological work can block the current event loop; measured linear scan/grammar phases, gated piece operations, and hard caps bound that delay. Build/CDN latency is outside parser runtime and affects only publication/load respectively. |
+| Cascade on bad data | Malformed TSS stops at parser with location; valid AST continues through existing caches/handler unchanged; no durable mutation. Wrong generated bytes fail deterministic/parity/SRI gates before release or browser execution. |
 | Compromised-session impact | N/A: no session/record access. A caller able to choose TSS can consume only bounded local parse resources and cannot execute code. |
-| Fault isolation boundary | Current synchronous `handle()` call and its requesting render/build; fetched promise rejection follows existing cache eviction behavior. |
+| Fault isolation boundary | Runtime: current synchronous `handle()` call and its requesting render/build; fetched promise rejection follows existing cache eviction behavior. Publication: prepack fails before package creation. Delivery: browser SRI fails the one script load. |
+
+### Architecture eight-question review
+
+1. **New trust boundary:** none in parser runtime; exact Terser/registry is trusted at package build, and direct browser users optionally trust an exact-version CDN artifact constrained by SRI.
+2. **Reachable inputs and validation:** runtime inputs remain trusted TSS/config and are type-, syntax-, and resource-bounded by the parser. Build input is the checked-in canonical source plus fixed package command; no user-controlled build options are accepted.
+3. **Secrets/keys/tokens:** none introduced or consumed. SRI is a public digest, not a secret.
+4. **Dependency:** Terser `5.49.0` (BSD-2-Clause), published 2026-07-08 by the same maintainer as `5.48.0`, with about 66.36 million weekly downloads when vetted. It has ten locked transitive packages, registry integrity/signature metadata, and no install/preinstall/postinstall lifecycle script. It and the security-driven `lodash@4.18.1` root-dev update pass a full zero-vulnerability npm audit.
+5. **Data collection/retention:** none. The generated artifact contains executable parser code only and no source map, TSS input, diagnostic value, PII, or telemetry.
+6. **External endpoint/failure mode:** parser code calls none. A browser may request the documented exact-version CDN URL; failure blocks that script only, while SRI rejects changed bytes and self-hosting/CommonJS remain available.
+7. **Logging/PII:** no log is emitted by parser or generated artifact; diagnostics retain class/message/line/column/offset and omit source excerpts.
+8. **Blast radius:** bad canonical parser behavior affects all TSS consumers but is bounded by oracle/snapshots/consumer tests. Bad minification affects direct browser users only and is blocked by reproducibility, parity, package inspection, and SRI. There is no record/session/data pivot or durable mutation.
 
 ## Rollback Plan
 
 | Item | Answer |
 |---|---|
-| Code rollback | In-repo/source-DI adoption reverts the feature PR/commit; external npm adoption pins `@jtorm/tss-parser@1.0.0`. No feature flag or state migration. |
+| Code rollback | In-repo/source-DI adoption reverts the feature PR/commit; external npm adoption pins `@jtorm/tss-parser@1.0.0`. Browser hosts change their version-pinned CDN URL with the same rollback. No feature flag or state migration. |
 | Schema rollback | N/A — AST wire shape and manifest schema are unchanged; no database/schema. |
 | Data rollback | N/A — parser writes no durable data. Existing content-addressed manifests remain valid because valid AST JSON is identical. |
 | Auto-rollback trigger | CI/differential/snapshot/Codex failure blocks PR. After release, any valid-input AST/hash drift or legitimate default-limit rejection triggers immediate pin to `1.0.0`. |
@@ -408,6 +467,9 @@ Full PASTA is not triggered because no high-value identity/payment/PII flow or n
 ## Migration and SemVer
 
 - Publish as `@jtorm/tss-parser@2.0.0` after this PR is merged by the maintainer; this task only prepares metadata.
+- Because v2 is not yet published, the browser artifact joins the same planned
+  `2.0.0` release rather than causing another version bump. Later changes to its
+  global/export behavior follow normal SemVer.
 - Existing `^1.0.0` dependents do not auto-adopt v2. Hosts explicitly install/inject `2.0.0` after their compatibility run. Existing dependent metadata remains untouched unless a failing local seam test proves a source change is required; runtime code has no package import edge.
 - Hosts call `config()` before `dataParser.init()` exactly as today. New limits default to immutable hard ceilings and may only be lowered.
 - Hosts or manifest builds that record a `toolchain.tssParser` fingerprint report `2.0.0` when adopting it; the manifest wire version and existing packs do not change.
@@ -416,6 +478,9 @@ Full PASTA is not triggered because no high-value identity/payment/PII flow or n
 - Unknown top-level config metadata remains ignored. Invalid known separator/quote/limit values now throw and are part of the explicit major-version migration.
 - Multi-character delimiters and regex-metacharacter separators use v2 literal semantics; v1's single-unit/raw-regex behavior is not an oracle-compatible profile.
 - Rollback is an exact parser pin/revert; no consumer package downgrade, AST migration, cache flush, database action, or compatibility shim is required.
+- Browser hosts load `tss-parser.min.js` through an exact-version CDN URL and use
+  `globalThis.jTormTSSParser`. A rollback changes that version pin; after publication,
+  neither the generated path nor global singleton may be removed.
 
 ## Testing Strategy and Red-First Implementation Order
 
@@ -426,8 +491,12 @@ Full PASTA is not triggered because no high-value identity/payment/PII flow or n
 5. Run new-vs-oracle deep equality for curated/generated/full 257-file corpora and retain the independent hash snapshot.
 6. Run direct consumer suites (`data-parser`, `attrs`, `if`, `view-model`, `tss-model`), handler-wrapper inheritance, rejection/cache eviction, and manifest compiler restoration/determinism tests.
 7. Record actual tokenizer maxima for all 257 files and run requested local gates: focused parser/differential/resource tests, exact `npm test`, `npm run typecheck`, package dry-run, source/oracle-integrity guards, Semgrep, `git diff --check`, syntax checks, dependency audit, and complexity/resource evidence.
-8. Apply review-router, architecture, differential, refactor, tech-debt, production-readiness, and fresh 100/100 verification loops; fix every valid finding red-first.
-9. Update README/spec/evaluation/security/ledger/backlog, commit conventionally, open a ready PR into `dev`, and iterate CI/current-head Codex review until clean without merging.
+8. Add browser-build tests first and observe them fail without the build contract.
+   Implement the generated classic-script wrapper, exact Terser pin, CDN metadata,
+   deterministic double-build check, full-corpus parity, license retention, and 7 KiB
+   gzip ratchet; verify the package dry-run contains the artifact but not tooling.
+9. Apply review-router, architecture, differential, refactor, tech-debt, production-readiness, and fresh scored verification loops; fix every valid finding red-first and record accepted residual costs honestly.
+10. Update README/spec/evaluation/security/ledger/backlog, commit conventionally, open a ready PR into `dev`, and iterate CI/current-head Codex review until clean without merging.
 
 ## Planning Constraints and Delivery Shape
 
@@ -449,8 +518,10 @@ Full PASTA is not triggered because no high-value identity/payment/PII flow or n
 - [x] Every pre-existing singleton key/export and known mutable reset/snapshot field is preserved.
 - [x] No runtime import/dependency, adjacent package change, handwritten TS/d.ts, or parser-scope leak is introduced.
 - [x] `@jtorm/tss-parser` is documented and versioned `2.0.0`; package dry-run contains only intended files.
+- [x] Prepack deterministically emits the licensed, browser-loadable singleton under
+  7 KiB gzip with exact 257-file parity and no CommonJS/package regression.
 - [ ] All requested tests, static/security/review gates, CI, and clean current-head Codex review pass.
-- [ ] Ready PR targets `dev` and remains unmerged.
+- [x] Ready PR targets `dev` and remains unmerged.
 
 ## Open Questions
 
@@ -493,6 +564,23 @@ The first implementation skeptic pass found two grammar-valid classes absent fro
 Each class was pinned red-first. The compatibility phase now lowers the recursive parse tree once into virtual legacy coordinates and applies the historical blanking sequence through a bounded implicit piece rope only when a nested collision/interleaving requires it; it never runs or reparses the frozen implementation. The checked-in characterization adds the minimized collision/method cases and a frozen 4,096-form seeded nested matrix. A fresh independent 200,000-case run reports 200,000 accepted by both implementations and zero JSON divergences.
 
 Resource review of that exact projection then found the former 8,192-node ceiling could exceed a 128 MiB isolate on a dense method/interleaving shape. A red-first near-ceiling witness lowered the immutable node cap to 4,096 and gated non-interleaved inputs onto the direct AST path. Replacing quadratic parent discovery with coordinate-compressed predecessor lookup brought the final witness to about 83 MiB/0.18 s; direct hard-bound shapes use about 66–76 MiB. Exact compatibility measures 9,046 bytes gzip, so the explicit source ratchet is 10 KiB rather than hiding the required compatibility machinery.
+
+The final implementation review challenged that compatibility cost directly. Under
+the same Terser/browser wrapper, v1 is 5,197 raw / 1,826 gzip-9 bytes and v2 is
+16,575 / 6,120 bytes: about 3.2× raw and 3.35× compressed, or 4,294 additional
+gzip bytes. Lead judgment retained the projection because minimized grammar-valid
+inputs demonstrably drift without it; the cost is now an explicit trade-off rather
+than the architecture review's original same-gzip estimate.
+
+A fresh skeptic/architect/minimalist pass found no parser-output defect and independently
+reported about 850,000 additional both-accepted cases with zero divergence. It did find
+that the cited 200,000-case run was manual and array-backed, and that multiline location
+tests depended too heavily on a mirrored helper. PR CI now selects 200,000 cases; streaming
+reduced measured peak RSS from about 1.4 GiB to 167 MiB; hard-coded LF/CRLF/CR/U+2028/
+U+2029/comment anchors and the exact CRLF source-limit boundary are independent. Browser
+tests also pin the documented raw/gzip byte counts. A stale-model claim that
+`lodash@4.18.1` did not exist was retracted after live registry publication/integrity,
+clean-audit, installation, and focused-test evidence. The synthesized verdict is **PASS**.
 
 ## Approval
 

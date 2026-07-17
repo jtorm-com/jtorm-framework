@@ -135,6 +135,27 @@ test('line and column tracking handles every supported line break', () => {
     'TSS unexpected closing delimiter',
     source.indexOf('}')
   );
+
+  const anchors = [
+    ['\n}', 1, 2, 1],
+    ['\r\n}', 2, 2, 1],
+    ['\r}', 1, 2, 1],
+    ['\u2028}', 1, 2, 1],
+    ['\u2029}', 1, 2, 1],
+    ['/* first\nsecond */   \n   }', 25, 3, 4]
+  ];
+  for (const [input, offset, line, column] of anchors) {
+    let error;
+    try {
+      parser().handle(input);
+    } catch (caught) {
+      error = caught;
+    }
+    assert.ok(error instanceof SyntaxError);
+    assert.equal(error.offset, offset);
+    assert.equal(error.line, line);
+    assert.equal(error.column, column);
+  }
 });
 
 test('configured quotes protect structural delimiters in selectors and values', () => {

@@ -9,6 +9,8 @@
 node_modules/
 # @jtorm/types ships a generated declaration (emitted by its `prepack` from the JSDoc); build artifact, not source
 src/types/src/types.d.ts
+# @jtorm/tss-parser ships a generated browser build (emitted by prepack from canonical CommonJS)
+src/parsers/tss-parser/tss-parser.min.js
 
 # Local strategy / research / planning docs + agent guidance (private; repo is public)
 /docs/

@@ -36,8 +36,10 @@
 > at `6e352fa`):** the parser P3 is locally complete and in delivery. The active package is now a
 > bounded tokenizer plus recursive-descent parser with located diagnostics, exact valid v1 AST
 > compatibility against a frozen oracle and all 257 shipped TSS files, immutable resource ceilings,
-> and a documented `2.0.0` migration/rollback. Local gates are 579/579 plus a clean 200,000-case
-> differential; ready PR #55 targets `dev`, with CI/current-head Codex review tracked in the feature record.
+> and a documented `2.0.0` migration/rollback. An exact-pinned Terser prepack also emits the same
+> singleton as a classic browser script (16,575 raw / 6,120 gzip-9 bytes). Local gates are 582/582;
+> PR CI now streams the full 200,000-case differential at 167 MiB peak RSS. Ready PR #55 targets
+> `dev`, with CI/current-head Codex review tracked in the feature record.
 
 ---
 
@@ -88,7 +90,7 @@ Live in production on a Magento store via a Node host engine.
 
 ### Weaknesses (ranked, whole-framework)
 
-1. **✅ Addressed 2026-07-16 — the former TSS parser black box.** The fixed-point string-rewriting engine is frozen as a source-hashed test-only oracle and is absent from the package. Production now uses a bounded literal tokenizer and recursive-descent grammar with original UTF-16 line/column/offset diagnostics, iterative method chains, and source/token/depth/node/declaration ceilings. Exact `{s,m,p,c}` behavior is differential-tested over generated matrices and all 257 shipped TSS files. Offset-era one-character interleavings use one bounded post-parse virtual-layout projection rather than executing or re-entering the old parser; ordinary inputs return the direct grammar AST. The published helper/singleton surface remains intact for external hosts. **Legibility grade: B+** (the exact-output projection remains deliberately intricate and is isolated, bounded, measured, and characterized).
+1. **✅ Addressed 2026-07-17 — the former TSS parser black box.** The fixed-point string-rewriting engine is frozen as a source-hashed test-only oracle and is absent from the package. Production now uses a bounded literal tokenizer and recursive-descent grammar with original UTF-16 line/column/offset diagnostics, iterative method chains, and source/token/depth/node/declaration ceilings. Exact `{s,m,p,c}` behavior is differential-tested over generated matrices and all 257 shipped TSS files. Offset-era one-character interleavings use one bounded post-parse virtual-layout projection rather than executing or re-entering the old parser; ordinary inputs return the direct grammar AST. The published helper/singleton surface remains intact for external hosts. The original approximately-300-LOC/same-gzip estimate was not met: under one Terser browser wrapper v1 is 5,197 raw / 1,826 gzip-9 bytes and v2 is 16,575 / 6,120. The extra 4,294 gzip bytes are the explicit cost of exact valid-output projection, diagnostics, literal custom syntax, and resource policy. **Legibility grade: B** (the direct grammar is clear; the exact-output projection remains deliberately intricate but isolated, bounded, measured, and characterized).
 2. **Cold-render fetch waterfall — the biggest unpriced runtime cost.** One cold `Product.default` render = **28 sequential HTTP GETs** (17 TSS + 10 HTML shells + 1 JSON), a **~12-deep dependency chain**, because each composition hop's children are only discoverable after the parent's TSS arrives and the handler awaits each rule serially (handler.js:37-110). ~18 KB raw / ~3 KB gz of content delivered as 28 files. SSR amortizes via singleton caches (warm = 0 fetches); a browser SPA cold page pays it in full — ~250 ms chain latency minimum at 20 ms RTT. No manifest, no bundle, no prefetch, no sibling-parallelism. A build step the architecture refuses on principle would collapse 28→1 (≈40–50× request reduction).
 3. **"SEO for free" is ~15% delivered.** The framework consumes schema.org shapes but emits none. The `.jsonld` alternate link (head-id.tss:24-40) points at an *externally* served document most crawlers won't treat as page markup. Emitting `<script type="application/ld+json">` from the already-typed model would be nearly free and is absent.
 4. **Three open data→sink security gaps** (see §Security).

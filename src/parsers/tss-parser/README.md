@@ -46,6 +46,32 @@ The result is:
 }]
 ```
 
+## Browser build
+
+The CommonJS source remains the package `main`. For direct browser use, package
+prepack generates a separate classic script with Terser:
+
+```html
+<script
+  src="https://cdn.jsdelivr.net/npm/@jtorm/tss-parser@2.0.0/tss-parser.min.js"
+  integrity="sha384-7o3Tks+MOJ5edMDCBmm9vVtGMoZvjP/2JBhn/8LgnD/f9Zmzi/CroZG+ew12daYW6c"
+  crossorigin="anonymous"></script>
+<script>
+  globalThis.jTormTSSParser.config({});
+  const tree = globalThis.jTormTSSParser.handle('a { color: red; }');
+</script>
+```
+
+The browser file publishes the same mutable singleton as
+`globalThis.jTormTSSParser`; hosts still inject that singleton into adjacent jTorm
+packages. It is not a package-entry remap or an ES module, so CommonJS consumers
+continue using `require('@jtorm/tss-parser')` unchanged.
+
+`npm run build` emits the gitignored `tss-parser.min.js`; `npm pack` and publish run
+the build through `prepack`. Terser is pinned as a development dependency and no
+minifier code ships or executes at runtime. The current artifact is 16,575 raw bytes
+and 6,120 bytes at gzip level 9, with a 7 KiB gzip ratchet.
+
 Rules keep source order. A nested selectorless rule or method inherits the
 nearest truthy parent selector. Shorthand properties are inserted before block
 properties, so a block declaration with the same key wins without changing key
@@ -158,8 +184,9 @@ single bounded method-lowering layout and an implicit piece rope. The layout is
 never retokenized, grammar-parsed, or fixed-point rescanned; non-interleaved
 sources stay on the direct AST path.
 
-The package's production source is ratcheted below 10 KiB gzip. Tests, snapshots,
-and the frozen v1 differential oracle are not published.
+The canonical CommonJS source is ratcheted below 10 KiB gzip and the deployable
+browser build below 7 KiB gzip. Test/oracle files, snapshots, and build-dependency
+code are not published.
 
 ## Diagnostics
 
@@ -205,8 +232,10 @@ config validation, and diagnostics are new:
 
 1. Run existing TSS through the v1/v2 compatibility suite.
 2. Fix malformed assets that v1 silently dropped or misparsed.
-3. Install and inject `@jtorm/tss-parser@2`.
+3. Install and inject `@jtorm/tss-parser@2.0.0`.
 4. Keep calling `config()` before data-parser initialization.
+5. Browser hosts may instead load the exact-version `tss-parser.min.js` CDN path and
+   inject `globalThis.jTormTSSParser`; pin the full package version for rollback.
 
 Quoted structural delimiters now remain literal instead of corrupting brace or
 header offsets. This includes a quoted declaration terminator inside method
@@ -220,4 +249,4 @@ so equivalent sources may intentionally differ when adopting those extensions.
 There is no runtime dual-parser mode and no data or AST migration. To roll back,
 pin external consumers to `@jtorm/tss-parser@1.0.0`; source-composed hosts
 revert the parser change and rebuild any manifests with the prior toolchain
-label.
+label. Browser hosts switch their version-pinned CDN URL to the prior tested build.

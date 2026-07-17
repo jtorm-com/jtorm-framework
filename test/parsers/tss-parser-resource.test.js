@@ -44,6 +44,21 @@ test('the 128-KiB hard source boundary completes and one code unit over fails fi
   assert.deepEqual(p.pairs, []);
 });
 
+test('source-limit diagnostics treat a CRLF boundary as one line break', () => {
+  const p = makeTssParser();
+  const source = 'a'.repeat(p.max.source - 1) + '\r\n';
+  assert.throws(
+    () => p.handle(source),
+    error => {
+      assert.ok(error instanceof RangeError);
+      assert.equal(error.offset, p.max.source);
+      assert.equal(error.line, 2);
+      assert.equal(error.column, 1);
+      return true;
+    }
+  );
+});
+
 test('recursive rule descent admits the exact effective depth and rejects one over', () => {
   let p = makeTssParser();
   p.config({ limits: { depth: 4 } });

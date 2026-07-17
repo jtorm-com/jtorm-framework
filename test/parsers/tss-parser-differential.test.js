@@ -174,7 +174,7 @@ function generatedSources() {
   return out;
 }
 
-function adversarialSources(count) {
+function *adversarialSources(count) {
   const selectors = ['a', '.x', '', '#id', 'a b', 'a>b', '[data-v=x]'];
   const properties = [
     'x:1;',
@@ -208,14 +208,12 @@ function adversarialSources(count) {
   function rule(depth) {
     return pick(selectors) + pick(methods) + '{' + body(depth) + '}';
   }
-  const out = [];
   for (let i = 0; i < count; i++) {
     let source = '';
     const roots = 1 + next() % 3;
     for (let j = 0; j < roots; j++) source += rule(3);
-    out.push(source);
+    yield source;
   }
-  return out;
 }
 
 test('frozen v1 parser oracle has the reviewed source hash', () => {
@@ -403,12 +401,20 @@ test(`${seededCount} seeded nested/interleaved forms match the frozen v1 oracle`
   assert.ok(Number.isSafeInteger(seededCount) && seededCount > 0);
   const sources = adversarialSources(seededCount);
   const { actual, expected } = parsers();
-  const frozen = sources.map(source => [source, expected.handle(source)]);
-  const hash = crypto.createHash('sha256').update(JSON.stringify(frozen)).digest('hex');
+  const digest = crypto.createHash('sha256');
+  let count = 0;
+  digest.update('[');
+  for (const source of sources) {
+    const tree = expected.handle(source);
+    assert.deepEqual(actual.handle(source), tree, source);
+    digest.update((count ? ',' : '') + JSON.stringify([source, tree]));
+    count++;
+  }
+  digest.update(']');
+  const hash = digest.digest('hex');
+  assert.equal(count, seededCount);
   if (seededCount === 4096)
     assert.equal(hash, '3d274ffe1c4bf7db6b46ab9e428ed34536f9c5fccbe2bd57d16db676aca07875');
-  for (const [source, tree] of frozen)
-    assert.deepEqual(actual.handle(source), tree, source);
 });
 
 test('all 257 checked-in TSS files are directly equal to the v1 oracle', () => {
