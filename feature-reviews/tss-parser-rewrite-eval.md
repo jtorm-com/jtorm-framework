@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-17
 **Branch:** `agent/p3-tss-parser-rewrite` from merged PR #54 / `dev` `6e352fa`
-**Status:** READY PR #55 — local gates clean; CI/current-head Codex delivery gates pending
+**Status:** READY PR #55 — local gates clean; external delivery gates tracked on the PR
 
 ## Outcome
 
@@ -34,7 +34,11 @@ An in-memory instrumentation probe found 55 of the 257 checked-in files enter th
   architecture/spec/security/evaluation/agent records. No adjacent runtime source changed.
 - **Entry points traced:** `config()`, `handle()`, `view-model.create() → handle()`, `tss-model.get() → handle() → identity cache cleanup/retry`, and manifest `compile() → lock/snapshot → handle() → finally restore`.
 - **Junction questions:** no nullable/void/async authorization/count-modify/token/env-fallback junction exists in synchronous parsing. The affected async callers await their parse path, preserve error identity, and use existing identity/lock controls; parser failure cannot be mistaken for success or leave a partial AST.
-- **PR comments:** ready PR #55 is open into `dev`; no review thread existed at publication. The local cross-model specification, implementation, and final-diff reviews are recorded below.
+- **PR comments:** ready PR #55 is open into `dev`. Current-head review produced
+  three accepted red-first corrections (package ranges, stray top-level terminator,
+  and ES2015 intrinsic use). Two algorithm-helper-only comments were resolved as
+  outside the approved major-version behavior contract after README clarification;
+  every thread has an evidence-backed reply.
 - **Ratchet/docs:** source-ratchet review converged. This repository has no `FEATURES.md`, `docs/features`, frontend action catalog, security STRIDE directory, or feature-review progress index; the project-specific parser README, feature/evaluation/security records, AGENTS contract, architecture backlog, and outcome ledger are the applicable documentation owners.
 
 ## Red-first ledger
@@ -52,6 +56,8 @@ An in-memory instrumentation probe found 55 of the 257 checked-in files enter th
 | Extended differential was manual and array-backed | Final adversarial review found CI ran 4,096 cases while the cited 200,000-case run peaked near 1.4 GiB | PR CI selects 200,000; streamed comparison preserves the frozen digest and passes at 167 MiB peak RSS |
 | Multiline diagnostics depended on a mirrored test helper | Skeptic review showed a shared location bug could pass both implementation and helper | Hard-coded LF/CRLF/CR/U+2028/U+2029/comment positions plus the exact source-limit CRLF boundary pass |
 | Parser 2.x was unreachable through direct consumer ranges | Current-head Codex found all three published direct consumers still declared `^1.0.0`; the package test failed at `tss-model@1.0.5 !== 1.0.6` | Patch-bumped consumer metadata requires `^2.0.0`; focused package/source guards and three dry-runs pass |
+| Stray top-level terminator was absorbed into a later selector | Current-head Codex minimized `orphan; a{x:1;}`; focused test observed a returned `orphan; a` selector instead of an error | Rule-header scanning now stops at `propertyEnd` and reports `TSS expected rule` at offset 0 |
+| ES2015 browser config called ES2022 `Object.hasOwn` | Browser test removed the intrinsic from its realm and observed a plain `TypeError` on a documented lower limit | Runtime uses `Object.prototype.hasOwnProperty.call`; realm-limited config and full parity pass |
 
 ## Compatibility evidence
 
@@ -79,12 +85,12 @@ Measured on Node v25.5.0 in this workspace. RSS values are `/usr/bin/time -f %M`
 | 4,096-node boundary | about 0.12 s / 66.8 MiB; exact/over test passes |
 | 16,384 declarations | about 0.13 s / 68.4 MiB; exact/over test passes |
 | Near-node-ceiling method/interleaving | about 0.18 s / 83.4 MiB; 5 s test timeout |
-| Production source | 40,509 raw bytes / 9,046 gzip-9 bytes; 10 KiB ratchet |
-| Browser artifact | 16,575 minified bytes / 6,120 gzip-9 bytes / 5,574 Brotli-11 bytes on Node v25.5.0; CI LTS zlib emits 6,115 gzip bytes; portable 7 KiB ratchet |
+| Production source | 40,707 raw bytes / 9,065 gzip-9 bytes; 10 KiB ratchet |
+| Browser artifact | 16,678 minified bytes / 6,136 gzip-9 bytes / 5,586 Brotli-11 bytes on Node v25.5.0; exact bytes/SRI plus portable 7 KiB ratchet |
 | Frozen v1 under same browser wrapper | 5,197 minified bytes / 1,826 gzip-9 bytes / 1,666 Brotli-11 bytes |
 
-The browser artifact is therefore about 3.2× v1 raw and 3.35× v1 gzip, an
-absolute increase of 11,378 raw / 4,294 gzip bytes. This misses the architecture
+The browser artifact is therefore about 3.21× v1 raw and 3.36× v1 gzip, an
+absolute increase of 11,481 raw / 4,310 gzip bytes. This misses the architecture
 review's original same-gzip estimate. The retained cost buys bounded malformed-input
 handling, original locations, configurable literal syntax, and exact offset-era valid
 outputs; the latter requires the isolated compatibility projection.
@@ -104,7 +110,7 @@ Thirty maximum-source parses measured v2 p50 34.184 ms, p95 71.905 ms, and max 7
 - Runtime source and generated browser code contain no `require()`, runtime third-party
   dependency, dynamic load, `eval`, logging, or handwritten TypeScript/declaration
   file. Terser is an exact-pinned build-only dependency.
-- `npm pack --dry-run --json` reports `@jtorm/tss-parser@2.0.0`, 19,835-byte tarball / 68,266-byte unpacked, with exactly `README.md`, `package.json`, `src/tss-parser.js`, and generated `tss-parser.min.js`; tests/oracle/build dependency code do not ship.
+- `npm pack --dry-run --json` reports `@jtorm/tss-parser@2.0.0`, 19,948-byte tarball / 68,824-byte unpacked, with exactly `README.md`, `package.json`, `src/tss-parser.js`, and generated `tss-parser.min.js`; tests/oracle/build dependency code do not ship.
 - Direct-consumer dry-runs report three-file packages: `tss-model@1.0.6`
   (1,227-byte tarball), `data-parser@1.0.4` (3,111 bytes), and
   `attrs-method@1.0.4` (1,705 bytes), each with parser `^2.0.0` metadata.
@@ -134,7 +140,7 @@ The failure-before-publication, failure-during-parse, retry, overlap, stale-stat
 
 - **review-router — PASS.** The 25-file branch scope routes to test/source-ratchet and refactor review; the user-mandated architecture, differential security, tech-debt, production, and large-diff adversarial gates were added. API, frontend, database, infrastructure, privacy-processing, AI, payments, queues, and growth domain reviews are otherwise N/A.
 - **review-architecture — PASS.** `config → validate → atomic publish` and `source → normalize/tokenize → recursive descent → optional bounded compatibility projection → atomic publish` retain one runtime package owner, zero runtime imports, the public singleton, and the `{s,m,p,c}` boundary. View, fetched-cache, and compiler propagation terminate in the existing owners. Exact Terser and optional CDN delivery are separately modeled build/publication boundaries with deterministic parity and rollback controls.
-- **differential-review — PASS.** The security record traces the transitive render/build/package blast radius and closes nine findings (two high, seven medium). Semgrep, zero-vulnerability audit, frozen-oracle integrity, publication exclusion, resource ceilings, CI-scale differential, package resolution, and consumer propagation are clean. The installed skill's four referenced supplemental files were absent and that coverage limit is recorded rather than implied.
+- **differential-review — PASS.** The security record traces the transitive render/build/package blast radius and closes eleven findings (two high, nine medium). Semgrep, zero-vulnerability audit, frozen-oracle integrity, publication exclusion, malformed-input boundaries, ES2015 execution, resource ceilings, CI-scale differential, package resolution, and consumer propagation are clean. The installed skill's four referenced supplemental files were absent and that coverage limit is recorded rather than implied.
 - **review-refactor — PASS.** Valid behavior is independently frozen; malformed/config narrowing is a documented major-version contract; no export, runtime dependency, adjacent runtime source, suppression, or speculative abstraction was added. One exact build-only dependency produces the required browser artifact. Three direct-consumer metadata packages are patch-bumped solely so normal resolution adopts parser 2.x. Historical helpers remain only because they are a locked published surface. The direct parser is linear in source/tokens and the bounded compatibility path is `O(nodes log nodes)`.
 - **review-privacy — PASS / applicability N/A.** Source is transient trusted framework text, no personal-data field or data store is added, and errors contain only fixed text plus numeric position. No source excerpt, value, logging, retention, transfer, moderation, audit, consent, or erasure path changes; all privacy/compliance checklist items are consequently N/A for this diff.
 - **source-ratchet-review — PASS.** Complete-file SHA-256 plus mutate/append/truncate controls dominate oracle drift; package enumeration proves exclusion. A separate gzip dominating invariant has a deterministic incompressible over-budget control. Neither guard parses callable aliases, so the alias provenance matrix is out of scope.
@@ -155,7 +161,7 @@ The failure-before-publication, failure-during-parse, retry, overlap, stale-stat
 | Validation | 10/10 | Located malformed grammar and exact/over source/token/depth/node/declaration limits |
 | Error Handling | 10/10 | Atomic publication, fixed diagnostics, identity propagation, cache retry, compiler restoration |
 | Security/Privacy | 10/10 | STRIDE/resource controls, no excerpts/logging/runtime imports or dependencies, oracle excluded from package |
-| Performance | 9/10 | Bounded single-pass front end and logarithmic projection; browser gzip is 3.35× v1 and maximum parses remain synchronous |
+| Performance | 9/10 | Bounded single-pass front end and logarithmic projection; browser gzip is 3.36× v1 and maximum parses remain synchronous |
 | Maintainability | 8/10 | Explicit grammar/phase ownership and frozen oracle, offset compatibility still requires substantial specialized machinery |
 | Testability | 10/10 | Red-first ledger, generated and 200k differential, snapshots, consumer and mutation controls |
 | Readability | 8/10 | Named lexical/grammar phases are legible; the quarantined projection and retained legacy helper surface remain dense |
@@ -176,7 +182,7 @@ Fresh verification re-read every changed runtime/test file after the final adver
 | `git diff --check` / syntax | PASS | Diff hygiene and all changed JavaScript syntax clean |
 | review-router | PASS | Routed review plus explicit user-mandated gates complete |
 | review-architecture | PASS | Locked package/DI/AST/consumer boundaries and traced flows retained |
-| differential-review | PASS | Security record has nine fixed findings and no open finding |
+| differential-review | PASS | Security record has eleven fixed findings and no open finding |
 | review-refactor | PASS | Behavior, scope, complexity, and publication checks clean |
 | review-privacy | PASS / N/A | No PII, data processing, retention, logging, or transfer change |
 | source-ratchet-review | PASS | Oracle and gzip dominating invariants converge with negative controls |
@@ -184,8 +190,8 @@ Fresh verification re-read every changed runtime/test file after the final adver
 | tech-debt-ratchet | PASS | Exact final staged payload reports no new debt pattern |
 | production-readiness | PASS | Limits/latency/RSS/package/rollout evidence; accepted synchronous and size residuals documented |
 | Feature evaluation / verification | PASS | 94/100; no local blocker, with size/compatibility complexity scored explicitly |
-| CI/current-head Codex | PENDING | Ready PR #55 is open; PR must remain unmerged |
+| CI/current-head Codex | PR GATE | The final current-head result must be green/clean; PR remains unmerged |
 
 ## Current judgment
 
-No known compatibility, security, privacy, or production-resource blocker remains unresolved locally. The parser is materially larger than v1 even after minification; that accepted maintainability/distribution cost is explicit above. The exact staged debt gate and ledger/backlog reconciliation are complete. Delivery waits on green CI and a clean current-head Codex review; PR #55 remains unmerged.
+No known compatibility, security, privacy, or production-resource blocker remains unresolved locally. The parser is materially larger than v1 even after minification; that accepted maintainability/distribution cost is explicit above. The exact staged debt gate and ledger/backlog reconciliation are complete. GitHub records the required final green CI and clean current-head Codex gate; PR #55 remains unmerged.

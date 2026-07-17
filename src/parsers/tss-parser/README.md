@@ -56,7 +56,7 @@ prepack generates a separate classic script with Terser:
 ```html
 <script
   src="https://cdn.jsdelivr.net/npm/@jtorm/tss-parser@2.0.0/tss-parser.min.js"
-  integrity="sha384-7o3Tks+MOJ5edMDCBmm9vVtGMoZvjP/2JBhn/8LgnD/f9Zmzi/CroZG+ew12daYW6c"
+  integrity="sha384-9sLlIh3YH7yAaxLXoGKfbMphwMbQtGuJLnSTe8N89kGi/4TsheHQV6kPLE/KZRZL"
   crossorigin="anonymous"></script>
 <script>
   globalThis.jTormTSSParser.config({});
@@ -69,10 +69,13 @@ The browser file publishes the same mutable singleton as
 packages. It is not a package-entry remap or an ES module, so CommonJS consumers
 continue using `require('@jtorm/tss-parser')` unchanged.
 
+The classic runtime targets ES2015 hosts and does not require newer built-ins such
+as `Object.hasOwn`.
+
 `npm run build` emits the gitignored `tss-parser.min.js`; `npm pack` and publish run
 the build through `prepack`. Terser is pinned as a development dependency and no
-minifier code ships or executes at runtime. The current artifact is 16,575 raw bytes
-and, measured with Node v25.5.0 zlib, 6,120 bytes at gzip level 9, with a portable
+minifier code ships or executes at runtime. The current artifact is 16,678 raw bytes
+and, measured with Node v25.5.0 zlib, 6,136 bytes at gzip level 9, with a portable
 7 KiB gzip ratchet.
 
 Rules keep source order. A nested selectorless rule or method inherits the
@@ -211,6 +214,8 @@ try {
 - Invalid input/config types use `TypeError`.
 - Malformed quotes, comments, shorthand, blocks, methods, or top-level text use
   `SyntaxError`.
+- A declaration terminator before a top-level rule is malformed and reports the
+  first stray text position; it is never folded into that rule's selector.
 - Resource ceilings use `RangeError`.
 - Source-derived errors end with `at line L, column C` and expose numeric
   `line`, `column`, and `offset`.

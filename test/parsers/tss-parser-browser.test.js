@@ -74,9 +74,9 @@ test('Terser build is deterministic, licensed, bounded, and browser-compatible',
   const integrity = 'sha384-' + crypto.createHash('sha384').update(first).digest('base64');
   const readme = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
   assert.ok(readme.includes(integrity));
-  assert.match(readme, /16,575 raw bytes[\s\S]*6,120 bytes at gzip level 9/);
+  assert.match(readme, /16,678 raw bytes[\s\S]*6,136 bytes at gzip level 9/);
   const compressed = zlib.gzipSync(first, { level: 9 });
-  assert.equal(first.length, 16575);
+  assert.equal(first.length, 16678);
   const withinBudget = value => zlib.gzipSync(value, { level: 9 }).length <= 7168;
   assert.ok(
     compressed.length <= 7168 && withinBudget(first),
@@ -93,12 +93,15 @@ test('Terser build is deterministic, licensed, bounded, and browser-compatible',
   assert.equal(withinBudget(Buffer.concat([first, noise])), false);
 
   const context = vm.createContext({});
+  vm.runInContext('Object.hasOwn = undefined', context);
   vm.runInContext(first.toString(), context, { filename: 'tss-parser.min.js' });
   const browser = context.jTormTSSParser, common = fresh();
   assert.ok(browser && typeof browser.handle === 'function');
   assert.equal(context.module, undefined);
   assert.deepEqual(Object.keys(browser), Object.keys(common));
 
+  browser.config({ limits: { source: 1024 } });
+  assert.equal(browser.limits.source, 1024);
   browser.config({});
   common.config({});
   assert.deepEqual(Object.keys(browser), Object.keys(common));

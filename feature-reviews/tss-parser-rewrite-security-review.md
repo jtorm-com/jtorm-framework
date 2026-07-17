@@ -97,6 +97,8 @@ radius; the README pins both package version and SHA-384 SRI.
 | CDN artifact is replaced in transit/origin | Exact-version URL and tested SHA-384 SRI in browser instructions; self-hosting remains available | Mitigated |
 | Browser build gains hidden runtime loading | Generated-output guards reject `require()` and source maps; canonical source has no dynamic load/eval/network path; Semgrep/package review applies | Mitigated |
 | Published dependents silently retain parser v1 | All three direct metadata edges require parser `^2.0.0`; patch versions and package dry-runs are source-guarded | Fixed |
+| Stray top-level declarations become selectors | A property terminator before the next rule fails at the first stray source position | Fixed |
+| ES2015 browser lacks a newer intrinsic | Browser parity runs after deleting `Object.hasOwn`; config limits still validate and apply | Fixed |
 
 ## Findings
 
@@ -243,6 +245,33 @@ No runtime source or DI owner changes.
 it and the coordinated-release source guard now pass, and all three package dry-runs
 contain only their existing README, metadata, and runtime source.
 
+### Fixed — MEDIUM: stray top-level text could be folded into a selector
+
+**Mapping:** CWE-20 (Improper Input Validation)
+**Location:** `src/parsers/tss-parser/src/tss-parser.js`, `parseRule()`
+**Attack/failure:** While searching for a rule opener, the parser rejected end-of-file
+stray text but skipped over an earlier property terminator. Input such as
+`orphan; a{x:1;}` therefore returned a selector named `orphan; a`, deferring an
+authoring/concatenation error into handler traversal instead of producing the
+specified located syntax diagnostic.
+**Fix:** Stop rule-header scanning on a top-level property terminator and report
+`TSS expected rule` at the first non-whitespace source token.
+**Evidence:** the focused malformed-input case was observed accepting before the
+change and now reports `SyntaxError`, line 1, column 1, offset 0.
+
+### Fixed — MEDIUM: browser runtime depended on an ES2022 intrinsic
+
+**Mapping:** CWE-684 (Incorrect Provision of Specified Functionality)
+**Location:** `src/parsers/tss-parser/src/tss-parser.js`, `config()`
+**Attack/failure:** The classic artifact is emitted for ES2015, but lower-limit
+configuration called `Object.hasOwn`, which was standardized later. An otherwise
+supported browser could load and parse with the artifact yet throw a plain
+`TypeError` as soon as it configured documented limits.
+**Fix:** Use the ES5-compatible `Object.prototype.hasOwnProperty.call` check.
+**Evidence:** the generated script test was observed red with `Object.hasOwn`
+removed from its VM realm; deterministic build, lower-limit config, and full
+browser/CommonJS parity now pass in that realm.
+
 No critical, high, medium, or low finding remains open.
 
 ## Security properties checked
@@ -257,7 +286,8 @@ No critical, high, medium, or low finding remains open.
   expand.
 - Test-only legacy code is outside the package tarball.
 - Build output retains the license banner, publishes one intentional parser global,
-  and is byte-reproducible; CommonJS remains the canonical package entry.
+  and is byte-reproducible; CommonJS remains the canonical package entry. The
+  classic runtime remains functional in an ES2015 realm without `Object.hasOwn`.
 - Terser `5.49.0` was published by the established unchanged maintainer, records
   registry integrity/signature metadata, has no install lifecycle scripts, and had
   about 66.36 million weekly downloads when vetted; all ten transitives are locked.
@@ -307,4 +337,5 @@ resource limits without adding runtime authority. The build-time Terser trust
 boundary is exact-pinned and independently guarded as described above. All review
 findings were fixed red-first. Differential security review approves the change.
 Requested static and production gates are clean;
-CI and current-head external review remain delivery gates after PR publication.
+CI and current-head external review are mandatory PR delivery gates; GitHub records
+their final status and the PR remains unmerged.

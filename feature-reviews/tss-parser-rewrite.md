@@ -577,7 +577,7 @@ Resource review of that exact projection then found the former 8,192-node ceilin
 
 The final implementation review challenged that compatibility cost directly. Under
 the same Terser/browser wrapper, v1 is 5,197 raw / 1,826 gzip-9 bytes and v2 is
-16,575 / 6,120 bytes: about 3.2× raw and 3.35× compressed, or 4,294 additional
+16,678 / 6,136 bytes: about 3.21× raw and 3.36× compressed, or 4,310 additional
 gzip bytes. Lead judgment retained the projection because minimized grammar-valid
 inputs demonstrably drift without it; the cost is now an explicit trade-off rather
 than the architecture review's original same-gzip estimate.
@@ -592,6 +592,12 @@ tests pin exact raw bytes/SRI plus the documented local gzip figure and enforce 
 portable 7 KiB gzip budget. A stale-model claim that
 `lodash@4.18.1` did not exist was retracted after live registry publication/integrity,
 clean-audit, installation, and focused-test evidence. The synthesized verdict is **PASS**.
+
+Current-head PR review then found two boundary gaps, both pinned red-first. A
+top-level property terminator before a later rule now reports the first stray token
+instead of becoming selector text, and lower-limit config in the classic build now
+works in an ES2015 realm with `Object.hasOwn` removed. Neither correction changes a
+valid oracle AST or the package/runtime ownership model.
 
 ## Approval
 

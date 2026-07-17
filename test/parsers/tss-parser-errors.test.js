@@ -96,10 +96,18 @@ test('malformed grammar reports the original opening or offending position', () 
     ['a{/* secret-value', SyntaxError, 'TSS unclosed comment', 2],
     ['a->->x{}', SyntaxError, 'TSS empty method', 3],
     ['a->x(n:1{}', SyntaxError, 'TSS malformed shorthand', 4],
-    ['orphan;', SyntaxError, 'TSS expected rule', 0]
+    ['orphan;', SyntaxError, 'TSS expected rule', 0],
+    ['orphan; a{x:1;}', SyntaxError, 'TSS expected rule', 0]
   ];
   for (const [source, Type, prefix, offset] of cases)
     located(parser(), source, Type, prefix, offset);
+  located(
+    parser({ propertyEnd: ';;' }),
+    'orphan;; a{x:1;;}',
+    SyntaxError,
+    'TSS expected rule',
+    0
+  );
 });
 
 test('comment recognition remains ahead of quote recognition for diagnostics', () => {

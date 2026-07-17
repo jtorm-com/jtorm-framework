@@ -865,6 +865,10 @@ function parseRule(state, parentSelector, parentDepth, parent) {
     const tokens = state.tokens, from = state.i;
     let open = from;
     while (tokens[open].t !== OPEN) {
+        if (tokens[open].t === PE) {
+            const token = first(tokens, from, open);
+            fail(SyntaxError, 'TSS expected rule', state.source, token.o);
+        }
         if (tokens[open].t === CLOSE)
             fail(SyntaxError, 'TSS unexpected closing delimiter', state.source, tokens[open].o)
         ;
@@ -1268,7 +1272,7 @@ module.exports = {
                     invalid()
                 ;
                 for (const key of Object.keys(supplied)) {
-                    if (!Object.hasOwn(HARD, key))
+                    if (!Object.prototype.hasOwnProperty.call(HARD, key))
                         invalid()
                     ;
                     const value = supplied[key];
