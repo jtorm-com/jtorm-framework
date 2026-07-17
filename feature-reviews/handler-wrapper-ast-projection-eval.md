@@ -1,16 +1,16 @@
 # Handler-Wrapper AST Projection — Evaluation
 
 **Branch:** `agent/eliminate-handler-wrapper-ast-mutation`
-**Base:** `dev` at `4dd7e3a53b01fca24ab30e9c121783035e4681c5`
+**Base:** `dev` at `4dd7e3a53b01fca24ab30e9c121783035e4681c5`; merged as `0017bd9`
 **Started:** 2026-07-17
-**Status:** GITHUB GATES PENDING
-**PR:** [#57](https://github.com/jtorm-com/jtorm-framework/pull/57) — ready, open into `dev`, unmerged
+**Completed:** 2026-07-17
+**Status:** MERGED PR #57 — final head `61f5a95` passed CI and clean current-head Codex review
+**PR:** [#57](https://github.com/jtorm-com/jtorm-framework/pull/57) — merged into `dev` as `0017bd9`
 
 ## Resumption Context
 
-**Last Completed Phase:** Local verification and scoped review
-**Next Action:** Push the record-only delivery commit, then obtain green CI and a
-clean Codex review against that one current head.
+**Last Completed Phase:** Delivery
+**Next Action:** None — the canonical architecture backlog records weakness #7 complete.
 **Issues Found (not yet fixed):** None.
 **Accepted Findings Fixed:** Specification review fixed entry-time child capture,
 `node.b` live forwarding, projection non-retention wording, concurrent allocation
@@ -184,7 +184,7 @@ ordinary-source-`b` descriptor assertions were added.
 ## Delivery
 
 - Implementation commit: `820fe75` (`fix: preserve cached AST selectors in wrappers`).
-- Ready PR into `dev`: [#57](https://github.com/jtorm-com/jtorm-framework/pull/57), confirmed open/non-draft/mergeable.
-- GitHub Actions current-head result: pending.
-- Codex current-head review: pending.
-- Merge: prohibited by task; the PR will remain open and unmerged.
+- Ready PR into `dev`: [#57](https://github.com/jtorm-com/jtorm-framework/pull/57), left unmerged at agent handoff.
+- GitHub Actions passed on final head `61f5a95`.
+- Codex reported no major issues on reviewed commit `61f5a95`; zero review threads remained.
+- The maintainer merged PR #57 into `dev` as `0017bd9` at 2026-07-17T16:31:29Z.
