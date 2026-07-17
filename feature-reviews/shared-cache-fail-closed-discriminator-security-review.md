@@ -9,7 +9,7 @@
 
 ## Security Decision
 
-Shared cache participation is denied unless the request policy owner can derive a valid, non-empty explicit own render discriminator or configured host base from a strict cache root. Render-context-model owns bounded cache resolution through own object-valued `c`/`p` links while leaving ordinary render resolution unchanged. Prototype-inherited candidates, links, and persistence attestation cannot authorize sharing. NUL-bearing discriminators and resolved URLs are invalid because the existing tagged/NUL-delimited format otherwise admits cross-scope collisions. Denial is availability-preserving: the fetch/render continues through its ordinary uncached path. `undefined` is an absence-of-key control, never an inserted key, sentinel, random identity, or serialized context.
+Shared cache participation is denied unless the request policy owner can derive a valid, non-empty explicit own render discriminator or configured host base from a strict cache root. Render-context-model owns bounded cache resolution through own object-valued `c`/`p` links while leaving ordinary render resolution unchanged. Prototype-inherited candidates, links, request namespaces, and persistence attestation cannot authorize sharing; an inherited request accessor is rejected before evaluation. NUL-bearing discriminators and resolved URLs are invalid because the existing tagged/NUL-delimited format otherwise admits cross-scope collisions. Denial is availability-preserving: the fetch/render continues through its ordinary uncached path. `undefined` is an absence-of-key control, never an inserted key, sentinel, random identity, or serialized context.
 
 ## Assets and Boundary
 
@@ -107,6 +107,7 @@ The STRIDE table above covers all six categories at the host-context-to-shared-s
 | CACHE-06 | CWE-639 / CWE-922 | UI persistence has no provenance marker; legacy raw/NUL-collision bytes can look newly scoped | seeded legacy fragment -> later render |
 | CACHE-07 | CWE-1321 / CWE-639 | inherited render links or migration attestation can select shared authority | prototype pollution -> cross-render content |
 | CACHE-08 | CWE-639 | root-only fetch origin/base or a custom effective base can diverge from UI configured scope | isolated fetch keys -> collapsed rendered fragment |
+| CACHE-09 | CWE-1321 / CWE-639 | inherited request accessor can manufacture fresh identities across validation reads | prototype authority -> shared fetch/fragment key |
 
 The chain is behavioral rather than an injection sink: a caller first removes or collides the cache authority, then uses a shared coordinate to reach a previous result. Semgrep can detect nearby unsafe syntax but cannot prove this cross-method identity flow; direct behavioral tests are the primary verification.
 
@@ -150,7 +151,7 @@ The attack trees above are the required AND/OR artifacts. Preconditions are only
 
 Post-implementation these witnesses must fail to reach shared state while ordinary valid scoped witnesses must continue to hit. No destructive or external exploitation is required.
 
-Implementation review added red witnesses for inherited object-valued `c`/`p` links, an inherited effective base crossing the unchanged SSRF guard through a cache hit, prototype-inherited `uiCacheScoped`, root-only origin/base fragment collapse, and a no-request custom `option()` facade collapse. The first attempted request-local parent walk was rejected by the ownership ratchet; the converged repair lives in render-context-model and all focused owner/cache regressions pass. Final full-suite/static/differential evidence is recorded only after the no-edit verification pass.
+Implementation review added red witnesses for inherited object-valued `c`/`p` links, an inherited effective base crossing the unchanged SSRF guard through a cache hit, prototype-inherited `uiCacheScoped`, root-only origin/base fragment collapse, and a no-request custom `option()` facade collapse. Current-head Codex review then exposed an inherited `request` accessor that manufactured a fresh object on each read and evaded the identity guard; request/UI regressions proved the issue red, and the policy now rejects that namespace before evaluating the accessor. The first attempted request-local parent walk was rejected by the ownership ratchet; the converged repair lives in render-context-model and all focused owner/cache regressions pass. Final full-suite/static/differential evidence is recorded only after the no-edit verification pass.
 
 ## Privacy Assessment
 
@@ -193,14 +194,15 @@ security/privacy, or readiness finding.
 
 The final implementation review fixed red witnesses for inherited effective-base SSRF/cache hits,
 prototype-inherited context links and persistence attestation, UI root-only fetch/fragment scope
-collapse, and deliberate effective-base facade compatibility. The request-local parent-walk attempt
-was removed after the ownership ratchet correctly rejected it; strict traversal resides only in
-render-context-model.
+collapse, and deliberate effective-base facade compatibility. Current-head Codex review additionally
+found a fresh-identity inherited request accessor; the accepted finding was reproduced red-first and
+fixed by denying that namespace before evaluation. The request-local parent-walk attempt was removed
+after the ownership ratchet correctly rejected it; strict traversal resides only in render-context-model.
 
 Evidence at this gate:
 
-- focused model/cache/manifest/get/UI/isolation/pipeline/source matrix: 219/219;
-- exact `npm test`: 631/631; typecheck and syntax checks pass;
+- focused model/cache/manifest/get/UI/isolation/pipeline/source matrix: 221/221;
+- exact `npm test`: 633/633; typecheck and syntax checks pass;
 - Semgrep: 83 rules over eight changed runtime files, zero findings;
 - eight package dry-runs contain exactly README, package metadata, and runtime source;
 - source ownership/no-import guards, JSONL validation, production/full dependency audits, and diff

@@ -366,3 +366,23 @@ test('inherited render-context handoff and parent links cannot authorize cache s
     rm.base = saved;
   }
 });
+
+test('an inherited request accessor cannot authorize sharing with fresh identities', () => {
+  const saved = rm.base;
+  const p = {};
+  let calls = 0;
+  Object.defineProperty(p, 'request', {
+    get() { calls++; return {tenant: 'prototype-' + calls}; }
+  });
+  const c = Object.assign(Object.create(p), {c: 0});
+
+  try {
+    rm.base = '/configured/';
+    assert.equal(rm.policy(c), '');
+    assert.equal(rm.discriminator(c), '');
+    assert.equal(rm.cacheKey('/x', c), undefined);
+    assert.equal(calls, 0);
+  } finally {
+    rm.base = saved;
+  }
+});

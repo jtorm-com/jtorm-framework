@@ -99,6 +99,9 @@ module.exports = {
             r = x.root;
 
             try {
+                if (r && !this.own(r, 'request') && 'request' in r)
+                    return null
+                ;
                 q = this.context(c);
                 if (q != null && (typeof q !== 'object' || Array.isArray(q)
                     || q !== r && !this.plain(q)))

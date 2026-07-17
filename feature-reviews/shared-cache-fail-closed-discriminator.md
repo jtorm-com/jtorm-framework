@@ -12,7 +12,7 @@
 **Last Completed Mode:** Implement
 **Current Mode:** Review
 **Next Action:** Obtain green CI and a clean Codex review on the final PR #59 head with zero unresolved threads; do not merge.
-**Issues Found and fixed:** Shared fetch, manifest-pack, and rendered-fragment caches accepted keys with no explicit render discriminator. Adversarial red tests also exposed inherited render links, inherited effective bases, root-only fetch/UI scope divergence, and prototype-inherited persistence attestation; each now fails closed at its existing policy owner.
+**Issues Found and fixed:** Shared fetch, manifest-pack, and rendered-fragment caches accepted keys with no explicit render discriminator. Adversarial red tests also exposed inherited render links, inherited request accessors, inherited effective bases, root-only fetch/UI scope divergence, and prototype-inherited persistence attestation; each now fails closed at its existing policy owner.
 **Design Decisions Made:** An unscoped cache key is `undefined`; generic promise-cache bypasses it without touching its map; request-model owns discriminator validity and exact scoped key construction; render-context-model owns strict own-link cache root resolution without changing normal `context()`; UI cache consumes those owners and quarantines provenance-ambiguous persistence until explicit own post-cleanup attestation.
 
 **Context for Next Session:**
@@ -70,8 +70,8 @@ PR #58 merged at `b96b850de9c9f953329b551ee78551dfb9f608a9`; local `dev` was fas
 - [x] Checkpoint 4: host DI, metadata, migration docs, and backlog records
 
 ### Test Mode
-- [x] Focused tests passing (219/219)
-- [x] Exact `npm test` passing (631/631)
+- [x] Focused tests passing (221/221)
+- [x] Exact `npm test` passing (633/633)
 - [x] `npm run typecheck` passing
 - [x] Package dry-runs passing (8/8; three files each)
 - [x] Source guards, Semgrep, syntax, JSONL, audits, tech-debt, and diff checks passing
@@ -192,7 +192,7 @@ Field participation remains deliberately specific:
 
 Any present malformed candidate that the active aggregate or first-match traversal reaches fails the cache decision closed. Fetch policy aggregates all active request candidates and therefore validates all of them. UI validates candidates in precedence order only until a valid winner: empty/null candidates fall through, a malformed reached candidate denies participation, and a valid higher-precedence winner preserves current first-match behavior without inspecting lower fields. Structural root-resolution failure always denies participation.
 
-Cache-only context validity is explicit and does not change ordinary `context()`, URL, or timeout behavior. `render-context-model.cacheContext()` applies the existing bound while requiring an object-valued view `c` handoff and every traversed object-valued `p` link to be own; prototype-inherited links cannot select cache authority. Omitted/null input remains valid for configured-base opt-in. A resolved root must be a non-array object, and any present create-doc `c` marker on that root must be numeric/boolean. Non-array class/prototyped render roots remain supported, but only own discriminator candidates authorize sharing. A distinct effective object returned by the published request `context()` facade must be plain. When that facade selects a raw request member, that member must be own, plain, non-array, and distinct from the root; a custom facade may deliberately select a different plain effective object. Fetch policy continues to derive effective request fields and base through `context()` and `option()`. UI does not inspect a malformed lower-precedence request namespace after a valid own root-tenant winner.
+Cache-only context validity is explicit and does not change ordinary `context()`, URL, or timeout behavior. `render-context-model.cacheContext()` applies the existing bound while requiring an object-valued view `c` handoff and every traversed object-valued `p` link to be own; prototype-inherited links cannot select cache authority. Omitted/null input remains valid for configured-base opt-in. A resolved root must be a non-array object, and any present create-doc `c` marker on that root must be numeric/boolean. Non-array class/prototyped render roots remain supported, but only own discriminator candidates authorize sharing. An inherited `request` namespace fails the cache decision closed before it is read, so an accessor cannot manufacture fresh identities to evade ownership validation. A distinct effective object returned by the published request `context()` facade must be plain. When that facade selects a raw request member, that member must be own, plain, non-array, and distinct from the root; a custom facade may deliberately select a different plain effective object. Fetch policy continues to derive effective request fields and base through `context()` and `option()`. UI does not inspect a malformed lower-precedence request namespace after a valid own root-tenant winner.
 
 ### Fetch Policy Compatibility
 
@@ -216,6 +216,7 @@ Cache-only context validity is explicit and does not change ordinary `context()`
 | omitted/null context with configured non-empty base | `b:<configured>` | explicit host opt-in |
 | non-null input whose root resolution returns null | `''` | bounded `p`-cycle/overflow/invalid-root bypass; configured base cannot revive it |
 | malformed request namespace / invalid create-doc flag | `''` | cache-only structural bypass; ordinary request path remains unchanged |
+| inherited request namespace, including a fresh-identity accessor | `''` | bypass before reading it; prototype state cannot authorize sharing |
 | inherited tenant/origin | ignored | configured base may independently opt in when no effective inherited base changes request behavior |
 | inherited request base `null`/`undefined` | configured fallback | normal `option()` also falls back; exact configured-base behavior |
 | inherited request base non-null, including `''`, remains the effective `option()` value | `''` | it affects URL/allow behavior but is not explicit cache authority, so the whole decision bypasses |
@@ -384,6 +385,7 @@ The first independent review blocked implementation. The specification was amend
 | failure/interleaving proof was too abstract | require actual handler/event rejection, interleaved fragment operations, missing-owner proof, and leading-NUL migration proof |
 | malformed request containers can inherit configured base | add cache-only structural validity for request namespace, self-cycle, create-doc flag, and resolved root |
 | inherited object-valued `c`/`p` links can select cache authority | add strict bounded own-link resolution to render-context-model and delegate from request/UI; keep normal `context()` unchanged |
+| inherited `request` accessor can return a fresh object per read and evade an identity-only guard | reject an inherited request namespace before evaluating it; lock zero accessor calls plus fetch/UI no-state regressions |
 | request-local parent validation duplicated the P3 policy owner | keep the ownership ratchet red, remove the duplicate walk, patch-bump render-context, and raise only required consumer minima |
 | inherited non-null base can alter URL/SSRF behavior while colliding with configured scope | bypass when it remains the effective option; preserve configured fallback for inherited null/undefined and deliberate distinct facade replacement |
 | root-only origin/base fetch keys can collapse into one UI configured-base scope | retain UI precedence by bypassing incompatible raw root fields; preserve distinct custom effective-base overrides |
@@ -406,7 +408,7 @@ These are deliberate security compatibility exceptions only for ambiguous/collid
 
 ### Red Proof
 
-1. Request-policy tests lock all absent/null/empty/malformed/bounded-`p`-cycle cases, invalid request containers/create-doc flags, non-empty precedence, omitted-vs-invalid configured-base behavior, field-specific `0`/`false`/`NaN`/`0n`/`1n` compatibility, NUL collision rejection, resolved-URL NUL bypass, and exact ordinary scoped identities.
+1. Request-policy tests lock all absent/null/empty/malformed/bounded-`p`-cycle cases, invalid or inherited request containers/create-doc flags, non-empty precedence, omitted-vs-invalid configured-base behavior, field-specific `0`/`false`/`NaN`/`0n`/`1n` compatibility, NUL collision rejection, resolved-URL NUL bypass, inherited-accessor non-evaluation, and exact ordinary scoped identities.
 2. Promise-cache tests seed scoped and literal-`undefined` entries and prove an undefined bypass neither reads nor reorders/evicts/mutates them, does not run hit callbacks, and does not deduplicate; `null` and scoped keys retain generic compatibility.
 3. Data/HTML/TSS tests prove sequential fresh sources and explicitly interleaved independent promises for unscoped calls; transport/parse failure leaves seeded maps byte/order-identical; scoped identity, LRU, isolation, and rejection eviction remain. TSS unscoped arrays remain strictly sequential and retain no scalar.
 4. Manifest tests use separate roots to prove unscoped sequential/interleaved pack loads do not share the singleton pack map, validation/acquisition failures leave it empty, and same-root prepared-index behavior remains. Scoped guarded hits, identity, and isolation remain.

@@ -55,7 +55,10 @@ Independent implementation review added valid red witnesses and drove these corr
 4. inherited `uiCacheScoped` could authorize ambiguous legacy content;
 5. root-only fetch origin/base and no-request effective-base overrides could collapse separately
    keyed fetches into one UI fragment scope;
-6. an inherited raw base replaced by a deliberate `option()` override was unnecessarily bypassed.
+6. an inherited raw base replaced by a deliberate `option()` override was unnecessarily bypassed;
+7. current-head Codex review found that an inherited `request` accessor returning a fresh object on
+   every read could evade an identity-only ownership guard; request and UI regressions now prove the
+   namespace is rejected before the accessor runs.
 
 Each finding has an executable regression. No accepted in-scope finding is currently unresolved.
 
@@ -108,15 +111,15 @@ consumers. Other compatible consumer ranges remain unchanged.
 | Gate | Result |
 |---|---|
 | Baseline red | 57/77 pass; 20 intended failures before runtime edits |
-| Review red/green | inherited-base, inherited-link, attestation, fetch/UI divergence, and facade witnesses fixed |
-| Focused model/cache/get/UI/pipeline/source suites | 219/219 PASS |
-| Exact `npm test` | 631/631 PASS |
+| Review red/green | inherited-base/link/request-accessor, attestation, fetch/UI divergence, and facade witnesses fixed |
+| Focused model/cache/get/UI/pipeline/source suites | 221/221 PASS |
+| Exact `npm test` | 633/633 PASS |
 | `npm run typecheck` | PASS |
 | Source ownership ratchet | 10/10 source/ownership guards; task-specific no-edit report/sentinel PASS |
 | Semgrep / syntax / runtime imports | 83 rules / 8 runtime files / 0 findings; all changed JS parses; zero runtime `require()` |
 | Package publication dry-runs | 8/8 PASS; exactly 3 intended files each |
 | Dependency audits | production and full development audits: 0 vulnerabilities |
-| JSONL / `git diff --check` | 289/289 records valid; diff hygiene PASS |
+| JSONL / `git diff --check` | 294/294 records valid; diff hygiene PASS |
 | Tech-debt ratchet | PASS on exact staged candidate |
 | Ready PR / CI / current-head Codex review | PR #59 ready and mergeable; remote gates pending; merge prohibited |
 
@@ -129,8 +132,9 @@ moderation, and audit-log-specific gates are not applicable because the diff add
 surfaces.
 
 Independent architecture, security/privacy, and readiness reviews report no remaining reproducible
-finding after 214, 123, and current exact/focused verification respectively. The staged tech-debt
-gate and remote delivery gates remain required before completion.
+finding after 214, 123, and current exact/focused verification respectively. The accepted
+fresh-identity inherited-accessor Codex finding is covered by the final 221 focused and 633 exact
+tests. The staged tech-debt gate and new-head remote delivery gates remain required before completion.
 
 ## Review Limitations
 
