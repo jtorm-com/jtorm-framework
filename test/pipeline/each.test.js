@@ -2,6 +2,26 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { render } = require('../helpers/engine.js');
+const { makeTssParser } = require('../helpers/parser.js');
+
+test('each preserves its parsed child structure while boiling a detached fragment', async () => {
+  const tree = makeTssParser().handle(".a->each { d: items; ->append { h: 'iter'; } }");
+  const child = tree[0].c[0].c[0], p = child.p, c = child.c;
+  assert.equal(child.s, '.a');
+
+  const { body } = await render(
+    '<body><div class="a"></div></body>',
+    tree,
+    { items: [{}] }
+  );
+
+  assert.equal(body, '<div class="a">iter</div>');
+  assert.strictEqual(tree[0].c[0].c[0], child);
+  assert.equal(child.s, '.a');
+  assert.equal(child.m, 'append');
+  assert.strictEqual(child.p, p);
+  assert.strictEqual(child.c, c);
+});
 
 // `each` validate requires children (each-method.js:27 `v.t.c.length`); with no
 // children it is a silent no-op. The positive each path (object arrays rendered

@@ -3,6 +3,23 @@
 
 /** @typedef {import('@jtorm/types').ViewModel} ViewModel */
 
+function project(t) {
+    const r = [];
+
+    for (let k in t) {
+        const n = t[k], p = {s: 'body', m: n.m, p: n.p, c: n.c};
+
+        Object.defineProperty(p, 'b', {
+            enumerable: true,
+            get: function () { return n.b; },
+            set: function (b) { n.b = b; }
+        });
+        r[k] = p;
+    }
+
+    return r;
+}
+
 module.exports = {
     jTormHandlerWrapper: {
         // DI
@@ -29,9 +46,7 @@ module.exports = {
 
             await e.handle(v, 'before', 'iteration');
 
-            for (let k in t2)
-                t2[k].s = 'body'
-            ;
+            const t3 = project(t2);
 
             // The iteration body builds a DETACHED fragment that the caller (each's
             // append / insert / wrap) then re-inserts into the parent doc. Pass the
@@ -59,7 +74,7 @@ module.exports = {
                 c.locale = v.c.locale
             ;
 
-            const v2 = await s.viewModel.create(v.r ? v.r : h, t2, m, c, 1);
+            const v2 = await s.viewModel.create(v.r ? v.r : h, t3, m, c, 1);
 
             v2.cid = v.cid;
             v2.cs = v.cs;
