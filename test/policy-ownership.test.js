@@ -154,7 +154,8 @@ test('coordinated package releases declare their policy owners and dependency mi
     'src/methods/attrs-method': '1.0.4',
     'tooling/ui-manifest-compiler': '1.0.1',
     'src/plugins/css-plugin': '1.0.5',
-    'src/plugins/js-plugin': '1.0.5'
+    'src/plugins/js-plugin': '1.0.5',
+    'src/plugins/ui-cache-plugin': '1.0.1'
   };
   const dependencies = {
     'src/models/request-model': {'@jtorm/render-context-model': '^1.0.1'},

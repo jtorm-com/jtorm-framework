@@ -2,8 +2,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
+const _ = require('lodash');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
 const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
+const { jTormViewModel: vm } = require('../../src/models/view-model/src/view-model.js');
 
 rm.renderContextModel = cm;
 
@@ -179,6 +181,25 @@ test('shared-cache keys require a non-empty explicit request discriminator', () 
     assert.equal(rm.cacheKey('same.json', { request: { base: '' } }), undefined);
   } finally {
     rm.base = saved;
+  }
+});
+
+test('nullish view create flags retain configured-base cache opt-in', async () => {
+  const saved = {base: rm.base, _: vm._};
+
+  try {
+    rm.base = '/configured/';
+    vm._ = _;
+    for (const flag of [undefined, null]) {
+      const v = await vm.create({}, [], {}, flag);
+      assert.equal(v.c.c, flag);
+      assert.equal(rm.policy(v), 'b:/configured/');
+      assert.equal(rm.discriminator(v), '/configured/');
+      assert.equal(rm.cacheKey('x', v), 'b:/configured/\0/configured/x');
+    }
+  } finally {
+    rm.base = saved.base;
+    vm._ = saved._;
   }
 });
 

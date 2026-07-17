@@ -89,7 +89,7 @@ module.exports = {
                 ;
                 if ('c' in r) {
                     d = r.c;
-                    if (typeof d !== 'number' && typeof d !== 'boolean')
+                    if (d != null && typeof d !== 'number' && typeof d !== 'boolean')
                         return null
                     ;
                 }

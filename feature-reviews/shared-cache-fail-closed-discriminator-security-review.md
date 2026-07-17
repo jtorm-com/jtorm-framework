@@ -197,16 +197,18 @@ The final implementation review fixed red witnesses for inherited effective-base
 prototype-inherited context links and persistence attestation, UI root-only fetch/fragment scope
 collapse, and deliberate effective-base facade compatibility. Current-head Codex review additionally
 found fresh-identity/value inherited request and base accessors; both accepted findings were
-reproduced red-first and fixed by denying accessor-derived authority before evaluation. The
-request-local parent-walk attempt was removed after the ownership ratchet correctly rejected it;
-strict render-context traversal resides only in render-context-model.
+reproduced red-first and fixed by denying accessor-derived authority before evaluation. A later
+compatibility review also restored configured-base opt-in for the nullish optional create flags
+emitted by `ViewModel.create()`; non-null malformed flags still bypass. The request-local parent-walk
+attempt was removed after the ownership ratchet correctly rejected it; strict render-context
+traversal resides only in render-context-model.
 
 Evidence at this gate:
 
-- focused model/cache/manifest/get/UI/isolation/pipeline/source matrix: 224/224;
-- exact `npm test`: 635/635; typecheck and syntax checks pass;
+- focused model/cache/manifest/get/UI/isolation/pipeline/source matrix: 225/225;
+- exact `npm test`: 636/636; typecheck and syntax checks pass;
 - Semgrep: 83 rules over eight changed runtime files, zero findings;
-- eight package dry-runs contain exactly README, package metadata, and runtime source;
+- nine package dry-runs contain exactly README, package metadata, and runtime source;
 - source ownership/no-import guards, JSONL validation, production/full dependency audits, and diff
   hygiene pass;
 - no new runtime import/dependency, endpoint, log, collection, export, third-party transfer, or

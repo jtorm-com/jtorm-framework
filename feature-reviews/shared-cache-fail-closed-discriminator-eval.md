@@ -61,7 +61,11 @@ Independent implementation review added valid red witnesses and drove these corr
    namespace is rejected before the accessor runs;
 8. the next-head Codex review found the same repeated-read class in an inherited `base` accessor;
    bounded descriptor inspection now rejects accessors without execution while stable inherited
-   data properties retain the configured-fallback and deliberate-override compatibility matrix.
+   data properties retain the configured-fallback and deliberate-override compatibility matrix;
+9. current-head review found normal `ViewModel.create()` roots with nullish optional `c` flags were
+   rejected before configured-base opt-in; actual view-model output now locks that compatibility;
+10. the touched published UI-cache-plugin README now carries the required 1.0.1 patch release even
+    though its runtime JavaScript and dependency graph remain unchanged.
 
 Each finding has an executable regression. No accepted in-scope finding is currently unresolved.
 
@@ -105,9 +109,10 @@ not claimed closed.
 | `@jtorm/tss-model` | 1.0.7 | consume request/promise owner minima; parser unchanged |
 | `@jtorm/ui-manifest-model` | 1.0.2 | cross-render pack bypass and owner minima |
 | `@jtorm/ui-cache-model` | 1.0.6 | request DI, strict root minimum, fragment/persistence bypass |
+| `@jtorm/ui-cache-plugin` | 1.0.1 | publish affected DI/migration documentation; runtime unchanged |
 
 Publication order is render-context, then request and promise-cache, then the remaining five
-consumers. Other compatible consumer ranges remain unchanged.
+model consumers, then the documentation-only plugin patch. Other compatible consumer ranges remain unchanged.
 
 ## Verification
 
@@ -115,14 +120,14 @@ consumers. Other compatible consumer ranges remain unchanged.
 |---|---|
 | Baseline red | 57/77 pass; 20 intended failures before runtime edits |
 | Review red/green | inherited-base/link/request/base-accessor, attestation, fetch/UI divergence, and facade witnesses fixed |
-| Focused model/cache/get/UI/pipeline/source suites | 224/224 PASS |
-| Exact `npm test` | 635/635 PASS |
+| Focused model/cache/get/UI/pipeline/source suites | 225/225 PASS |
+| Exact `npm test` | 636/636 PASS |
 | `npm run typecheck` | PASS |
 | Source ownership ratchet | 10/10 source/ownership guards; task-specific no-edit report/sentinel PASS |
 | Semgrep / syntax / runtime imports | 83 rules / 8 runtime files / 0 findings; all changed JS parses; zero runtime `require()` |
-| Package publication dry-runs | 8/8 PASS; exactly 3 intended files each |
+| Package publication dry-runs | 9/9 PASS; exactly 3 intended files each |
 | Dependency audits | production and full development audits: 0 vulnerabilities |
-| JSONL / `git diff --check` | 297/297 records valid; diff hygiene PASS |
+| JSONL / `git diff --check` | 300/300 records valid; diff hygiene PASS |
 | Tech-debt ratchet | PASS on exact staged candidate |
 | Ready PR / CI / current-head Codex review | PR #59 ready and mergeable; remote gates pending; merge prohibited |
 
@@ -136,8 +141,9 @@ surfaces.
 
 Independent architecture, security/privacy, and readiness reviews report no remaining reproducible
 finding after 214, 123, and current exact/focused verification respectively. The accepted
-fresh-identity/value inherited-accessor Codex findings are covered by the final 224 focused and 635
-exact tests. The staged tech-debt gate and new-head remote delivery gates remain required before completion.
+fresh-identity/value inherited-accessor and nullish-create compatibility Codex findings are covered
+by the final 225 focused and 636 exact tests. The staged tech-debt gate and new-head remote delivery
+gates remain required before completion.
 
 ## Review Limitations
 
