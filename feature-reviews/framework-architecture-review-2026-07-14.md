@@ -32,18 +32,19 @@
 > and clean Codex review before the maintainer merged it into `dev`;
 > parser replacement remains the next independent P3 task.
 >
-> **Backlog update — 2026-07-16 (PR #55 from merged PR #54 / `dev`
-> at `6e352fa`):** the parser P3 is locally complete and in delivery. The active package is now a
+> **Backlog update — 2026-07-17 (`dev` at `ccff152`):** PR #55 completed the parser
+> P3. The active package is now a
 > bounded tokenizer plus recursive-descent parser with located diagnostics, exact valid v1 AST
 > compatibility against a frozen oracle and all 257 shipped TSS files, immutable resource ceilings,
 > and a documented `2.0.0` migration/rollback. An exact-pinned Terser prepack also emits the same
 > singleton as a classic browser script (16,684 raw / 6,147 gzip-9 bytes on the recorded Node 25 toolchain; CI enforces a portable 7 KiB ratchet). Local gates are 582/582;
-> PR CI now streams the full 200,000-case differential at 167 MiB peak RSS. Ready PR #55 targets
-> `dev`. All four published direct-consumer metadata edges are patch-bumped to require parser `^2.0.0` after
+> PR CI streams the full 200,000-case differential at 167 MiB peak RSS. All four
+> published direct-consumer metadata edges are patch-bumped to require parser `^2.0.0` after
 > current-head review proved `^1.0.0` would strand normal installs on v1. Later
 > review also pinned top-level stray-terminator diagnostics and removed the lone
-> ES2022 intrinsic from the ES2015 classic runtime; final CI/current-head Codex
-> status is tracked on the unmerged PR.
+> ES2022 intrinsic from the ES2015 classic runtime. Final feature head `a5c31fc`
+> passed CI and a clean current-head Codex review before the maintainer merged it
+> into `dev` as `ccff152`.
 
 ---
 
@@ -184,7 +185,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P2** | Emit inline JSON-LD from typed model | ✅ Done — PR #47 | Makes the headline SEO claim true | M |
 | **P2** | Normalize `v.io` → returned effect object | ✅ Done — PR #49 | Deletes the infinite-loop trap; makes dispatch an invariant | M |
 | **P3** | Collapse DRY debt (context/state/fetch-models/plugins) | ✅ Done — PR #51 | 4-way duplication; bundle + maintainability | M |
-| **P3** | Replace the parser (tokenizer + recursive descent) | In review — PR #55 | Unblocks all future DSL work + real diagnostics | L |
+| **P3** | Replace the parser (tokenizer + recursive descent) | ✅ Done — PR #55 | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | ✅ Done — PR #53 | Info-disclosure + dead weight | S |
 
 ### Comparable projects worth studying
