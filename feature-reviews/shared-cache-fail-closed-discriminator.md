@@ -11,7 +11,7 @@
 
 **Last Completed Mode:** Implement
 **Current Mode:** Review
-**Next Action:** Complete the routed reviews and exact verification matrix, then publish a ready PR for current-head CI and Codex review.
+**Next Action:** Obtain green CI and a clean Codex review on the final PR #59 head with zero unresolved threads; do not merge.
 **Issues Found and fixed:** Shared fetch, manifest-pack, and rendered-fragment caches accepted keys with no explicit render discriminator. Adversarial red tests also exposed inherited render links, inherited effective bases, root-only fetch/UI scope divergence, and prototype-inherited persistence attestation; each now fails closed at its existing policy owner.
 **Design Decisions Made:** An unscoped cache key is `undefined`; generic promise-cache bypasses it without touching its map; request-model owns discriminator validity and exact scoped key construction; render-context-model owns strict own-link cache root resolution without changing normal `context()`; UI cache consumes those owners and quarantines provenance-ambiguous persistence until explicit own post-cleanup attestation.
 
@@ -112,7 +112,7 @@ The converged fix puts strict own-link traversal in `render-context-model.cacheC
 - [x] Feature/evaluation/security records updated
 - [x] Review ledger updated
 - [x] Architecture backlog marks fail-open subproblem complete and TTL/purge next
-- [ ] Ready PR opened into `dev`
+- [x] Ready PR #59 opened into `dev`
 
 ---
 

@@ -5,7 +5,7 @@
 **Started:** `2026-07-17T17:26:06Z`
 **Status:** IN_PROGRESS
 **Mode:** Post-implementation evaluation
-**Delivery:** Ready PR into `dev` pending
+**Delivery:** Ready PR #59 into `dev`; CI/current-head Codex review pending; merge prohibited
 
 ## Scope and Ownership
 
@@ -118,7 +118,7 @@ consumers. Other compatible consumer ranges remain unchanged.
 | Dependency audits | production and full development audits: 0 vulnerabilities |
 | JSONL / `git diff --check` | 289/289 records valid; diff hygiene PASS |
 | Tech-debt ratchet | PASS on exact staged candidate |
-| Ready PR / CI / current-head Codex review | PENDING; PR must remain unmerged |
+| Ready PR / CI / current-head Codex review | PR #59 ready and mergeable; remote gates pending; merge prohibited |
 
 ## Routed Review Disposition
 
