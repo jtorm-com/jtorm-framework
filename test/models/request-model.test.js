@@ -386,3 +386,23 @@ test('an inherited request accessor cannot authorize sharing with fresh identiti
     rm.base = saved;
   }
 });
+
+test('an inherited base accessor cannot authorize sharing with changing identities', () => {
+  const saved = rm.base;
+  const p = {};
+  let calls = 0;
+  Object.defineProperty(p, 'base', {
+    get() { calls++; return '/prototype-' + calls + '/'; }
+  });
+  const c = Object.assign(Object.create(p), {c: 0});
+
+  try {
+    rm.base = '/configured/';
+    assert.equal(rm.policy(c), '');
+    assert.equal(rm.discriminator(c), '');
+    assert.equal(rm.cacheKey('/x', c), undefined);
+    assert.equal(calls, 0);
+  } finally {
+    rm.base = saved;
+  }
+});

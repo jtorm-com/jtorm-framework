@@ -49,15 +49,26 @@ module.exports = {
             return !!v && Object.prototype.hasOwnProperty.call(v, k);
         },
 
-        cacheBase: function (c, r) {
+        cacheBase: function (c, r, e) {
+            let p, d, i = 0;
+
+            if (r && !this.own(r, 'base') && 'base' in r) {
+                p = Object.getPrototypeOf(r);
+                while (p && i++ < 128 && !(d = Object.getOwnPropertyDescriptor(p, 'base')))
+                    p = Object.getPrototypeOf(p)
+                ;
+                if (!d || !this.own(d, 'value'))
+                    return null
+                ;
+            }
+
             const v = this.option(c, 'base', this.base);
 
-            if (r && !this.own(r, 'base') && 'base' in r && r.base != null
-                && Object.is(v, r.base))
+            if (d && d.value != null && Object.is(v, d.value))
                 return null
             ;
 
-            return {explicit: !!(r && this.own(r, 'base') && r.base != null), value: v};
+            return {explicit: !!(e !== false && r && this.own(r, 'base') && r.base != null), value: v};
         },
 
         cacheRoot: function (c) {
@@ -213,8 +224,7 @@ module.exports = {
                     if (v === null || v !== undefined) return '';
                 }
 
-                b = n ? this.cacheBase(c, r)
-                    : {explicit: false, value: this.option(c, 'base', this.base)};
+                b = this.cacheBase(c, r, n);
                 if (!b) return '';
                 if (!n && r && 'base' in r && r.base != null && Object.is(b.value, r.base))
                     return ''

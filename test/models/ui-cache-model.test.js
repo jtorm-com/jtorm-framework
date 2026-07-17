@@ -525,3 +525,27 @@ test('an inherited request accessor cannot retain or serve a rendered fragment',
     rm.base = savedBase;
   }
 });
+
+test('an inherited base accessor cannot retain or serve a rendered fragment', async () => {
+  const old = {cache: c.cache, order: c.order, requestModel: c.requestModel};
+  const savedBase = rm.base;
+  const p = {};
+  let calls = 0;
+  Object.defineProperty(p, 'base', {
+    get() { calls++; return '/prototype-' + calls + '/'; }
+  });
+  const root = Object.assign(Object.create(p), {c: 0});
+
+  try {
+    c.cache = {}; c.order = new Map(); c.requestModel = rm; rm.base = '/configured/';
+    c.set(root, 'en', 'same', 'default', 'PROTOTYPE');
+
+    assert.equal(await c.get(root, 'en', 'same', 'default'), null);
+    assert.deepEqual(c.cache, {});
+    assert.equal(c.order.size, 0);
+    assert.equal(calls, 0);
+  } finally {
+    c.cache = old.cache; c.order = old.order; c.requestModel = old.requestModel;
+    rm.base = savedBase;
+  }
+});
