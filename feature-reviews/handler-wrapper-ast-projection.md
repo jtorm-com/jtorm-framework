@@ -1,25 +1,25 @@
 # Feature Development: Handler-wrapper AST projection
 
-**Status:** GITHUB_GATES_PENDING
+**Status:** COMPLETE
 **Claimed:** 2026-07-17T12:50:00Z
 **Agent:** Codex `/root`
-**Current Mode:** Documentation and Publication
+**Current Mode:** Complete — PR #57 merged into `dev` as `0017bd9`
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Review
-**Current Mode:** Documentation and Publication
-**Next Action:** Push the record-only PR #57 delivery commit, then converge CI and Codex review against that current head.
+**Last Completed Mode:** Delivery
+**Current Mode:** Complete
+**Next Action:** None — architecture weakness #7 is closed in the canonical backlog.
 **Files Created:** Feature specification/evaluation/security records and `test/pipeline/cached-tss-reuse.test.js`
 **Files Modified:** `@jtorm/handler-wrapper` source/README/package, handler-wrapper and each/insert/wrap tests, architecture backlog, and review ledger
 **Tests Written:** 10 red regression/characterization tests across five focused files (plus one new cached-reuse file)
-**Issues Found (not yet fixed):** None. Architecture weakness #7 is fixed locally; delivery gates remain.
+**Issues Found (not yet fixed):** None. Architecture weakness #7 is fixed on `dev`.
 **Design Decisions Made:** Project only direct wrapper children per invocation; share nested structure; forward the intentional source-owned `b` cache; construct after `before.iteration`; retain no projection state.
 
-**Context for Next Session:**
-PR #56 is merged at `4dd7e3a`; this branch starts at that exact head. Red proof was 10 pass/10 fail; the final focused set is 100/100 and exact `npm test` is 592/592. All local reviews are clean at 100/100; only staged ratchet and GitHub delivery remain.
+**Completion Context:**
+PR #57 final head `61f5a95` passed GitHub Actions and a clean current-head Codex review with zero review threads. The maintainer merged it into `dev` as `0017bd9` on 2026-07-17. Red proof was 10 pass/10 fail; the final focused set was 100/100 and exact `npm test` was 592/592.
 
 ---
 
@@ -231,7 +231,7 @@ None. The task authorization resolves scope, compatibility, package ownership, a
 - [x] Existing each/insert/wrap/get/UI output, traversal, lifecycle, locale/context/cache-id/result, lexical scope, and loud errors remain exact.
 - [x] Source `b` installs, reuses, and invalidates through the projection without retaining model/DOM/context data.
 - [x] Projection is non-recursive `O(d)` time/space over direct children and adds no shared mutable projection state.
-- [ ] Only handler-wrapper receives a runtime/package patch; all requested documentation/review/verification/PR gates pass.
+- [x] Only handler-wrapper receives a runtime/package patch; all requested documentation/review/verification/PR gates pass.
 
 ### Delivery Plan and Definition of Done
 
@@ -243,7 +243,7 @@ The independently verifiable critical path is: specification gate → red struct
 4. Run all requested static, package, security, review, and full-suite gates; fix findings in bounded batches and re-run affected gates.
 5. Update the project-specific feature/evaluation/security/backlog/ledger records, publish one ready PR into `dev`, and iterate only that PR until CI and a current-head Codex review are clean.
 
-**Definition of Done:** The measurable success criteria above pass; exact project commands are green; every requested review gate has zero unresolved valid findings; documentation and SemVer are correct; the ready PR targets `dev`, has green CI and a clean review against its current head, and remains unmerged. Generic `feature-dev` documentation paths absent from this repository (`docs/features`, `docs/frontend`, `docs/security`, `feature-reviews/PROGRESS.md`) are replaced by the repository's requested feature/evaluation/security/backlog and `.claude-tasks` records.
+**Definition of Done:** The measurable success criteria above pass; exact project commands are green; every requested review gate has zero unresolved valid findings; documentation and SemVer are correct; and the ready PR targets `dev`, has green CI and a clean review against its current head, and remains unmerged at agent handoff. Generic `feature-dev` documentation paths absent from this repository (`docs/features`, `docs/frontend`, `docs/security`, `feature-reviews/PROGRESS.md`) are replaced by the repository's requested feature/evaluation/security/backlog and `.claude-tasks` records.
 
 **Sizing/appetite:** Medium / 5-point change, anchored to the recent binding-cache and returned-effect architecture follow-ups: runtime code is narrow, but concurrency/failure proof and delivery review have a longer tail. The appetite is one focused architecture PR and its required review loop. If correctness requires a parser, handler, document-model, cache-policy, or public-contract change, the circuit breaker is to stop implementation and reshape rather than silently expand scope or lower quality.
 
@@ -384,6 +384,6 @@ The feature-dev test personas were applied with repository adaptations: `tdd-gui
 ### Documentation and Publication
 - [x] Required feature/evaluation/security/backlog/ledger records updated locally
 - [x] Ready PR #57 opened into `dev`
-- [ ] CI green
-- [ ] Current-head Codex review clean
-- [ ] PR left unmerged
+- [x] CI green at final head `61f5a95`
+- [x] Current-head Codex review clean at `61f5a95`
+- [x] PR left unmerged for maintainer handoff, then merged as `0017bd9`
