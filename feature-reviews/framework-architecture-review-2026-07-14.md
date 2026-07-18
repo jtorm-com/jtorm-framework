@@ -65,17 +65,18 @@
 > `e5abb4b` passed CI and a clean current-head Codex review with zero unresolved
 > threads before the maintainer merged it as `60072ba`.
 >
-> **Backlog update — 2026-07-18 (`agent/shared-cache-ttl-purge` from `dev` at
-> `2b1105b`):** the remaining bounded TTL/purge half of weakness #12 is complete in
-> this change. Shared data, HTML, TSS, manifest-pack, and rendered-fragment caches
+> **Backlog update — 2026-07-18 (`dev` at `1e7f166`):** PR #61 completed the
+> remaining bounded TTL/purge half of weakness #12. Shared data, HTML, TSS,
+> manifest-pack, and rendered-fragment caches
 > default to an absolute five-minute in-process TTL, retain pending single-flight
 > deduplication, and expose exact plus explicit full purge facades. Expiration and
 > invalidation retain the existing discriminator, URL/SSRF, timeout, validation,
 > event, persistence-attestation, and public value-shape contracts. Persisted
 > fragments intentionally start a new TTL at `init()`; versioned persisted timestamps
 > for absolute age across restarts and stale-while-revalidate remain separate follow-ups,
-> not claims of this closure. Ready PR #61 targets `dev` and remains unmerged;
-> green CI and a clean current-head Codex review are its delivery gate.
+> not claims of this closure. Final head `f01d4dc` passed CI and a clean current-head
+> Codex review with zero unresolved threads before the maintainer merged PR #61 into
+> `dev` as `1e7f166`.
 
 ---
 
@@ -220,8 +221,8 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P3** | Move `error-handler` dump behind a debug flag | ✅ Done — PR #53 | Info-disclosure + dead weight | S |
 | **P3** | Eliminate `handler-wrapper` cached-AST selector mutation | ✅ Done — PR #57 | Makes cached trees safe across sequential/interleaved/tenant renders without undoing parser inheritance | M |
 | **P3** | Fail shared cache participation closed without an explicit render discriminator | ✅ Done — PR #59; fail-open half of weakness #12 | Prevents cross-render sharing while preserving ordinary uncached work and scoped warm behavior | M |
-| **P3** | Add cache TTL and explicit purge APIs | ✅ Done — PR #61; TTL/purge half of weakness #12 | Makes template/cache invalidation operational without process restart while preserving scoped warm behavior | M |
-| **P4** | Version the persisted fragment schema for absolute age across restarts | Separate follow-up | Current attested entries intentionally receive a new in-process TTL at `init()`; persisted timestamps require an explicit schema/migration contract | M |
+| **P3** | Add cache TTL and explicit purge APIs | ✅ Done — merged PR #61; TTL/purge half of weakness #12 | Makes template/cache invalidation operational without process restart while preserving scoped warm behavior | M |
+| **P4** | Version the persisted fragment schema for absolute age across restarts | Next bounded task | Current attested entries intentionally receive a new in-process TTL at `init()`; persisted timestamps require an explicit schema/migration contract | M |
 | **P4** | Evaluate stale-while-revalidate and HTTP validator integration | Separate follow-up | Background refresh, stale fallback, cache headers, ETag, and Last-Modified semantics need their own failure/security/resource contract | M–L |
 
 ### Comparable projects worth studying
