@@ -40,6 +40,7 @@ test('same-identity unscoped fragment renders observe fresh output across shared
   assert.equal(second.body, '<div>B</div>');
   assert.deepEqual(jTormUiCacheModel.cache, {});
   assert.equal(jTormUiCacheModel.order.size, 0);
+  assert.equal(jTormUiCacheModel.settlements.get(jTormUiCacheModel.order), undefined);
 });
 
 test('explicitly scoped warm renders retain byte output and fetch-cache reuse', async () => {
@@ -85,6 +86,7 @@ test('an unscoped handler failure after a cid render leaves no fragment state', 
   );
   assert.deepEqual(jTormUiCacheModel.cache, {});
   assert.equal(jTormUiCacheModel.order.size, 0);
+  assert.equal(jTormUiCacheModel.settlements.get(jTormUiCacheModel.order), undefined);
 });
 
 test('an unscoped event failure after UI-cache ordering leaves no fragment state', async () => {
@@ -104,6 +106,7 @@ test('an unscoped event failure after UI-cache ordering leaves no fragment state
     );
     assert.deepEqual(jTormUiCacheModel.cache, {});
     assert.equal(jTormUiCacheModel.order.size, 0);
+    assert.equal(jTormUiCacheModel.settlements.get(jTormUiCacheModel.order), undefined);
   } finally {
     WIRED_PLUGINS.pop();
   }
@@ -126,6 +129,7 @@ test('a scoped event failure after UI staging publishes no fragment', async () =
     );
     assert.deepEqual(jTormUiCacheModel.cache, {});
     assert.equal(jTormUiCacheModel.order.size, 0);
+    assert.equal(jTormUiCacheModel.settlements.get(jTormUiCacheModel.order), undefined);
   } finally {
     WIRED_PLUGINS.pop();
   }
@@ -149,6 +153,7 @@ test('a scoped completion-hook failure after UI preparation publishes no fragmen
     );
     assert.deepEqual(jTormUiCacheModel.cache, {});
     assert.equal(jTormUiCacheModel.order.size, 0);
+    assert.equal(jTormUiCacheModel.settlements.get(jTormUiCacheModel.order), undefined);
   } finally {
     WIRED_PLUGINS.pop();
   }

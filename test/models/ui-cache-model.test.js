@@ -12,14 +12,20 @@ c.requestModel = rm;
 c.promiseCacheModel = pm;
 rm.base = 'test:';
 const nativeClock = pm.clock;
+const nativePersistenceClock = c.persistenceClock;
 
 function ttlReset(ttl = 300000) {
   c.cache = {};
   c.order = new Map();
   c.max = 512;
   c.ttl = ttl;
+  c.persistenceClock = nativePersistenceClock;
   c.updated = 0;
+  c.revision = 0;
   c.saveModel = null;
+  c.stores = new WeakMap();
+  c.settlements = new WeakMap();
+  c.persistenceObserved = new WeakMap();
   c.renderContextModel = cm;
   c.requestModel = rm;
   c.promiseCacheModel = pm;
@@ -29,6 +35,7 @@ function ttlReset(ttl = 300000) {
 
 test.afterEach(() => {
   pm.clock = nativeClock;
+  c.persistenceClock = nativePersistenceClock;
 });
 
 test('get() returns the value set() stored for the same (l,id,c)', async () => {
@@ -101,16 +108,25 @@ test('rendered fragments prefer explicit request origin over a shared request ba
   assert.equal(await c.get(b, 'en', 'comp1', 'default'), 'TENANT B');
 });
 
-test('save() rebuilds the nested {l:{id:{c:d}}} shape for saveModel; init() reloads it', async () => {
+test('save() writes the versioned fragment envelope while the live nested cache shape stays unchanged', async () => {
   const store = { uiCacheScoped: true, o: null, get() { return this.o; }, set(o) { this.o = o; } };
   c.cache = {}; c.order = new Map(); c.max = 512; c.updated = 0; c.saveModel = store;
+  c.persistenceClock = () => 100;
   c.set(null, 'en', 'comp1', 'default', 'A');
   c.set(null, 'en', 'comp1', 'boxed', 'B');
   c.set(null, 'nl', 'comp2', 'default', 'C');
   await c.save();
   assert.deepEqual(store.o, {
-    en: { comp1: { ['test:\0default']: 'A', ['test:\0boxed']: 'B' } },
-    nl: { comp2: { ['test:\0default']: 'C' } }
+    version: 1,
+    fragments: [
+      {language: 'en', cid: 'comp1', variant: 'test:\0default', html: 'A', settledAt: 100},
+      {language: 'en', cid: 'comp1', variant: 'test:\0boxed', html: 'B', settledAt: 100},
+      {language: 'nl', cid: 'comp2', variant: 'test:\0default', html: 'C', settledAt: 100}
+    ]
+  });
+  assert.deepEqual(c.cache, {
+    en: {comp1: {['test:\0default']: 'A', ['test:\0boxed']: 'B'}},
+    nl: {comp2: {['test:\0default']: 'C'}}
   });
 
   // a fresh init() from the same store repopulates the cache
@@ -121,8 +137,11 @@ test('save() rebuilds the nested {l:{id:{c:d}}} shape for saveModel; init() relo
 });
 
 test('save() only persists when dirty — a freshly loaded cache is not re-written', async () => {
-  const store = { uiCacheScoped: true, o: { en: { comp1: { ['test:\0default']: 'A' } } }, sets: 0, get() { return this.o; }, set(o) { this.o = o; this.sets++; } };
+  const store = { uiCacheScoped: true, o: {version: 1, fragments: [
+    {language: 'en', cid: 'comp1', variant: 'test:\0default', html: 'A', settledAt: 0}
+  ]}, sets: 0, get() { return this.o; }, set(o) { this.o = o; this.sets++; } };
   c.cache = {}; c.order = new Map(); c.max = 512; c.updated = 0; c.saveModel = store;
+  c.persistenceClock = () => 0;
   await c.init();                 // loads A; must NOT mark dirty
   await c.save();
   assert.equal(store.sets, 0, 'a clean (freshly loaded) cache must not be persisted');
@@ -131,16 +150,16 @@ test('save() only persists when dirty — a freshly loaded cache is not re-writt
   assert.equal(store.sets, 1, 'a new entry must trigger exactly one persist');
 });
 
-test('init() bounds an oversized persisted cache to `max`', async () => {
-  const store = { uiCacheScoped: true, o: { en: {
-    a: { ['test:\0d']: '1' }, b: { ['test:\0d']: '2' }, cc: { ['test:\0d']: '3' },
-    dd: { ['test:\0d']: '4' }, ee: { ['test:\0d']: '5' }
-  } }, get() { return this.o; }, set() {} };
+test('init() quarantines an oversized versioned persisted cache before loading any entry', async () => {
+  const store = { uiCacheScoped: true, o: {version: 1, fragments: [
+    {language: 'en', cid: 'a', variant: 'test:\0d', html: '1', settledAt: 0},
+    {language: 'en', cid: 'b', variant: 'test:\0d', html: '2', settledAt: 0},
+    {language: 'en', cid: 'cc', variant: 'test:\0d', html: '3', settledAt: 0}
+  ]}, get() { return this.o; }, set() {} };
   c.cache = {}; c.order = new Map(); c.max = 2; c.updated = 0; c.saveModel = store;
   await c.init();
-  assert.equal(await c.get(null, 'en', 'a', 'd'), null, 'oldest loaded entry evicted past max');
-  assert.equal(await c.get(null, 'en', 'ee', 'd'), '5', 'newest loaded entry retained');
-  assert.ok(c.order.size <= 2, 'init loaded past max: ' + c.order.size);
+  assert.deepEqual(c.cache, {});
+  assert.equal(c.order.size, 0);
 });
 
 test('set() is write-once — a repeat of the same key keeps the first value and does not re-dirty', async () => {
@@ -163,8 +182,11 @@ test('set() write-once does not bump recency (a repeat leaves eviction order int
 });
 
 test('init() clears a stale dirty flag — a freshly reloaded cache is not re-persisted', async () => {
-  const store = { uiCacheScoped: true, o: { en: { comp1: { ['test:\0default']: 'A' } } }, sets: 0, get() { return this.o; }, set(o) { this.o = o; this.sets++; } };
+  const store = { uiCacheScoped: true, o: {version: 1, fragments: [
+    {language: 'en', cid: 'comp1', variant: 'test:\0default', html: 'A', settledAt: 0}
+  ]}, sets: 0, get() { return this.o; }, set(o) { this.o = o; this.sets++; } };
   c.cache = {}; c.order = new Map(); c.max = 512; c.updated = 1; c.saveModel = store;  // dirty BEFORE init
+  c.persistenceClock = () => 0;
   await c.init();
   await c.save();
   assert.equal(store.sets, 0, 'reloading a persisted cache must not leave it marked dirty');
@@ -183,6 +205,7 @@ test('dirty tracking is per render context while cache/order remain shared', asy
   const a = { c: { c: 1, s: null, a: null } };
   const b = { c: { c: 1, s: null, a: null } };
   c.cache = {}; c.order = new Map(); c.max = 512; c.updated = 0; c.saveModel = store;
+  c.persistenceClock = () => 100;
 
   c.set(a, 'en', 'comp1', 'default', 'A');
 
@@ -193,7 +216,9 @@ test('dirty tracking is per render context while cache/order remain shared', asy
 
   await c.save(a);
   assert.equal(store.sets, 1, 'render A save persists its own dirty write');
-  assert.deepEqual(store.o, { en: { comp1: { ['test:\0default']: 'A' } } });
+  assert.deepEqual(store.o, {version: 1, fragments: [
+    {language: 'en', cid: 'comp1', variant: 'test:\0default', html: 'A', settledAt: 100}
+  ]});
 });
 
 test('unscoped fragment read, write, and save bypass seeded state without recency, dirty, or persistence effects', async () => {
@@ -270,13 +295,12 @@ test('interleaved unscoped fragment coordinates cannot observe or retain each ot
   }
 });
 
-test('an attested persisted store ignores malformed variants while scoped entries retain their shape', async () => {
+test('an attested mixed-validity envelope is quarantined as one atomic unit', async () => {
   const old = {cache: c.cache, order: c.order, max: c.max, updated: c.updated, saveModel: c.saveModel, requestModel: c.requestModel};
-  const store = {uiCacheScoped: true, o: {en: {same: {
-    default: 'RAW',
-    ['\0default']: 'LEADING',
-    ['tenant\0default']: 'SCOPED'
-  }}}, get() { return this.o; }, set() {}};
+  const store = {uiCacheScoped: true, o: {version: 1, fragments: [
+    {language: 'en', cid: 'same', variant: 'tenant\0default', html: 'SCOPED', settledAt: 0},
+    {language: 'en', cid: 'same', variant: 'default', html: 'RAW', settledAt: 0}
+  ]}, get() { return this.o; }, set() {}};
   const root = {c: 0, s: null, a: null, tenant: 'tenant'};
 
   try {
@@ -284,15 +308,15 @@ test('an attested persisted store ignores malformed variants while scoped entrie
     c.saveModel = store; c.requestModel = rm; rm.base = '';
     await c.init();
 
-    assert.deepEqual(c.cache, {en: {same: {['tenant\0default']: 'SCOPED'}}});
-    assert.equal(c.order.size, 1);
-    assert.equal(await c.get(root, 'en', 'same', 'default'), 'SCOPED');
+    assert.deepEqual(c.cache, {});
+    assert.equal(c.order.size, 0);
+    assert.equal(await c.get(root, 'en', 'same', 'default'), null);
     assert.equal(c.updated, 0);
 
     c.put('en', 'same', 'raw', 'NO');
     c.put('en', 'same', '\0leading', 'NO');
-    assert.deepEqual(c.cache, {en: {same: {['tenant\0default']: 'SCOPED'}}});
-    assert.equal(c.order.size, 1);
+    assert.deepEqual(c.cache, {});
+    assert.equal(c.order.size, 0);
   } finally {
     c.cache = old.cache; c.order = old.order; c.max = old.max; c.updated = old.updated;
     c.saveModel = old.saveModel; c.requestModel = old.requestModel; rm.base = '';
@@ -612,6 +636,7 @@ test('fragment ttl zero reuses no settled value and Infinity is the no-clock rol
 test('exact and full fragment purge are deterministic, isolation-safe, and persist only live deletions through save()', async () => {
   ttlReset();
   pm.clock = () => 0;
+  c.persistenceClock = () => 0;
   const a = {c: 0, tenant: 'a'}, b = {c: 0, tenant: 'b'};
   const store = {sets: 0, value: null, async set(value) { this.sets++; this.value = value; }};
   c.saveModel = store;
@@ -628,14 +653,16 @@ test('exact and full fragment purge are deterministic, isolation-safe, and persi
   assert.equal(store.sets, 0, 'purge uses the existing explicit save path');
   await c.save(a);
   assert.equal(store.sets, 1);
-  assert.deepEqual(store.value, {en: {same: {['b\0default']: 'B'}}});
+  assert.deepEqual(store.value, {version: 1, fragments: [
+    {language: 'en', cid: 'same', variant: 'b\0default', html: 'B', settledAt: 0}
+  ]});
 
   assert.equal(c.purgeAll(b), 1);
   assert.equal(c.purgeAll(b), 0);
   const cycle = {c: 0}; cycle.p = cycle;
   assert.equal(c.purgeAll(cycle), 0);
   await c.save(b);
-  assert.deepEqual(store.value, {});
+  assert.deepEqual(store.value, {version: 1, fragments: []});
 });
 
 test('purging a pending fragment lease detaches it, settles existing followers, and cannot affect a newer lease', async () => {
@@ -753,16 +780,15 @@ test('replacing UI cache/order identities or hitting the flight cap detaches obs
   assert.equal(c.order.size, 0);
 });
 
-test('init timestamps an attested persisted batch with one clock read and keeps timestamps out of the saved shape', async () => {
+test('init restores one versioned batch from original settlement time with one process-clock read', async () => {
   ttlReset(10);
   let now = 4, clocks = 0;
   pm.clock = () => { clocks++; return now; };
-  const original = {
-    en: {
-      a: {['tenant\0default']: 'A'},
-      b: {['tenant\0default']: 'B'}
-    }
-  };
+  c.persistenceClock = () => now;
+  const original = {version: 1, fragments: [
+    {language: 'en', cid: 'a', variant: 'tenant\0default', html: 'A', settledAt: 4},
+    {language: 'en', cid: 'b', variant: 'tenant\0default', html: 'B', settledAt: 4}
+  ]};
   const store = {uiCacheScoped: true, value: original, get() { return this.value; }, async set(value) { this.value = value; }};
   c.saveModel = store;
   await c.init();
@@ -774,8 +800,10 @@ test('init timestamps an attested persisted batch with one clock read and keeps 
   now = 14;
   assert.equal(await c.get(root, 'en', 'a', 'default'), null);
   await c.save(root);
-  assert.deepEqual(store.value, {en: {b: {['tenant\0default']: 'B'}}});
-  assert.deepEqual(Object.keys(store.value.en.b['tenant\0default']), ['0'], 'fragment remains a string, not a timestamp wrapper');
+  assert.deepEqual(store.value, {version: 1, fragments: [
+    {language: 'en', cid: 'b', variant: 'tenant\0default', html: 'B', settledAt: 4}
+  ]});
+  assert.equal(store.value.fragments[0].html, 'B', 'fragment remains a string, not a timestamp wrapper');
 });
 
 test('persisted fragment age survives restart instead of receiving a fresh ttl', async () => {

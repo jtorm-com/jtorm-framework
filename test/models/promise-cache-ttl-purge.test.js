@@ -36,6 +36,34 @@ test('absolute TTL starts at successful settlement, preserves warm identity, and
   assert.equal(loads, 2);
 });
 
+test('restore() keeps elapsed age inside the promise-cache owner and preserves strict zero/finite/Infinity policy', () => {
+  let now = 5, clocks = 0;
+  const o = owner(10), m = new Map(), value = {};
+  pm.clock = () => { clocks++; return now; };
+  const sample = pm.time(o);
+  const restored = pm.restore(o, 9, sample);
+  assert.equal(clocks, 1, 'restore itself performs no clock read');
+  m.set('k', value);
+  assert.equal(pm.stamp(o, m, 'k', value, restored, {}), true);
+  assert.equal(pm.fresh(o, m, 'k', value), true);
+  now = 6;
+  assert.equal(pm.fresh(o, m, 'k', value), false, 'age 10 is the strict expiry boundary');
+  assert.equal(pm.restore(o, 10, sample), undefined);
+  assert.equal(pm.restore(o, -1, sample), undefined);
+  assert.equal(pm.restore(o, 1.5, sample), undefined);
+  assert.equal(pm.restore(o, Number.MAX_SAFE_INTEGER + 1, sample), undefined);
+  assert.equal(pm.restore(o, 1, {clock: sample.clock, value: NaN}), undefined);
+  assert.equal(pm.restore(o, 1, {clock: null, value: sample.value}), undefined);
+  assert.equal(clocks, 3);
+
+  const zero = owner(0);
+  pm.clock = () => { throw new Error('zero restore clock'); };
+  assert.equal(pm.restore(zero, 0, undefined), undefined);
+
+  const forever = owner(Infinity);
+  assert.equal(pm.restore(forever, 999, Infinity), Infinity);
+});
+
 test('pending work never expires, while exact purge detaches it without aborting or letting late completion own a newer insertion', async () => {
   let now = 0, releaseOld, releaseNew, loads = 0;
   const o = owner(1);

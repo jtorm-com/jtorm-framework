@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "fragments": [
+    {
+      "language": "en",
+      "cid": "card",
+      "variant": "https://tenant.example\u0000default",
+      "html": "<article>cached</article>",
+      "settledAt": 1000
+    }
+  ]
+}

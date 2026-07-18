@@ -52,7 +52,9 @@ test('shared runtime policies have one injected source owner per family', () => 
   assert.match(read(owners[1]), /\.keys\(\)\.next\(\)/);
   assert.match(read(owners[1]), /r\.token !== n \|\| c\.get\(q\) !== p/);
   assert.match(read(owners[1]), /metadata: new WeakMap\(\)/);
+  assert.match(read(owners[1]), /restore: function \(o, age, a\)/);
   assert.match(read('src/models/ui-cache-model/src/ui-cache-model.js'), /promiseCacheModel\.fresh\(/);
+  assert.match(read('src/models/ui-cache-model/src/ui-cache-model.js'), /promiseCacheModel\.restore\(this, now - r\.settledAt, a\)/);
   assert.match(read(owners[2]), /renderContextModel/);
   assert.match(read(owners[2]), /\.parseUrl\(|\.createElement\(|\.appendChild\(|URL blocked/);
 });
@@ -142,12 +144,12 @@ test('ownership analyzer catches representative bypass families without comment/
 test('coordinated package releases declare their policy owners and dependency minima', () => {
   const releases = {
     'src/models/render-context-model': '1.0.1',
-    'src/models/promise-cache-model': '1.0.2',
+    'src/models/promise-cache-model': '1.0.3',
     'src/models/asset-plugin-model': '1.0.0',
     'src/models/request-model': '1.1.5',
     'src/models/ui-manifest-model': '1.0.3',
     'src/models/layer-model': '1.0.2',
-    'src/models/ui-cache-model': '1.0.7',
+    'src/models/ui-cache-model': '2.0.0',
     'src/models/data-model': '1.0.7',
     'src/models/html-model': '1.0.7',
     'src/models/tss-model': '1.0.8',
@@ -159,7 +161,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     'tooling/ui-manifest-compiler': '1.0.1',
     'src/plugins/css-plugin': '1.0.5',
     'src/plugins/js-plugin': '1.0.5',
-    'src/plugins/ui-cache-plugin': '1.0.2'
+    'src/plugins/ui-cache-plugin': '1.0.3'
   };
   const dependencies = {
     'src/models/request-model': {'@jtorm/render-context-model': '^1.0.1'},
@@ -170,7 +172,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     },
     'src/models/layer-model': {'@jtorm/render-context-model': '^1.0.0'},
     'src/models/ui-cache-model': {
-      '@jtorm/promise-cache-model': '^1.0.2',
+      '@jtorm/promise-cache-model': '^1.0.3',
       '@jtorm/render-context-model': '^1.0.1',
       '@jtorm/request-model': '^1.1.5'
     },
@@ -185,7 +187,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     'src/plugins/ui-cache-plugin': {
       '@jtorm/event-model': '^1.0.2',
       '@jtorm/handler-wrapper': '^1.0.7',
-      '@jtorm/ui-cache-model': '^1.0.7'
+      '@jtorm/ui-cache-model': '^2.0.0'
     },
     'src/parsers/data-parser': {'@jtorm/tss-parser': '^2.0.0'},
     'src/methods/attrs-method': {'@jtorm/tss-parser': '^2.0.0'},

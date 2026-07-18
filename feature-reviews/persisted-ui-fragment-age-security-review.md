@@ -1,13 +1,13 @@
-# Persisted UI Fragment Age — Pre-Implementation Security Review
+# Persisted UI Fragment Age — Security and Privacy Review
 
 **Date:** 2026-07-18  
-**Status:** Pre-code approved  
+**Status:** Implementation review complete; delivery gates in progress
 **Scope:** Versioned persisted rendered-fragment age only  
 **Primary specification:** `feature-reviews/persisted-ui-fragment-age.md`
 
 ## Gate Decision
 
-Implementation may begin only after the specification's independent explorer/architect review confirms the controls below. The persistence boundary is treated as untrusted even though the host supplies the adapter. Invalid provenance, version, structure, identity, timestamp, clock, or resource bounds must produce an empty clean live cache and ordinary cold rendering. No High or Medium threat is deferred.
+Implementation began after the specification's independent explorer/architect review confirmed the controls below. The completed diff continues to treat the persistence boundary as untrusted even though the host supplies the adapter. Invalid provenance, version, structure, identity, timestamp, clock, or resource bounds produce an empty clean live cache and ordinary cold rendering. No High or Medium threat is deferred.
 
 ## Security Objective
 
@@ -244,3 +244,59 @@ These residual risks are accepted only under the documented host contract. Any d
 ## Pre-Code Verdict
 
 The design is approved after independent explorer and architect review. Required implementation gates are: exact own provenance/version checks, bounded whole-envelope staging, restart-stable publication timestamp, current-policy age restore, pair-bound weak metadata, immutable save snapshots, complete cleanup, red-first adversarial coverage, major SemVer, and isolated migration/rollback. No stale-while-revalidate or HTTP validator behavior is included.
+
+## Post-Implementation Review
+
+The final local diff implements every mandatory control without changing the existing request,
+manifest, parser, handler, or network boundaries. The deep threat model was retraced through these
+five paths:
+
+1. attested adapter load -> exact wire validation -> current-policy age restoration -> atomic swap;
+2. scoped O(1) hit -> exact content/order/store/timestamp authentication -> non-sliding freshness;
+3. successful direct/completion publication -> paired process and absolute time -> dirty revision;
+4. bounded frozen save snapshot -> one adapter call -> revision-safe cleanup; and
+5. expiry/eviction/purge/abort/replacement -> paired metadata removal and no late resurrection.
+
+Three concrete implementation findings were reproduced red-first and fixed: a throwing adapter
+`get` accessor now stays inside the cold-load failure boundary; test-engine adapter DI no longer
+leaks across renders; and a rejected replacement publication retains the previous complete
+content/process/absolute metadata pair. Adversarial review also added duplicate-identity and mixed
+fresh/stale batch proofs. The full dispositions are in the differential and cross-model records.
+
+### Final control evidence
+
+| Control family | Result |
+|---|---|
+| Provenance/scope/version | PASS — own descriptor gates and unscoped zero-touch tests |
+| Whole-envelope validation | PASS — malformed, cyclic, accessor, polluted, oversized, duplicate, mixed, unknown, and failed-load cases are empty and clean |
+| Absolute age/current TTL | PASS — just-before/exact/after boundary, save delay, non-sliding hits, TTL changes, zero/Infinity, future/regression |
+| Pairing/concurrency | PASS — exact byte/order/store/time binding, delayed init, async/overlapping saves, replacement rollback |
+| Lifecycle/deletion | PASS — handler/event failure, abort, late completion, expiry, eviction, exact/full purge, failed save |
+| Isolation | PASS — explicit tenant/origin/base separation and unscoped same-identity pipeline restart |
+| Static/supply chain | PASS — 88 Semgrep rules with zero findings; full/production audits zero vulnerabilities; no runtime import/new dependency |
+| Verification | PASS — focused 143/143, exact repository 705/705, typecheck, package, syntax, source, JSON/JSONL, and diff guards |
+
+### Privacy disposition
+
+`settledAt` remains the only new datum. It is necessary for TTL enforcement, stored exactly once
+with its fragment, never logged or reused, and removed from live/persisted state with that fragment.
+Because it can reveal user-specific publication activity, hosts must include it in the fragment's
+access, encryption, retention, erasure, backup, replica, residency, and incident-response policy.
+No new controller/processor, transfer, consent, profiling, audit-log, or subject-identity flow is
+introduced.
+
+### Infrastructure and rollback disposition
+
+No database, service, route, queue, job, timer, credential, or external SDK is added. Adapter
+durability, ordering, timeouts, backups, metrics, and alerts remain host-owned. Failed reads stay
+cold; failed writes stay dirty and are observable through an awaited direct `save()`. A safe
+downgrade requires persistence disabled plus v1 cleared or a reader-compatible snapshot restored
+before starting 1.x. Old and new readers must never share the namespace.
+
+## Current Security Verdict
+
+**PASS; LOCAL REVIEW COMPLETE.** No framework-addressable High or Medium security, privacy,
+infrastructure, or failure-atomicity finding remains. The only accepted residual risks are the
+documented trusted-host clock, adapter durability/order, and external backup/erasure boundaries.
+Final staged-ratchet, CI, and current-head Codex evidence are recorded in the completion evaluation.
+Stale-while-revalidate and HTTP validators remain separate future threat boundaries.

@@ -2,25 +2,32 @@
 
 **Date:** 2026-07-18  
 **Author:** Codex `/root`  
-**Status:** Specification approved; implementation not started  
+**Status:** Implementation and local review complete; delivery in progress
 **Claimed:** 2026-07-18T17:10:22Z  
-**Current Mode:** Implement checkpoint 1 - red-first defect proof
+**Current Mode:** Delivery - commit and ready PR
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Design  
-**Current Mode:** Implement checkpoint 1 - red-first defect proof  
-**Next Action:** Write and observe the persisted-age restart regression before changing runtime code.
+**Last Completed Mode:** Review
+**Current Mode:** Delivery - commit and ready PR
+**Next Action:** Commit the clean feature-only index and open the ready PR into `dev`.
 
 **Files Created:**
-- `feature-reviews/persisted-ui-fragment-age.md` - Workflow state and approved implementation specification.
+- specification, security, differential, adversarial, and evaluation records;
+- exact wire-v1, migration, and rollback fixtures; and
+- focused persistence model tests.
 
-**Files Modified:** None yet.  
-**Tests Written:** None yet.
+**Files Modified:** Promise-cache/UI-cache runtime owners, UI plugin dependency metadata, host test
+DI/reset, focused model/plugin/pipeline guards, package/root READMEs, package metadata, `AGENTS.md`,
+and the architecture backlog.
+**Tests Written:** Red restart defect, dual-clock TTL boundaries, hostile envelopes, byte/timestamp
+pairing, async saves, lifecycle/purge cleanup, isolation, and persistence/restart pipeline coverage.
 
-**Issue proved by source trace:** `ui-cache-model.init()` currently obtains one new process-local promise-cache timestamp and publishes every attested persisted fragment with it. A fragment settled at `t0` and reloaded just before `t0 + ttl` therefore receives another full TTL.
+**Issue proved red-first:** a fragment settled at `t0` and reloaded just before `t0 + ttl` received
+another full TTL from the previous `init()` implementation. The committed regression failed before
+runtime changes and now passes with only the true remaining lifetime.
 
 **Design decisions:**
 - Persist a public wire-version `1` envelope containing a deterministic LRU-ordered array of structurally paired fragment bytes and absolute settlement timestamps.
@@ -213,7 +220,8 @@ At `init()`, obtain one opaque current process-time sample first, then let `now`
 | `test/pipeline/ui-cache.test.js` | Preserve the default-null language compatibility proof under exact wire v1 | Medium |
 | Focused model/plugin/pipeline tests | Red defect, schema/adversarial/concurrency/lifecycle proofs | Medium |
 | `test/fixtures/ui-cache-persistence-v1.json` | Exact wire golden | Low |
-| `test/fixtures/ui-cache-persistence-legacy.json` | Legacy quarantine/migration/rollback fixture | Low |
+| `test/fixtures/ui-cache-persistence-migration.json` | Legacy quarantine and trusted-timestamp migration golden | Low |
+| `test/fixtures/ui-cache-persistence-rollback.json` | Older-reader isolation and rollback-order golden | Low |
 | `README.md`, `AGENTS.md` | Host and locked architecture contract | Medium |
 | Architecture feature/evaluation/security/ledger records | Completion evidence and next-follow-up status | Low |
 
@@ -427,13 +435,13 @@ Residual host risks are explicit: the framework cannot verify that a host truthf
 
 ## Success Criteria
 
-- [ ] Under the required restart-stable nondecreasing Unix-ms host clock, a persisted fragment's total reusable lifetime never exceeds the current TTL measured from original successful publication across any number of restarts; all detectable future/live regressions fail cold.
-- [ ] Exact/after TTL boundaries miss and leave no live content or timestamp metadata.
-- [ ] Save delay, init, and hits do not change `settledAt`.
-- [ ] All invalid/legacy/hostile envelopes fail cold atomically and within `max`.
-- [ ] Scoped provenance, isolation, publication lifecycle, LRU, leases, write-once, dirty/save, and public in-memory contracts remain compatible.
-- [ ] The exact v1 golden, migration fixture, rollback/deployment/privacy guidance, and major SemVer contract are published.
-- [ ] Architecture weakness #12 remains closed; only this P4 item is marked complete; stale-while-revalidate/HTTP validators remain a named independent follow-up.
+- [x] Under the required restart-stable nondecreasing Unix-ms host clock, a persisted fragment's total reusable lifetime never exceeds the current TTL measured from original successful publication across any number of restarts; all detectable future/live regressions fail cold.
+- [x] Exact/after TTL boundaries miss and leave no live content or timestamp metadata.
+- [x] Save delay, init, and hits do not change `settledAt`.
+- [x] All invalid/legacy/hostile envelopes fail cold atomically and within `max`.
+- [x] Scoped provenance, isolation, publication lifecycle, LRU, leases, write-once, dirty/save, and public in-memory contracts remain compatible.
+- [x] The exact v1 golden, migration fixture, rollback/deployment/privacy guidance, and major SemVer contract are published.
+- [x] Architecture weakness #12 remains closed; only this P4 item is marked complete; stale-while-revalidate/HTTP validators remain a named independent follow-up.
 - [ ] Every requested review and verification gate is clean, CI is green, and Codex approves the current PR head with no unresolved findings.
 
 ## Open Questions
@@ -487,24 +495,24 @@ None. No product-level choice remains unresolved.
 - [x] Independent architecture and threat-model review complete
 
 ### Implement Mode
-- [ ] Checkpoint 1: red-first defect proof
-- [ ] Checkpoint 2: core wire-schema and absolute-age logic
-- [ ] Checkpoint 3: validation, failure atomicity, save concurrency, purge edges
-- [ ] Checkpoint 4: host integration, package metadata, and documentation
+- [x] Checkpoint 1: red-first defect proof
+- [x] Checkpoint 2: core wire-schema and absolute-age logic
+- [x] Checkpoint 3: validation, failure atomicity, save concurrency, purge edges
+- [x] Checkpoint 4: host integration, package metadata, and documentation
 
 ### Test Mode
-- [ ] Focused tests passing
-- [ ] Full tests passing
-- [ ] Typecheck and package dry-runs passing
+- [x] Focused tests passing (143/143)
+- [x] Exact full tests passing (705/705)
+- [x] Typecheck and three package dry-runs passing
 
 ### Review Mode
-- [ ] Requested review skills complete
-- [ ] Security/static analysis gates complete
-- [ ] 100/100 code quality
-- [ ] Verification loop passed
+- [x] Requested review skills complete
+- [x] Security/static analysis gates complete
+- [x] 100/100 code quality
+- [x] Verification loop passed
 
 ### Documentation/Delivery Mode
-- [ ] Architecture, migration, rollback, security, evaluation, and ledger records updated
+- [x] Architecture, migration, rollback, security, evaluation, and ledger records updated
 - [ ] Ready PR opened into `dev`
 - [ ] CI green
 - [ ] Clean Codex review on current head with zero unresolved threads

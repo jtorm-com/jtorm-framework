@@ -18,4 +18,6 @@ The model itself awaits the adapter and retains dirty retry state on failure; ad
 that require completion/error visibility call and await `uiCacheModel.save(scopedView)` directly.
 Persisted reload is quarantined until the host has cleared the old store and
 sets an own `uiCacheScoped = true` field on the model's save adapter; inherited attestation is
-ignored. See the model README for the migration contract.
+ignored. Plugin `1.0.3+` requires UI-cache model `2.x`, whose versioned envelope preserves the
+successful completion timestamp across restarts. See the model README for the clock, migration,
+deployment, privacy, and rollback contract.

@@ -1,0 +1,9 @@
+{
+  "storeVersion": 1,
+  "beforeOlderReader": [
+    "disablePersistence",
+    "clearVersion1StoreOrRestoreReaderCompatibleSnapshot",
+    "startOlderReader"
+  ],
+  "mixedReadersAllowed": false
+}

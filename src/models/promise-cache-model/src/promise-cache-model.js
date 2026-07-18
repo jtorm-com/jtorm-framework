@@ -63,6 +63,29 @@ module.exports = {
             return this.read(o);
         },
 
+        restore: function (o, age, a) {// restore a settled insertion point from trusted elapsed age; representation stays private here
+            const t = this.policy(o);
+            let r;
+
+            if (!Number.isSafeInteger(age) || age < 0 || t === undefined || t === 0)
+                return
+            ;
+            if (t === Infinity)
+                return Infinity
+            ;
+            if (age >= t || !a || a === Infinity || typeof a.clock !== 'function'
+                || typeof a.value !== 'number' || !Number.isFinite(a.value) || a.value < 0)
+                return
+            ;
+
+            r = this.observed.get(o);
+            if (!r || r.clock !== a.clock || r.last < a.value)
+                return
+            ;
+
+            return {clock: a.clock, value: a.value - age};
+        },
+
         live: function (o, a) {
             const t = this.policy(o);
             let n;

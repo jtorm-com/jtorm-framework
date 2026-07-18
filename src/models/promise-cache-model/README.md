@@ -33,6 +33,13 @@ The public cache still contains the original promises. Timestamp records live in
 keyed by the current cache Map and are bounded by its exact keys, so replacing a host Map is not
 retained. Runtime source has no imports.
 
+Persistence owners that already validated a trustworthy elapsed age may call
+`restore(owner, age, sampledTime)`. It applies the owner's current finite/zero/Infinity policy and
+returns an opaque process-local insertion record; callers pass that record back to `stamp()` and
+must not inspect or synthesize its fields. This keeps strict `< ttl`, clock identity, regression,
+and timestamp representation in this model while a separate persistence owner retains an absolute
+timestamp. `restore()` performs no clock read and never serializes clock identity.
+
 An `undefined` key is the fail-closed bypass: `load()` runs normally, but the owner does not read,
 insert, deduplicate, evict, or alter recency in `c`. Other key identities, including `null`, remain
 generic API-compatible cache keys; request/cache consumers normalize their unscoped result to
