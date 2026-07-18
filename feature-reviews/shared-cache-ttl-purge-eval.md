@@ -104,7 +104,7 @@ The linked STRIDE record covers the changed trust boundary, all six categories, 
 
 ## Source-ratchet and tech-debt applicability
 
-The existing policy-ownership ratchet was updated to require weak centralized metadata, UI delegation to `promiseCacheModel.fresh`, exact DI, package versions, and dependency minima. Runtime behavior is primarily protected by deterministic tests rather than brittle source regexes. The source-ratchet review converged with its no-edit sentinel; no second analyzer is warranted. Final staged tech-debt review remains pending until the exact candidate is staged.
+The existing policy-ownership ratchet was updated to require weak centralized metadata, UI delegation to `promiseCacheModel.fresh`, exact DI, package versions, and dependency minima. Runtime behavior is primarily protected by deterministic tests rather than brittle source regexes. The source-ratchet review converged with its no-edit sentinel; no second analyzer is warranted. Final staged tech-debt review passed on the exact candidate with zero findings.
 
 ## Production readiness
 
@@ -120,7 +120,7 @@ The existing policy-ownership ratchet was updated to require weak centralized me
 
 Residual operational risks are bounded cold-load spikes at expiry, an owner-wide cold window after a backward wall-clock correction, and shared leader failure for same-key followers. Hosts can tune TTL, inject a monotonic clock, retain request limits/timeouts, or set `Infinity` while rolling back.
 
-**Production-readiness verdict:** PASS locally; remote gates remain.
+**Production-readiness verdict:** PASS. Final-head CI and Codex review also passed before maintainer merge.
 
 ## Package SemVer
 
