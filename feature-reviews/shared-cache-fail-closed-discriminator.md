@@ -1,22 +1,22 @@
 # Feature Development: Fail-Closed Shared Cache Discriminator
 
-**Status:** IN_PROGRESS
+**Status:** COMPLETE
 **Claimed:** 2026-07-17T17:26:06Z
 **Agent:** Codex `/root`
-**Current Mode:** Review
+**Current Mode:** Complete — PR #59 merged into `dev` as `60072ba`
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Implement
-**Current Mode:** Review
-**Next Action:** Obtain green CI and a clean Codex review on the final PR #59 head with zero unresolved threads; do not merge.
+**Last Completed Mode:** Delivery
+**Current Mode:** Complete
+**Next Action:** Start the independent weakness #12 TTL/purge follow-up from current `dev`; this fail-open discriminator record is complete.
 **Issues Found and fixed:** Shared fetch, manifest-pack, and rendered-fragment caches accepted keys with no explicit render discriminator. Adversarial red tests also exposed inherited render links, inherited request/base accessors, inherited effective bases, nullish create-flag compatibility, root-only fetch/UI scope divergence, and prototype-inherited persistence attestation; each now resolves at its existing policy owner.
 **Design Decisions Made:** An unscoped cache key is `undefined`; generic promise-cache bypasses it without touching its map; request-model owns discriminator validity and exact scoped key construction; render-context-model owns strict own-link cache root resolution without changing normal `context()`; UI cache consumes those owners and quarantines provenance-ambiguous persistence until explicit own post-cleanup attestation.
 
-**Context for Next Session:**
-PR #58 merged at `b96b850de9c9f953329b551ee78551dfb9f608a9`; local `dev` was fast-forwarded to `origin/dev`; work continues on `agent/fail-closed-shared-cache-discriminator`.
+**Completion Context:**
+PR #59 final head `e5abb4bf67455fb29c1a17f42bd3ae9ef21192e3` passed CI and a clean current-head Codex review with zero unresolved threads, then the maintainer merged it into `dev` as `60072ba7e3b3d9bebd9ff6818a7322cd60107e7d` on 2026-07-18. TTL/purge remains separately tracked and is not claimed complete here.
 
 ---
 
@@ -104,8 +104,8 @@ The converged fix puts strict own-link traversal in `render-context-model.cacheC
 - [x] Named local review gates complete
 - [x] 100/100 code quality
 - [x] Local verification loop passed
-- [ ] Current-head CI green
-- [ ] Current-head Codex review clean with zero unresolved threads
+- [x] Current-head CI green
+- [x] Current-head Codex review clean with zero unresolved threads
 
 ### Documentation Mode
 - [x] Package READMEs updated
@@ -636,7 +636,7 @@ None. The maintainer request resolves scope, behavior, migration, SemVer, review
 - [x] Two same-identity unscoped pipeline renders cannot leak fetched or rendered content; scoped warm renders are byte-for-byte compatible.
 - [x] Focused/full/typecheck/package/source/security/JSONL/diff gates pass.
 - [x] Architecture backlog closes only the fail-open discriminator subproblem and names TTL/purge as next.
-- [ ] Ready PR targets `dev`, CI is green, and current-head Codex review is clean with zero unresolved threads; PR remains unmerged.
+- [x] PR #59 targeted `dev`; final head CI was green and current-head Codex review was clean with zero unresolved threads before maintainer merge as `60072ba7e`.
 
 ## Approval
 
