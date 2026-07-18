@@ -3,7 +3,7 @@
 **Branch:** `feat/persisted-ui-fragment-age`
 **Base:** `dev` at `3c614cd5cf65854d5e85922445a7fca1221db659`
 **Started:** 2026-07-18
-**Status:** Implementation and local gates complete; ready PR #63 in review
+**Status:** COMPLETE
 **Specification:** [`persisted-ui-fragment-age.md`](persisted-ui-fragment-age.md)
 **Security review:** [`persisted-ui-fragment-age-security-review.md`](persisted-ui-fragment-age-security-review.md)
 **Differential review:** [`persisted-ui-fragment-age-differential-review.md`](persisted-ui-fragment-age-differential-review.md)
@@ -182,7 +182,9 @@ stored settlement and is therefore undetectable, external adapter tearing/reorde
 backups retaining purged state. All are explicitly assigned to the host; detectable violations fail
 cold. No framework-addressable High or Medium risk remains.
 
-**Production-readiness verdict:** PASS locally; ready PR, CI, and current-head Codex gates remain.
+**Production-readiness verdict:** PASS; COMPLETE. Final head `91954dec75980184d34b39d1c20efb5e5d7fce45`
+passed CI and a clean current-head Codex review with zero unresolved threads before maintainer merge
+as `f2a397626d30f4a36240f0e302694b63ccfaeabd`.
 
 ## Package SemVer
 
@@ -226,12 +228,14 @@ No other runtime package changed or received a bump.
 | Cross-model adversarial review | PASS — three lenses, no unresolved finding |
 | Source-ratchet review | PASS — four analyzer tests and no-edit convergence sentinel |
 | Staged tech-debt ratchet | PASS — zero new debt patterns on the exact feature-only index |
-| Ready PR | PASS — non-draft mergeable PR #63 targets `dev` |
-| CI / current-head Codex | In progress |
+| PR lifecycle | PASS — ready non-draft PR #63 targeted `dev` and remained unmerged during agent delivery |
+| CI / current-head Codex | PASS — final head `91954dec75980184d34b39d1c20efb5e5d7fce45`, CI run `29659804861`, clean review, zero unresolved threads |
+| Maintainer merge | PASS — PR #63 merged into `dev` as `f2a397626d30f4a36240f0e302694b63ccfaeabd` on 2026-07-18 |
 
 ## Current verdict
 
-**PASS; PR REVIEW IN PROGRESS.** The specification, implementation, red-first proof, reviews, local
-verification, documentation, package artifacts, staged debt gate, migration/rollback contract, and
-ready PR #63 are complete. The remaining work is green CI and a clean Codex review against the final
-head with zero unresolved threads. The PR will remain unmerged.
+**PASS; COMPLETE.** The specification, implementation, red-first proof, reviews, verification,
+documentation, package artifacts, staged debt gate, migration/rollback contract, final-head CI,
+and current-head Codex review are complete with zero unresolved threads. The agent left PR #63
+unmerged; the maintainer subsequently merged it into `dev` as
+`f2a397626d30f4a36240f0e302694b63ccfaeabd` on 2026-07-18.
