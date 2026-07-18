@@ -940,3 +940,117 @@ test('pack promise LRU evicts by recency and rejected acquisition retries', asyn
   assert.equal(attempts, 2);
   assert.equal(await mm.get('html', '@h/retry.html', root), 'retry');
 });
+
+test('unscoped manifest packs bypass cross-render state while the prepared root stays local and reusable', async () => {
+  reset();
+  const built = await pack([
+    { type: 'html', request: '@h/a.html', value: 'A' }
+  ]);
+  const descriptor = [{
+    url: '/same.json', hash: built.hash, mode: 'required'
+  }];
+  const kept = Promise.resolve('kept');
+  mm.c = new Map([['kept', kept]]);
+  mm.max = 1;
+  const before = [...mm.c.entries()];
+  let reads = 0;
+  mm.requestModel = {
+    cacheKey: () => undefined,
+    get: () => ({ text: async () => {
+      reads++;
+      return JSON.stringify(built.manifest);
+    } }),
+    url: url => url,
+    allow: async () => true
+  };
+
+  const a = {};
+  await mm.prepare(descriptor, a);
+  await mm.prepare(descriptor, a);
+  assert.equal(reads, 1, 'one render root retains its prepared promise/index');
+  assert.equal(await mm.get('html', '@h/a.html', a), 'A');
+
+  const b = {};
+  await mm.prepare(descriptor, b);
+  assert.equal(reads, 2, 'a second unscoped render reacquires the same pack');
+  assert.equal(await mm.get('html', '@h/a.html', b), 'A');
+  assert.deepEqual([...mm.c.entries()], before);
+});
+
+test('a fetch-capable manifest request adapter without cache policy acquires uncached', async () => {
+  reset();
+  const built = await pack([{type: 'html', request: '@h/a.html', value: 'A'}]);
+  const kept = Promise.resolve('kept');
+  const before = [['kept', kept]];
+  let reads = 0;
+  mm.c = new Map(before);
+  mm.requestModel = {
+    get: () => ({text: async () => { reads++; return JSON.stringify(built.manifest); }}),
+    url: url => url,
+    allow: async () => true
+  };
+  const descriptor = [{url: '/same.json', hash: built.hash, mode: 'required'}];
+  const root = {};
+
+  await mm.prepare(descriptor, root);
+
+  assert.equal(reads, 1);
+  assert.equal(await mm.get('html', '@h/a.html', root), 'A');
+  assert.deepEqual([...mm.c.entries()], before);
+});
+
+test('interleaved unscoped manifest roots do not share one in-flight pack promise', async () => {
+  reset();
+  const built = await pack([]);
+  const descriptor = [{
+    url: '/same.json', hash: built.hash, mode: 'required'
+  }];
+  const before = [...mm.c.entries()];
+  const releases = [];
+  let reads = 0;
+  mm.requestModel = {
+    cacheKey: () => undefined,
+    get: () => ({ text: () => {
+      reads++;
+      return new Promise(resolve => releases.push(() => resolve(JSON.stringify(built.manifest))));
+    } }),
+    url: url => url,
+    allow: async () => true
+  };
+
+  const a = mm.prepare(descriptor, {});
+  const b = mm.prepare(descriptor, {});
+  await new Promise(resolve => setImmediate(resolve));
+  const started = reads;
+  for (const release of releases) release();
+  await Promise.all([a, b]);
+  assert.equal(started, 2);
+  assert.deepEqual([...mm.c.entries()], before);
+});
+
+test('unscoped manifest acquisition and validation failures cannot evict seeded shared state', async () => {
+  reset();
+  const built = await pack([]);
+  const kept = Promise.resolve('kept');
+  const descriptor = [{
+    url: '/same.json', hash: built.hash, mode: 'required'
+  }];
+  mm.c = new Map([['kept', kept]]);
+  mm.max = 1;
+  const before = [...mm.c.entries()];
+  let text = '{';
+  mm.requestModel = {
+    cacheKey: () => undefined,
+    get: () => ({ text: async () => text }),
+    url: url => url,
+    allow: async () => true
+  };
+
+  await assert.rejects(() => mm.prepare(descriptor, {}), /Manifest JSON invalid/);
+  assert.deepEqual([...mm.c.entries()], before);
+
+  text = null;
+  mm.requestModel.get = () => ({ text: async () => { throw new Error('transport'); } });
+  await assert.rejects(() => mm.prepare(descriptor, {}), /transport/);
+  assert.deepEqual([...mm.c.entries()], before);
+});

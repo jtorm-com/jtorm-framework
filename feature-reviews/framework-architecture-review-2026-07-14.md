@@ -54,6 +54,16 @@
 > failure phases, and each/insert/wrap/get/UI compatibility tests pass. Final head
 > `61f5a95` passed CI and a clean current-head Codex review before the maintainer
 > merged it into `dev` as `0017bd9`.
+>
+> **Backlog update — 2026-07-17 (fail-closed shared-cache discriminator):** the
+> fail-open half of weakness #12 is complete. Shared data, HTML, TSS, manifest-pack,
+> and rendered-fragment caches now require a valid explicit tenant/origin/base
+> discriminator; unscoped work stays on the normal uncached path without shared
+> reads, writes, deduplication, recency, eviction, dirty state, or persistence.
+> Scoped key bytes and warm behavior remain compatible, and persisted fragments are
+> quarantined until a host attests a complete scoped-only store migration. Weakness
+> #12 is **not fully closed**: TTL, purge APIs,
+> clocks, and stale-revalidation remain the next independent cache follow-up.
 
 ---
 
@@ -115,7 +125,7 @@ Live in production on a Magento store via a Node host engine.
 9. **Binding re-parse per node per render** (handler.js:73; data-parser has no cache). The AST is cached but every binding string is re-regexed and re-split on every render. Cheapest large perf win available: compile bindings onto the AST node once.
 10. **DRY debt from the isolation retrofit.** 5 near-identical `context(v)` walks, 4 `state(v)` copies, 3 near-clone fetch models (tss/data/html, ~85% identical), 2 near-clone css/js plugins (~90% identical). Every isolation fix had to be applied in ≥4 places — the slice history shows exactly that. Directly against the CLAUDE.md DRY/smallest-bundle mandate.
 11. **`Thing.default` ships demo junk.** `thing-update-1.0.1.tss` (schema-ui.js:336-338) appends a stray `<input type=email>` and a `ul` to `<body>` — so any bare `ui:{c:'Thing'}` (e.g. `Person.default`, schema-ui.js:427-430) inherits it. The one live instance of the "versioned update file" mechanic is a landmine; no end-to-end test covers `Thing.default` or `Person.default`.
-12. **Fail-open tenant scoping.** Omit `c.request`/`c.tenant` and the cache policy key and ui-cache tenant prefix silently become `''` → cross-tenant shared caches (request-model.js:55-71, ui-cache-model.js:51-71). The easiest wiring is the unsafest. Plus: no TTL/purge on any of the 4 LRU caches — a template update needs a process restart.
+12. **Partially closed — fail-open tenant scoping fixed; TTL/purge remains.** Shared cache participation now fails closed when no valid explicit tenant/origin/base discriminator exists, including malformed/cyclic and legacy persisted-fragment cases. The independent remaining weakness is that none of the bounded LRU caches has TTL or an explicit purge surface, so a template update still needs a process restart.
 
 ### DRY / SOLID grade
 
@@ -197,6 +207,8 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P3** | Replace the parser (tokenizer + recursive descent) | ✅ Done — PR #55 | Unblocks all future DSL work + real diagnostics | L |
 | **P3** | Move `error-handler` dump behind a debug flag | ✅ Done — PR #53 | Info-disclosure + dead weight | S |
 | **P3** | Eliminate `handler-wrapper` cached-AST selector mutation | ✅ Done — PR #57 | Makes cached trees safe across sequential/interleaved/tenant renders without undoing parser inheritance | M |
+| **P3** | Fail shared cache participation closed without an explicit render discriminator | ✅ Done — fail-open half of weakness #12 | Prevents cross-render sharing while preserving ordinary uncached work and scoped warm behavior | M |
+| **P3** | Add cache TTL and explicit purge APIs | **Next independent weakness #12 follow-up** | Makes template/cache invalidation operational without process restart; deliberately separate from tenant scoping | M |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.

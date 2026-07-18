@@ -16,7 +16,7 @@ test('ui-cache dirty flag from a detached append fragment is saved at root after
         );
 
         assert.equal(store.sets, 1, 'root after-view save must persist the fragment cache write');
-        assert.equal(store.o.null.frag.default, 'cached');
+        assert.equal(store.o.null.frag['http://localhost\0default'], 'cached');
     } finally {
         jTormUiCacheModel.saveModel = null;
     }

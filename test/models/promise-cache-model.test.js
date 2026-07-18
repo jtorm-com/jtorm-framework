@@ -54,3 +54,46 @@ test('a degenerate maximum retains the newest entry and uses replaced owner stat
   assert.equal(old.size, 0);
   assert.strictEqual(owner.c.get(1), p);
 });
+
+test('undefined is an actual cache bypass with no read, write, deduplication, rejection eviction, or recency change', async () => {
+  const stale = Promise.resolve('STALE');
+  const calls = {get: 0, set: 0, delete: 0, keys: 0};
+  class TrackedMap extends Map {
+    get(key) { calls.get++; return super.get(key); }
+    set(key, value) { calls.set++; return super.set(key, value); }
+    delete(key) { calls.delete++; return super.delete(key); }
+    keys() { calls.keys++; return super.keys(); }
+  }
+  const cache = new TrackedMap([['a', Promise.resolve('A')], [undefined, stale]]);
+  const owner = {c: cache, max: 1};
+  const before = [...owner.c.entries()];
+  let loads = 0;
+  const load = () => Promise.resolve(++loads);
+  calls.get = calls.set = calls.delete = calls.keys = 0;
+
+  const a = pm.get(owner, undefined, {load});
+  const b = pm.get(owner, undefined, {load});
+  assert.notStrictEqual(b, a);
+  assert.deepEqual(await Promise.all([a, b]), [1, 2]);
+  assert.deepEqual(calls, {get: 0, set: 0, delete: 0, keys: 0});
+  assert.deepEqual([...owner.c.entries()], before);
+
+  await assert.rejects(
+    () => pm.get(owner, undefined, {load: () => Promise.reject(new Error('no cache'))}),
+    /no cache/
+  );
+  assert.deepEqual(calls, {get: 0, set: 0, delete: 0, keys: 0});
+  assert.deepEqual([...owner.c.entries()], before);
+});
+
+test('non-undefined generic keys retain existing identity semantics', async () => {
+  for (const key of [null, '', 0, false]) {
+    const owner = {c: new Map(), max: 2};
+    let loads = 0;
+    const a = pm.get(owner, key, {load: async () => ++loads});
+    const b = pm.get(owner, key, {load: async () => ++loads});
+    assert.strictEqual(b, a);
+    assert.equal(await b, 1);
+    assert.equal(loads, 1);
+  }
+});

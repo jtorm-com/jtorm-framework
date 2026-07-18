@@ -56,8 +56,8 @@ runtime remains pure CommonJS with dependency injection and no runtime imports.
 
 Hosts compose three stateless policy models before rendering:
 
-- `@jtorm/render-context-model` owns bounded, cycle-safe render-root traversal and
-  namespaced root state.
+- `@jtorm/render-context-model` owns bounded, cycle-safe render-root traversal, strict own-link
+  cache-root resolution, and namespaced root state. Normal render traversal remains compatible.
 - `@jtorm/promise-cache-model` owns in-flight promise dedupe, rejection cleanup, and
   bounded LRU mechanics while each fetch model retains its own cache, key, and loader.
 - `@jtorm/asset-plugin-model` owns the shared CSS/JS collection, URL-policy, DOM insertion,
@@ -68,6 +68,16 @@ layer, UI-cache, data/HTML/TSS, and CSS/JS collaborators. Publish render-context
 promise-cache first, then request-model, then asset-plugin-model, then the remaining consumer
 release set. Rollback requires pinning the prior consumer versions together and restoring the
 previous host DI graph.
+
+Shared data, HTML, TSS, manifest-pack, and rendered-fragment caches participate only when the
+request owner derives a valid explicit tenant/origin/base discriminator. Missing or malformed
+scope continues through normal uncached rendering without retained state. A single-tenant host
+can opt in by configuring a non-empty request base. Inject that same request model into UI-cache.
+After upgrade, UI-cache quarantines persisted fragments until the host clears the old store and
+sets an own `uiCacheScoped = true` field on its save adapter; inherited attestation is ignored,
+and old unscoped and new scoped bytes cannot be
+distinguished selectively. Perform that cleanup before enabling reload or any coordinated
+rollback. TTL and explicit purge remain a separate architecture follow-up.
 
 ## Credits
 The idea is heavily inspired from [Transphporm](https://github.com/Level-2/Transphporm), all credits go to them in finding a different way to handle template rendering.

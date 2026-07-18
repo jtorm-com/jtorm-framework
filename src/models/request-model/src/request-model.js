@@ -36,6 +36,117 @@ module.exports = {
             return r && r[k] != null ? r[k] : d;
         },
 
+        plain: function (v) {
+            if (!v || typeof v !== 'object' || Array.isArray(v))
+                return false
+            ;
+
+            const p = Object.getPrototypeOf(v);
+            return p === Object.prototype || p === null;
+        },
+
+        own: function (v, k) {
+            return !!v && Object.prototype.hasOwnProperty.call(v, k);
+        },
+
+        cacheBase: function (c, r, e) {
+            let p, d, i = 0;
+
+            if (r && !this.own(r, 'base') && 'base' in r) {
+                p = Object.getPrototypeOf(r);
+                while (p && i++ < 128 && !(d = Object.getOwnPropertyDescriptor(p, 'base')))
+                    p = Object.getPrototypeOf(p)
+                ;
+                if (!d || !this.own(d, 'value'))
+                    return null
+                ;
+            }
+
+            const v = this.option(c, 'base', this.base);
+
+            if (d && d.value != null && Object.is(v, d.value))
+                return null
+            ;
+
+            return {explicit: !!(e !== false && r && this.own(r, 'base') && r.base != null), value: v};
+        },
+
+        cacheRoot: function (c) {
+            let r, d;
+
+            if (c == null)
+                return {root: null}
+            ;
+
+            try {
+                if (!this.renderContextModel || typeof this.renderContextModel.cacheContext !== 'function')
+                    return null
+                ;
+
+                r = this.renderContextModel.cacheContext(c);
+                if (!r || typeof r !== 'object' || Array.isArray(r))
+                    return null
+                ;
+                if ('c' in r) {
+                    d = r.c;
+                    if (d != null && typeof d !== 'number' && typeof d !== 'boolean')
+                        return null
+                    ;
+                }
+            } catch (e) {
+                return null;
+            }
+
+            return {root: r};
+        },
+
+        cacheContext: function (c, x) {
+            let r, q, d;
+
+            x = x || this.cacheRoot(c);
+            if (!x)
+                return null
+            ;
+            r = x.root;
+
+            try {
+                if (r && !this.own(r, 'request') && 'request' in r)
+                    return null
+                ;
+                q = this.context(c);
+                if (q != null && (typeof q !== 'object' || Array.isArray(q)
+                    || q !== r && !this.plain(q)))
+                    return null
+                ;
+                if (r) {
+                    d = r.request;
+                    if (q === d && !this.own(r, 'request'))
+                        return null
+                    ;
+                    if ((q === r || q === d) && d != null
+                        && (d === r || !this.plain(d)))
+                        return null
+                    ;
+                }
+            } catch (e) {
+                return null;
+            }
+
+            return {root: r, request: q};
+        },
+
+        primitive: function (v) {
+            if (v == null || v === '')
+                return
+            ;
+            if (!['string', 'number', 'boolean', 'bigint'].includes(typeof v))
+                return null
+            ;
+
+            v = String(v);
+            return v.indexOf(this.sep) === -1 ? v : null;
+        },
+
         url: function (u, c) {
             let r;
             const b = this.option(c, 'base', this.base);
@@ -50,27 +161,101 @@ module.exports = {
         },
 
         policy: function (c) {
-            const r = this.context(c), b = this.option(c, 'base', this.base), a = [];
+            const x = this.cacheContext(c), a = [];
+            let r, b, v;
 
-            if (r && r.tenant != null)
-                a.push('t:' + r.tenant)
+            if (!x)
+                return ''
             ;
 
-            if (r && r.origin != null)
-                a.push('o:' + r.origin)
-            ;
+            try {
+                r = x.request;
 
-            if (b)
-                a.push('b:' + b)
-            ;
+                v = this.primitive(r && this.own(r, 'tenant') ? r.tenant : undefined);
+                if (v === null) return '';
+                if (v !== undefined) a.push('t:' + v);
+
+                v = this.primitive(r && this.own(r, 'origin') ? r.origin : undefined);
+                if (v === null) return '';
+                if (v !== undefined) a.push('o:' + v);
+
+                b = this.cacheBase(c, r);
+                if (!b) return '';
+                if (b.value) {
+                    v = this.primitive(b.value);
+                    if (v === null) return '';
+                    if (v !== undefined) a.push('b:' + v);
+                }
+            } catch (e) {
+                return '';
+            }
 
             return a.join(this.sep);
         },
 
-        cacheKey: function (u, c) {
-            const p = this.policy(c), r = this.url(u, c);
+        discriminator: function (c) {
+            let x = this.cacheRoot(c);
+            let r, v, b, n;
 
-            return p ? p + this.sep + r : r;
+            if (!x)
+                return ''
+            ;
+
+            try {
+                r = x.root;
+                v = this.primitive(r && this.own(r, 'tenant') ? r.tenant : undefined);
+                if (v === null) return '';
+                if (v !== undefined) return v;
+
+                x = this.cacheContext(c, x);
+                if (!x) return '';
+                r = x.request;
+                n = r !== x.root;
+                v = this.primitive(n && this.own(r, 'tenant') ? r.tenant : undefined);
+                if (v === null) return '';
+                if (v !== undefined) return v;
+
+                v = this.primitive(n && this.own(r, 'origin') ? r.origin : undefined);
+                if (v === null) return '';
+                if (v !== undefined) return v;
+
+                if (!n && r && this.own(r, 'origin')) {
+                    v = this.primitive(r.origin);
+                    if (v === null || v !== undefined) return '';
+                }
+
+                b = this.cacheBase(c, r, n);
+                if (!b) return '';
+                if (!n && r && 'base' in r && r.base != null && Object.is(b.value, r.base))
+                    return ''
+                ;
+                if (b.explicit) {
+                    v = this.primitive(b.value);
+                    return v === null || v === undefined ? '' : v;
+                }
+
+                if (!b.value) return '';
+                v = this.primitive(b.value);
+                return v === null || v === undefined ? '' : v;
+            } catch (e) {
+                return '';
+            }
+        },
+
+        cacheKey: function (u, c) {
+            const p = this.policy(c);
+            let r;
+
+            if (!p)
+                return
+            ;
+
+            r = String(this.url(u, c));
+            if (r.indexOf(this.sep) !== -1)
+                return
+            ;
+
+            return p + this.sep + r;
         },
 
         /** @type {jTormUrlGuard} */

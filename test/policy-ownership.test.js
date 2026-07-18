@@ -139,37 +139,41 @@ test('ownership analyzer catches representative bypass families without comment/
 
 test('coordinated package releases declare their policy owners and dependency minima', () => {
   const releases = {
-    'src/models/render-context-model': '1.0.0',
-    'src/models/promise-cache-model': '1.0.0',
+    'src/models/render-context-model': '1.0.1',
+    'src/models/promise-cache-model': '1.0.1',
     'src/models/asset-plugin-model': '1.0.0',
-    'src/models/request-model': '1.1.4',
-    'src/models/ui-manifest-model': '1.0.1',
+    'src/models/request-model': '1.1.5',
+    'src/models/ui-manifest-model': '1.0.2',
     'src/models/layer-model': '1.0.2',
-    'src/models/ui-cache-model': '1.0.5',
-    'src/models/data-model': '1.0.5',
-    'src/models/html-model': '1.0.5',
-    'src/models/tss-model': '1.0.6',
+    'src/models/ui-cache-model': '1.0.6',
+    'src/models/data-model': '1.0.6',
+    'src/models/html-model': '1.0.6',
+    'src/models/tss-model': '1.0.7',
     'src/parsers/tss-parser': '2.0.0',
     'src/parsers/data-parser': '1.0.4',
     'src/methods/attrs-method': '1.0.4',
     'tooling/ui-manifest-compiler': '1.0.1',
     'src/plugins/css-plugin': '1.0.5',
-    'src/plugins/js-plugin': '1.0.5'
+    'src/plugins/js-plugin': '1.0.5',
+    'src/plugins/ui-cache-plugin': '1.0.1'
   };
   const dependencies = {
-    'src/models/request-model': {'@jtorm/render-context-model': '^1.0.0'},
+    'src/models/request-model': {'@jtorm/render-context-model': '^1.0.1'},
     'src/models/ui-manifest-model': {
-      '@jtorm/promise-cache-model': '^1.0.0',
+      '@jtorm/promise-cache-model': '^1.0.1',
       '@jtorm/render-context-model': '^1.0.0',
-      '@jtorm/request-model': '^1.1.4'
+      '@jtorm/request-model': '^1.1.5'
     },
     'src/models/layer-model': {'@jtorm/render-context-model': '^1.0.0'},
-    'src/models/ui-cache-model': {'@jtorm/render-context-model': '^1.0.0'},
-    'src/models/data-model': {'@jtorm/promise-cache-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'},
-    'src/models/html-model': {'@jtorm/promise-cache-model': '^1.0.0', '@jtorm/request-model': '^1.1.4'},
+    'src/models/ui-cache-model': {
+      '@jtorm/render-context-model': '^1.0.1',
+      '@jtorm/request-model': '^1.1.5'
+    },
+    'src/models/data-model': {'@jtorm/promise-cache-model': '^1.0.1', '@jtorm/request-model': '^1.1.5'},
+    'src/models/html-model': {'@jtorm/promise-cache-model': '^1.0.1', '@jtorm/request-model': '^1.1.5'},
     'src/models/tss-model': {
-      '@jtorm/promise-cache-model': '^1.0.0',
-      '@jtorm/request-model': '^1.1.4',
+      '@jtorm/promise-cache-model': '^1.0.1',
+      '@jtorm/request-model': '^1.1.5',
       '@jtorm/tss-parser': '^2.0.0'
     },
     'src/parsers/data-parser': {'@jtorm/tss-parser': '^2.0.0'},

@@ -13,7 +13,7 @@ rm.renderContextModel = cm;
 test('awaits text BEFORE parsing (bug: a Promise must not reach tssParser.handle)', async () => {
   tm.c = new Map();
   tm.tssParser = makeTssParser();
-  tm.requestModel = { get: () => ({ text: () => Promise.resolve('a { color: red; }') }) };
+  tm.requestModel = { cacheKey: u => String(u), get: () => ({ text: () => Promise.resolve('a { color: red; }') }) };
   const tree = await tm.get('/x');
   assert.equal(tree[0].s, 'a');
   assert.deepEqual(tree[0].p, { color: 'red' });
@@ -24,6 +24,7 @@ test('cache hits return the same parsed AST and node identities', async () => {
   tm.tssParser = makeTssParser();
   let fetches = 0;
   tm.requestModel = {
+    cacheKey: u => String(u),
     get: () => ({ text: async () => { fetches++; return "a->attr { n: 'data-x'; v: value; }"; } })
   };
 
@@ -50,6 +51,7 @@ test('a located parser rejection keeps identity, evicts, and retries', async () 
     }
   };
   tm.requestModel = {
+    cacheKey: u => String(u),
     get: () => ({ text: async () => { fetches++; return source; } })
   };
 
@@ -71,7 +73,7 @@ test('concurrent callers share one in-flight parse', async () => {
   let release, fetches = 0, parses = 0;
   tm.c = new Map(); tm.max = 512;
   tm.tssParser = { handle: t => { parses++; return [t]; } };
-  tm.requestModel = { get: () => ({ text: () => {
+  tm.requestModel = { cacheKey: u => String(u), get: () => ({ text: () => {
     fetches++;
     return new Promise(resolve => { release = resolve; });
   } }) };
@@ -88,7 +90,7 @@ test('array inputs load and concatenate sequentially in source order', async () 
   const starts = [], releases = {};
   tm.c = new Map(); tm.max = 512;
   tm.tssParser = { handle: t => [t] };
-  tm.requestModel = { get: u => ({ text: () => {
+  tm.requestModel = { cacheKey: u => String(u), get: u => ({ text: () => {
     starts.push(u);
     return new Promise(resolve => { releases[u] = resolve; });
   } }) };
@@ -106,7 +108,7 @@ test('array inputs load and concatenate sequentially in source order', async () 
 test('bounds the cache to `max` entries — evicts oldest, no unbounded growth', async () => {
   tm.c = new Map(); tm.max = 3;
   tm.tssParser = { handle: (t) => t };
-  tm.requestModel = { get: (u) => ({ text: () => Promise.resolve(u) }) };
+  tm.requestModel = { cacheKey: u => String(u), get: (u) => ({ text: () => Promise.resolve(u) }) };
   for (let i = 0; i < 10; i++) await tm.get('/u' + i);
   assert.ok(tm.c.size <= 3, 'cache grew past max: ' + tm.c.size);
 });
@@ -114,7 +116,7 @@ test('bounds the cache to `max` entries — evicts oldest, no unbounded growth',
 test('LRU: a re-read entry survives eviction over an older untouched one', async () => {
   tm.c = new Map(); tm.max = 2;
   tm.tssParser = { handle: (t) => t };
-  tm.requestModel = { get: (u) => ({ text: () => Promise.resolve(u) }) };
+  tm.requestModel = { cacheKey: u => String(u), get: (u) => ({ text: () => Promise.resolve(u) }) };
   await tm.get('/a');   // [a]
   await tm.get('/b');   // [a,b]
   await tm.get('/a');   // bump a -> [b,a]
@@ -127,7 +129,7 @@ test('LRU: a re-read entry survives eviction over an older untouched one', async
 test('caches and returns an integer-like key (LRU order must not depend on key type)', async () => {
   tm.c = new Map(); tm.max = 2;
   tm.tssParser = { handle: (t) => t };
-  tm.requestModel = { get: (u) => ({ text: () => Promise.resolve('v' + u) }) };
+  tm.requestModel = { cacheKey: u => String(u), get: (u) => ({ text: () => Promise.resolve('v' + u) }) };
   await tm.get('/a');
   await tm.get('/b');   // at max
   assert.equal(await tm.get(42), 'v42'); // integer key must round-trip, not return undefined
@@ -138,6 +140,7 @@ test('cache key includes the resolved request base', async () => {
   tm.tssParser = { handle: (t) => t };
   let fetches = 0;
   tm.requestModel = {
+    cacheKey: (u, c) => c.request.base + u,
     url: (u, c) => c.request.base + u,
     get: (u, c) => ({ text: () => { fetches++; return Promise.resolve(c.request.base); } })
   };

@@ -229,8 +229,7 @@ module.exports = {
                 if (!r || typeof r !== 'object')
                     throw new Error('Manifest context invalid')
                 ;
-                if (!s.requestModel || typeof s.requestModel.cacheKey !== 'function'
-                    || typeof s.requestModel.get !== 'function'
+                if (!s.requestModel || typeof s.requestModel.get !== 'function'
                     || typeof s.requestModel.url !== 'function'
                     || typeof s.requestModel.allow !== 'function')
                     throw new Error('Manifest request model invalid')
@@ -287,7 +286,10 @@ module.exports = {
         },
 
         cacheKey: function (d, c) {
-            return JSON.stringify([this.requestModel.cacheKey(d.url, c), d.hash]);
+            const q = this.requestModel && typeof this.requestModel.cacheKey === 'function'
+                ? this.requestModel.cacheKey(d.url, c) : undefined;
+
+            return q == null || q === '' ? undefined : JSON.stringify([q, d.hash]);
         },
 
         load: function (d, c) {

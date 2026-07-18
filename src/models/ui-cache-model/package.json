@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/ui-cache-model",
   "description": "jTorm UI Cache Model",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,6 +14,7 @@
     "directory": "src/models/ui-cache-model"
   },
   "dependencies": {
-    "@jtorm/render-context-model": "^1.0.0"
+    "@jtorm/render-context-model": "^1.0.1",
+    "@jtorm/request-model": "^1.1.5"
   }
 }
