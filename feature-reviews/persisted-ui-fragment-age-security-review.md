@@ -1,7 +1,7 @@
 # Persisted UI Fragment Age — Security and Privacy Review
 
 **Date:** 2026-07-18
-**Status:** Implementation review complete; ready PR #63 delivery gates in progress
+**Status:** COMPLETE
 **Scope:** Versioned persisted rendered-fragment age only
 **Primary specification:** `feature-reviews/persisted-ui-fragment-age.md`
 
@@ -299,8 +299,9 @@ before starting 1.x. Old and new readers must never share the namespace.
 
 ## Current Security Verdict
 
-**PASS; LOCAL REVIEW COMPLETE.** No framework-addressable High or Medium security, privacy,
-infrastructure, or failure-atomicity finding remains. The only accepted residual risks are the
-documented trusted-host clock, adapter durability/order, and external backup/erasure boundaries.
-Final staged-ratchet, CI, and current-head Codex evidence are recorded in the completion evaluation.
-Stale-while-revalidate and HTTP validators remain separate future threat boundaries.
+**PASS; COMPLETE.** No framework-addressable High or Medium security, privacy, infrastructure, or
+failure-atomicity finding remains. The only accepted residual risks are the documented trusted-host
+clock, adapter durability/order, and external backup/erasure boundaries. Final head `91954de`
+passed CI and a clean current-head Codex review with zero unresolved threads before the maintainer
+merged PR #63 into `dev` as `f2a3976`. Stale-while-revalidate and HTTP validators remain separate
+future threat boundaries.
