@@ -10,6 +10,7 @@ module.exports = {
 
         c: new Map(),
         max: 512,// DI: LRU cap on cached fetch promises; least-recently-used evicted beyond this
+        ttl: 300000,// DI: absolute successful-result retention in milliseconds; Infinity opts out
 
         key: function (v, c) {
             const q = this.requestModel && typeof this.requestModel.cacheKey === 'function'
@@ -38,6 +39,35 @@ module.exports = {
                     return s.requestModel.get(v, c).text().then(function (t) { return s.tssParser.handle(t); });
                 }
             });
+        },
+
+        purge: function (v, c) {
+            const a = [v], q = new Set(), seen = new Set();
+            let n, x;
+
+            try {
+                while (a.length) {
+                    x = a.pop();
+                    if (Array.isArray(x)) {
+                        if (seen.has(x)) continue;
+                        seen.add(x);
+                        for (let k = x.length - 1; k >= 0; k--) a.push(x[k]);
+                    } else {
+                        n = this.key(x, c);
+                        if (n !== undefined) q.add(n);
+                    }
+                }
+            } catch (e) {
+                return 0;
+            }
+
+            n = 0;
+            for (x of q) n += this.promiseCacheModel.purge(this, x);
+            return n;
+        },
+
+        purgeAll: function () {
+            return this.promiseCacheModel.purgeAll(this);
         }
     }
 };

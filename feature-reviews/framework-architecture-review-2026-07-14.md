@@ -63,9 +63,19 @@
 > Scoped key bytes and warm behavior remain compatible, and persisted fragments are
 > quarantined until a host attests a complete scoped-only store migration. Final head
 > `e5abb4b` passed CI and a clean current-head Codex review with zero unresolved
-> threads before the maintainer merged it as `60072ba`. Weakness #12 is **not fully
-> closed**: TTL, purge APIs,
-> clocks, and stale-revalidation remain the next independent cache follow-up.
+> threads before the maintainer merged it as `60072ba`.
+>
+> **Backlog update — 2026-07-18 (`agent/shared-cache-ttl-purge` from `dev` at
+> `2b1105b`):** the remaining bounded TTL/purge half of weakness #12 is complete in
+> this change. Shared data, HTML, TSS, manifest-pack, and rendered-fragment caches
+> default to an absolute five-minute in-process TTL, retain pending single-flight
+> deduplication, and expose exact plus explicit full purge facades. Expiration and
+> invalidation retain the existing discriminator, URL/SSRF, timeout, validation,
+> event, persistence-attestation, and public value-shape contracts. Persisted
+> fragments intentionally start a new TTL at `init()`; versioned persisted timestamps
+> for absolute age across restarts and stale-while-revalidate remain separate follow-ups,
+> not claims of this closure. PR/current-head delivery evidence will be appended after
+> the required ready-PR review gate.
 
 ---
 
@@ -127,7 +137,7 @@ Live in production on a Magento store via a Node host engine.
 9. **Binding re-parse per node per render** (handler.js:73; data-parser has no cache). The AST is cached but every binding string is re-regexed and re-split on every render. Cheapest large perf win available: compile bindings onto the AST node once.
 10. **DRY debt from the isolation retrofit.** 5 near-identical `context(v)` walks, 4 `state(v)` copies, 3 near-clone fetch models (tss/data/html, ~85% identical), 2 near-clone css/js plugins (~90% identical). Every isolation fix had to be applied in ≥4 places — the slice history shows exactly that. Directly against the CLAUDE.md DRY/smallest-bundle mandate.
 11. **`Thing.default` ships demo junk.** `thing-update-1.0.1.tss` (schema-ui.js:336-338) appends a stray `<input type=email>` and a `ul` to `<body>` — so any bare `ui:{c:'Thing'}` (e.g. `Person.default`, schema-ui.js:427-430) inherits it. The one live instance of the "versioned update file" mechanic is a landmine; no end-to-end test covers `Thing.default` or `Person.default`.
-12. **Partially closed — PR #59 fixed fail-open tenant scoping; TTL/purge remains.** Shared cache participation now fails closed when no valid explicit tenant/origin/base discriminator exists, including malformed/cyclic and legacy persisted-fragment cases. Final head `e5abb4b` passed green CI and clean current-head Codex review before merge as `60072ba`. The independent remaining weakness is that none of the bounded LRU caches has TTL or an explicit purge surface, so a template update still needs a process restart.
+12. **✅ Closed in two bounded halves — PR #59 fixed fail-open tenant scoping; the current TTL/purge change bounds live retention and adds administrative invalidation.** Shared cache participation still requires a valid explicit tenant/origin/base discriminator. Scoped data, HTML, TSS, manifest-pack, and rendered-fragment results now default to a five-minute absolute in-process TTL, and hosts can invalidate one exact scoped identity or explicitly purge a whole participating cache without restarting. Pending work remains deduplicated, successful hits do not slide expiry, and stale work re-enters the unchanged acquisition/render controls. Persisted absolute age across restarts and stale-while-revalidate are separately tracked enhancements, not unresolved parts of this weakness closure.
 
 ### DRY / SOLID grade
 
@@ -210,7 +220,9 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P3** | Move `error-handler` dump behind a debug flag | ✅ Done — PR #53 | Info-disclosure + dead weight | S |
 | **P3** | Eliminate `handler-wrapper` cached-AST selector mutation | ✅ Done — PR #57 | Makes cached trees safe across sequential/interleaved/tenant renders without undoing parser inheritance | M |
 | **P3** | Fail shared cache participation closed without an explicit render discriminator | ✅ Done — PR #59; fail-open half of weakness #12 | Prevents cross-render sharing while preserving ordinary uncached work and scoped warm behavior | M |
-| **P3** | Add cache TTL and explicit purge APIs | **Next independent weakness #12 follow-up** | Makes template/cache invalidation operational without process restart; deliberately separate from tenant scoping | M |
+| **P3** | Add cache TTL and explicit purge APIs | ✅ Done — current change; TTL/purge half of weakness #12 | Makes template/cache invalidation operational without process restart while preserving scoped warm behavior | M |
+| **P4** | Version the persisted fragment schema for absolute age across restarts | Separate follow-up | Current attested entries intentionally receive a new in-process TTL at `init()`; persisted timestamps require an explicit schema/migration contract | M |
+| **P4** | Evaluate stale-while-revalidate and HTTP validator integration | Separate follow-up | Background refresh, stale fallback, cache headers, ETag, and Last-Modified semantics need their own failure/security/resource contract | M–L |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.

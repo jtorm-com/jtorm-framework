@@ -297,3 +297,82 @@ test('handler-wrapper projections forward the live compiled-binding cache to eac
     dp.current = current;
   }
 });
+
+test('handler-wrapper carries one ephemeral iteration token through before/after/complete and completes after the existing after chain', async () => {
+  const t = source(), pv = parent(t), calls = [];
+  let child, token;
+  pv.l = 'en';
+  hw.eventModel = {
+    handle: async (view, phase, type, value) => {
+      assert.equal(type, 'iteration');
+      if (!token) token = value;
+      assert.strictEqual(value, token);
+      calls.push(phase);
+      if (phase === 'before') assert.strictEqual(view, pv);
+      else {
+        assert.strictEqual(view, child);
+        assert.equal(view.l, 'en');
+      }
+    },
+    complete: async (view, type, value) => {
+      assert.strictEqual(view, child);
+      assert.equal(type, 'iteration');
+      assert.strictEqual(value, token);
+      calls.push('complete');
+    },
+    abort: async () => { calls.push('abort'); }
+  };
+  hw.viewModel = {create: async () => {
+    calls.push('create');
+    child = {h: {body: () => { calls.push('body'); return 'OK'; }}};
+    return child;
+  }};
+  hw.handler = {handle: async () => {
+    calls.push('handler');
+    assert.equal(child.l, 'en');
+    child.l = 'mutated';
+    return 'rendered';
+  }};
+
+  assert.equal(await hw.handle('', t, {}, pv), 'OK');
+  assert.ok(token && typeof token === 'object');
+  assert.deepEqual(calls, ['before', 'create', 'handler', 'after', 'body', 'complete']);
+});
+
+test('handler-wrapper aborts every failed iteration span without masking the original error', async () => {
+  for (const phase of ['before', 'create', 'handler', 'after', 'complete']) {
+    const t = source(), pv = parent(t, phase), original = new Error(phase), cleanup = new Error('cleanup');
+    let child, token, aborts = 0;
+    hw.eventModel = {
+      handle: async (view, at, type, value) => {
+        token = token || value;
+        assert.strictEqual(value, token);
+        if (at === phase) throw original;
+      },
+      complete: async (view, type, value) => {
+        assert.strictEqual(value, token);
+        if (phase === 'complete') throw original;
+      },
+      abort: async (view, type, value, error) => {
+        aborts++;
+        assert.strictEqual(value, token);
+        assert.strictEqual(error, original);
+        throw cleanup;
+      }
+    };
+    hw.viewModel = {create: async () => {
+      if (phase === 'create') throw original;
+      child = {h: {body: () => 'body'}};
+      return child;
+    }};
+    hw.handler = {handle: async () => {
+      if (phase === 'handler') throw original;
+      return 'rendered';
+    }};
+
+    await assert.rejects(() => hw.handle('', t, {}, pv), error => error === original);
+    assert.equal(aborts, 1, phase);
+    assert.ok(token && typeof token === 'object');
+    void child;
+  }
+});

@@ -35,10 +35,20 @@ The descriptor `hash` is trusted deployment metadata and must not be copied from
 The model validates received text, schema, structure, per-value hashes, and computed = declared =
 expected SHA-256 before installing an index. Installation is atomic on the topmost render context.
 Pack promises use the request model's policy-aware cache key and a bounded 32-entry LRU.
+Successful cross-render packs have an absolute `ttl` of `300000` ms by default; hosts may set
+`manifest.ttl` independently (`0` pending-only, `Infinity` non-expiring rollback). Expired packs
+re-enter the unchanged request URL/allow, timeout, acquisition classification, digest, schema,
+and value-validation path.
 When that request key is unscoped, each render root reacquires and validates its pack without
 touching the cross-render promise cache. Repeated `prepare()` calls on that same root still reuse
 the root-local prepared promise/index; this bypass does not change atomic installation,
 supersession, validation, digest, or acquisition classification.
+
+`purge({url, hash, mode?}, context)` removes exactly one scoped cross-render pack and returns `0`
+or `1`; malformed/unscoped input is a no-op. `mode`, when supplied, must still be `required` or
+`optional` but does not change key identity. `purgeAll()` explicitly clears all shared packs and
+returns the count. Neither API changes a render root's already prepared `manifest.promise/index`;
+only a new/subsequent root reacquires.
 Manifests are public static assets: they must never contain PII, credentials, secrets, or request-,
 tenant-, model-, DOM-, or user-derived state. The trusted compiler/source-adapter boundary owns
 that exclusion; the runtime validates structure and integrity, not data classification.
@@ -57,5 +67,5 @@ getMethod.manifest = manifest;
 ```
 
 Removing the `prepare()` call and the optional `getMethod.manifest` injection restores the legacy
-waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.0.1` and
+waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.0.2` and
 `@jtorm/request-model@1.1.5` before this package and the fetch/UI cache consumers.

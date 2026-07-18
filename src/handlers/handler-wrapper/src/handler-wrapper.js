@@ -39,14 +39,17 @@ module.exports = {
             const
                 t2 = t.c,
                 s = this,
-                e = s.eventModel;
+                e = s.eventModel,
+                x = {};
+            let r, v2 = v;
 
-            if (t.s)
-                v.c.s = t.s;
+            try {
+                if (t.s)
+                    v.c.s = t.s;
 
-            await e.handle(v, 'before', 'iteration');
+                await e.handle(v, 'before', 'iteration', x);
 
-            const t3 = project(t2);
+                const t3 = project(t2);
 
             // The iteration body builds a DETACHED fragment that the caller (each's
             // append / insert / wrap) then re-inserts into the parent doc. Pass the
@@ -64,31 +67,43 @@ module.exports = {
             // the each(e:) path, which already creates with c:1. a:null is explicit: v.c.a
             // is element-refs bound to the PARENT document — never inherit them into this
             // detached fragment (a fresh doc); a nested get/ui inside re-resolves its own.
-            const c = {s: null, a: null, b: 'body', c: 1};
+                const c = {s: null, a: null, b: 'body', c: 1};
 
-            if (v.c && typeof v.c === 'object')
-                c.p = v.c
-            ;
+                if (v.c && typeof v.c === 'object')
+                    c.p = v.c
+                ;
 
-            if (v.c && v.c.locale != null)
-                c.locale = v.c.locale
-            ;
+                if (v.c && v.c.locale != null)
+                    c.locale = v.c.locale
+                ;
 
-            const v2 = await s.viewModel.create(v.r ? v.r : h, t3, m, c, 1);
+                v2 = await s.viewModel.create(v.r ? v.r : h, t3, m, c, 1);
 
-            v2.cid = v.cid;
-            v2.cs = v.cs;
+                v2.cid = v.cid;
+                v2.cs = v.cs;
+                v2.l = v.l;
 
-            if (!v.r)
-                v.r = await s.handler.handle(null, null, null, null, v2)
-            ;
+                if (!v.r)
+                    v.r = await s.handler.handle(null, null, null, null, v2)
+                ;
 
-            v2.cid = v.cid;
-            v2.cs = v.cs;
+                v2.cid = v.cid;
+                v2.cs = v.cs;
+                v2.l = v.l;
 
-            await e.handle(v2, 'after', 'iteration');
+                await e.handle(v2, 'after', 'iteration', x);
+                r = v2.h.body();
+                if (typeof e.complete === 'function')
+                    await e.complete(v2, 'iteration', x)
+                ;
 
-            return v2.h.body();
+                return r;
+            } catch (q) {
+                if (typeof e.abort === 'function')
+                    try { await e.abort(v2, 'iteration', x, q); } catch (a) {}
+                ;
+                throw q;
+            }
         }
     }
 };

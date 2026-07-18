@@ -9,6 +9,7 @@ module.exports = {
 
         c: new Map(),
         max: 512,// DI: LRU cap on cached fetch promises; least-recently-used evicted beyond this
+        ttl: 300000,// DI: absolute successful-result retention in milliseconds; Infinity opts out
 
         key: function (v, c) {
             const q = this.requestModel && typeof this.requestModel.cacheKey === 'function'
@@ -24,6 +25,17 @@ module.exports = {
             return s.promiseCacheModel.get(s, q, {
                 load: function () { return s.requestModel.get(v, c).json(); }
             });
+        },
+
+        purge: function (v, c) {
+            let q;
+
+            try { q = this.key(v, c); } catch (e) { return 0; }
+            return this.promiseCacheModel.purge(this, q);
+        },
+
+        purgeAll: function () {
+            return this.promiseCacheModel.purgeAll(this);
         }
     }
 };

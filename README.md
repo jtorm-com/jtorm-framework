@@ -54,17 +54,20 @@ runtime remains pure CommonJS with dependency injection and no runtime imports.
 
 ## Shared runtime policy owners
 
-Hosts compose three stateless policy models before rendering:
+Hosts compose three shared policy models before rendering:
 
 - `@jtorm/render-context-model` owns bounded, cycle-safe render-root traversal, strict own-link
   cache-root resolution, and namespaced root state. Normal render traversal remains compatible.
-- `@jtorm/promise-cache-model` owns in-flight promise dedupe, rejection cleanup, and
-  bounded LRU mechanics while each fetch model retains its own cache, key, and loader.
+- `@jtorm/promise-cache-model` owns in-flight promise dedupe, insertion-safe rejection cleanup,
+  bounded LRU mechanics, overridable clock policy, absolute TTLs, and purge metadata while each
+  cache retains its public value store, key, loader/render path, and independently configurable
+  `ttl`.
 - `@jtorm/asset-plugin-model` owns the shared CSS/JS collection, URL-policy, DOM insertion,
   dedupe, and cleanup lifecycle while both plugins retain their public facades.
 
 Runtime packages still import nothing; hosts inject these owners into request, manifest,
-layer, UI-cache, data/HTML/TSS, and CSS/JS collaborators. Publish render-context and
+layer, UI-cache, data/HTML/TSS, and CSS/JS collaborators. UI-cache now receives the same
+promise-cache owner as fetch/manifest models. Publish render-context and
 promise-cache first, then request-model, then asset-plugin-model, then the remaining consumer
 release set. Rollback requires pinning the prior consumer versions together and restoring the
 previous host DI graph.
@@ -77,7 +80,23 @@ After upgrade, UI-cache quarantines persisted fragments until the host clears th
 sets an own `uiCacheScoped = true` field on its save adapter; inherited attestation is ignored,
 and old unscoped and new scoped bytes cannot be
 distinguished selectively. Perform that cleanup before enabling reload or any coordinated
-rollback. TTL and explicit purge remain a separate architecture follow-up.
+rollback.
+
+The five shared caches default to a finite absolute TTL of `300000` ms. Pending work continues to
+deduplicate, successful hits do not slide expiry, `0` disables settled reuse, and explicit
+`Infinity` is the configuration-only rollback to former retention. Data/HTML/TSS expose exact
+URL/context `purge()` plus `purgeAll()`; manifest exposes exact descriptor/context purge for its
+cross-render pack cache; UI-cache exposes exact render/language/cid/variant purge and an explicit
+global purge requiring a valid scoped dirty root. Exact unscoped calls are always no-ops and never
+infer full purge from `undefined`.
+
+UI fragment timestamps remain process-local and are not persisted. Attested entries loaded by
+`init()` begin a new in-process TTL; absolute age across restarts remains separate versioned-schema
+work. Persist a live UI purge by calling `save(scopedRootView)` afterward; the adapter must retain
+its own `uiCacheScoped === true` attestation. The plugin preserves its non-awaited after-view save
+timing; an operator requiring persistence completion or error visibility explicitly awaits that
+`save()` call. The UI plugin's staged render dedupe requires the
+coordinated `@jtorm/event-model@^1.0.2` and `@jtorm/handler-wrapper@^1.0.7` lifecycle packages.
 
 ## Credits
 The idea is heavily inspired from [Transphporm](https://github.com/Level-2/Transphporm), all credits go to them in finding a different way to handle template rendering.

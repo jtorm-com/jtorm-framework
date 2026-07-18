@@ -41,7 +41,7 @@ function build() {
 test('package declares a build-only classic-browser artifact without remapping CommonJS', () => {
   const root = pkg(repo), parser = pkg(dir);
   const consumers = [
-    ['src/models/tss-model', '@jtorm/tss-model', '1.0.7'],
+    ['src/models/tss-model', '@jtorm/tss-model', '1.0.8'],
     ['src/parsers/data-parser', '@jtorm/data-parser', '1.0.4'],
     ['src/methods/attrs-method', '@jtorm/attrs-method', '1.0.4'],
     ['tooling/ui-manifest-compiler', '@jtorm/ui-manifest-compiler', '1.0.1']

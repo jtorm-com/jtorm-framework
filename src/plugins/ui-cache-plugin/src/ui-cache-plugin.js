@@ -22,14 +22,24 @@ module.exports = {
             }
         },
 
-        beforeIteration: async function (v) {
+        beforeIteration: async function (v, x) {
             if (v.cid)
-                v.r = await this.uiCacheModel.get(v, v.l, v.cid, v.cs ? v.cs : 'default');
+                v.r = await this.uiCacheModel.get(v, v.l == null ? null : v.l, v.cid, v.cs ? v.cs : 'default', x);
         },
 
-        afterIteration: function (v) {
+        afterIteration: function (v, x) {
             if (v.cid)
-                this.uiCacheModel.set(v, v.l, v.cid, v.cs ? v.cs : 'default', v.h.body());
+                this.uiCacheModel.stage(v, v.l == null ? null : v.l, v.cid, v.cs ? v.cs : 'default', v.h.body(), x);
+        },
+
+        completeIteration: function (v, x) {
+            const s = this;
+
+            return function () { s.uiCacheModel.complete(v, x); };
+        },
+
+        abortIteration: function (v, x, e) {
+            this.uiCacheModel.abort(v, x, e);
         },
 
         afterView: function (v) {
