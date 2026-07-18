@@ -137,7 +137,7 @@ Nine runtime packages change and receive patch releases: promise cache `1.0.2`, 
 | `npm run typecheck` | PASS |
 | Package dry-runs (nine changed packages) | PASS — exact README/package/source three-file contents |
 | Runtime import/source/syntax guards | PASS — zero runtime imports, 10/10 source-policy tests, 22 changed JS files parse |
-| JSONL/diff guards | PASS — 322 JSONL records parse in the completion candidate and `git diff --check` is clean |
+| JSONL/diff guards | PASS — 323 JSONL records parse in the completion candidate and `git diff --check` is clean |
 | Semgrep and dependency audits | PASS — 83 rules over 9 runtime files, zero findings; production/full audits zero vulnerabilities |
 | Staged tech-debt ratchet | PASS — zero new debt patterns on the exact staged candidate |
 | Ready PR, green CI, current-head clean Codex review | PASS — final head `f01d4dcb36662f5416f77e7a5196bff4eb5f3c5c` passed CI and a clean current-head Codex review with zero unresolved threads before maintainer merge as `1e7f1667cf333d9b6bc326fd21034c1486f68ac8` |
