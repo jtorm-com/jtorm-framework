@@ -78,8 +78,9 @@
 > Codex review with zero unresolved threads before the maintainer merged PR #61 into
 > `dev` as `1e7f166`.
 >
-> **Backlog update — 2026-07-18 (persisted-age P4 follow-up):** Rendered-fragment
-> persistence now uses an explicit wire-v1 envelope that pairs exact scoped HTML bytes
+> **Backlog update — 2026-07-18 (ready PR #63):** The persisted-age P4 follow-up
+> versions rendered-fragment persistence with an explicit wire-v1 envelope that pairs
+> exact scoped HTML bytes
 > with the original successful-publication Unix-ms timestamp. Reload requires the existing
 > own scoped-store attestation plus an own recognized version, applies the current TTL to
 > original age through the promise-cache policy owner, and atomically quarantines legacy,
@@ -232,7 +233,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P3** | Eliminate `handler-wrapper` cached-AST selector mutation | ✅ Done — PR #57 | Makes cached trees safe across sequential/interleaved/tenant renders without undoing parser inheritance | M |
 | **P3** | Fail shared cache participation closed without an explicit render discriminator | ✅ Done — PR #59; fail-open half of weakness #12 | Prevents cross-render sharing while preserving ordinary uncached work and scoped warm behavior | M |
 | **P3** | Add cache TTL and explicit purge APIs | ✅ Done — merged PR #61; TTL/purge half of weakness #12 | Makes template/cache invalidation operational without process restart while preserving scoped warm behavior | M |
-| **P4** | Version the persisted fragment schema for absolute age across restarts | ✅ Done — persisted-age follow-up; delivery evidence in the linked feature evaluation | Wire v1 preserves original successful settlement time, applies current TTL to remaining age, and defines fail-closed migration/deployment/rollback | M |
+| **P4** | Version the persisted fragment schema for absolute age across restarts | ✅ Done — ready PR #63 | Wire v1 preserves original successful settlement time, applies current TTL to remaining age, and defines fail-closed migration/deployment/rollback | M |
 | **P4** | Evaluate stale-while-revalidate and HTTP validator integration | Next independent follow-up | Background refresh, stale fallback, cache headers, ETag, and Last-Modified semantics need their own failure/security/resource contract | M–L |
 
 ### Comparable projects worth studying

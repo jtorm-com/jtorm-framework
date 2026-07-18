@@ -3,7 +3,7 @@
 **Branch:** `feat/persisted-ui-fragment-age`
 **Base:** `dev` at `3c614cd5cf65854d5e85922445a7fca1221db659`
 **Started:** 2026-07-18
-**Status:** Implementation and local gates complete; remote delivery in progress
+**Status:** Implementation and local gates complete; ready PR #63 in review
 **Specification:** [`persisted-ui-fragment-age.md`](persisted-ui-fragment-age.md)
 **Security review:** [`persisted-ui-fragment-age-security-review.md`](persisted-ui-fragment-age-security-review.md)
 **Differential review:** [`persisted-ui-fragment-age-differential-review.md`](persisted-ui-fragment-age-differential-review.md)
@@ -224,11 +224,12 @@ No other runtime package changed or received a bump.
 | Cross-model adversarial review | PASS — three lenses, no unresolved finding |
 | Source-ratchet review | PASS — four analyzer tests and no-edit convergence sentinel |
 | Staged tech-debt ratchet | PASS — zero new debt patterns on the exact feature-only index |
-| Ready PR / CI / current-head Codex | Pending delivery |
+| Ready PR | PASS — non-draft mergeable PR #63 targets `dev` |
+| CI / current-head Codex | In progress |
 
 ## Current verdict
 
-**PASS; REMOTE DELIVERY PENDING.** The specification, implementation, red-first proof, reviews,
-local verification, documentation, package artifacts, staged debt gate, and migration/rollback
-contract are complete. The remaining work is a ready PR into `dev`, green CI, and a clean Codex
-review against the final head with zero unresolved threads. The PR will remain unmerged.
+**PASS; PR REVIEW IN PROGRESS.** The specification, implementation, red-first proof, reviews, local
+verification, documentation, package artifacts, staged debt gate, migration/rollback contract, and
+ready PR #63 are complete. The remaining work is green CI and a clean Codex review against the final
+head with zero unresolved threads. The PR will remain unmerged.

@@ -1,8 +1,8 @@
 # Persisted UI Fragment Age — Security and Privacy Review
 
-**Date:** 2026-07-18  
-**Status:** Implementation review complete; delivery gates in progress
-**Scope:** Versioned persisted rendered-fragment age only  
+**Date:** 2026-07-18
+**Status:** Implementation review complete; ready PR #63 delivery gates in progress
+**Scope:** Versioned persisted rendered-fragment age only
 **Primary specification:** `feature-reviews/persisted-ui-fragment-age.md`
 
 ## Gate Decision
