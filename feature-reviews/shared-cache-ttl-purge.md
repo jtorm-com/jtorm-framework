@@ -2,10 +2,10 @@
 
 **Date:** 2026-07-18
 **Author:** Codex `/root`
-**Status:** Approved
-**Feature-dev Status:** IN_PROGRESS
+**Status:** COMPLETE
+**Feature-dev Status:** COMPLETE
 **Claimed:** 2026-07-18T13:08:10Z
-**Current Mode:** Delivery
+**Current Mode:** Complete — PR #61 merged into `dev` as `1e7f166`
 
 ## Problem Statement
 
@@ -288,7 +288,7 @@ Reference class: PR #58 policy-owner extraction plus PR #59 discriminator harden
 - [x] Required README/migration/evaluation/security/ledger/backlog documentation is complete.
 - [x] Focused suites, exact `npm test`, typecheck, package dry-runs, source guards, Semgrep, syntax, JSONL, dependency audits, and `git diff --check` pass.
 - [x] All requested pre-delivery review gates and the fresh feature-dev verification score 10/10 in all ten dimensions.
-- [ ] A ready PR targets `dev`, CI is green, current-head Codex review is clean with no unresolved threads, and the PR remains unmerged.
+- [x] PR #61 targeted `dev`; final head CI was green and current-head Codex review was clean with zero unresolved threads before maintainer merge as `1e7f166`.
 
 ## Open Questions
 
@@ -296,7 +296,7 @@ None. The user fixed the product contract, default, persistence boundary, and ro
 
 ## Implementation Quality Gate
 
-**Gate status:** PASSED LOCALLY. Remote CI/current-head review remains a separate delivery gate.
+**Gate status:** PASSED. Remote CI/current-head review completed cleanly before maintainer merge.
 
 | Dimension | Score | Implementation evidence |
 |-----------|-------|-------------------------|
@@ -390,17 +390,17 @@ None. The user fixed the product contract, default, persistence boundary, and ro
 
 ## Resumption Context
 
-**Last Completed Mode:** Review
-**Current Mode:** Delivery
-**Next Action:** Monitor ready PR #61 into `dev`, obtain green CI and a clean current-head Codex review, and leave it unmerged.
+**Last Completed Mode:** Delivery
+**Current Mode:** Complete
+**Next Action:** Start the separate persisted-fragment schema follow-up for absolute age across restarts from current `dev`; stale-while-revalidate remains independent.
 **Files Created:** `feature-reviews/shared-cache-ttl-purge.md`, `feature-reviews/stride-shared-cache-ttl-purge.md`
 **Files Modified:** Central promise/data/HTML/TSS/manifest/UI/event/wrapper/plugin runtime owners, focused tests and host wiring, package metadata, READMEs, and review records listed in this spec.
 **Tests Written:** Deterministic promise, data/HTML/TSS, manifest, UI fragment/lifecycle, discriminator, async-save, and scoped pipeline TTL/purge cases.
 **Issues Found and fixed:** Pre-implementation focused run produced the expected 29 failures: missing TTL/purge/lifecycle APIs, indefinite settled reuse at the exact boundary, and partial scoped UI publication after an event failure. Adversarial review then produced eight additional focused red cases for deferred completion, language propagation, abort cleanup, null-root reentrancy, replaced stores, and published save timing; all now pass.
 **Design Decisions Made:** Central weak cache-map/key/insertion-token metadata; owner-wide clock regression; exact purge signatures above; process-local batch persisted TTL; explicit global UI purge with scoped dirty root; opt-in bounded UI render leases; ephemeral wrapper token; additive finalization over unchanged event buckets; revision-safe save.
 
-**Context for Next Session:**
-PR #60 is merged into `dev` at `2b1105b0796784852dc92217fa647ed433f99ffb`; local branch is `agent/shared-cache-ttl-purge`. Untouched focused baseline: 244/244 passing.
+**Completion Context:**
+PR #61 final head `f01d4dcb36662f5416f77e7a5196bff4eb5f3c5c` passed CI and a clean current-head Codex review with zero unresolved threads, then the maintainer merged it into `dev` as `1e7f1667cf333d9b6bc326fd21034c1486f68ac8` on 2026-07-18. Weakness #12 is closed in its two bounded halves; persisted absolute age across restarts remains explicitly separate schema work.
 
 ## Progress Log
 
@@ -454,5 +454,5 @@ PR #60 is merged into `dev` at `2b1105b0796784852dc92217fa647ed433f99ffb`; local
 - [x] Package READMEs and host migration guidance updated.
 - [x] Feature/evaluation/security records, review ledger, and architecture backlog updated.
 - [x] Ready PR #61 opened into `dev` as a non-draft, mergeable change.
-- [ ] Green CI and clean current-head Codex review obtained.
-- [ ] PR left unmerged.
+- [x] Green CI and clean current-head Codex review obtained with zero unresolved threads.
+- [x] PR remained unmerged during agent delivery; the maintainer subsequently merged it as `1e7f166`.

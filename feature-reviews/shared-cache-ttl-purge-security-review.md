@@ -1,7 +1,7 @@
 # Shared-cache TTL and purge APIs — Security and privacy review
 
 **Date:** 2026-07-18
-**Status:** LOCAL_VERIFIED
+**Status:** COMPLETE
 **Scope:** Process-local TTL and purge half of architecture weakness #12
 **Base:** `dev` at `2b1105b0796784852dc92217fa647ed433f99ffb`
 **Specification:** [`shared-cache-ttl-purge.md`](shared-cache-ttl-purge.md)
@@ -129,4 +129,4 @@ These risks are documented, bounded, configurable, and do not reopen cross-scope
 
 ## Current verdict
 
-**PASS LOCALLY; REMOTE DELIVERY PENDING.** No unresolved security or privacy finding remains. Focused 291/291, exact 679/679, typecheck, nine package dry-runs, 10 source-policy guards, 22 syntax checks, 83-rule Semgrep with zero findings, production/full audits, JSONL validation, and the staged tech-debt ratchet are green. Final completion requires green CI and a clean current-head Codex review.
+**PASS; COMPLETE.** No unresolved security or privacy finding remains. Focused 291/291, exact 679/679, typecheck, nine package dry-runs, 10 source-policy guards, 22 syntax checks, 83-rule Semgrep with zero findings, production/full audits, JSONL validation, and the staged tech-debt ratchet are green. Final head `f01d4dcb36662f5416f77e7a5196bff4eb5f3c5c` also passed CI and a clean current-head Codex review with zero unresolved threads before the maintainer merged PR #61 into `dev` as `1e7f1667cf333d9b6bc326fd21034c1486f68ac8`.
