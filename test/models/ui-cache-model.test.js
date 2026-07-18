@@ -778,6 +778,32 @@ test('init timestamps an attested persisted batch with one clock read and keeps 
   assert.deepEqual(Object.keys(store.value.en.b['tenant\0default']), ['0'], 'fragment remains a string, not a timestamp wrapper');
 });
 
+test('persisted fragment age survives restart instead of receiving a fresh ttl', async () => {
+  ttlReset(10);
+  let now = 1000;
+  pm.clock = () => now;
+  c.persistenceClock = () => now;
+  const store = {
+    uiCacheScoped: true,
+    value: null,
+    get() { return this.value; },
+    async set(value) { this.value = value; }
+  };
+  c.saveModel = store;
+
+  c.set(null, 'en', 'same', 'default', 'OLD');
+  await c.save(null);
+
+  now = 1009;
+  await c.init();
+  assert.equal(await c.get(null, 'en', 'same', 'default'), 'OLD', 'restart before expiry keeps only the remaining lifetime');
+
+  now = 1010;
+  assert.equal(await c.get(null, 'en', 'same', 'default'), null, 'the original settlement boundary must still expire the fragment');
+  assert.deepEqual(c.cache, {});
+  assert.equal(c.order.size, 0);
+});
+
 test('async save clears only an unchanged dirty revision and retains retry state on mutation or failure', async () => {
   ttlReset();
   pm.clock = () => 0;
