@@ -16,12 +16,14 @@ const {
 const nativeDigest = async (bytes) => new Uint8Array(
   createHash('sha256').update(bytes).digest()
 );
+const nativeClock = promiseCacheModel.clock;
 
 function reset() {
   mm.promiseCacheModel = promiseCacheModel;
   mm.renderContextModel = renderContextModel;
   mm.c = new Map();
   mm.max = 32;
+  mm.ttl = 300000;
   mm.maxText = 1048576;
   mm.maxValues = 262144;
   mm.maxDepth = 128;
@@ -29,7 +31,12 @@ function reset() {
   mm.maxMetadata = 65536;
   mm.digest = nativeDigest;
   mm.requestModel = null;
+  if (promiseCacheModel.reset) promiseCacheModel.reset(mm);
 }
+
+test.afterEach(() => {
+  promiseCacheModel.clock = nativeClock;
+});
 
 async function pack(assets) {
   const withHashes = [];
@@ -1053,4 +1060,116 @@ test('unscoped manifest acquisition and validation failures cannot evict seeded 
   mm.requestModel.get = () => ({ text: async () => { throw new Error('transport'); } });
   await assert.rejects(() => mm.prepare(descriptor, {}), /transport/);
   assert.deepEqual([...mm.c.entries()], before);
+});
+
+test('manifest-pack TTL is finite, absolute, and exact-boundary refresh uses the unchanged validation path', async () => {
+  reset();
+  let now = 0, reads = 0, current;
+  promiseCacheModel.clock = () => now;
+  mm.ttl = 10;
+  mm.digest = async () => new Uint8Array(32).fill(7);
+  const first = await pack([{type: 'html', request: '@h/a.html', value: 'A'}]);
+  const second = await pack([{type: 'html', request: '@h/a.html', value: 'B'}]);
+  assert.equal(first.hash, second.hash, 'controlled digest keeps one descriptor identity');
+  current = first.manifest;
+  mm.requestModel = {
+    cacheKey: (url, c) => c.tenant + ':' + url,
+    get: () => ({text: async () => { reads++; return JSON.stringify(current); }}),
+    url: url => url,
+    allow: async () => true
+  };
+  const descriptor = [{url: '/pack.json', hash: first.hash, mode: 'required'}];
+
+  const rootA = {tenant: 'tenant'};
+  await mm.prepare(descriptor, rootA);
+  assert.equal(await mm.get('html', '@h/a.html', rootA), 'A');
+  current = second.manifest;
+
+  now = 9;
+  const warm = {tenant: 'tenant'};
+  await mm.prepare(descriptor, warm);
+  assert.equal(await mm.get('html', '@h/a.html', warm), 'A');
+  assert.equal(reads, 1);
+
+  now = 10;
+  const fresh = {tenant: 'tenant'};
+  await mm.prepare(descriptor, fresh);
+  assert.equal(await mm.get('html', '@h/a.html', fresh), 'B');
+  assert.equal(reads, 2);
+});
+
+test('manifest exact purge detaches only one scoped pack, preserves an already prepared root, and forces a new root cold', async () => {
+  reset();
+  promiseCacheModel.clock = () => 0;
+  mm.digest = async () => new Uint8Array(32).fill(8);
+  const first = await pack([{type: 'html', request: '@h/a.html', value: 'A'}]);
+  const second = await pack([{type: 'html', request: '@h/a.html', value: 'B'}]);
+  let current = first.manifest, reads = 0;
+  mm.requestModel = {
+    cacheKey: (url, c) => c && c.tenant ? c.tenant + ':' + url : undefined,
+    get: () => ({text: async () => { reads++; return JSON.stringify(current); }}),
+    url: url => url,
+    allow: async () => true
+  };
+  const descriptor = {url: '/pack.json', hash: first.hash};
+  const prepared = {tenant: 'a'};
+  await mm.prepare([{...descriptor, mode: 'required'}], prepared);
+  await mm.prepare([{...descriptor, mode: 'required'}], {tenant: 'b'});
+  current = second.manifest;
+
+  assert.equal(mm.purge(descriptor, prepared), 1);
+  assert.equal(mm.purge(descriptor, prepared), 0);
+  assert.equal(mm.purge(undefined, prepared), 0);
+  assert.equal(mm.purge(descriptor, {}), 0);
+
+  await mm.prepare([{...descriptor, mode: 'required'}], prepared);
+  assert.equal(await mm.get('html', '@h/a.html', prepared), 'A', 'prepared root remains root-local after shared purge');
+  assert.equal(reads, 2);
+
+  const newA = {tenant: 'a'};
+  await mm.prepare([{...descriptor, mode: 'required'}], newA);
+  assert.equal(await mm.get('html', '@h/a.html', newA), 'B');
+  const warmB = {tenant: 'b'};
+  await mm.prepare([{...descriptor, mode: 'required'}], warmB);
+  assert.equal(await mm.get('html', '@h/a.html', warmB), 'A', 'scope b remained warm');
+  assert.equal(reads, 3);
+  assert.equal(mm.purgeAll(), 2);
+  assert.equal(mm.purgeAll(), 0);
+});
+
+test('concurrent manifest roots after expiry share one fresh pack promise and failed replacement leaves no participation', async () => {
+  reset();
+  let now = 0, current, reads = 0, release;
+  promiseCacheModel.clock = () => now;
+  mm.ttl = 1;
+  mm.digest = async () => new Uint8Array(32).fill(9);
+  const first = await pack([{type: 'html', request: '@h/a.html', value: 'A'}]);
+  const second = await pack([{type: 'html', request: '@h/a.html', value: 'B'}]);
+  current = first.manifest;
+  mm.requestModel = {
+    cacheKey: url => url,
+    get: () => ({text: () => {
+      reads++;
+      if (reads === 1) return Promise.resolve(JSON.stringify(current));
+      return new Promise(resolve => { release = resolve; });
+    }}),
+    url: url => url,
+    allow: async () => true
+  };
+  const descriptor = [{url: '/pack.json', hash: first.hash, mode: 'required'}];
+  await mm.prepare(descriptor, {});
+  current = second.manifest;
+  now = 1;
+
+  const a = mm.prepare(descriptor, {}), b = mm.prepare(descriptor, {});
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(reads, 2);
+  release(JSON.stringify(current));
+  await Promise.all([a, b]);
+  assert.equal(reads, 2);
+
+  now = 2;
+  mm.requestModel.get = () => ({text: async () => { reads++; throw new Error('transport'); }});
+  await assert.rejects(() => mm.prepare(descriptor, {}), /transport/);
+  assert.equal(mm.c.size, 0);
 });

@@ -12,6 +12,7 @@ module.exports = {
         version: '1.0.0',
         c: new Map(),
         max: 32,
+        ttl: 300000,
         maxText: 1048576,
         maxValues: 262144,
         maxDepth: 128,
@@ -290,6 +291,29 @@ module.exports = {
                 ? this.requestModel.cacheKey(d.url, c) : undefined;
 
             return q == null || q === '' ? undefined : JSON.stringify([q, d.hash]);
+        },
+
+        purge: function (d, c) {
+            let q;
+
+            try {
+                if (!this.plain(d)
+                    || !this.fields(d, ['url', 'hash', 'mode'], ['url', 'hash'])
+                    || typeof d.url !== 'string' || !d.url
+                    || !/^sha256-[0-9a-f]{64}$/.test(d.hash)
+                    || d.mode !== undefined && d.mode !== 'required' && d.mode !== 'optional')
+                    return 0
+                ;
+                q = this.cacheKey(d, c);
+            } catch (e) {
+                return 0;
+            }
+
+            return this.promiseCacheModel.purge(this, q);
+        },
+
+        purgeAll: function () {
+            return this.promiseCacheModel.purgeAll(this);
         },
 
         load: function (d, c) {

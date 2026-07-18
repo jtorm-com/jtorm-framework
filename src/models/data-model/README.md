@@ -17,7 +17,9 @@ get: url
 
 Scoped results are cached as the in-flight promise using `requestModel.cacheKey()`. The cache is a
 bounded LRU — at most `max` entries are kept (default `512`, injectable), the
-least-recently-used evicted beyond that. A rejected fetch is not cached.
+least-recently-used evicted beyond that. A rejected fetch is not cached. Successful results have
+an absolute `ttl` of `300000` ms by default; set this model's `ttl` independently. `0` reuses only
+pending work and `Infinity` restores non-expiring reuse.
 
 When `cacheKey()` is missing or returns `undefined`, `null`, or `''`, the JSON request runs through
 the normal uncached path. It does not read, populate, deduplicate through, evict from, or alter
@@ -26,3 +28,8 @@ enable sharing; there is no URL/String fallback.
 
 Inject `requestModel` and `promiseCacheModel`. The shared policy owner operates on this model's
 live exported `c` and `max` fields; replacing either host reset surface takes immediate effect.
+It also owns clock/expiration metadata, so hosts preserving `c` must preserve that policy state.
+
+`purge(url, context)` removes exactly the request-model scoped key and returns `0` or `1`.
+`purgeAll()` explicitly clears this model and returns its prior entry count. An unscoped or
+malformed exact purge returns `0`; `undefined` never means full purge.

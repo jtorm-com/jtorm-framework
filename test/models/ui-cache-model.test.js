@@ -4,11 +4,32 @@ const assert = require('node:assert/strict');
 const { jTormUiCacheModel: c } = require('../../src/models/ui-cache-model/src/ui-cache-model.js');
 const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
+const { jTormPromiseCacheModel: pm } = require('../../src/models/promise-cache-model/src/promise-cache-model.js');
 
 c.renderContextModel = cm;
 rm.renderContextModel = cm;
 c.requestModel = rm;
+c.promiseCacheModel = pm;
 rm.base = 'test:';
+const nativeClock = pm.clock;
+
+function ttlReset(ttl = 300000) {
+  c.cache = {};
+  c.order = new Map();
+  c.max = 512;
+  c.ttl = ttl;
+  c.updated = 0;
+  c.saveModel = null;
+  c.renderContextModel = cm;
+  c.requestModel = rm;
+  c.promiseCacheModel = pm;
+  rm.base = 'test:';
+  if (pm.reset) pm.reset(c);
+}
+
+test.afterEach(() => {
+  pm.clock = nativeClock;
+});
 
 test('get() returns the value set() stored for the same (l,id,c)', async () => {
   c.cache = {}; c.order = new Map(); c.max = 512; c.saveModel = null;
@@ -546,6 +567,304 @@ test('an inherited base accessor cannot retain or serve a rendered fragment', as
     assert.equal(calls, 0);
   } finally {
     c.cache = old.cache; c.order = old.order; c.requestModel = old.requestModel;
+    rm.base = savedBase;
+  }
+});
+
+test('rendered fragments default to five minutes, retain exact warm order/value state, and expire at age === ttl without sliding', async () => {
+  ttlReset(10);
+  let now = 0;
+  pm.clock = () => now;
+
+  c.set(null, 'en', 'same', 'default', 'A');
+  const k = c.key('en', 'same', 'test:\0default');
+  const record = c.order.get(k);
+  now = 5;
+  assert.equal(await c.get(null, 'en', 'same', 'default'), 'A');
+  assert.strictEqual(c.order.get(k), record, 'a hit may reorder but must preserve timestamp identity');
+  now = 9;
+  assert.equal(await c.get(null, 'en', 'same', 'default'), 'A');
+  now = 10;
+  assert.equal(await c.get(null, 'en', 'same', 'default'), null);
+  assert.equal(c.order.has(k), false);
+  assert.deepEqual(c.cache, {});
+  assert.equal(c.ttl, 10);
+
+  ttlReset();
+  assert.equal(c.ttl, 300000);
+});
+
+test('fragment ttl zero reuses no settled value and Infinity is the no-clock rollback', async () => {
+  ttlReset(0);
+  let clocks = 0;
+  pm.clock = () => { clocks++; return 0; };
+  c.set(null, 'en', 'same', 'default', 'A');
+  assert.equal(await c.get(null, 'en', 'same', 'default'), null);
+  assert.deepEqual(c.cache, {});
+
+  ttlReset(Infinity);
+  pm.clock = () => { throw new Error('Infinity clock read'); };
+  c.set(null, 'en', 'same', 'default', 'A');
+  assert.equal(await c.get(null, 'en', 'same', 'default'), 'A');
+  assert.equal(clocks, 0);
+});
+
+test('exact and full fragment purge are deterministic, isolation-safe, and persist only live deletions through save()', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  const a = {c: 0, tenant: 'a'}, b = {c: 0, tenant: 'b'};
+  const store = {sets: 0, value: null, async set(value) { this.sets++; this.value = value; }};
+  c.saveModel = store;
+  c.set(a, 'en', 'same', 'default', 'A');
+  c.set(b, 'en', 'same', 'default', 'B');
+  await c.save(a);
+  await c.save(b);
+  store.sets = 0;
+
+  assert.equal(c.purge(a, 'en', 'same', 'default'), 1);
+  assert.equal(c.purge(a, 'en', 'same', 'default'), 0);
+  assert.equal(c.purge({}, 'en', 'same', 'default'), 0);
+  assert.equal(await c.get(b, 'en', 'same', 'default'), 'B');
+  assert.equal(store.sets, 0, 'purge uses the existing explicit save path');
+  await c.save(a);
+  assert.equal(store.sets, 1);
+  assert.deepEqual(store.value, {en: {same: {['b\0default']: 'B'}}});
+
+  assert.equal(c.purgeAll(b), 1);
+  assert.equal(c.purgeAll(b), 0);
+  const cycle = {c: 0}; cycle.p = cycle;
+  assert.equal(c.purgeAll(cycle), 0);
+  await c.save(b);
+  assert.deepEqual(store.value, {});
+});
+
+test('purging a pending fragment lease detaches it, settles existing followers, and cannot affect a newer lease', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  const leaderRoot = {c: 0, tenant: 'a'};
+  const followerRoot = {c: 0, tenant: 'a'};
+  const nextRoot = {c: 0, tenant: 'a'};
+  const oldToken = {}, followerToken = {}, newToken = {};
+
+  assert.equal(await c.get(leaderRoot, 'en', 'same', 'default', oldToken), null);
+  let followerSettled = false;
+  const follower = c.get(followerRoot, 'en', 'same', 'default', followerToken)
+    .then(value => { followerSettled = true; return value; });
+  await Promise.resolve();
+  assert.equal(followerSettled, false);
+  assert.equal(c.purge(leaderRoot, 'en', 'same', 'default'), 1);
+  assert.equal(leaderRoot.uiCache, undefined, 'pending-only purge does not dirty persisted state');
+
+  assert.equal(await c.get(nextRoot, 'en', 'same', 'default', newToken), null);
+  c.stage(leaderRoot, 'en', 'same', 'default', 'OLD', oldToken);
+  await c.complete(leaderRoot, oldToken);
+  assert.equal(await follower, 'OLD');
+  assert.equal(await c.get(leaderRoot, 'en', 'same', 'default'), null, 'detached old result was not published');
+
+  c.stage(nextRoot, 'en', 'same', 'default', 'NEW', newToken);
+  await c.complete(nextRoot, newToken);
+  assert.equal(await c.get(leaderRoot, 'en', 'same', 'default'), 'NEW');
+});
+
+test('same-root reentrant acquisition bypasses its own lease while independent roots deduplicate', async () => {
+  ttlReset();
+  pm.clock = () => { throw new Error('pending paths do not read the clock'); };
+  const root = {c: 0, tenant: 'a'};
+  const child = {c: {p: root}};
+  const other = {c: 0, tenant: 'a'};
+  const token = {}, nested = {}, follower = {};
+
+  assert.equal(await c.get(root, 'en', 'same', 'default', token), null);
+  assert.equal(await c.get(child, 'en', 'same', 'default', nested), null, 'same-root lookup never awaits itself');
+  let settled = false;
+  const waiting = c.get(other, 'en', 'same', 'default', follower)
+    .then(value => { settled = true; return value; });
+  await Promise.resolve();
+  assert.equal(settled, false);
+
+  c.stage(root, 'en', 'same', 'default', 'A', token);
+  await c.complete(root, token);
+  assert.equal(await waiting, 'A');
+  assert.equal(await c.get(root, 'en', 'same', 'default'), null, 'clock failure prevents retention but not follower completion');
+});
+
+test('a configured-base lookup without a render root bypasses its own pending lease instead of awaiting forever', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  const leader = {}, nested = {};
+
+  assert.equal(await c.get(null, 'en', 'same', 'default', leader), null);
+  let settled = false;
+  const lookup = c.get(null, 'en', 'same', 'default', nested)
+    .then(value => { settled = true; return value; });
+  await Promise.resolve();
+  assert.equal(settled, true);
+  assert.equal(await lookup, null);
+  c.abort(null, leader, new Error('cleanup'));
+});
+
+test('aborted fragment leaders reject existing followers, publish nothing, and leave a newer render free to acquire', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  const a = {c: 0, tenant: 'a'}, b = {c: 0, tenant: 'a'};
+  const token = {}, follower = {}, error = new Error('render failed');
+
+  assert.equal(await c.get(a, 'en', 'same', 'default', token), null);
+  const waiting = c.get(b, 'en', 'same', 'default', follower);
+  c.abort(a, token, error);
+  await assert.rejects(() => waiting, value => value === error);
+  assert.deepEqual(c.cache, {});
+  assert.equal(c.order.size, 0);
+
+  const next = {};
+  assert.equal(await c.get(b, 'en', 'same', 'default', next), null);
+  c.stage(b, 'en', 'same', 'default', 'OK', next);
+  c.complete(b, next);
+  assert.equal(await c.get(a, 'en', 'same', 'default'), 'OK');
+});
+
+test('replacing UI cache/order identities or hitting the flight cap detaches obsolete work without late publication', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  c.max = 1;
+  const a = {c: 0, tenant: 'a'}, b = {c: 0, tenant: 'a'};
+  const old = {}, capped = {};
+  assert.equal(await c.get(a, 'en', 'old', 'default', old), null);
+  assert.equal(await c.get(b, 'en', 'new', 'default', capped), null);
+  assert.equal(c.flight().size, 1, 'flight participation is bounded by max');
+  c.stage(a, 'en', 'old', 'default', 'OLD', old);
+  c.complete(a, old);
+  assert.equal(await c.get(a, 'en', 'old', 'default'), null, 'max-detached work cannot publish');
+
+  c.max = 512;
+  const cacheOnly = {};
+  assert.equal(await c.get(a, 'en', 'cache-only', 'default', cacheOnly), null);
+  c.cache = {};
+  c.stage(a, 'en', 'cache-only', 'default', 'CACHE-ONLY', cacheOnly);
+  c.complete(a, cacheOnly);
+  assert.deepEqual(c.cache, {}, 'work tied to a replaced exported cache cannot publish');
+  assert.equal(c.flight().has(c.key('en', 'cache-only', 'a\0default')), false);
+
+  c.cache = {};
+  c.order = new Map();
+  c.stage(b, 'en', 'new', 'default', 'NEW', capped);
+  c.complete(b, capped);
+  assert.deepEqual(c.cache, {}, 'late work tied to a replaced order identity cannot publish');
+  assert.equal(c.order.size, 0);
+});
+
+test('init timestamps an attested persisted batch with one clock read and keeps timestamps out of the saved shape', async () => {
+  ttlReset(10);
+  let now = 4, clocks = 0;
+  pm.clock = () => { clocks++; return now; };
+  const original = {
+    en: {
+      a: {['tenant\0default']: 'A'},
+      b: {['tenant\0default']: 'B'}
+    }
+  };
+  const store = {uiCacheScoped: true, value: original, get() { return this.value; }, async set(value) { this.value = value; }};
+  c.saveModel = store;
+  await c.init();
+  assert.equal(clocks, 1);
+  const root = {c: 0, tenant: 'tenant'};
+  now = 13;
+  assert.equal(await c.get(root, 'en', 'a', 'default'), 'A');
+  assert.equal(await c.get(root, 'en', 'b', 'default'), 'B');
+  now = 14;
+  assert.equal(await c.get(root, 'en', 'a', 'default'), null);
+  await c.save(root);
+  assert.deepEqual(store.value, {en: {b: {['tenant\0default']: 'B'}}});
+  assert.deepEqual(Object.keys(store.value.en.b['tenant\0default']), ['0'], 'fragment remains a string, not a timestamp wrapper');
+});
+
+test('async save clears only an unchanged dirty revision and retains retry state on mutation or failure', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  const root = {c: 0, tenant: 'tenant'};
+  let release, calls = 0;
+  c.saveModel = {set() {
+    calls++;
+    return new Promise((resolve, reject) => { release = calls === 1 ? resolve : reject; });
+  }};
+  c.set(root, 'en', 'a', 'default', 'A');
+  let settled = false;
+  const saving = c.save(root).then(() => { settled = true; });
+  await Promise.resolve();
+  assert.equal(settled, false, 'save awaits the adapter');
+  c.set(root, 'en', 'b', 'default', 'B');
+  release();
+  await saving;
+  assert.ok(root.uiCache.updated, 'a concurrent mutation leaves dirty retry state');
+
+  const failed = c.save(root);
+  await Promise.resolve();
+  release(new Error('save failed'));
+  await assert.rejects(() => failed, /save failed/);
+  assert.ok(root.uiCache.updated, 'an async failure leaves dirty retry state');
+});
+
+test('a host-seeded fragment without matching order/timestamp metadata fails fresh instead of acquiring an immortal timestamp', async () => {
+  ttlReset();
+  let clocks = 0;
+  pm.clock = () => { clocks++; return 0; };
+  c.cache = {en: {same: {['tenant\0default']: 'SEEDED'}}};
+  const root = {c: 0, tenant: 'tenant'};
+
+  assert.equal(await c.get(root, 'en', 'same', 'default'), null);
+  assert.deepEqual(c.cache, {});
+  assert.equal(c.order.size, 0);
+  assert.equal(clocks, 0, 'missing metadata is stale without clock access');
+});
+
+test('replacing only the exported cache cannot attach an old timestamp to new fragment content', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  const root = {c: 0, tenant: 'tenant'};
+  c.set(root, 'en', 'same', 'default', 'OLD');
+  c.cache = {en: {same: {['tenant\0default']: 'HOST-SEED'}}};
+
+  assert.equal(await c.get(root, 'en', 'same', 'default'), null);
+  assert.deepEqual(c.cache, {});
+  assert.equal(c.order.size, 0);
+});
+
+test('a new write after exported-cache replacement cannot authenticate a surviving old timestamp', async () => {
+  ttlReset();
+  pm.clock = () => 0;
+  const root = {c: 0, tenant: 'tenant'};
+  c.set(root, 'en', 'old', 'default', 'OLD');
+  c.cache = {en: {old: {['tenant\0default']: 'HOST-SEED'}}};
+  c.set(root, 'en', 'new', 'default', 'NEW');
+
+  assert.equal(await c.get(root, 'en', 'old', 'default'), null);
+  assert.equal(await c.get(root, 'en', 'new', 'default'), 'NEW');
+});
+
+test('malformed, cyclic, and truly unscoped fragment purges are no-ops without cache, metadata, dirty, flight, or clock effects', async () => {
+  const savedBase = rm.base;
+  ttlReset();
+  const kept = {l: 'en', id: 'same', c: 'tenant\0default'};
+  c.cache = {en: {same: {['tenant\0default']: 'KEPT'}}};
+  c.order = new Map([[c.key('en', 'same', 'tenant\0default'), kept]]);
+  let clocks = 0;
+  pm.clock = () => { clocks++; throw new Error('unscoped clock'); };
+  rm.base = '';
+  const root = {c: 0}, cycle = {c: 0}; cycle.p = cycle;
+  const beforeCache = JSON.parse(JSON.stringify(c.cache));
+  const beforeOrder = [...c.order.entries()];
+
+  try {
+    assert.equal(c.purge(root, 'en', 'same', 'default'), 0);
+    assert.equal(c.purge(cycle, 'en', 'same', 'default'), 0);
+    assert.equal(c.purgeAll(root), 0);
+    assert.equal(c.purgeAll(cycle), 0);
+    assert.deepEqual(c.cache, beforeCache);
+    assert.deepEqual([...c.order.entries()], beforeOrder);
+    assert.equal(root.uiCache, undefined);
+    assert.equal(cycle.uiCache, undefined);
+    assert.equal(clocks, 0);
+  } finally {
     rm.base = savedBase;
   }
 });

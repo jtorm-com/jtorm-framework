@@ -5,7 +5,7 @@ const { jTormPromiseCacheModel: pm } = require('../../src/models/promise-cache-m
 
 test('dedupes in-flight work and bumps hit recency', async () => {
   let release, loads = 0;
-  const owner = {c: new Map(), max: 2};
+  const owner = {c: new Map(), max: 2, ttl: Infinity};
   const op = {load: () => {
     loads++;
     return new Promise(resolve => { release = resolve; });
@@ -25,7 +25,7 @@ test('dedupes in-flight work and bumps hit recency', async () => {
 
 test('runs an optional guarded-hit hook without replacing the cached promise', async () => {
   let hits = 0;
-  const owner = {c: new Map(), max: 2};
+  const owner = {c: new Map(), max: 2, ttl: Infinity};
   const p = pm.get(owner, 'a', {load: () => Promise.resolve('A')});
   assert.equal(await pm.get(owner, 'a', {load: () => Promise.resolve('unused'), hit: async () => { hits++; }}), 'A');
   assert.strictEqual(owner.c.get('a'), p);
@@ -34,7 +34,7 @@ test('runs an optional guarded-hit hook without replacing the cached promise', a
 
 test('late rejection removes only its own identity, not a newer entry', async () => {
   let reject;
-  const owner = {c: new Map(), max: 1};
+  const owner = {c: new Map(), max: 1, ttl: Infinity};
   const stale = pm.get(owner, 'a', {load: () => new Promise((_, r) => { reject = r; })});
   stale.catch(() => {});
   await pm.get(owner, 'b', {load: () => Promise.resolve('B')});
@@ -46,7 +46,7 @@ test('late rejection removes only its own identity, not a newer entry', async ()
 });
 
 test('a degenerate maximum retains the newest entry and uses replaced owner state', async () => {
-  const old = new Map(), owner = {c: old, max: 0};
+  const old = new Map(), owner = {c: old, max: 0, ttl: Infinity};
   owner.c = new Map();
   const p = pm.get(owner, 1, {load: () => Promise.resolve('one')});
 
@@ -65,7 +65,7 @@ test('undefined is an actual cache bypass with no read, write, deduplication, re
     keys() { calls.keys++; return super.keys(); }
   }
   const cache = new TrackedMap([['a', Promise.resolve('A')], [undefined, stale]]);
-  const owner = {c: cache, max: 1};
+  const owner = {c: cache, max: 1, ttl: Infinity};
   const before = [...owner.c.entries()];
   let loads = 0;
   const load = () => Promise.resolve(++loads);
@@ -88,7 +88,7 @@ test('undefined is an actual cache bypass with no read, write, deduplication, re
 
 test('non-undefined generic keys retain existing identity semantics', async () => {
   for (const key of [null, '', 0, false]) {
-    const owner = {c: new Map(), max: 2};
+    const owner = {c: new Map(), max: 2, ttl: Infinity};
     let loads = 0;
     const a = pm.get(owner, key, {load: async () => ++loads});
     const b = pm.get(owner, key, {load: async () => ++loads});

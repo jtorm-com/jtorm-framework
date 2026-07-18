@@ -45,3 +45,13 @@ And by naming the handler function accordingly, in this case `afterView`:
 ```
 
 You can view the `@jtorm/ui-cache-plugin` as an example.
+
+Iteration dispatch accepts an opaque extra lifecycle token. The event tree and before/after
+buckets are unchanged. `complete(v, 'iteration', token)` walks the existing `after.iteration`
+bucket and calls optional `completeIteration(v, token)` hooks only after the ordinary after chain
+succeeds. One completion hook may return a deferred commit function; it runs only after every
+completion hook succeeds, and competing commits fail before either runs. This lets the UI cache
+publish after other lifecycle participants can no longer reject the iteration.
+`abort(v, 'iteration', token, error)` calls optional `abortIteration` hooks for cleanup; every hook
+is attempted and cleanup failures are suppressed so they cannot replace the original render
+failure. Existing plugins may ignore the extra argument and need no new event registration block.
