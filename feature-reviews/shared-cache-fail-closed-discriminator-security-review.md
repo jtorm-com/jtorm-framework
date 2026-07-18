@@ -1,7 +1,7 @@
 # Security Review: Fail-Closed Shared Cache Discriminator
 
 **Date:** 2026-07-17
-**Status:** Post-implementation local security/privacy gate PASS; remote current-head review pending
+**Status:** COMPLETE — security/privacy gate PASS; final-head CI and current-head Codex review clean before PR #59 merge
 **Scope:** Weakness #12 fail-open discriminator subproblem only
 **Specification:** `feature-reviews/shared-cache-fail-closed-discriminator.md`
 
@@ -178,7 +178,7 @@ Single-tenant hosts opt in with a real stable configured request base or a stabl
 | SSRF / external requests | Regression required: URL resolution, allow policy, timeouts, and guarded manifest hits unchanged |
 | Resource abuse | Accepted bounded tradeoff: unscoped calls repeat normal work; scoped asymptotics remain |
 | Dependency security | PASS by design: no new package or runtime dependency |
-| Privacy | PASS by design pending differential evidence: retention/disclosure is reduced |
+| Privacy | PASS: differential review and isolation evidence confirm reduced retention/disclosure |
 | Threat modeling | PASS pre-code: DFD, assets, actors, all STRIDE categories, attack trees, PASTA, residual risk, and test mapping exist |
 | Authentication, secrets, crypto, headers, API assets, audit logs, mobile, queue, AI/LLM, anomaly detection, RLS, secret rotation | N/A: no affected surface |
 
@@ -188,7 +188,7 @@ The framework cannot determine whether a host-provided non-empty discriminator t
 
 ## Post-Implementation Gate
 
-PASS locally. Architecture, differential, refactor, insecure-defaults, safety-friction, privacy,
+PASS. Architecture, differential, refactor, insecure-defaults, safety-friction, privacy,
 bounded threat-model, source-ratchet, tech-debt applicability, and production-readiness reviews were
 routed. Three independent final reviews report no remaining reproducible architecture,
 security/privacy, or readiness finding.
@@ -216,5 +216,6 @@ Evidence at this gate:
 
 Residual risk is limited to a host deliberately reusing one discriminator or falsely setting its
 own post-cleanup attestation. TTL and explicit purge remain the next independent weakness #12
-follow-up. Remote CI and a clean Codex review against the final PR head remain delivery gates, not
-substitutes for this local security decision.
+follow-up. Final head `e5abb4bf67455fb29c1a17f42bd3ae9ef21192e3` passed CI and a clean
+current-head Codex review with zero unresolved threads before the maintainer merged PR #59 into
+`dev` as `60072ba7e3b3d9bebd9ff6818a7322cd60107e7d`.
