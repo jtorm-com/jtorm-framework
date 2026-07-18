@@ -140,7 +140,7 @@ Nine runtime packages change and receive patch releases: promise cache `1.0.2`, 
 | JSONL/diff guards | PASS — 318 JSONL records parse and `git diff --check` is clean after the local review ledger append |
 | Semgrep and dependency audits | PASS — 83 rules over 9 runtime files, zero findings; production/full audits zero vulnerabilities |
 | Staged tech-debt ratchet | PASS — zero new debt patterns on the exact staged candidate |
-| Ready PR, green CI, current-head clean Codex review | Pending; PR must remain unmerged |
+| Ready PR, green CI, current-head clean Codex review | Ready non-draft PR #61 targets `dev` and is mergeable; CI/current-head Codex pending; PR must remain unmerged |
 
 ## Current verdict
 

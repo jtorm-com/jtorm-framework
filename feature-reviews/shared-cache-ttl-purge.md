@@ -392,7 +392,7 @@ None. The user fixed the product contract, default, persistence boundary, and ro
 
 **Last Completed Mode:** Review
 **Current Mode:** Delivery
-**Next Action:** Commit and publish the locally verified candidate as a ready PR into `dev`, then complete CI/current-head Codex review without merging.
+**Next Action:** Monitor ready PR #61 into `dev`, obtain green CI and a clean current-head Codex review, and leave it unmerged.
 **Files Created:** `feature-reviews/shared-cache-ttl-purge.md`, `feature-reviews/stride-shared-cache-ttl-purge.md`
 **Files Modified:** Central promise/data/HTML/TSS/manifest/UI/event/wrapper/plugin runtime owners, focused tests and host wiring, package metadata, READMEs, and review records listed in this spec.
 **Tests Written:** Deterministic promise, data/HTML/TSS, manifest, UI fragment/lifecycle, discriminator, async-save, and scoped pipeline TTL/purge cases.
@@ -453,5 +453,6 @@ PR #60 is merged into `dev` at `2b1105b0796784852dc92217fa647ed433f99ffb`; local
 
 - [x] Package READMEs and host migration guidance updated.
 - [x] Feature/evaluation/security records, review ledger, and architecture backlog updated.
-- [ ] Ready PR opened into `dev`, green CI obtained, and clean current-head Codex review obtained.
+- [x] Ready PR #61 opened into `dev` as a non-draft, mergeable change.
+- [ ] Green CI and clean current-head Codex review obtained.
 - [ ] PR left unmerged.
