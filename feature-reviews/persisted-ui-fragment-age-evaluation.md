@@ -31,10 +31,12 @@ The initial focused regression persisted a scoped fragment at `t0`, restarted at
 and observed the prior implementation serving it for another full TTL. The old `init()` assigned
 reload time to every persisted fragment. That red witness was committed before runtime changes.
 
-Review then found and proved three additional implementation defects red-first: a throwing adapter
+Review then found and proved four additional implementation defects red-first: a throwing adapter
 `get` accessor escaping the cold-load boundary, test-engine adapter leakage between renders, and a
-rejected replacement publication losing the previous promise-cache stamp. All three now pass, as
-do the adversarial duplicate and mixed-age proofs.
+rejected replacement publication losing the previous promise-cache stamp. Current-head Codex review
+also found that `instanceof Promise` rejected native Promises from another realm; a red `node:vm`
+proof now passes through native-brand adoption without evaluating a malformed envelope `then`
+accessor. All four fixes pass, as do the adversarial duplicate and mixed-age proofs.
 
 ## Ownership and data flow
 
@@ -214,8 +216,8 @@ No other runtime package changed or received a bump.
 |---|---|
 | Red-first defect | PASS — restart just before expiry reproduced the old full-TTL extension before runtime changes |
 | Review findings | PASS — adapter accessor, harness isolation, and replacement rollback reproduced red then fixed |
-| Focused promise/UI/plugin/discriminator/TTL/purge/wiring/isolation/pipeline | PASS — 143/143 |
-| Exact `npm test` | PASS — 705/705 |
+| Focused promise/UI/plugin/discriminator/TTL/purge/wiring/isolation/pipeline | PASS — 144/144 after current-head review fix |
+| Exact `npm test` | PASS — 706/706 after current-head review fix |
 | `npm run typecheck` | PASS |
 | Package dry-runs | PASS — promise-cache `1.0.3`, UI-cache `2.0.0`, plugin `1.0.3` |
 | Syntax/JSON/JSONL/source/diff guards | PASS |

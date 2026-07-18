@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 const { jTormUiCacheModel: c } = require('../../src/models/ui-cache-model/src/ui-cache-model.js');
 const { jTormRenderContextModel: cm } = require('../../src/models/render-context-model/src/render-context-model.js');
 const { jTormRequestModel: rm } = require('../../src/models/request-model/src/request-model.js');
@@ -315,6 +316,25 @@ test('hostile, oversized, failed, and mixed-validity loads leave no partial stat
   c.saveModel = throwingAdapter;
   await c.init();
   assertCold();
+});
+
+test('init adopts cross-realm native promises without evaluating a malformed envelope then accessor', async () => {
+  reset();
+  wallNow = 1;
+  const value = wire([record(0)]);
+  const promised = vm.runInNewContext('Promise.resolve(value)', {value});
+  c.saveModel = {uiCacheScoped: true, get() { return promised; }};
+  await c.init();
+  assert.equal(await c.get(null, 'en', 'same', 'default'), 'OLD');
+
+  reset();
+  let reads = 0;
+  const malformed = wire([record(0)]);
+  Object.defineProperty(malformed, 'then', {get() { reads++; throw new Error('must not run'); }});
+  c.saveModel = adapter(malformed);
+  await c.init();
+  assertCold();
+  assert.equal(reads, 0);
 });
 
 test('attestation and schema version must be own data properties', async () => {

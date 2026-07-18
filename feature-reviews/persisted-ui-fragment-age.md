@@ -123,6 +123,7 @@ A host that persists rendered UI fragments expects the configured absolute TTL t
 - The adapter payload must independently carry an own data-property recognized `version`.
 - Before live publication, validate the complete envelope and all records into bounded temporary state.
 - `init()` may await a synchronous or asynchronous adapter `get()`, but it captures an internal lifecycle-revision token for the new empty cache/order generation first. Any valid scoped lease/publication/purge mutation, identity replacement, or newer init invalidates that token; the delayed candidate is discarded and cannot overwrite or resurrect newer state. The module-local token only detects async lifecycle change: it is never a cache key, discriminator, sentinel identity, serialized value, or per-render retained field.
+- An asynchronous `get()` result is a native Promise from the current or another JavaScript realm. Adopt it through the intrinsic native Promise brand, not `instanceof`, without reading an arbitrary thenable or malformed envelope `then` accessor. Rejected Promises and unsupported thenables fail cold.
 - Valid envelope objects may use `Object.prototype` or `null`; entries follow the same rule. `fragments` must be a dense ordinary Array with no extra/symbol/accessor properties.
 - Every record has exactly the five named fields. `language`, `cid`, `variant`, and `html` are strings; language/cid contain no NUL; the stored scoped variant contains exactly one non-leading NUL; `settledAt` is a nonnegative safe integer. Existing accepted primitive language/cid inputs are serialized as their current nested object property keys via `String(value)` (notably the plugin's default `null` language becomes wire string `"null"`), matching today's restart canonicalization.
 - The array length must not exceed the currently effective fragment `max` (positive safe integer, otherwise the existing effective bound of one). An oversized envelope is quarantined before per-record traversal.
@@ -254,7 +255,7 @@ await saveModel.set(Object.freeze({
 }));
 ```
 
-Adapter method names and call counts remain `get()` once at init and `set(payload)` once per successful dirty save. `get()` may return synchronously or by promise because `init()` is already async. `cache`, `order`, `get`, `set`, `put`, `complete`, `abort`, `save`, `purge`, `purgeAll`, and state/reset identities remain available.
+Adapter method names and call counts remain `get()` once at init and `set(payload)` once per successful dirty save. `get()` may return synchronously or by native Promise, including a cross-realm Promise, because `init()` is already async; arbitrary thenables are rejected without accessor evaluation. `cache`, `order`, `get`, `set`, `put`, `complete`, `abort`, `save`, `purge`, `purgeAll`, and state/reset identities remain available.
 
 ## Migration, Cleanup, and Rollback
 
@@ -501,8 +502,8 @@ None. No product-level choice remains unresolved.
 - [x] Checkpoint 4: host integration, package metadata, and documentation
 
 ### Test Mode
-- [x] Focused tests passing (143/143)
-- [x] Exact full tests passing (705/705)
+- [x] Focused tests passing (144/144)
+- [x] Exact full tests passing (706/706 after current-head review fix)
 - [x] Typecheck and three package dry-runs passing
 
 ### Review Mode

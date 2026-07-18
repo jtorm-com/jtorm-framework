@@ -55,10 +55,15 @@ No high-severity finding was reported. The valid proof and documentation gaps we
    - Principle cited: hot-path minimalism
    - Lead judgment: malformed timestamp metadata must fail fresh, and the content/timestamp pair must remain complete on every authenticated hit. Two constant-time numeric checks preserve O(1) behavior and are required by the failure-atomicity contract.
 
-9. **[low, rejected] Await arbitrary thenables returned by `saveModel.get()`.**
+9. **[low, partially accepted after current-head Codex review] Await asynchronous adapter results.**
    - Lens: Skeptic
    - Principle cited: async adapter compatibility
-   - Lead judgment: the documented contract is synchronous data or a Promise. Assimilating arbitrary thenables would evaluate an untrusted own/inherited `then` accessor before descriptor validation, weakening the hostile-envelope boundary; an unsupported thenable safely cold-misses today.
+   - Lead judgment: the documented contract is synchronous data or a native Promise. Current-head
+     review correctly identified that `instanceof Promise` excluded native Promises from another
+     realm, so a red proof now locks native-brand adoption. Arbitrary thenables remain unsupported:
+     assimilating them would evaluate an untrusted own/inherited `then` accessor before descriptor
+     validation, weakening the hostile-envelope boundary. A paired test proves that accessor stays
+     unread.
 
 10. **[low, rejected] Remove the authenticated-sample ordering and consolidate all WeakMap reset state behind a new abstraction.**
     - Lens: Architect

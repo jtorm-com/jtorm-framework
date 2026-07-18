@@ -177,6 +177,7 @@ Controls are the existing fail-closed discriminator, own descriptor gates, exact
 |---|---|
 | PM-owned local restoration | focused `restore(owner, age, sampledTime)` tests for strict boundary, zero/Infinity, invalid age/sample, one-sample determinism, and opaque record freshness |
 | Own attestation and version | inherited/accessor/prototype/unknown/unversioned fixtures; zero adapter/clock/state effects |
+| Async adapter adoption | same- and cross-realm native Promise load; malformed envelope `then` accessor remains unread |
 | Whole-envelope atomic validation | malformed/cyclic/accessor/prototype/oversized/mixed/duplicate/failed-get cases all empty and clean |
 | Publication-only absolute time | direct set, compatible low-level put, plugin complete, save delay, hit, handler/event failure, abort |
 | Current-TTL original-age restore | just-before/exact/after boundary; shorter/longer/zero/Infinity; process restart pipeline |
@@ -257,11 +258,14 @@ five paths:
 4. bounded frozen save snapshot -> one adapter call -> revision-safe cleanup; and
 5. expiry/eviction/purge/abort/replacement -> paired metadata removal and no late resurrection.
 
-Three concrete implementation findings were reproduced red-first and fixed: a throwing adapter
+Four concrete implementation findings were reproduced red-first and fixed: a throwing adapter
 `get` accessor now stays inside the cold-load failure boundary; test-engine adapter DI no longer
 leaks across renders; and a rejected replacement publication retains the previous complete
-content/process/absolute metadata pair. Adversarial review also added duplicate-identity and mixed
-fresh/stale batch proofs. The full dispositions are in the differential and cross-model records.
+content/process/absolute metadata pair. A current-head Codex finding then proved cross-realm native
+Promises were incorrectly treated as envelopes; native-brand adoption now awaits them without
+evaluating arbitrary thenables or a malformed envelope `then` accessor. Adversarial review also
+added duplicate-identity and mixed fresh/stale batch proofs. The full dispositions are in the
+differential and cross-model records.
 
 ### Final control evidence
 
@@ -274,7 +278,7 @@ fresh/stale batch proofs. The full dispositions are in the differential and cros
 | Lifecycle/deletion | PASS — handler/event failure, abort, late completion, expiry, eviction, exact/full purge, failed save |
 | Isolation | PASS — explicit tenant/origin/base separation and unscoped same-identity pipeline restart |
 | Static/supply chain | PASS — 88 Semgrep rules with zero findings; full/production audits zero vulnerabilities; no runtime import/new dependency |
-| Verification | PASS — focused 143/143, exact repository 705/705, typecheck, package, syntax, source, JSON/JSONL, and diff guards |
+| Verification | PASS — focused 144/144, exact repository 706/706, typecheck, three package dry-runs, syntax/source/JSON, and 88-rule Semgrep |
 
 ### Privacy disposition
 

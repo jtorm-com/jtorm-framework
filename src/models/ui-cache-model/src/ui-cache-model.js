@@ -27,6 +27,19 @@ const descriptor = function (o, k) {
     return Object.prototype.hasOwnProperty.call(d, 'value') ? d : false;
 };
 
+const promised = function (o) {
+    let ok = 1, p;
+
+    try {
+        p = new Promise(function (resolve, reject) {
+            try { Promise.prototype.then.call(o, resolve, reject); }
+            catch (e) { ok = 0; resolve(); }
+        });
+    } catch (e) { return; }
+
+    return ok ? p : undefined;
+};
+
 const exact = function (o, names) {
     let keys;
 
@@ -365,7 +378,7 @@ module.exports = {
         },
 
         init: async function () {
-            let a, candidateOrder, d, g, m, n, now, o, records, sampled = 0;
+            let a, candidateOrder, d, g, m, n, now, o, p, records, sampled = 0;
             const old = this.order, token = change();
 
             this.cache = {};
@@ -397,7 +410,8 @@ module.exports = {
                 g = m.get;
                 if (typeof g !== 'function') return;
                 o = g.call(m);
-                if (o instanceof Promise) o = await o;
+                p = promised(o);
+                if (p) o = await p;
             } catch (e) { return; }
             if (lifecycle !== token || this.cache !== cache || this.order !== order) return;
             records = envelope(this, o);

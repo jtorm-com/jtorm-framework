@@ -87,6 +87,11 @@ leading-NUL, multi-NUL, and NUL-bearing language/cid coordinates are invalid. In
 be O(n) for `n <= max`; normal hits remain O(1). There are no timers, refresh jobs, or retained
 render-context records.
 
+Adapter `get()` may return the envelope directly or a native Promise from any JavaScript realm.
+The model adopts the Promise by its native brand rather than `instanceof`, so a cross-realm result
+works while an arbitrary thenable or malformed envelope `then` accessor is not evaluated. Rejected
+Promises and unsupported thenables fail cold like other adapter failures.
+
 The current TTL applies to original age after restart. Finite entries load only when
 `now - settledAt < ttl` and receive only that remaining lifetime from the injected
 promise-cache-model; `ttl = 0` retains none and `ttl = Infinity` is explicitly non-expiring.

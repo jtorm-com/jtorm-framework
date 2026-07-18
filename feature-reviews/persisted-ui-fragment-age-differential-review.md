@@ -88,6 +88,10 @@ remain in place.
 4. **Duplicate identities and mixed stale/fresh valid batches lacked direct witnesses.** Focused
    tests now prove whole-envelope duplicate quarantine and deterministic retention of only the
    still-fresh subset.
+5. **Cross-realm native Promises failed the asynchronous adapter contract.** Current-head Codex
+   review found the `instanceof Promise` check. A red `node:vm` test reproduced the cold miss; init
+   now adopts native Promises by their intrinsic brand while proving a malformed envelope `then`
+   accessor remains unread.
 
 No High or Medium finding remains. The cross-model skeptic/architect/minimalist findings and
 dispositions are recorded in the linked adversarial review.
@@ -130,7 +134,7 @@ are therefore outside the diff and remain characterized by the full suite.
 ## Differential verdict
 
 **PASS.** The changed persistence boundary is explicit, bounded, fail-cold on untrusted input,
-scope-preserving, and failure-atomic at the framework/adapter call boundary. Focused 143/143,
-repository 705/705, typecheck, syntax/source/JSON guards, 88-rule Semgrep, package dry-runs, and
-production/full dependency audits are green. Final staged-ratchet, CI, and current-head Codex review
-are tracked in the completion evaluation.
+scope-preserving, and failure-atomic at the framework/adapter call boundary. Focused 144/144, exact
+repository 706/706, typecheck, three package dry-runs, syntax guards, and the refreshed 88-rule
+Semgrep scan are green after the current-head review fix. Debt-ratchet, CI, and Codex reruns are
+tracked in the completion evaluation.
