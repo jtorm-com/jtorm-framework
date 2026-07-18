@@ -209,6 +209,7 @@ jTormLayerPlugin.handler = jTormHandler;
 jTormLayerModel.saveModel = null;
 const DEFAULT_TRANSPORT = jTormRequestModel.transport; // restore after any per-render fixture override
 const DEFAULT_CLOCK = jTormPromiseCacheModel.clock;
+const DEFAULT_PERSISTENCE_CLOCK = jTormUiCacheModel.persistenceClock;
 
 // Host XSS sanitizer seam override (see the DI block). A test opts in with
 // setSanitize(fn) before render(); reset() re-applies it to the raw-sink
@@ -267,6 +268,7 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
         }
     }
     jTormPromiseCacheModel.clock = DEFAULT_CLOCK;
+    jTormUiCacheModel.persistenceClock = DEFAULT_PERSISTENCE_CLOCK;
     jTormDataModel.ttl = jTormHtmlModel.ttl = jTormTssModel.ttl = jTormUiManifestModel.ttl = jTormUiCacheModel.ttl = 300000;
     jTormUiManifestModel.max = 32;
     jTormUiManifestModel.maxText = 1048576;
@@ -280,6 +282,7 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
     jTormJsonLdPlugin.jsonLdModel = jTormJsonLdModel;
     jTormUiManifestModel.requestModel = jTormRequestModel;
     jTormUiCacheModel.requestModel = jTormRequestModel;
+    jTormUiCacheModel.saveModel = null;
     jTormUiManifestModel.digest = async bytes => new Uint8Array(
         createHash('sha256').update(bytes).digest()
     );
@@ -289,6 +292,8 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
         jTormUiCacheModel.cache = {};      // per-cid rendered-fragment cache (nested store)
         jTormUiCacheModel.order = new Map(); // LRU recency tracker parallel to cache
         jTormUiCacheModel.stores = new WeakMap();
+        jTormUiCacheModel.settlements = new WeakMap();
+        jTormUiCacheModel.persistenceObserved = new WeakMap();
         jTormUiCacheModel.flights = new WeakMap();
         jTormUiCacheModel.iterations = new WeakMap();
     }
@@ -363,7 +368,7 @@ function fixtureTransport(fixtures, metrics) {
  * @param {number|object} [c] create-doc mode, or an explicit render context.
  * @param {{url:string,hash:string,mode:'required'|'optional'}[]|null} [manifests] ordered UI packs prepared after root creation and before events/handler.
  * @param {number} [warm] when truthy, repeat prepare on the same root and report its request delta.
- * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,clock?:Function,ttl?:number}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
+ * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,clock?:Function,persistenceClock?:Function,ttl?:number,uiCacheStore?:object|null,uiCacheInit?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
  * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
  */
 async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0, options = null) {
@@ -381,8 +386,17 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     if (options && typeof options.clock === 'function')
         jTormPromiseCacheModel.clock = options.clock
     ;
+    if (options && typeof options.persistenceClock === 'function')
+        jTormUiCacheModel.persistenceClock = options.persistenceClock
+    ;
     if (options && Object.prototype.hasOwnProperty.call(options, 'ttl'))
         jTormDataModel.ttl = jTormHtmlModel.ttl = jTormTssModel.ttl = jTormUiManifestModel.ttl = jTormUiCacheModel.ttl = options.ttl
+    ;
+    if (options && Object.prototype.hasOwnProperty.call(options, 'uiCacheStore'))
+        jTormUiCacheModel.saveModel = options.uiCacheStore
+    ;
+    if (options && options.uiCacheInit)
+        await jTormUiCacheModel.init()
     ;
     const handle = jTormHandler.handle;
     jTormHandler.handle = async function (...args) {

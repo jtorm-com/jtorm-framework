@@ -76,11 +76,11 @@ Shared data, HTML, TSS, manifest-pack, and rendered-fragment caches participate 
 request owner derives a valid explicit tenant/origin/base discriminator. Missing or malformed
 scope continues through normal uncached rendering without retained state. A single-tenant host
 can opt in by configuring a non-empty request base. Inject that same request model into UI-cache.
-After upgrade, UI-cache quarantines persisted fragments until the host clears the old store and
-sets an own `uiCacheScoped = true` field on its save adapter; inherited attestation is ignored,
-and old unscoped and new scoped bytes cannot be
-distinguished selectively. Perform that cleanup before enabling reload or any coordinated
-rollback.
+UI-cache `2.x` persists a version-1 rendered-fragment envelope with each fragment's original
+successful-publication Unix-ms timestamp. Reload requires both an own data-property
+`uiCacheScoped === true` adapter attestation and the recognized own wire version; inherited or
+unversioned data stays cold. Every 1.x store lacks trustworthy settlement age, so cold-clear it or
+externally construct v1 only from trustworthy original timestamps before enabling reload.
 
 The five shared caches default to a finite absolute TTL of `300000` ms. Pending work continues to
 deduplicate, successful hits do not slide expiry, `0` disables settled reuse, and explicit
@@ -90,13 +90,16 @@ cross-render pack cache; UI-cache exposes exact render/language/cid/variant purg
 global purge requiring a valid scoped dirty root. Exact unscoped calls are always no-ops and never
 infer full purge from `undefined`.
 
-UI fragment timestamps remain process-local and are not persisted. Attested entries loaded by
-`init()` begin a new in-process TTL; absolute age across restarts remains separate versioned-schema
-work. Persist a live UI purge by calling `save(scopedRootView)` afterward; the adapter must retain
-its own `uiCacheScoped === true` attestation. The plugin preserves its non-awaited after-view save
+Rendered-fragment age now survives restart under the current finite/zero/Infinity TTL by combining
+that persisted absolute timestamp with promise-cache-owned process-local freshness. Hosts inject a
+nondecreasing restart-stable Unix-ms clock, deploy promise-cache `1.0.3+`, UI-cache `2.x`, and UI
+plugin `1.0.3+` together, and finish `init()` before creating render roots. Mixed readers must not
+share a store. Before downgrade, disable persistence and clear v1 or restore a reader-compatible
+snapshot; older readers are not assumed to reject the new envelope safely. Persist a live UI purge
+by calling `save(scopedRootView)` afterward. The plugin preserves its non-awaited after-view save
 timing; an operator requiring persistence completion or error visibility explicitly awaits that
-`save()` call. The UI plugin's staged render dedupe requires the
-coordinated `@jtorm/event-model@^1.0.2` and `@jtorm/handler-wrapper@^1.0.7` lifecycle packages.
+`save()` call. See the UI-cache model README for wire, clock, privacy, deployment, and rollback
+details. Stale-while-revalidate and HTTP validators remain independent follow-ups.
 
 ## Credits
 The idea is heavily inspired from [Transphporm](https://github.com/Level-2/Transphporm), all credits go to them in finding a different way to handle template rendering.
