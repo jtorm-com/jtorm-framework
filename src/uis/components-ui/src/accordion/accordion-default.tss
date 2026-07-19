@@ -3,62 +3,17 @@
 ->if(to: 'array') {
     ->else
     ->if(to: 'object')
-    ->each(a: 'source')
     ->if(
-        d: source.items,
+        d: items,
         to: 'array'
     ) {
-        ->append {
-            cid: 'jtorm/components-ui-0.1.0/accordion-shell';
-            cs: 'default';
-
-            ->get {
-                t: '@c/accordion/accordion-shell.tss';
-            }
+        ->get {
+            t: '@c/accordion/accordion-group.tss';
         }
 
         .jtorm-accordion:last-child {
-            ->if(
-                d: source.id,
-                to: 'string'
-            )
-            ->attr {
-                n: 'id';
-                v: source.id;
-            }
-
-            ->if(
-                d: source.class,
-                to: 'string'
-            )
-            ->attr {
-                n: 'class';
-                v: source.class;
-                m: 'a';
-            }
-
-            ->if(
-                d: source.lang,
-                to: 'string'
-            )
-            ->attr {
-                n: 'lang';
-                v: source.lang;
-            }
-
-            ->if(
-                d: source.dir,
-                to: 'string',
-                v: '^(ltr|rtl|auto)$',
-                r: true
-            )
-            ->attr {
-                n: 'dir';
-                v: source.dir;
-            }
-
             ->each(
-                d: source.items,
+                d: items,
                 a: 'item'
             )
             ->data(

@@ -2,7 +2,7 @@
 
 module.exports = {
     jTormBootstrapUI: {
-        id: "jtorm/bootstrap-ui-0.1.0/src",
+        id: "jtorm/bootstrap-ui-0.2.0/src",
         alias: "@b",
         framework: "bootstrap",
         url: "http://localhost:4001/",
@@ -49,6 +49,9 @@ module.exports = {
                 }
             },
             accordion: {
+                group: {
+                    t: ['@c/accordion/accordion-group.tss', '@b/accordion/accordion-group.tss']
+                },
                 default: {
                     t: ['@c/accordion/accordion-default.tss', '@b/accordion/accordion.tss']
                 },

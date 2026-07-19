@@ -6,7 +6,7 @@
     to: 'string'
 ) {
     ->append {
-        cid: 'jtorm/components-ui-0.1.0/button-shell';
+        cid: 'jtorm/components-ui-0.2.0/button-shell';
         cs: 'default';
 
         ->get {

@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/schema-ui",
   "description": "jTorm Schema UI",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -13,5 +13,7 @@
     "url": "https://gitlab.com/jtorm/jtorm-framework.git",
     "directory": "src/uis/schema-ui"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jtorm/components-ui": "^0.2.0"
+  }
 }

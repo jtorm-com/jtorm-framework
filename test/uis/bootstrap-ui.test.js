@@ -23,6 +23,7 @@ const descriptors = {
     'alert.warning': ['@c/alert/alert-warning.tss', '@b/alert/alert.tss'],
     'alert.error': ['@c/alert/alert-error.tss', '@b/alert/alert.tss'],
     'card.default': ['@c/card/card-default.tss', '@b/card/card.tss'],
+    'accordion.group': ['@c/accordion/accordion-group.tss', '@b/accordion/accordion-group.tss'],
     'accordion.default': ['@c/accordion/accordion-default.tss', '@b/accordion/accordion.tss'],
     'accordion.item': ['@c/accordion/accordion-item.tss', '@b/accordion/accordion-item.tss'],
     'loading.default': ['@c/loading/loading-default.tss', '@b/loading/loading.tss']
@@ -47,6 +48,7 @@ const classes = {
         'mb-0'
     ],
     '@b/card/card.tss': ['card p-3', 'card-link', 'card-text', 'card-title d-block'],
+    '@b/accordion/accordion-group.tss': ['accordion'],
     '@b/accordion/accordion.tss': [
         'accordion',
         'accordion-body',
@@ -69,6 +71,7 @@ const gateReads = {
     '@b/badge/badge.tss': ['count', 'label'],
     '@b/alert/alert.tss': ['heading', 'message'],
     '@b/card/card.tss': ['heading'],
+    '@b/accordion/accordion-group.tss': [],
     '@b/accordion/accordion.tss': ['items'],
     '@b/accordion/accordion-item.tss': ['content', 'summary'],
     '@b/loading/loading.tss': []
@@ -97,6 +100,9 @@ const selectors = {
         '.jtorm-card__action',
         '.jtorm-card__summary',
         '.jtorm-card__title'
+    ],
+    '@b/accordion/accordion-group.tss': [
+        '.jtorm-accordion:last-child:not(.accordion)'
     ],
     '@b/accordion/accordion.tss': [
         '.jtorm-accordion:last-child',
@@ -148,6 +154,11 @@ const ifParams = {
         {d: 'heading', to: "'string'"},
         {el: "'.jtorm-card__summary'"},
         {el: "'.jtorm-card__action'"}
+    ],
+    '@b/accordion/accordion-group.tss': [
+        {to: "'array'"},
+        {to: "'object'"},
+        {el: "'.jtorm-accordion:last-child:not(.accordion)'"}
     ],
     '@b/accordion/accordion.tss': [
         {to: "'array'"},
@@ -253,12 +264,12 @@ test('bootstrap-ui package identity, dependencies, and registry ID advance toget
     const { pkg, ui } = load();
 
     assert.equal(pkg.name, '@jtorm/bootstrap-ui');
-    assert.equal(pkg.version, '0.1.0');
+    assert.equal(pkg.version, '0.2.0');
     assert.equal(pkg.main, 'src/bootstrap-ui.js');
     assert.equal(ui.id, `jtorm/bootstrap-ui-${pkg.version}/src`);
     assert.equal(ui.alias, '@b');
     assert.equal(ui.framework, 'bootstrap');
-    assert.deepEqual(pkg.dependencies, {'@jtorm/components-ui': '^0.1.0'});
+    assert.deepEqual(pkg.dependencies, {'@jtorm/components-ui': '^0.2.0'});
     assert.deepEqual(pkg.peerDependencies, {bootstrap: '^5.3.8'});
     assert.deepEqual(pkg.peerDependenciesMeta, {bootstrap: {optional: true}});
 
@@ -266,10 +277,10 @@ test('bootstrap-ui package identity, dependencies, and registry ID advance toget
     assert.doesNotMatch(source, /\brequire\s*\(|\bimport\s*\(/);
 });
 
-test('all 14 canonical variants bind through components-ui before one Bootstrap overlay', () => {
+test('all 15 canonical variants bind through components-ui before one Bootstrap overlay', () => {
     const { ui } = load();
 
-    assert.equal(Object.keys(descriptors).length, 14);
+    assert.equal(Object.keys(descriptors).length, 15);
     for (const [name, t] of Object.entries(descriptors)) {
         assert.deepEqual(descriptor(ui, name), {t}, name);
         assert.match(t[0], /^@c\//, name + ' canonical first');

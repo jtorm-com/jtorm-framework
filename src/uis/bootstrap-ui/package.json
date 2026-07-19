@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/bootstrap-ui",
   "description": "Bootstrap UI adapter for jTorm canonical components",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -18,7 +18,7 @@
     "directory": "src/uis/bootstrap-ui"
   },
   "dependencies": {
-    "@jtorm/components-ui": "^0.1.0"
+    "@jtorm/components-ui": "^0.2.0"
   },
   "peerDependencies": {
     "bootstrap": "^5.3.8"

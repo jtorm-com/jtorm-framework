@@ -3,7 +3,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { gzipSync } = require('node:zlib');
 const { render } = require('../helpers/engine.js');
-const { PRODUCT_DYNAMIC, productManifest } = require('../helpers/ui-manifest.js');
+const {
+  FAQ_DYNAMIC,
+  PRODUCT_DYNAMIC,
+  faqManifest,
+  productManifest
+} = require('../helpers/ui-manifest.js');
 
 const MAX_GZIP_BYTES = 8192;
 
@@ -107,7 +112,7 @@ test('compiler emits the deterministic model-free Product closure and ten diagno
   assert.deepEqual(result.manifest.dynamic, PRODUCT_DYNAMIC);
   assert.equal(
     result.hash,
-    'sha256-910d349afb6795b7df6fa72fa95d91beff16c3cc5a6aacf8ac6eb65372548cb8'
+    'sha256-e2353f189108167f42fb83b45d1e9c4aa97e8aaea5e94da9ecc6b072a4cf9d89'
   );
   assert.equal(Buffer.byteLength(result.json), 32068);
   const gzipBytes = gzipSync(result.json, { level: 9, mtime: 0 }).length;
@@ -179,4 +184,54 @@ test('prepared Product pack revalidates with its paired ETag and a bodyless 304'
   assert.deepEqual(validated.requests, [url]);
   assert.deepEqual(validated.requestHeaders, [{'If-None-Match': '"pack-a"'}]);
   assert.equal(validated.bytes, 0);
+});
+
+test('compiler emits the deterministic model-free FAQ accordion closure', async () => {
+  const result = await faqManifest();
+
+  assert.equal(result.manifest.assets.length, 8);
+  assert.deepEqual(result.manifest.dynamic, FAQ_DYNAMIC);
+  assert.equal(
+    result.hash,
+    'sha256-bd3bd15afef5070d96d6ca86340d60333b0d6ac125a67613998ebdd8b8a3b230'
+  );
+  assert.equal(Buffer.byteLength(result.json), 9584);
+  assert.match(result.filename, /^faq[.]sha256-[0-9a-f]{64}[.]json$/);
+  assert.equal(result.json, JSON.stringify(JSON.parse(result.json)));
+});
+
+test('prepared FAQ accordion closure preserves live and detached output with one pack request', async () => {
+  const result = await faqManifest();
+  const url = '/ui/' + result.filename;
+  const descriptors = [{ url, hash: result.hash, mode: 'required' }];
+  const fixtures = { [url]: { text: result.json } };
+  const html = '<body><div class="faq"></div></body>';
+  const tss = ".faq->ui { c: 'FAQPage.accordion'; }";
+  const data = {
+    '@type': 'FAQPage',
+    mainEntity: [{
+      '@type': 'Question',
+      name: 'Prepared question',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Prepared answer'
+      }
+    }]
+  };
+  const baseline = await render(html, tss, data);
+  const live = await render(
+    html, tss, data, 'http://localhost/', fixtures, 0, descriptors, 1
+  );
+  const detached = await render(
+    html, tss, data, 'http://localhost/', fixtures, 1, descriptors, 1
+  );
+
+  assert.deepEqual(live.requests, [url]);
+  assert.deepEqual(detached.requests, [url]);
+  assert.deepEqual(live.warmRequests, []);
+  assert.deepEqual(detached.warmRequests, []);
+  assert.equal(live.bytes, Buffer.byteLength(result.json));
+  assert.equal(detached.bytes, Buffer.byteLength(result.json));
+  assert.equal(live.body, baseline.body);
+  assert.equal(detached.body, baseline.body);
 });

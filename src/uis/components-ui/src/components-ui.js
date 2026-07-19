@@ -2,7 +2,7 @@
 
 module.exports = {
     jTormComponentsUI: {
-        id: "jtorm/components-ui-0.1.0/src",
+        id: "jtorm/components-ui-0.2.0/src",
         alias: "@c",
         framework: "components",
         url: "http://localhost:4001/",
@@ -58,6 +58,9 @@ module.exports = {
                 }
             },
             accordion: {
+                group: {
+                    t: ['@c/accordion/accordion-group.tss']
+                },
                 default: {
                     t: ['@c/accordion/accordion-default.tss']
                 },

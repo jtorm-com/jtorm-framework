@@ -31,6 +31,7 @@ const { jTormComponentsUI } = require('@jtorm/components-ui');
 | alert.warning | heading, message | root fields | named region |
 | alert.error | heading, message | root fields | named alert |
 | card.default | heading | summary, action, root fields | named article |
+| accordion.group | none | root fields | empty disclosure group |
 | accordion.default | items | root fields | disclosure group |
 | accordion.item | summary, content | open, root fields | details/summary |
 | loading.default | none | label, root fields | visible status |
@@ -80,6 +81,8 @@ An accordion is an ordered array of independent native disclosures. Multiple ite
 }
 ```
 
+`accordion.group` exposes the same canonical root without consuming an `items` field. It is the public composition seam for owners that need to validate or stream their own collection before invoking `accordion.item`. The group accepts only the shared root fields; unknown fields, including `items`, are inert.
+
 ## Rendering and cache layers
 
 Canonical fallbacks render in two phases:
@@ -107,7 +110,7 @@ The following optional fields apply only to a component root:
 | dir | string: ltr, rtl, or auto | Non-string or invalid values are omitted |
 
 Unknown fields are not copied to the root or descendants. In particular, title, style, tabindex, hidden, event attributes, arbitrary data attributes, and arbitrary ARIA attributes are not accepted by this foundation.
-Each canonical component accepts one object model. Top-level arrays, scalars, functions, and null emit no component; `accordion.items` is the only collection field in this foundation and the host must bound attacker-influenced item counts.
+Each canonical component accepts one object model. Top-level arrays, scalars, functions, and null emit no component; `accordion.default.items` is the only collection field in this foundation and the host must bound attacker-influenced item counts.
 Accordion iteration reads only canonical own enumerable array indices. Inherited properties and named array properties are ignored.
 
 The documented model is the binding contract. Canonical TSS reads only its approved fields directly; unknown fields are inert because no selector or sink consumes them. `->data` is reserved for an actually derived value, such as badge label/count normalization, or an internal alias handoff that avoids mutating accordion items. Pure member copies rooted at `source`, including whole-model and renamed-field copies, are rejected by the source contract.
@@ -195,6 +198,7 @@ Do not use these components for fabricated popularity, false urgency, disguised 
 A future framework adapter may change HTML templates where it provides accessibility-equivalent behavior, class names, and asset URLs. It must preserve:
 
 - all canonical component and variant names;
+- the root-only `accordion.group` composition seam;
 - required and optional data shapes;
 - label/count precedence and numeric zero;
 - native behavior or an accessibility-equivalent implementation;
@@ -215,6 +219,8 @@ The jtorm-* classes are unstyled fallback hooks. They are not adapter input fiel
 
 ## Compatibility and migration
 
+Version 0.2.0 adds `accordion.group` and extracts `accordion.default`'s existing root binding into that required same-package artifact. Existing valid and invalid `accordion.default` and `accordion.item` HTML/data behavior is unchanged. A cold default render now acquires one additional constant artifact regardless of item count. All seven static shell IDs advance together from `jtorm/components-ui-0.1.0/*` to `jtorm/components-ui-0.2.0/*`; regenerate prepared UI manifests and let the new generation populate cold.
+
 Version 0.1.0 adds the canonical foundation without removing any published key or export. The legacy recipes remain available with their existing behavior:
 
 - button.primaryButton
@@ -234,6 +240,6 @@ No framework adapter, CSS, runtime JavaScript, or resolver/compiler change is in
 
 ## Rollback
 
-Before publishing, revert the feature commit. After publishing, consumers can pin @jtorm/components-ui@0.0.6 and restore the previous UI registration/manifest while a corrective 0.1.1 is prepared. Published versions are not deleted. There is no database or caller-data migration to roll back.
+Before publishing, revert the feature commit. After publishing, stop selecting consumers that require `accordion.group`, pin `@jtorm/components-ui@0.1.0`, restore or regenerate manifests from that package identity, and reinitialize the resolver before new render roots. Published versions are not deleted. There is no database or caller-data migration to roll back.
 
-If UI-cache persistence is enabled, evict the seven `jtorm/components-ui-0.1.0/*-shell` IDs for each relevant scoped `null` language/`default` variant (or clear the isolated UI-cache namespace) during rollback. Older code does not request those versioned IDs, so leaving them until TTL/eviction is safe for rendering but may retain unused static bytes.
+If UI-cache persistence is enabled, the seven `jtorm/components-ui-0.2.0/*-shell` IDs are isolated from 0.1.0 readers. They may be evicted for operational cleanup or left unused until TTL/LRU eviction. Do not mix a 0.2 schema or Bootstrap package with the 0.1 components package.

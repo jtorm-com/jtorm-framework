@@ -1,0 +1,80 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->each(a: 'source')
+    ->if(
+        d: source.@type,
+        to: 'string',
+        v: '^FAQPage$',
+        r: true
+    )
+    ->if(
+        d: source.mainEntity,
+        to: 'array'
+    )
+    ->data(_faqGroup.ready: true) {
+        body
+            ->append(d: _faqGroup)
+            ->ui {
+                c: 'accordion.group';
+            }
+
+        .jtorm-accordion:last-child
+            ->each(
+                d: source.mainEntity,
+                a: 'question'
+            )
+            ->if(
+                d: question,
+                to: 'array'
+            ) {
+                ->else
+                ->if(
+                    d: question,
+                    to: 'object'
+                )
+                ->if(
+                    d: question.@type,
+                    to: 'string',
+                    v: '^Question$',
+                    r: true
+                )
+                ->if(
+                    d: question.name,
+                    to: 'string'
+                )
+                ->if(
+                    d: question.acceptedAnswer,
+                    to: 'array'
+                ) {
+                    ->else
+                    ->if(
+                        d: question.acceptedAnswer,
+                        to: 'object'
+                    )
+                    ->if(
+                        d: question.acceptedAnswer.@type,
+                        to: 'string',
+                        v: '^Answer$',
+                        r: true
+                    )
+                    ->if(
+                        d: question.acceptedAnswer.text,
+                        to: 'string'
+                    )
+                    ->data(
+                        _faqItem.summary: question.name,
+                        _faqItem.content: question.acceptedAnswer.text
+                    ) {
+                        body
+                            ->append(d: _faqItem)
+                            ->ui {
+                                c: 'accordion.item';
+                            }
+                    }
+                }
+            }
+    }
+}

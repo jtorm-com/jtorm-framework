@@ -81,6 +81,7 @@ const canonical = {
     'alert.warning': ['@c/alert/alert-warning.tss'],
     'alert.error': ['@c/alert/alert-error.tss'],
     'card.default': ['@c/card/card-default.tss'],
+    'accordion.group': ['@c/accordion/accordion-group.tss'],
     'accordion.default': ['@c/accordion/accordion-default.tss'],
     'accordion.item': ['@c/accordion/accordion-item.tss'],
     'loading.default': ['@c/loading/loading-default.tss']
@@ -91,9 +92,12 @@ const shellBindings = {
     '@c/badge/badge-default.tss': '@c/badge/badge-shell.tss',
     '@c/alert/alert-base.tss': '@c/alert/alert-shell.tss',
     '@c/card/card-default.tss': '@c/card/card-shell.tss',
-    '@c/accordion/accordion-default.tss': '@c/accordion/accordion-shell.tss',
+    '@c/accordion/accordion-group.tss': '@c/accordion/accordion-shell.tss',
     '@c/accordion/accordion-item.tss': '@c/accordion/accordion-item-shell.tss',
     '@c/loading/loading-default.tss': '@c/loading/loading-shell.tss'
+};
+const componentBindings = {
+    '@c/accordion/accordion-default.tss': '@c/accordion/accordion-group.tss'
 };
 const shells = Object.values(shellBindings);
 const support = [
@@ -128,7 +132,7 @@ const published = {
 };
 
 test('components-ui package and mapper IDs advance together without dependencies', () => {
-    assert.equal(pkg.version, '0.1.0');
+    assert.equal(pkg.version, '0.2.0');
     assert.equal(ui.id, `jtorm/components-ui-${pkg.version}/src`);
     assert.equal(ui.alias, '@c');
     assert.equal(ui.framework, 'components');
@@ -136,7 +140,7 @@ test('components-ui package and mapper IDs advance together without dependencies
 });
 
 test('all canonical framework-neutral variants map to TSS-only artifacts', () => {
-    assert.equal(Object.keys(canonical).length, 14);
+    assert.equal(Object.keys(canonical).length, 15);
     for (const [name, t] of Object.entries(canonical))
         assert.deepEqual(descriptor(name), { t }, name)
     ;
@@ -183,6 +187,17 @@ test('foundation artifacts contain no runtime assets, DI, or raw-html binding', 
             binding + ' versioned cid'
         );
         assert.deepEqual(paramValues(tree, 'cs'), ["'default'"], binding + ' cache variant');
+    }
+
+    for (const [binding, component] of Object.entries(componentBindings)) {
+        const tree = parser.handle(fs.readFileSync(
+            path.join(root, binding.replace(/^@c\//, '')),
+            'utf8'
+        ));
+
+        assert.deepEqual(componentRefs(tree), [component], binding + ' component binding');
+        assert.equal(hasParam(tree, 'cid'), false, binding + ' delegates cache identity');
+        assert.equal(hasParam(tree, 'cs'), false, binding + ' delegates cache scope');
     }
 
     for (const shell of shells) {

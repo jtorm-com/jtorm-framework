@@ -6,7 +6,7 @@
     ->each(a: 'source')
     ->text(fallback: 'Loading') {
         ->append {
-            cid: 'jtorm/components-ui-0.1.0/loading-shell';
+            cid: 'jtorm/components-ui-0.2.0/loading-shell';
             cs: 'default';
 
             ->get {

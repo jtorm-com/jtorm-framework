@@ -1,6 +1,6 @@
 # jTorm Bootstrap UI
 
-Bootstrap `^5.3.8` presentation for the 14 canonical `@jtorm/components-ui` variants. The adapter keeps the canonical model, semantic HTML, safe text/URL binding, localization, and static-shell cache. It adds fixed Bootstrap classes afterward.
+Bootstrap `^5.3.8` presentation for the 15 canonical `@jtorm/components-ui` variants. The adapter keeps the canonical model, semantic HTML, safe text/URL binding, localization, and static-shell cache. It adds fixed Bootstrap classes afterward.
 
 The package contains no Bootstrap CSS or JavaScript, runtime import, event handler, `data-bs-*` attribute, automatic Bootstrap asset request, model translation, or fragment-cache identity. Its trusted `@b/*.tss` presentation artifacts are acquired through the host's existing jTorm TSS/request path, just like the canonical `@c/*.tss` artifacts.
 
@@ -91,7 +91,9 @@ The complete field and validation contract remains documented by `@jtorm/compone
 | `alert.warning` | `alert alert-warning` |
 | `alert.error` | `alert alert-danger` |
 | `card.default` | `card` plus spacing/title/text/link classes |
-| `accordion.default` / `accordion.item` | native disclosure plus accordion/item/header/body classes and utilities |
+| `accordion.group` | native disclosure root plus the `accordion` class |
+| `accordion.default` | native disclosure root/items plus accordion/item/header/body classes and utilities |
+| `accordion.item` | native disclosure item plus item/header/body classes and utilities |
 | `loading.default` | inline-flex layout plus a small border spinner |
 
 `badge` already comes from the canonical shell and is not duplicated by the overlay.
@@ -102,6 +104,8 @@ Accordion items remain native `details` and `summary` elements. The adapter does
 
 This is a Bootstrap-themed native accordion, not stock Bootstrap Collapse markup. If a future design requires structurally identical Collapse behavior, it needs a separate reviewed interaction/state owner rather than adding hidden JavaScript coupling here.
 
+Schema-owned projections resolve their nested canonical calls through the globally configured framework. Configure `framework = 'bootstrap'` for `FAQPage.accordion` presentation. An explicit outer `f: 'bootstrap'` that misses this mapper and falls back to schema does not propagate into nested calls when the global framework is different; this adapter does not change resolver context semantics.
+
 ## Rendering and cache layers
 
 Each descriptor runs in a fixed order:
@@ -111,7 +115,7 @@ Each descriptor runs in a fixed order:
 
 Both are required TSS artifacts served through the host's existing request policy and optional UI-manifest path. If an `@b` artifact is unavailable or denied, the existing request/get failure remains loud; the adapter does not silently return a partially styled success. Hosts therefore own reliable same-origin/package serving or manifest preparation for both aliases.
 
-The adapter creates no shell and no `cid`. Existing `jtorm/components-ui-0.1.0/*-shell` entries therefore stay framework-neutral and contain neither caller data nor Bootstrap classes. Warm and persisted cache hits restore canonical structure, bind current caller/localized data, and then receive presentation classes again.
+The adapter creates no shell and no `cid`. Existing `jtorm/components-ui-0.2.0/*-shell` entries therefore stay framework-neutral and contain neither caller data nor Bootstrap classes. Warm and persisted cache hits restore canonical structure, bind current caller/localized data, and then receive presentation classes again.
 
 If a future adapter version changes HTML structure, it must use Bootstrap-owned versioned shell IDs; it must not write adapter structure into canonical component cache entries.
 
@@ -138,6 +142,6 @@ Visual intent is presentation only. The host still owns authorization, destructi
 
 ## Compatibility, upgrade, and rollback
 
-Version 0.1.0 targets the canonical `@jtorm/components-ui` 0.1 contract and Bootstrap `^5.3.8`. Test Bootstrap upgrades and custom Sass/variable builds in the host before deployment because CSS behavior is outside this package's bytes.
+Version 0.2.0 adds the root-only `accordion.group` overlay and targets the canonical `@jtorm/components-ui` 0.2 contract. Existing 0.1 overlays retain their strict gates and output. Bootstrap `^5.3.8` remains the optional peer. Test Bootstrap upgrades and custom Sass/variable builds in the host before deployment because CSS behavior is outside this package's bytes.
 
-To roll back, remove `jTormBootstrapUI` from the injected `uis`, restore the previous `framework`, call the resolver initialization path, and remove the Bootstrap stylesheet only if no other UI uses it. No data migration or fragment-cache purge is required because this adapter creates no stored data or cache entry. Published versions are never deleted; consumers may pin while a corrective patch is prepared.
+To roll back the coordinated feature, stop selecting `FAQPage.accordion`, pin `@jtorm/bootstrap-ui@0.1.0` with `@jtorm/components-ui@0.1.0` and `@jtorm/schema-ui@0.1.2`, restore matching manifests, and call the resolver initialization path. Alternatively remove `jTormBootstrapUI` from the injected `uis`, restore the previous `framework`, and remove the Bootstrap stylesheet only if no other UI uses it. No data migration or Bootstrap-owned fragment-cache purge is required because this adapter creates no stored data or cache entry.
