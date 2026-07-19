@@ -1,0 +1,31 @@
+{
+  "name": "@jtorm/bootstrap-ui",
+  "description": "Bootstrap UI adapter for jTorm canonical components",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "bootstrap",
+    "jtorm",
+    "ui"
+  ],
+  "main": "src/bootstrap-ui.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jtorm-com/jtorm-framework.git",
+    "directory": "src/uis/bootstrap-ui"
+  },
+  "dependencies": {
+    "@jtorm/components-ui": "^0.1.0"
+  },
+  "peerDependencies": {
+    "bootstrap": "^5.3.8"
+  },
+  "peerDependenciesMeta": {
+    "bootstrap": {
+      "optional": true
+    }
+  }
+}

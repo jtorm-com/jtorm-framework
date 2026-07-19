@@ -1,0 +1,40 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->if(
+        d: heading,
+        to: 'string'
+    ) {
+        .jtorm-card:last-child {
+            ->attr {
+                n: 'class';
+                v: 'card p-3';
+                m: 'a';
+            }
+
+            .jtorm-card__title->attr {
+                n: 'class';
+                v: 'card-title d-block';
+                m: 'a';
+            }
+
+            .jtorm-card__summary
+            ->if(el: '.jtorm-card__summary')
+            ->attr {
+                n: 'class';
+                v: 'card-text';
+                m: 'a';
+            }
+
+            .jtorm-card__action
+            ->if(el: '.jtorm-card__action')
+            ->attr {
+                n: 'class';
+                v: 'card-link';
+                m: 'a';
+            }
+        }
+    }
+}

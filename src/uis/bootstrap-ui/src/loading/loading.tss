@@ -1,0 +1,20 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object') {
+        .jtorm-loading:last-child {
+            ->attr {
+                n: 'class';
+                v: 'd-inline-flex align-items-center gap-2';
+                m: 'a';
+            }
+
+            .jtorm-loading__indicator->attr {
+                n: 'class';
+                v: 'spinner-border spinner-border-sm';
+                m: 'a';
+            }
+        }
+    }
+}
