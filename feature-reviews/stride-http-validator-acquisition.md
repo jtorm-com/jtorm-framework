@@ -1,7 +1,7 @@
 # STRIDE Threat Model: HTTP Validator Acquisition Caches
 
 **Date:** 2026-07-19
-**Status:** Implemented; local controls verified; publication gates pending
+**Status:** COMPLETE — PR #69 merged after green CI and clean current-head Codex review
 **Feature:** `feature-reviews/http-validator-acquisition.md`
 **Scope:** opt-in HTTP validators for the scoped data, HTML, TSS, and UI-manifest acquisition caches
 

@@ -1,20 +1,20 @@
 # Feature Development: HTTP Validator Acquisition Caches
 
-**Status:** IMPLEMENTED — ready PR #69; GitHub gates are authoritative
+**Status:** MERGED — PR #69 landed in `dev` as `f252ab0`
 **Claimed:** 2026-07-19T09:06:42Z
 **Agent:** Codex `/root`
-**Current Mode:** Documentation and delivery
-**Worktree:** `/tmp/jtorm-http-validators`
-**Branch:** `feat/http-validator-acquisition`
+**Current Mode:** Complete
+**Worktree:** removed after merge
+**Branch:** deleted after merge
 **Base:** `origin/dev` at `83c5ef62ae4cf29e0eceb3eb54263c6c16fac556`
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Review and local verification (100/100)
-**Current Mode:** Documentation and delivery
-**Next Action:** iterate PR #69 current-head CI and Codex review to green/clean.
+**Last Completed Mode:** Delivery
+**Current Mode:** Complete
+**Next Action:** evaluate rendered-fragment SWR as its separate P4 architecture item.
 **Implementation:** request-model conditional parsing, promise-cache exact-generation transactions,
 four safe acquisition bridges, deterministic engine support, package releases, and focused
 model/pipeline/policy tests are complete.
@@ -24,8 +24,8 @@ model/pipeline/policy tests are complete.
 **Review findings fixed:** ten design findings and six implementation findings, including request
 and manifest TOCTOU observations plus exact base-validator detachment. Every implementation finding
 received a failing test before its fix.
-**Remaining gates:** ready PR, green current-head CI, clean current-head Codex review, and zero
-unresolved threads. The PR must not be merged.
+**Completion:** final head `cfba4b0` passed green CI and a clean current-head Codex review with
+zero unresolved threads. The maintainer merged PR #69; the delivery agent did not merge it.
 
 ---
 
@@ -618,5 +618,5 @@ The score becomes final only after independent review findings are incorporated 
 - [x] Package versions and canonical backlog updated
 - [x] Conventional commits created
 - [x] Ready PR opened into `dev` as #69
-- [ ] Current-head CI green
-- [ ] Current-head Codex review clean with zero unresolved threads
+- [x] Current-head CI green
+- [x] Current-head Codex review clean with zero unresolved threads

@@ -109,14 +109,16 @@
 > intentionally byte-compatible with the fallback. Selecting and implementing the first reference
 > framework is the next UI-system follow-up, independent of the open P4 cache-policy work.
 >
-> **Backlog update — 2026-07-19 (this change):** HTTP validators are now implemented as an exact
+> **Backlog update — 2026-07-19 (`dev` at `f252ab0`):** PR #69 completed HTTP validators as an exact
 > opt-in on those same four acquisition caches. One bounded opaque ETag or Last-Modified value is
 > atomically paired with the exact scoped promise-cache generation; every conditional request
 > re-runs request-model URL policy and resolved-key discrimination. A 200 publishes bytes and
 > metadata only after the owner's full parser/manifest validation path; a 304 reads no body and
 > can publish fresh only by reusing its exact current content+validator pair. Default traffic,
 > public promise/value shapes, manifest wire v1, and rendered-fragment cache/persistence remain
-> unchanged. Rendered-fragment SWR remains the independent P4 follow-up.
+> unchanged. Rendered-fragment SWR remains the independent P4 follow-up. Final head `cfba4b0`
+> passed CI and a clean current-head Codex review with zero unresolved threads before the
+> maintainer merged PR #69 into `dev` as `f252ab0`.
 
 ---
 
@@ -265,7 +267,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P4** | Version the persisted fragment schema for absolute age across restarts | ✅ Done — merged PR #63 | Wire v1 preserves original successful settlement time, applies current TTL to remaining age, and defines fail-closed migration/deployment/rollback | M |
 | **P4** | Add opt-in request-triggered SWR to safe acquisition caches | ✅ Done — merged PR #65 | Data/HTML/TSS/manifest packs default to zero, preserve strict scope/policy/validation, and refresh once per retained generation | M |
 | **P4** | Evaluate rendered-fragment SWR | Next independent follow-up | Background rendering crosses handler/event completion, independent timestamps, save adapters, persistence, and downstream revocation | L |
-| **P4** | Add opt-in HTTP validators to safe acquisition caches | ✅ Done — PR #69 | Exact scoped generation pairing, bounded opaque ETag/Last-Modified metadata, validated 200 replacement, and bodyless 304 reuse; rendered fragments remain excluded | M |
+| **P4** | Add opt-in HTTP validators to safe acquisition caches | ✅ Done — merged PR #69 | Exact scoped generation pairing, bounded opaque ETag/Last-Modified metadata, validated 200 replacement, and bodyless 304 reuse; rendered fragments remain excluded | M |
 | **P5** | Establish a framework-neutral common-component foundation | ✅ Done — merged PR #66 | Stable intent-based names and canonical models make visual-framework backends testable without coupling caller data to one framework | L |
 | **P5** | Design the UI-framework adapter layer and implement one reference adapter | Backlog — framework intentionally unselected | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
 
