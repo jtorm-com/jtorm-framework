@@ -1,6 +1,6 @@
 # Feature Development: HTTP Validator Acquisition Caches
 
-**Status:** IMPLEMENTED — local verification passed; publication gates pending
+**Status:** IMPLEMENTED — ready PR #69; GitHub gates are authoritative
 **Claimed:** 2026-07-19T09:06:42Z
 **Agent:** Codex `/root`
 **Current Mode:** Documentation and delivery
@@ -14,7 +14,7 @@
 
 **Last Completed Mode:** Review and local verification (100/100)
 **Current Mode:** Documentation and delivery
-**Next Action:** commit review records, push a ready PR into `dev`, then iterate current-head CI and Codex review to green/clean.
+**Next Action:** iterate PR #69 current-head CI and Codex review to green/clean.
 **Implementation:** request-model conditional parsing, promise-cache exact-generation transactions,
 four safe acquisition bridges, deterministic engine support, package releases, and focused
 model/pipeline/policy tests are complete.
@@ -617,6 +617,6 @@ The score becomes final only after independent review findings are incorporated 
 - [x] Specification, threat model, and evaluation complete
 - [x] Package versions and canonical backlog updated
 - [x] Conventional commits created
-- [ ] Ready PR opened into `dev`
+- [x] Ready PR opened into `dev` as #69
 - [ ] Current-head CI green
 - [ ] Current-head Codex review clean with zero unresolved threads

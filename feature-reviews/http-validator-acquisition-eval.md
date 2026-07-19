@@ -1,20 +1,20 @@
 # HTTP validator acquisition — Evaluation
 
-**Status:** LOCAL PASS — PR publication gates pending
+**Status:** LOCAL PASS — ready PR #69; GitHub gates are authoritative
 **Claimed:** 2026-07-19T09:06:42Z
 **Agent:** Codex `/root`
 **Mode:** Pre-PR branch evaluation
-**Current Phase:** 6 — documentation and delivery
+**Current Phase:** 7 — PR validation
 **Base ref:** `origin/dev` at `af5c62c`
 **Diff range:** `af5c62c...feat/http-validator-acquisition` plus current review records
-**PR review comments:** not a PR yet
+**PR review comments:** PR #69; current-head GitHub state is authoritative
 **Specification:** [http-validator-acquisition.md](http-validator-acquisition.md)
 **Threat model:** [stride-http-validator-acquisition.md](stride-http-validator-acquisition.md)
 
 ## Resumption Context
 
 **Last Completed Phase:** 5 — local review and verification
-**Next Action:** commit records, open a ready PR, and iterate current-head CI/Codex review
+**Next Action:** iterate PR #69 current-head CI/Codex review
 **Issues Found (not yet fixed):** none
 **Files Modified:** request-model; promise-cache-model; data/HTML/TSS/UI-manifest acquisition owners; package metadata/READMEs; engine and focused model/pipeline/policy tests; root architecture and feature records
 **Source-ratchet status:** PASS — exact allowlist/negative fixtures and no-edit convergence
@@ -146,10 +146,8 @@ already installed pinned Terser binary. The expectation was updated to the requi
 minor, the worktree used the existing dependency installation, the focused parser gate passed
 2/2, and the exact suite then passed 897/897.
 
-## Remaining Publication Gates
+## PR-Controlled Completion Gates
 
-- Commit these final review records and outcome ledger entries.
-- Open a ready, non-draft PR into `dev`.
 - Require green CI for the current PR head.
 - Require a clean Codex review against that same head and zero unresolved threads.
 - Do not merge.

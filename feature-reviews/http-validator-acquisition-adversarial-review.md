@@ -1,7 +1,7 @@
 # HTTP Validator Acquisition — Adversarial Review
 
 **Date:** 2026-07-19
-**Status:** LOCAL PASS; current-head GitHub Codex gate pending
+**Status:** LOCAL PASS; external gate is current-head GitHub Codex review on PR #69
 
 ## Skeptic Lens
 
