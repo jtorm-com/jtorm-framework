@@ -417,10 +417,10 @@ test(`${seededCount} seeded nested/interleaved forms match the frozen v1 oracle`
     assert.equal(hash, '3d274ffe1c4bf7db6b46ab9e428ed34536f9c5fccbe2bd57d16db676aca07875');
 });
 
-test('all 278 checked-in TSS files are directly equal to the v1 oracle', () => {
+test('all 285 checked-in TSS files are directly equal to the v1 oracle', () => {
   const files = listTss(path.join(repo, 'src')).sort();
   const { actual, expected } = parsers();
-  assert.equal(files.length, 278);
+  assert.equal(files.length, 285);
   for (const file of files) {
     const source = fs.readFileSync(file, 'utf8');
     assert.deepEqual(

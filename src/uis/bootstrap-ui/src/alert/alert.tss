@@ -1,0 +1,74 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->if(
+        d: heading,
+        to: 'string'
+    )
+    ->if(
+        d: message,
+        to: 'string'
+    ) {
+        .jtorm-alert:last-child->attr {
+            n: 'class';
+            v: 'alert';
+            m: 'a';
+        }
+
+        .jtorm-alert--default:last-child
+        ->if(el: '.jtorm-alert--default:last-child')
+        ->attr {
+            n: 'class';
+            v: 'alert-secondary';
+            m: 'a';
+        }
+
+        .jtorm-alert--info:last-child
+        ->if(el: '.jtorm-alert--info:last-child')
+        ->attr {
+            n: 'class';
+            v: 'alert-info';
+            m: 'a';
+        }
+
+        .jtorm-alert--success:last-child
+        ->if(el: '.jtorm-alert--success:last-child')
+        ->attr {
+            n: 'class';
+            v: 'alert-success';
+            m: 'a';
+        }
+
+        .jtorm-alert--warning:last-child
+        ->if(el: '.jtorm-alert--warning:last-child')
+        ->attr {
+            n: 'class';
+            v: 'alert-warning';
+            m: 'a';
+        }
+
+        .jtorm-alert--error:last-child
+        ->if(el: '.jtorm-alert--error:last-child')
+        ->attr {
+            n: 'class';
+            v: 'alert-danger';
+            m: 'a';
+        }
+
+        .jtorm-alert:last-child {
+            .jtorm-alert__title->attr {
+                n: 'class';
+                v: 'alert-heading d-block';
+                m: 'a';
+            }
+
+            .jtorm-alert__message->attr {
+                n: 'class';
+                v: 'mb-0';
+                m: 'a';
+            }
+        }
+    }
+}

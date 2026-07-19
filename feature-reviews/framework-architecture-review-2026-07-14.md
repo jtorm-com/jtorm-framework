@@ -119,6 +119,17 @@
 > unchanged. Rendered-fragment SWR remains the independent P4 follow-up. Final head `cfba4b0`
 > passed CI and a clean current-head Codex review with zero unresolved threads before the
 > maintainer merged PR #69 into `dev` as `f252ab0`.
+>
+> **Backlog update — 2026-07-19 (current Bootstrap adapter change):** the first
+> reference framework adapter is implemented as `@jtorm/bootstrap-ui@0.1.0`.
+> All fourteen canonical variants resolve through the unchanged `@c` model/binding
+> artifacts before one fixed-literal `@b` presentation overlay. The adapter adds no
+> model translation, runtime import, JavaScript, automatic Bootstrap asset request,
+> behavior attribute, or fragment-cache identity; the host owns a compatible Bootstrap
+> `^5.3.8` stylesheet, while accordion interaction remains native `details`/`summary`.
+> Full-pipeline tests cover
+> explicit/global resolution, fallback, invalid models, escaping/URL safety, and all
+> seven canonical shell caches across cold, neutral, warm, and persisted renders.
 
 ---
 
@@ -269,7 +280,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P4** | Evaluate rendered-fragment SWR | Next independent follow-up | Background rendering crosses handler/event completion, independent timestamps, save adapters, persistence, and downstream revocation | L |
 | **P4** | Add opt-in HTTP validators to safe acquisition caches | ✅ Done — merged PR #69 | Exact scoped generation pairing, bounded opaque ETag/Last-Modified metadata, validated 200 replacement, and bodyless 304 reuse; rendered fragments remain excluded | M |
 | **P5** | Establish a framework-neutral common-component foundation | ✅ Done — merged PR #66 | Stable intent-based names and canonical models make visual-framework backends testable without coupling caller data to one framework | L |
-| **P5** | Design the UI-framework adapter layer and implement one reference adapter | Backlog — framework intentionally unselected | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
+| **P5** | Design the UI-framework adapter layer and implement one reference adapter | ✅ Implemented — current Bootstrap adapter change | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.

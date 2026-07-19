@@ -1,0 +1,42 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->if(
+        d: label,
+        to: 'string'
+    ) {
+        .jtorm-button--default:last-child
+        ->if(el: '.jtorm-button--default:last-child')
+        ->attr {
+            n: 'class';
+            v: 'btn btn-secondary';
+            m: 'a';
+        }
+
+        .jtorm-button--primary:last-child
+        ->if(el: '.jtorm-button--primary:last-child')
+        ->attr {
+            n: 'class';
+            v: 'btn btn-primary';
+            m: 'a';
+        }
+
+        .jtorm-button--secondary:last-child
+        ->if(el: '.jtorm-button--secondary:last-child')
+        ->attr {
+            n: 'class';
+            v: 'btn btn-outline-secondary';
+            m: 'a';
+        }
+
+        .jtorm-button--destructive:last-child
+        ->if(el: '.jtorm-button--destructive:last-child')
+        ->attr {
+            n: 'class';
+            v: 'btn btn-danger';
+            m: 'a';
+        }
+    }
+}
