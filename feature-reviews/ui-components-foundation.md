@@ -1,6 +1,6 @@
 # Feature Development: UI Components Foundation
 
-**Status:** COMPLETE — cache layering and final verification passed
+**Status:** MERGED — PR #66 landed in `dev` at `6f6e8cf`
 **Claimed:** 2026-07-18T18:11:28Z
 **Agent:** Codex `/root`
 **Current Mode:** Complete
@@ -11,7 +11,9 @@
 
 **Last Completed Mode:** Final Ratification
 **Current Mode:** Complete
-**Next Action:** Push the reviewed commit and open the requested ready PR into dev.
+**Next Action:** Design the separate UI-framework adapter layer; preserve the canonical model,
+semantic/accessibility, per-render binding, and versioned shell-cache contracts before selecting
+and implementing the first framework backend.
 **Files Created:**
 - `feature-reviews/ui-components-foundation.md`
 - `feature-reviews/ui-components-foundation-spec.md`
@@ -58,7 +60,8 @@
 - Required red phase recorded before source changes.
 - Focused if-method and canonical-component suite: 41/41 passing; source convergence: 27/27.
 - Parser snapshot and v1 differential: 15/15 passing across all 278 TSS files.
-- Full repository suite on current dev: 732/732 passing.
+- Final PR head on current dev: full repository suite 786/786 passing; component source contracts
+  4/4, real component pipeline 19/19, and parser snapshot plus frozen-v1 differential 15/15.
 - `npm run typecheck`: passing.
 - Package dry-runs contain only intended files: components-ui 0.1.0 has 53 files; each-method
   1.0.5 and if-method 1.0.6 have 3 each.
@@ -66,7 +69,11 @@
 - External skeptic, architect, and minimalist lenses passed; one Low null-model finding was fixed red-first and its focused follow-up passed.
 
 **Context for Next Session:**
-Implementation and documentation are isolated in `/tmp/jtorm-ui-components-foundation`, rebased exactly onto current `dev`. Review must remain scoped to this diff and preserve unrelated work in the original checkout.
+PR #66 merged the reviewed foundation into `dev` as `6f6e8cf` on 2026-07-19 after green CI,
+a clean current-head Codex review, and zero unresolved review threads. The next UI-system work is a
+separate adapter-layer feature. Framework selection is intentionally deferred; any adapter must keep
+the canonical caller model framework-neutral and own distinct versioned shell identities unless its
+structure is deliberately byte-compatible with the fallback.
 
 ---
 
@@ -255,3 +262,4 @@ All six categories are concretely analyzed in the spec. Mandatory controls cover
 - [x] Package README, feature spec, STRIDE model, workflow, and evaluation updated
 - [x] Architecture corpus count updated in AGENTS.md
 - [x] No project progress index exists; not applicable
+- [x] PR #66 passed current-head CI and Codex review and merged into `dev` as `6f6e8cf`

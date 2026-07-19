@@ -99,6 +99,15 @@
 > event, timestamp, save-adapter, and persistence ownership. HTTP conditional requests remain a
 > third independent transport/cache-policy item; this change adds no ETag or Last-Modified
 > semantics.
+>
+> **Backlog update — 2026-07-19 (`dev` at `6f6e8cf`):** PR #66 completed the
+> framework-neutral UI component foundation: fourteen canonical variants across six common
+> families now share stable framework-neutral models, semantic and accessible fallbacks, direct
+> per-render data binding, and versioned literal-only shell caching. A UI-framework adapter layer
+> remains deliberately separate. Its design must preserve those public models and semantic/cache
+> invariants, and each adapter must own distinct versioned shell identities unless its structure is
+> intentionally byte-compatible with the fallback. Selecting and implementing the first reference
+> framework is the next UI-system follow-up, independent of the open P4 cache-policy work.
 
 ---
 
@@ -248,6 +257,8 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P4** | Add opt-in request-triggered SWR to safe acquisition caches | ✅ Done — merged PR #65 | Data/HTML/TSS/manifest packs default to zero, preserve strict scope/policy/validation, and refresh once per retained generation | M |
 | **P4** | Evaluate rendered-fragment SWR | Next independent follow-up | Background rendering crosses handler/event completion, independent timestamps, save adapters, persistence, and downstream revocation | L |
 | **P4** | Evaluate HTTP validator integration | Next independent follow-up | Conditional requests, cache headers, ETag, and Last-Modified semantics need a separate transport/failure/security contract | M |
+| **P5** | Establish a framework-neutral common-component foundation | ✅ Done — merged PR #66 | Stable intent-based names and canonical models make visual-framework backends testable without coupling caller data to one framework | L |
+| **P5** | Design the UI-framework adapter layer and implement one reference adapter | Backlog — framework intentionally unselected | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.
