@@ -140,8 +140,10 @@
 > `accordion.group` plus existing native `details` / `summary` items. Optional Bootstrap remains a
 > fixed-literal presentation overlay; the original root remains owned by JSON-LD, and existing
 > `FAQPage.default`, `FAQPage.link`, accordion defaults, and framework-resolution policy remain
-> unchanged. The coordinated components, Bootstrap, and schema package/cache identities advance
-> to `0.2.0`. Final head `314eb71` passed 928/928 local tests, green CI, and a clean current-head
+> unchanged. All three package versions advance to `0.2.0`; only the components/Bootstrap
+> singleton identities and components-owned canonical cache IDs advance, while schema retains its
+> published `jtorm/schema-ui-0.0.4/src` asset namespace. Final head `314eb71` passed 928/928 local
+> tests, green CI, and a clean current-head
 > Codex review with zero unresolved threads before the maintainer merged it as `9f0fe28`.
 > Live browser accessibility evidence remains an explicit pre-publication host gate. The next
 > UI-system follow-up is accessible form-field and validation composition over existing `html-ui`
