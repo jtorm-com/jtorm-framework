@@ -245,7 +245,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P3** | Fail shared cache participation closed without an explicit render discriminator | ✅ Done — PR #59; fail-open half of weakness #12 | Prevents cross-render sharing while preserving ordinary uncached work and scoped warm behavior | M |
 | **P3** | Add cache TTL and explicit purge APIs | ✅ Done — merged PR #61; TTL/purge half of weakness #12 | Makes template/cache invalidation operational without process restart while preserving scoped warm behavior | M |
 | **P4** | Version the persisted fragment schema for absolute age across restarts | ✅ Done — merged PR #63 | Wire v1 preserves original successful settlement time, applies current TTL to remaining age, and defines fail-closed migration/deployment/rollback | M |
-| **P4** | Add opt-in request-triggered SWR to safe acquisition caches | ✅ Implemented in this change | Data/HTML/TSS/manifest packs default to zero, preserve strict scope/policy/validation, and refresh once per retained generation | M |
+| **P4** | Add opt-in request-triggered SWR to safe acquisition caches | ✅ Done — merged PR #65 | Data/HTML/TSS/manifest packs default to zero, preserve strict scope/policy/validation, and refresh once per retained generation | M |
 | **P4** | Evaluate rendered-fragment SWR | Next independent follow-up | Background rendering crosses handler/event completion, independent timestamps, save adapters, persistence, and downstream revocation | L |
 | **P4** | Evaluate HTTP validator integration | Next independent follow-up | Conditional requests, cache headers, ETag, and Last-Modified semantics need a separate transport/failure/security contract | M |
 
