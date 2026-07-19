@@ -1,10 +1,11 @@
 # FAQPage Accordion Projection — Feature Specification
 
-**Status:** Implemented; automated verification complete; live browser QA pending
+**Status:** MERGED — PR #72 landed in `dev` as `9f0fe28`; live browser QA remains a pre-publication gate
 **Date:** 2026-07-19
 **Author:** /root
 **Branch:** `feat/schema-faq-accordion`
 **Base:** `origin/dev@8b821b2cdefc5c124c753fc79c9493ca6f340aa7`
+**Delivery:** Final head `314eb71` passed green CI and clean current-head Codex review before merge
 **Progress record:** `feature-reviews/schema-faq-accordion.md`
 **Threat model:** `feature-reviews/stride-schema-faq-accordion.md`
 **Test plan:** `feature-reviews/schema-faq-accordion-test-plan.md`
@@ -506,6 +507,7 @@ Rollback must restore the package trio; schema `0.2.x` must not run against an o
 - [x] Cold, warm, and restart-restored output reflects current data with the same seven data-free cache entries.
 - [x] Acquisition is constant in item count and representative 32-item output is one-to-one.
 - [x] Package IDs, dependencies, variants, prepared manifests, and rollback instructions are internally consistent.
+- [x] Final head passed green CI and clean current-head Codex review before PR #72 merged into `dev`.
 - [ ] Live browser accessibility QA and screenshots remain a pre-publish host gate; all automated tests, typecheck, package dry-runs, and rollback/cache-generation evidence pass.
 
 ## Authoritative References
