@@ -26,6 +26,23 @@ const paramValues = (nodes, name) => nodes.flatMap(node => [
     ...paramValues(node.c || [], name)
 ]);
 
+const memberPath = value => {
+    const v = String(value).replace(/\s/g, '');
+    if (!/^[A-Za-z_$][\w$]*(?:(?:\.[A-Za-z_$][\w$]*)|(?:\[['"][A-Za-z_$][\w$]*['"]\]))*$/.test(v))
+        return []
+    ;
+    return v.replace(/\[['"]([A-Za-z_$][\w$]*)['"]\]/g, '.$1').split('.');
+};
+
+const directSourceCopies = nodes => nodes.flatMap(node => [
+    ...(node.m === 'data'
+        ? Object.entries(node.p || {}).filter(([, value]) =>
+            memberPath(value)[0] === 'source'
+        )
+        : []),
+    ...directSourceCopies(node.c || [])
+]);
+
 const hasMethod = (nodes, names) => nodes.some(node =>
     names.has(node.m)
     || hasMethod(node.c || [], names)
@@ -184,6 +201,38 @@ test('foundation artifacts contain no runtime assets, DI, or raw-html binding', 
         );
     }
     assert.equal(hasMethod(parser.handle('->data { label: value; }'), staticMethods), true);
+    assert.deepEqual(
+        directSourceCopies(parser.handle('->data(_button.label: source.label) {}')),
+        [['_button.label', 'source.label']]
+    );
+    assert.deepEqual(
+        directSourceCopies(parser.handle("->data(_button['label']: source['label']) {}")),
+        [["_button['label']", "source['label']"]]
+    );
+    assert.deepEqual(
+        directSourceCopies(parser.handle('->data(_button . label: source . label) {}')),
+        [['_button . label', 'source . label']]
+    );
+    assert.deepEqual(
+        directSourceCopies(parser.handle('->data(label: item.label) {}')),
+        []
+    );
+    assert.deepEqual(
+        directSourceCopies(parser.handle('->data(label: source.action.label) {}')),
+        [['label', 'source.action.label']]
+    );
+    assert.deepEqual(
+        directSourceCopies(parser.handle('->data(copy: source) {}')),
+        [['copy', 'source']]
+    );
+    assert.deepEqual(
+        directSourceCopies(parser.handle('->data(value: source.label || source.count) {}')),
+        []
+    );
+    assert.deepEqual(
+        directSourceCopies(parser.handle("->data(intent: 'primary') {}")),
+        []
+    );
     assert.equal(hasMethod(parser.handle("div { class: 'safe'; }"), staticMethods), false);
     assert.deepEqual(
         paramValues(parser.handle('div { class: value; }'))
@@ -217,6 +266,7 @@ test('foundation artifacts contain no runtime assets, DI, or raw-html binding', 
     assert.equal(hasMethod(parser.handle('->ui {}'), runtimeAssets), false);
     assert.equal(hasParam(parser.handle('->ui { id: value; }'), 'di'), false);
     for (const [f, tree] of trees) {
+        assert.deepEqual(directSourceCopies(tree), [], f + ' direct source copy');
         assert.equal(hasParam(tree, 'h'), false, f + ' h');
         assert.equal(hasParam(tree, 'di'), false, f + ' di');
         assert.equal(hasMethod(tree, runtimeAssets), false, f + ' asset method');

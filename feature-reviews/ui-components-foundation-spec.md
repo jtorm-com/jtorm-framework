@@ -170,7 +170,7 @@ A future framework adapter may change templates, classes, and asset URLs, but it
 
 ### Rendering and Cache Boundary
 
-Every canonical fallback has two private layers. A *-shell.tss artifact uses only literal TSS parameters to build invariant native structure. Its binding artifact validates/projects the current model, appends that shell inside a cid iteration, and only then applies caller and localized values in the fresh detached fragment.
+Every canonical fallback has two private layers. A *-shell.tss artifact uses only literal TSS parameters to build invariant native structure. Its binding artifact validates the canonical object model, appends that shell inside a cid iteration, and only then reads documented fields directly from the current `source` in the fresh detached fragment. Direct source-member `->data` copies are not an isolation boundary because data-method merges into the current model; a source ratchet rejects whole-model, same-key, and renamed-field copies while retaining genuinely derived values and the accordion alias handoff.
 
 The existing @jtorm/ui-cache-model and plugin remain the sole fragment-cache owners. Scoped hosts may reuse shell bytes; unscoped hosts and hosts without the plugin render the same path cold. The resolver cache remains separate and continues to cache descriptors, not HTML. Shell IDs are jtorm/components-ui-<package-version>/<shell> with structural variant default; source tests force the package version and IDs to advance together. A host changing its resolver/native-template configuration independently must purge these IDs or isolate cache storage. Future adapters own distinct versioned IDs unless their structure is intentionally byte-compatible.
 
@@ -252,7 +252,7 @@ The root README remains unchanged. AGENTS.md receives only the factual 257-to-27
 | Spoofing | A visual intent could falsely present an action/status as authoritative or hide destructive intent | Low | Medium | Stable intent names, neutral default, stable destructive hook with adapter-owned visible treatment, no auth-state representation, ethical-use docs | Mandatory |
 | Tampering | Caller strings or card URLs could inject executable markup or a javascript-like URL | Medium | High | t-only visible data, no h data path, existing URL attribute guard, adversarial pipeline tests | Mandatory |
 | Repudiation | A destructive button could be mistaken for an audited action even though this package records nothing | Low | Medium | Document that components own presentation only and hosts own confirmation, authorization, execution, audit, and undo | Mandatory |
-| Information Disclosure | Root data could leak into title/data/global attributes on nested elements or hidden DOM | Medium | Medium | Narrow explicit root field projection, isolated scalar/object child scopes, DOM assertions against leaked fields | Mandatory |
+| Information Disclosure | Root data could leak into title/data/global attributes on nested elements or hidden DOM | Medium | Medium | Explicit documented field reads, `t: 0` template leaves, isolated accordion alias handoff, DOM assertions against leaked fields | Mandatory |
 | Denial of Service | Large accordion arrays could create excessive markup or super-linear work | Low | Medium | No JS/assets, one linear pass, document caller-owned collection sizing, regression test representative multi-item output | Mandatory |
 | Elevation of Privilege | A visual variant could be confused with permission to perform an action | Low | High | No events/actions/auth state in package; adapter contract forbids adding behavior; host remains authorization boundary | Mandatory |
 
@@ -265,7 +265,7 @@ No new authentication, authorization, persistence owner, PII, payment, network, 
 | Scope expands into behavior-heavy widgets with incomplete keyboard/focus behavior | Medium | High | Exhaustive non-goals; ship only native/static primitives in this slice |
 | Existing consumers regress because published mapper keys or legacy button markup changes | Medium | High | Preserve all keys; do not modify four legacy button/anchor TSS files; lock mapper and pipeline goldens; use a minor version |
 | Caller data reaches raw HTML or an unsafe href | Medium | High | t-only copy, no rich slots, guarded href, payload/unsafe-scheme tests |
-| Root attributes leak onto descendants through merged TSS data | Medium | Medium | Explicit root projection and isolated each scopes; test IDs/classes appear once |
+| Root attributes leak onto descendants through implicit/global binding | Medium | Medium | Direct approved-field reads, `t: 0` leaves, and isolated each alias; test IDs/classes appear once |
 | Caller/localized data or a prior render leaks through a persisted shell | Low | High | Literal-only shell source ratchet; versioned IDs; cold/warm multi-family test asserts cache bytes contain no sentinels and second renders bind fresh data |
 | Resolver/native-template configuration changes while old shell IDs remain live | Low | Medium | Versioned component IDs; host must purge/isolate cache when structural dependencies change independently |
 | Future adapters reinterpret intent or accessibility differently | Medium | Medium | Durable README contract plus adapter invariants and canonical intent names |
@@ -284,7 +284,7 @@ No new authentication, authorization, persistence owner, PII, payment, network, 
 | Alert roles fixed by intent | Caller-provided arbitrary role; role-free divs | A small reviewed mapping prevents invalid combinations while retaining region/status/alert semantics |
 | Shared base artifacts plus thin variant artifacts | Copy complete TSS per variant; dynamic framework class field | Keeps structure DRY without exposing adapter internals as data |
 | Cache invariant shells, bind data afterward | Cache completed components; do not cache components | Reuses the existing bounded lifecycle while excluding caller/localized values and preserving useful cold behavior |
-| Narrow projected root attributes | Pass the full model to every HTML leaf; support arbitrary attrs | Prevents accidental disclosure/duplication and gives adapters a stable minimal surface |
+| Direct canonical-model binding with explicit field reads | Mirror source fields into a private `->data` namespace; support arbitrary attrs | Removes a merge-only adapter that provided no isolation while approved sinks, `t: 0` leaves, and the shared model contract prevent disclosure/duplication |
 | Improve badge/loading in place | Add new parallel v2 keys; preserve every DOM detail | Keeps canonical defaults useful; 0.1.0 and migration docs communicate intentional output changes without deleting exports |
 | No base CSS | Ship opinionated CSS; inline styles | Avoids framework conflicts and extra bytes; semantic hooks let later layers own visual conformance |
 | Clean dev-based worktree | Continue on the unrelated named checkout; switch/reset current branch | Follows repository workflow and preserves unrelated user work |
@@ -316,7 +316,7 @@ No new authentication, authorization, persistence owner, PII, payment, network, 
 
 1. Create a clean dev-based feat/ui-components-foundation worktree and confirm a clean baseline.
 2. Write failing mapper/API, artifact-reference, and full-pipeline tests first, including legacy button output.
-3. Add private literal-only shell TSS, invoke each through a versioned cache identity, and keep model validation/projection/binding in the final artifact; then update the mapper and package version.
+3. Add private literal-only shell TSS, invoke each through a versioned cache identity, and keep model validation plus direct approved-field binding in the final artifact; then update the mapper and package version.
 4. Add edge-case coverage for missing fields, invalid button type, zero count, unsafe href, escaped payloads, root-field isolation, frozen accordion inputs, native open state, alert roles, and loading fallback.
 5. Update the parser snapshot through the repository's deterministic fixture workflow.
 6. Expand the package README with catalog, data contracts, examples, use/do-not-use guidance, adapter invariants, accessibility ownership, ethical persuasion, migration, and rollback.

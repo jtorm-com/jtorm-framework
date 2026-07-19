@@ -7,13 +7,6 @@
     ->if(
         d: source.items,
         to: 'array'
-    )
-    ->data(
-        _accordion.items: source.items,
-        _accordion.id: source.id,
-        _accordion.class: source.class,
-        _accordion.lang: source.lang,
-        _accordion.dir: source.dir
     ) {
         ->append {
             cid: 'jtorm/components-ui-0.1.0/accordion-shell';
@@ -26,46 +19,46 @@
 
         .jtorm-accordion:last-child {
             ->if(
-                d: _accordion.id,
+                d: source.id,
                 to: 'string'
             )
             ->attr {
                 n: 'id';
-                v: _accordion.id;
+                v: source.id;
             }
 
             ->if(
-                d: _accordion.class,
+                d: source.class,
                 to: 'string'
             )
             ->attr {
                 n: 'class';
-                v: _accordion.class;
+                v: source.class;
                 m: 'a';
             }
 
             ->if(
-                d: _accordion.lang,
+                d: source.lang,
                 to: 'string'
             )
             ->attr {
                 n: 'lang';
-                v: _accordion.lang;
+                v: source.lang;
             }
 
             ->if(
-                d: _accordion.dir,
+                d: source.dir,
                 to: 'string',
                 v: '^(ltr|rtl|auto)$',
                 r: true
             )
             ->attr {
                 n: 'dir';
-                v: _accordion.dir;
+                v: source.dir;
             }
 
             ->each(
-                d: _accordion.items,
+                d: source.items,
                 a: 'item'
             )
             ->data(

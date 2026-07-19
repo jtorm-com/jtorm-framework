@@ -4,19 +4,6 @@
 ->if(
     d: source.label,
     to: 'string'
-)
-->data(
-    _button.label: source.label,
-    _button.type: source.type,
-    _button.disabled: source.disabled,
-    _button.form: source.form,
-    _button.name: source.name,
-    _button.value: source.value,
-    _button.id: source.id,
-    _button.class: source.class,
-    _button.lang: source.lang,
-    _button.dir: source.dir,
-    _button.intent: source.intent
 ) {
     ->append {
         cid: 'jtorm/components-ui-0.1.0/button-shell';
@@ -29,22 +16,22 @@
 
     .jtorm-button:last-child {
         ->inner {
-            t: _button.label;
+            t: source.label;
         }
 
         ->if(
-            d: _button.type,
+            d: source.type,
             to: 'string',
             v: '^(button|reset|submit)$',
             r: true
         )
         ->attr {
             n: 'type';
-            v: _button.type;
+            v: source.type;
         }
 
         ->if(
-            d: _button.disabled,
+            d: source.disabled,
             v: true
         )
         ->attr {
@@ -53,80 +40,80 @@
         }
 
         ->if(
-            d: _button.form,
+            d: source.form,
             to: 'string'
         )
         ->attr {
             n: 'form';
-            v: _button.form;
+            v: source.form;
         }
 
         ->if(
-            d: _button.name,
+            d: source.name,
             to: 'string'
         )
         ->attr {
             n: 'name';
-            v: _button.name;
+            v: source.name;
         }
 
         ->if(
-            d: _button.value,
+            d: source.value,
             to: 'string'
         )
         ->attr {
             n: 'value';
-            v: _button.value;
+            v: source.value;
         }
 
         ->if(
-            d: _button.id,
+            d: source.id,
             to: 'string'
         )
         ->attr {
             n: 'id';
-            v: _button.id;
+            v: source.id;
         }
 
         ->if(
-            d: _button.class,
+            d: source.class,
             to: 'string'
         )
         ->attr {
             n: 'class';
-            v: _button.class;
+            v: source.class;
             m: 'a';
         }
 
         ->if(
-            d: _button.lang,
+            d: source.lang,
             to: 'string'
         )
         ->attr {
             n: 'lang';
-            v: _button.lang;
+            v: source.lang;
         }
 
         ->if(
-            d: _button.dir,
+            d: source.dir,
             to: 'string',
             v: '^(ltr|rtl|auto)$',
             r: true
         )
         ->attr {
             n: 'dir';
-            v: _button.dir;
+            v: source.dir;
         }
 
         ->if(
-            d: _button.intent,
+            d: source.intent,
             to: 'string',
             v: '^(default|primary|secondary|destructive)$',
             r: true
         )
         ->attr {
             n: 'class';
-            v: 'jtorm-button--' + _button.intent;
+            v: 'jtorm-button--' + source.intent;
             m: 'a';
         }
     }

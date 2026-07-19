@@ -85,7 +85,7 @@ An accordion is an ordered array of independent native disclosures. Multiple ite
 Canonical fallbacks render in two phases:
 
 1. A private `*-shell.tss` artifact builds only invariant semantic structure and literal fallback hooks. Its parent binding artifact invokes that shell inside a child-bearing append with a versioned `cid`, so the existing UI fragment cache may reuse the resulting bytes.
-2. The binding artifact validates and projects the current model, then applies caller and localized values after the shell is present. Labels, IDs, classes, state, URLs, and other caller fields never execute inside the cached shell iteration.
+2. The binding artifact validates the canonical object model, then reads documented fields directly from `source` after the shell is present. It does not create a mirrored `->data` namespace: the current model stays per-render, while labels, IDs, classes, state, URLs, and other caller fields never execute inside the cached shell iteration.
 
 This is separate from the UI resolver cache, which stores resolved descriptors rather than rendered HTML. With the UI-cache plugin disabled, or without a valid scoped cache discriminator, the same layers render cold and retain identical output. A cache hit restores a fresh detached shell before binding, so concurrent or later renders cannot reuse a prior caller's values.
 
@@ -107,6 +107,8 @@ The following optional fields apply only to a component root:
 Unknown fields are not copied to the root or descendants. In particular, title, style, tabindex, hidden, event attributes, arbitrary data attributes, and arbitrary ARIA attributes are not accepted by this foundation.
 Each canonical component accepts one object model. Top-level arrays, scalars, functions, and null emit no component; `accordion.items` is the only collection field in this foundation and the host must bound attacker-influenced item counts.
 Accordion iteration reads only canonical own enumerable array indices. Inherited properties and named array properties are ignored.
+
+The documented model is the binding contract. Canonical TSS reads only its approved fields directly; unknown fields are inert because no selector or sink consumes them. `->data` is reserved for an actually derived value, such as badge label/count normalization, or an internal alias handoff that avoids mutating accordion items. Pure member copies rooted at `source`, including whole-model and renamed-field copies, are rejected by the source contract.
 
 
 Button additionally accepts string form, name, and value fields. disabled and accordion open are enabled only by the boolean value true.

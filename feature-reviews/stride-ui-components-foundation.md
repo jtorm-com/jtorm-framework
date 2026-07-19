@@ -62,12 +62,12 @@ Assumptions:
       -> get-method + manifest/request policy
       -> package mapper/TSS/html templates [TRUSTED STATIC]
       -> null-safe whole-model array/type gate
-      -> component required-field gates and explicit approved-field projection
+      -> component required-field gates and explicit approved-field reads from source
       -> append package-versioned cid/default iteration
       -> scoped cache miss: literal shell TSS -> html-ui templates with t: 0
       -> ui-cache-model publishes trusted static shell bytes
          OR scoped cache hit: handler-wrapper restores those bytes into a fresh detached fragment
-      -> post-cache binding TSS reads the current projected model
+      -> post-cache binding TSS reads the current canonical model
       -> insert t: [escaped text boundary]
       -> attr [attribute and URL policy boundary]
       -> DOM / SSR serialization
@@ -82,9 +82,9 @@ Card actions add one branch:
 Accordion adds one loop:
 
     source.items [UNTRUSTED ARRAY]
-      -> each(d: items, a: item)
+      -> each(d: source.items, a: item)
       -> canonical own enumerable array indices only
-      -> private wrapper with lifecycle metadata
+      -> approved item fields handed to the child model without caller mutation
       -> accordion.item gate and render
       -> source array/items remain unchanged
 
@@ -92,7 +92,7 @@ Accordion adds one loop:
 
 | Boundary | Input | Control | Output |
 |----------|-------|---------|--------|
-| Host to component | Untrusted render model | Required-field and type gates; explicit field reads | Component-local source wrapper |
+| Host to component | Untrusted render model | Required-field and type gates; explicit documented field reads | Validated current model |
 | Static shell to optional UI cache | Trusted literal-only TSS and html-ui leaves | Versioned cid, default variant, exact source closure, existing scoped publication policy | Reusable shell HTML with no caller/localized values |
 | Cache to binding layer | Restored trusted shell bytes | Fresh detached fragment; binding executes after every miss/hit | Current-render component shell |
 | Static component to html template | Trusted TSS plus untrusted values | html-ui template only with t: 0 | Native semantic element |
@@ -196,8 +196,8 @@ Threats:
 Controls:
 
 - html-ui templates are composed with t: 0, so global.tss does not run.
-- Components explicitly read only id, class, lang, dir and button form/name/value.
-- Child text/action scopes are private and use templates with t: 0.
+- Components bind only documented fields through explicit TSS reads; direct source copies through data-method are rejected rather than treated as an isolation control.
+- Child text/action leaves use explicit sinks and templates with t: 0.
 - Accordion uses each alias item and never writes metadata into the source item.
 - No implicit loading ID is generated.
 - Every cid-bearing shell uses only literal parameters and contains no data, text, each, if, nested cache identity, or runtime method.
@@ -354,7 +354,8 @@ Completion evidence:
 - Exact npm test and npm run typecheck passed.
 - Diff review found no raw `h:`, arbitrary attrs, runtime imports/dependencies, `di`/event wiring, missing `t: 0`, unguarded href, source mutation, or unbounded nested iteration.
 - README ownership and ethical-use guidance were confirmed.
-- Three-lens adversarial review passed; its one Low null-model finding was fixed red-first and the focused follow-up passed.
+- The initial three-lens adversarial review passed; its one Low null-model finding was fixed red-first and the focused follow-up passed.
+- A later direct-binding review completed architect and minimalist lenses, fixed their shared source-ratchet coverage finding red-first, and records the skeptic lens as incomplete after an execution error rather than inferring a clean result.
 
 Re-run threat modeling if any future change adds:
 

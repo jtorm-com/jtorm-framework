@@ -3,7 +3,7 @@
 **Date:** 2026-07-19
 **Scope:** staged `feat/ui-components-foundation` candidate rebased onto `dev` at `9ee8cc850224041498282a893eca7451dde8364b`
 **Method:** read-only opposite-model review through Anthropic Claude after explicit user approval
-**Verdict:** PASS; zero unresolved valid findings
+**Verdict:** Initial candidate PASS; direct-binding correction has two completed lenses and one explicitly partial lens
 
 ## Review lenses
 
@@ -51,12 +51,32 @@ fallback copy before a caller label overwrites it. Current output and localizati
 correct and test-guarded; the optimization is not required for this semantic foundation and is
 deferred until it can be evaluated independently without source-fingerprint churn.
 
+## Direct-binding correction review
+
+User review identified that same-key data-method projections did not isolate component data: the
+verb merged those fields into the current model, and the component contract already names the
+canonical fields. The correction therefore removed those projections and bound documented fields
+directly from source, retaining only derived badge normalization, trusted variant literals, and the
+accordion alias handoff needed to avoid caller mutation.
+
+The private correction diff received two completed opposite-model lenses. The architect reported
+one Medium source-ratchet gap and the minimalist independently reported the same completeness gap:
+the first ratchet rejected only same-path copies and scanned only shell binding owners, so a renamed
+copy such as `label: source.action.label`, a whole-model copy, or a copy in another canonical/support
+artifact could evade it. A failing fixture proved both expression gaps. The ratchet now rejects any
+pure member expression rooted at source and runs across the complete parsed closure, while focused
+negative fixtures preserve derived expressions and non-source alias handoffs.
+
+The correction skeptic invocation remained API-bound and ended with an execution error, so it is
+recorded as partial coverage with no inferred verdict. Its absence is not presented as a clean
+review; the repository's green CI and clean current-head Codex PR review remain mandatory gates.
+
 ## Confirmed claims
 
 - All published mapper keys and four published button/anchor recipes remain unchanged.
 - Fourteen canonical variants use dependency-free TSS and semantic html-ui leaves only.
 - Caller-visible copy reaches escaped text sinks; card href reaches the existing unsafe-scheme guard.
-- `t: '0'` plus narrow projections prevents root and unknown-field leakage.
+- `t: '0'` plus explicit documented field reads prevents root and unknown-field leakage; later review removed identity projections because data-method merged rather than isolated them.
 - Variant intent and alert role are trusted wrapper literals, not caller authority.
 - each-method visits canonical own enumerable in-range indices, preserves sparse order and scalar
   wrapping, and ignores inherited/named properties without mutating input.
@@ -67,6 +87,7 @@ deferred until it can be evaluated independently without source-fingerprint chur
 
 ## Final decision
 
-The three-lens review and the focused accepted-fix follow-up are complete. The optional loading
-refactor is not a correctness, security, accessibility, performance, or maintainability blocker.
-There is no unresolved valid finding against the final candidate.
+The initial three-lens review and focused null-fix follow-up are complete. Both completed correction
+lenses' shared ratchet finding is fixed; their remaining observations are non-blocking. The
+correction skeptic lens is explicitly incomplete, and current-head PR gates remain required before
+the branch is mergeable.

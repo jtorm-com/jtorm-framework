@@ -7,15 +7,6 @@
     ->if(
         d: source.heading,
         to: 'string'
-    )
-    ->data(
-        _card.heading: source.heading,
-        _card.summary: source.summary,
-        _card.action: source.action,
-        _card.id: source.id,
-        _card.class: source.class,
-        _card.lang: source.lang,
-        _card.dir: source.dir
     ) {
         ->append {
             cid: 'jtorm/components-ui-0.1.0/card-shell';
@@ -29,59 +20,59 @@
         .jtorm-card:last-child {
             ->attr {
                 n: 'aria-label';
-                v: _card.heading;
+                v: source.heading;
             }
 
             ->if(
-                d: _card.id,
+                d: source.id,
                 to: 'string'
             )
             ->attr {
                 n: 'id';
-                v: _card.id;
+                v: source.id;
             }
 
             ->if(
-                d: _card.class,
+                d: source.class,
                 to: 'string'
             )
             ->attr {
                 n: 'class';
-                v: _card.class;
+                v: source.class;
                 m: 'a';
             }
 
             ->if(
-                d: _card.lang,
+                d: source.lang,
                 to: 'string'
             )
             ->attr {
                 n: 'lang';
-                v: _card.lang;
+                v: source.lang;
             }
 
             ->if(
-                d: _card.dir,
+                d: source.dir,
                 to: 'string',
                 v: '^(ltr|rtl|auto)$',
                 r: true
             )
             ->attr {
                 n: 'dir';
-                v: _card.dir;
+                v: source.dir;
             }
 
             .jtorm-card__title->inner {
-                t: _card.heading;
+                t: source.heading;
             }
 
             .jtorm-card__summary
             ->if(
-                d: _card.summary,
+                d: source.summary,
                 to: 'string'
             ) {
                 ->inner {
-                    t: _card.summary;
+                    t: source.summary;
                 }
 
                 ->else
@@ -89,13 +80,13 @@
             }
 
             .jtorm-card__action
-            ->if(d: _card.action) {
+            ->if(d: source.action) {
                 ->if(
-                    d: _card.action.href,
+                    d: source.action.href,
                     to: 'string'
                 ) {
                     ->if(
-                        d: _card.action.label,
+                        d: source.action.label,
                         to: 'string'
                     ) {
                         ->before {
@@ -104,11 +95,11 @@
 
                         ->attr {
                             n: 'href';
-                            v: _card.action.href;
+                            v: source.action.href;
                         }
 
                         ->inner {
-                            t: _card.action.label;
+                            t: source.action.label;
                         }
 
                         ->else

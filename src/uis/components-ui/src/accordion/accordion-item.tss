@@ -11,15 +11,6 @@
     ->if(
         d: source.content,
         to: 'string'
-    )
-    ->data(
-        _item.summary: source.summary,
-        _item.content: source.content,
-        _item.open: source.open,
-        _item.id: source.id,
-        _item.class: source.class,
-        _item.lang: source.lang,
-        _item.dir: source.dir
     ) {
         ->append {
             cid: 'jtorm/components-ui-0.1.0/accordion-item-shell';
@@ -32,7 +23,7 @@
 
         .jtorm-accordion__item:last-child {
             ->if(
-                d: _item.open,
+                d: source.open,
                 v: true
             )
             ->attr {
@@ -41,50 +32,50 @@
             }
 
             ->if(
-                d: _item.id,
+                d: source.id,
                 to: 'string'
             )
             ->attr {
                 n: 'id';
-                v: _item.id;
+                v: source.id;
             }
 
             ->if(
-                d: _item.class,
+                d: source.class,
                 to: 'string'
             )
             ->attr {
                 n: 'class';
-                v: _item.class;
+                v: source.class;
                 m: 'a';
             }
 
             ->if(
-                d: _item.lang,
+                d: source.lang,
                 to: 'string'
             )
             ->attr {
                 n: 'lang';
-                v: _item.lang;
+                v: source.lang;
             }
 
             ->if(
-                d: _item.dir,
+                d: source.dir,
                 to: 'string',
                 v: '^(ltr|rtl|auto)$',
                 r: true
             )
             ->attr {
                 n: 'dir';
-                v: _item.dir;
+                v: source.dir;
             }
 
             .jtorm-accordion__summary->inner {
-                t: _item.summary;
+                t: source.summary;
             }
 
             .jtorm-accordion__content->inner {
-                t: _item.content;
+                t: source.content;
             }
         }
     }

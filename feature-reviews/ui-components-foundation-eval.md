@@ -3,7 +3,7 @@
 **Branch:** feat/ui-components-foundation
 **Base:** dev at 9ee8cc850224041498282a893eca7451dde8364b
 **Date:** 2026-07-19
-**Status:** PASS; local cache-amendment and production-readiness review complete
+**Status:** PASS locally; direct-model correction and source-ratchet hardening complete
 **Specification:** ui-components-foundation-spec.md
 **Threat model:** stride-ui-components-foundation.md
 **Workflow:** ui-components-foundation.md
@@ -60,7 +60,7 @@ were added. All accepted findings now have focused green evidence.
 |---|---|
 | Canonical names and trusted descriptors | components-ui mapper |
 | Invariant semantic shell structure | private components-ui *-shell.tss plus existing html-ui leaves |
-| Model validation, field projection, and binding | canonical components-ui binding TSS |
+| Model validation and direct approved-field binding | canonical components-ui binding TSS |
 | Framework fallback, aliases, descriptor cache, and asset expansion | unchanged ui-resolver-model |
 | Rendered shell reuse, scope, TTL, persistence, and invalidation | unchanged ui-cache-model/plugin and handler-wrapper lifecycle |
 | Descriptor compilation | unchanged ui-compiler-model |
@@ -135,14 +135,16 @@ Card href reaches the existing unsafe-scheme guard. Unknown attributes do not pr
 wrappers reject top-level arrays, scalars, functions, and null. Accordion traversal ignores
 inherited and named properties and remains linear in actual enumerable indexed items.
 
-The source ratchet parses canonical plus statically referenced support artifacts and rejects every
-h parameter in the AST, runtime CSS or JavaScript verbs, DI instructions, and framework names. Its
-closure equality check prevents unreviewed support artifacts; positive fixtures cover parenthesized,
-block, and comment-interleaved parameter syntax. Parser snapshot and frozen-oracle differential
-gates cover all 278 checked-in TSS files. The shell ratchet additionally rejects dynamic shell
-methods/parameters, couples all seven cids to the components-ui package version, and locks the
-default structural variant. The cold/warm pipeline regression proves cache bytes are sentinel-free
-and unchanged while a second render binds different labels, IDs, state, and URLs.
+The source ratchet parses the complete canonical and statically referenced support closure and
+rejects every h parameter in the AST, runtime CSS or JavaScript verb, DI instruction, framework
+name, and pure data-method member copy rooted at source. Its closure equality check prevents
+unreviewed support artifacts; focused fixtures cover parenthesized, block, comment-interleaved,
+dot, bracket, whitespace, flattened-field, and whole-model syntax without rejecting derived
+expressions or alias handoffs. Parser snapshot and frozen-oracle differential gates cover all 278
+checked-in TSS files. The shell ratchet additionally rejects dynamic shell methods/parameters,
+couples all seven cids to the components-ui package version, and locks the default structural
+variant. The cold/warm pipeline regression proves cache bytes are sentinel-free and unchanged
+while a second render binds different labels, IDs, state, and URLs.
 
 There is no new PII, telemetry, cookie, consent, moderation, payment, authentication, or audit data.
 The optional existing persistence adapter stores only trusted static shell HTML for canonical
@@ -225,7 +227,7 @@ depend, while preserving published recipes and the dependency-free isomorphic ar
 | Spoofing | Residual | stable intent and neutral default; host truthfulness and adapter styling remain |
 | Tampering | Mitigated | escaped copy, guarded href, no arbitrary attrs or raw caller HTML |
 | Repudiation | Mitigated | presentation makes no audit or execution claim; host ownership is explicit |
-| Information disclosure | Mitigated | narrow root fields; literal-only shell cache; post-hit fresh binding; no caller/localized data in cached bytes |
+| Information disclosure | Mitigated | explicit documented field reads; t:0 leaves; literal-only shell cache; post-hit fresh binding; no caller/localized data in cached bytes |
 | Denial of service | Mitigated with residual | canonical indexed O(n) pass; host caps attacker-controlled collections |
 | Elevation of privilege | Mitigated | no event, authorization, network, or execution behavior exists |
 
@@ -248,11 +250,11 @@ depend, while preserving published recipes and the dependency-free isomorphic ar
 | Validation | 10/10 | whole-model, required-field, enum, URL, and collection-key matrices |
 | Error handling | 10/10 | safe omission for bad models; policy and drift failures remain loud |
 | Security and privacy | 10/10 | escaped copy, narrow attrs, literal-only persisted shells, no data collection or new dependency |
-| Performance | 10/10 | seven bounded cache identities, one sparse-safe O(n) collection pass, 11,008-byte package tarball |
+| Performance | 10/10 | seven bounded cache identities, one sparse-safe O(n) collection pass, 10,831-byte package tarball |
 | Maintainability | 10/10 | small shared bases, thin wrappers, stable adapter invariants |
 | Testability | 10/10 | real resolver-to-DOM pipeline plus deterministic ratchets |
 | Readability | 10/10 | package README, spec, threat model, and terse source contracts align |
-| **Total** | **100/100** | **no unresolved valid finding after cross-model review** |
+| **Total** | **100/100** | **all completed-review findings resolved; one correction lens explicitly incomplete** |
 
 ### Dependencies
 
@@ -273,8 +275,10 @@ null-language/default key (or left unused until TTL/eviction); consumers may pin
 - [x] STRIDE analysis reviewed
 - [x] 732 tests and typecheck passing
 - [x] Documentation and package payloads verified
-- [x] Cross-model skeptic, architect, and minimalist review completed
+- [x] Initial cross-model skeptic, architect, and minimalist review completed
 - [x] Accepted null-model finding fixed red-first and focused follow-up review passed
+- [x] Direct-binding architect/minimalist review completed and accepted ratchet finding fixed red-first
+- [x] Correction skeptic execution failure recorded without inferring a verdict; current-head Codex PR review remains mandatory
 - [x] Fresh no-edit convergence and staged-candidate gates passed; local commit created
 
 ## Verification ledger
@@ -287,14 +291,16 @@ null-language/default key (or left unused until TTL/eviction); consumers may pin
 | Parser snapshot and v1 differential | PASS; all 278 TSS files |
 | Exact npm test | PASS; 732 of 732 |
 | npm run typecheck | PASS |
-| Package dry-runs | PASS; components-ui 0.1.0 has 53 files and an 11,008-byte tarball; each-method 1.0.5 and if-method 1.0.6 have 3 files each |
+| Package dry-runs | PASS; components-ui 0.1.0 has 53 files and a 10,831-byte tarball; each-method 1.0.5 and if-method 1.0.6 have 3 files each |
 | Semgrep | PASS; 88 rules, 3 targets, zero findings |
 | Full and production dependency audit | PASS; zero vulnerabilities |
 | Diff whitespace | PASS |
-| External adversarial review | PASS; three lenses, one accepted Low fixed, focused follow-up PASS |
+| Initial external adversarial review | PASS; three lenses, one accepted Low fixed, focused follow-up PASS |
+| Direct-binding correction review | PARTIAL COVERAGE; architect and minimalist completed, shared ratchet finding fixed red-first; skeptic execution error recorded; current-head Codex remains mandatory |
 
 ## Current verdict
 
-**PASS.** The implementation, docs, tests, package payloads, cache isolation, security analysis,
-local production gates, three-lens adversarial review, and focused null-fix follow-up are complete
-with zero unresolved valid findings. The verified implementation is ready for the requested PR.
+**PASS locally.** The implementation, docs, tests, package payloads, cache isolation, security
+analysis, production gates, initial three-lens review, focused null fix, and completed correction
+lenses have no unresolved valid finding. The incomplete correction skeptic lens is disclosed and
+does not substitute for the repository's required green CI and clean current-head Codex PR review.

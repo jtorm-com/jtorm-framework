@@ -8,16 +8,6 @@
 ->if(
     d: source.message,
     to: 'string'
-)
-->data(
-    _alert.heading: source.heading,
-    _alert.message: source.message,
-    _alert.id: source.id,
-    _alert.class: source.class,
-    _alert.lang: source.lang,
-    _alert.dir: source.dir,
-    _alert.intent: source.intent,
-    _alert.role: source.role
 ) {
     ->append {
         cid: 'jtorm/components-ui-0.1.0/alert-shell';
@@ -31,77 +21,77 @@
     .jtorm-alert:last-child {
         ->attr {
             n: 'aria-label';
-            v: _alert.heading;
+            v: source.heading;
         }
 
         ->if(
-            d: _alert.id,
+            d: source.id,
             to: 'string'
         )
         ->attr {
             n: 'id';
-            v: _alert.id;
+            v: source.id;
         }
 
         ->if(
-            d: _alert.class,
+            d: source.class,
             to: 'string'
         )
         ->attr {
             n: 'class';
-            v: _alert.class;
+            v: source.class;
             m: 'a';
         }
 
         ->if(
-            d: _alert.lang,
+            d: source.lang,
             to: 'string'
         )
         ->attr {
             n: 'lang';
-            v: _alert.lang;
+            v: source.lang;
         }
 
         ->if(
-            d: _alert.dir,
+            d: source.dir,
             to: 'string',
             v: '^(ltr|rtl|auto)$',
             r: true
         )
         ->attr {
             n: 'dir';
-            v: _alert.dir;
+            v: source.dir;
         }
 
         ->if(
-            d: _alert.intent,
+            d: source.intent,
             to: 'string',
             v: '^(default|info|success|warning|error)$',
             r: true
         )
         ->attr {
             n: 'class';
-            v: 'jtorm-alert--' + _alert.intent;
+            v: 'jtorm-alert--' + source.intent;
             m: 'a';
         }
 
         ->if(
-            d: _alert.role,
+            d: source.role,
             to: 'string',
             v: '^(region|status|alert)$',
             r: true
         )
         ->attr {
             n: 'role';
-            v: _alert.role;
+            v: source.role;
         }
 
         .jtorm-alert__title->inner {
-            t: _alert.heading;
+            t: source.heading;
         }
 
         .jtorm-alert__message->inner {
-            t: _alert.message;
+            t: source.message;
         }
     }
 }
