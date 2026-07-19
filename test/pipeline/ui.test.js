@@ -866,7 +866,9 @@ test('ui SearchResultsPage composes WebPage, SearchAction, and mainEntity ItemLi
         + '<main id="body"><div id="contents"><ol><li value="1"><section class="thing">'
         + '<div class="contents"><header class="header"><h1><a href="https://e.com/schema">Schema result</a></h1></header>'
         + '<section class="body"></section><footer class="footer"></footer></div></section></li></ol></div></main>'
-        + '<div id="loading" data-nosnippet="1"><div><span></span><small>Loading</small></div></div>');
+        + '<div class="jtorm-loading" role="status" data-nosnippet="1">'
+        + '<span class="jtorm-loading__indicator" aria-hidden="true"></span>'
+        + '<small class="jtorm-loading__label">Loading</small></div>');
 });
 
 // The items path (thing-update-1.0.1.tss `ul->each{ d:items; e:'li'; li->inner{h:name} }`).

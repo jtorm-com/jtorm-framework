@@ -1,0 +1,107 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->each(a: 'source')
+->if(
+    d: source.heading,
+    to: 'string'
+)
+->if(
+    d: source.message,
+    to: 'string'
+)
+->data(
+    _alert.heading: source.heading,
+    _alert.message: source.message,
+    _alert.id: source.id,
+    _alert.class: source.class,
+    _alert.lang: source.lang,
+    _alert.dir: source.dir,
+    _alert.intent: source.intent,
+    _alert.role: source.role
+) {
+    ->append {
+        cid: 'jtorm/components-ui-0.1.0/alert-shell';
+        cs: 'default';
+
+        ->get {
+            t: '@c/alert/alert-shell.tss';
+        }
+    }
+
+    .jtorm-alert:last-child {
+        ->attr {
+            n: 'aria-label';
+            v: _alert.heading;
+        }
+
+        ->if(
+            d: _alert.id,
+            to: 'string'
+        )
+        ->attr {
+            n: 'id';
+            v: _alert.id;
+        }
+
+        ->if(
+            d: _alert.class,
+            to: 'string'
+        )
+        ->attr {
+            n: 'class';
+            v: _alert.class;
+            m: 'a';
+        }
+
+        ->if(
+            d: _alert.lang,
+            to: 'string'
+        )
+        ->attr {
+            n: 'lang';
+            v: _alert.lang;
+        }
+
+        ->if(
+            d: _alert.dir,
+            to: 'string',
+            v: '^(ltr|rtl|auto)$',
+            r: true
+        )
+        ->attr {
+            n: 'dir';
+            v: _alert.dir;
+        }
+
+        ->if(
+            d: _alert.intent,
+            to: 'string',
+            v: '^(default|info|success|warning|error)$',
+            r: true
+        )
+        ->attr {
+            n: 'class';
+            v: 'jtorm-alert--' + _alert.intent;
+            m: 'a';
+        }
+
+        ->if(
+            d: _alert.role,
+            to: 'string',
+            v: '^(region|status|alert)$',
+            r: true
+        )
+        ->attr {
+            n: 'role';
+            v: _alert.role;
+        }
+
+        .jtorm-alert__title->inner {
+            t: _alert.heading;
+        }
+
+        .jtorm-alert__message->inner {
+            t: _alert.message;
+        }
+    }
+}

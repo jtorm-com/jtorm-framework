@@ -1,0 +1,35 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@e.details';
+    t: '0';
+
+    details {
+        ->attr {
+            n: 'class';
+            v: 'jtorm-accordion__item';
+        }
+
+        ->append
+        ->ui {
+            c: '@e.summary';
+            t: '0';
+
+            summary->attr {
+                n: 'class';
+                v: 'jtorm-accordion__summary';
+            }
+        }
+
+        ->append
+        ->ui {
+            c: '@e.div';
+            t: '0';
+
+            div->attr {
+                n: 'class';
+                v: 'jtorm-accordion__content';
+            }
+        }
+    }
+}

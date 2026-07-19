@@ -1,0 +1,10 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->data(intent: 'success', role: 'status')
+    ->get {
+        t: '@c/alert/alert-base.tss';
+    }
+}

@@ -1,0 +1,91 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->each(a: 'source')
+    ->if(
+        d: source.summary,
+        to: 'string'
+    )
+    ->if(
+        d: source.content,
+        to: 'string'
+    )
+    ->data(
+        _item.summary: source.summary,
+        _item.content: source.content,
+        _item.open: source.open,
+        _item.id: source.id,
+        _item.class: source.class,
+        _item.lang: source.lang,
+        _item.dir: source.dir
+    ) {
+        ->append {
+            cid: 'jtorm/components-ui-0.1.0/accordion-item-shell';
+            cs: 'default';
+
+            ->get {
+                t: '@c/accordion/accordion-item-shell.tss';
+            }
+        }
+
+        .jtorm-accordion__item:last-child {
+            ->if(
+                d: _item.open,
+                v: true
+            )
+            ->attr {
+                n: 'open';
+                v: true;
+            }
+
+            ->if(
+                d: _item.id,
+                to: 'string'
+            )
+            ->attr {
+                n: 'id';
+                v: _item.id;
+            }
+
+            ->if(
+                d: _item.class,
+                to: 'string'
+            )
+            ->attr {
+                n: 'class';
+                v: _item.class;
+                m: 'a';
+            }
+
+            ->if(
+                d: _item.lang,
+                to: 'string'
+            )
+            ->attr {
+                n: 'lang';
+                v: _item.lang;
+            }
+
+            ->if(
+                d: _item.dir,
+                to: 'string',
+                v: '^(ltr|rtl|auto)$',
+                r: true
+            )
+            ->attr {
+                n: 'dir';
+                v: _item.dir;
+            }
+
+            .jtorm-accordion__summary->inner {
+                t: _item.summary;
+            }
+
+            .jtorm-accordion__content->inner {
+                t: _item.content;
+            }
+        }
+    }
+}

@@ -1,0 +1,46 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@e.article';
+    t: '0';
+
+    article {
+        ->attr {
+            n: 'class';
+            v: 'jtorm-card';
+        }
+
+        ->append
+        ->ui {
+            c: '@t.strong';
+            t: '0';
+
+            strong->attr {
+                n: 'class';
+                v: 'jtorm-card__title';
+            }
+        }
+
+        ->append
+        ->ui {
+            c: '@t.p';
+            t: '0';
+
+            p->attr {
+                n: 'class';
+                v: 'jtorm-card__summary';
+            }
+        }
+
+        ->append
+        ->ui {
+            c: '@e.a';
+            t: '0';
+
+            a->attr {
+                n: 'class';
+                v: 'jtorm-card__action';
+            }
+        }
+    }
+}

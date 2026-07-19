@@ -1,10 +1,62 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
-span/*->data(count: '0')*/->if(d: count) {
-  ->attr {
-    n: 'class';
-    v: 'badge';
-  }
-  ->inner {
-    t: count;
-  }
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->each(a: 'source')
+    ->data(value: source.label || source.count) {
+        ->append {
+            cid: 'jtorm/components-ui-0.1.0/badge-shell';
+            cs: 'default';
+
+            ->get {
+                t: '@c/badge/badge-shell.tss';
+            }
+        }
+
+        .jtorm-badge:last-child {
+            ->if(
+                d: source.id,
+                to: 'string'
+            )
+            ->attr {
+                n: 'id';
+                v: source.id;
+            }
+
+            ->if(
+                d: source.class,
+                to: 'string'
+            )
+            ->attr {
+                n: 'class';
+                v: source.class;
+                m: 'a';
+            }
+
+            ->if(
+                d: source.lang,
+                to: 'string'
+            )
+            ->attr {
+                n: 'lang';
+                v: source.lang;
+            }
+
+            ->if(
+                d: source.dir,
+                to: 'string',
+                v: '^(ltr|rtl|auto)$',
+                r: true
+            )
+            ->attr {
+                n: 'dir';
+                v: source.dir;
+            }
+
+            ->inner {
+                t: value;
+            }
+        }
+    }
 }

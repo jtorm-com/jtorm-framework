@@ -1,37 +1,70 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 
-->data(id: 'loading')
-->ui {
-    c: '@e.div';
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->each(a: 'source')
+    ->text(fallback: 'Loading')
+    ->data(label: fallback) {
+        ->append {
+            cid: 'jtorm/components-ui-0.1.0/loading-shell';
+            cs: 'default';
 
-    div {
-        ->attr {
-            n: 'data-nosnippet';
-            v: '1';
-            m: 'a';
+            ->get {
+                t: '@c/loading/loading-shell.tss';
+            }
         }
 
-        ->append
-        ->ui {
-            c: '@e.div';
-            t: '0';
+        .jtorm-loading:last-child {
+            ->if(
+                d: source.id,
+                to: 'string'
+            )
+            ->attr {
+                n: 'id';
+                v: source.id;
+            }
 
-            div {
-                ->append->ui {
-                    c: '@e.span';
-                    t: '0';
-                }
+            ->if(
+                d: source.class,
+                to: 'string'
+            )
+            ->attr {
+                n: 'class';
+                v: source.class;
+                m: 'a';
+            }
 
-                ->append
-                ->ui {
-                    c: '@t.small';
-                    t: '0';
+            ->if(
+                d: source.lang,
+                to: 'string'
+            )
+            ->attr {
+                n: 'lang';
+                v: source.lang;
+            }
 
-                    small
-                        ->text(label: 'Loading')
-                        ->inner {
-                            t: label;
-                        }
+            ->if(
+                d: source.dir,
+                to: 'string',
+                v: '^(ltr|rtl|auto)$',
+                r: true
+            )
+            ->attr {
+                n: 'dir';
+                v: source.dir;
+            }
+
+            .jtorm-loading__label->inner {
+                t: label;
+            }
+
+            ->if(
+                d: source.label,
+                to: 'string'
+            ) {
+                .jtorm-loading__label->inner {
+                    t: source.label;
                 }
             }
         }

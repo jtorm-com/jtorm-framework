@@ -1,0 +1,88 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->each(a: 'source')
+    ->if(
+        d: source.items,
+        to: 'array'
+    )
+    ->data(
+        _accordion.items: source.items,
+        _accordion.id: source.id,
+        _accordion.class: source.class,
+        _accordion.lang: source.lang,
+        _accordion.dir: source.dir
+    ) {
+        ->append {
+            cid: 'jtorm/components-ui-0.1.0/accordion-shell';
+            cs: 'default';
+
+            ->get {
+                t: '@c/accordion/accordion-shell.tss';
+            }
+        }
+
+        .jtorm-accordion:last-child {
+            ->if(
+                d: _accordion.id,
+                to: 'string'
+            )
+            ->attr {
+                n: 'id';
+                v: _accordion.id;
+            }
+
+            ->if(
+                d: _accordion.class,
+                to: 'string'
+            )
+            ->attr {
+                n: 'class';
+                v: _accordion.class;
+                m: 'a';
+            }
+
+            ->if(
+                d: _accordion.lang,
+                to: 'string'
+            )
+            ->attr {
+                n: 'lang';
+                v: _accordion.lang;
+            }
+
+            ->if(
+                d: _accordion.dir,
+                to: 'string',
+                v: '^(ltr|rtl|auto)$',
+                r: true
+            )
+            ->attr {
+                n: 'dir';
+                v: _accordion.dir;
+            }
+
+            ->each(
+                d: _accordion.items,
+                a: 'item'
+            )
+            ->data(
+                summary: item.summary,
+                content: item.content,
+                open: item.open,
+                id: item.id,
+                class: item.class,
+                lang: item.lang,
+                dir: item.dir
+            ) {
+                body
+                    ->append
+                    ->ui {
+                        c: 'accordion.item';
+                    }
+            }
+        }
+    }
+}

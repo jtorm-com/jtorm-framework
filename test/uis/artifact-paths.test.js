@@ -161,3 +161,8 @@ test('every schema-ui mapper t/h artifact resolves to a served disk file', () =>
     const { jTormSchemaUi } = require('../../src/uis/schema-ui/src/schema-ui.js');
     assert.deepEqual(missingMapper(jTormSchemaUi, 'src/uis/schema-ui/src/schema-ui.js'), []);
 });
+
+test('every components-ui mapper t/h artifact resolves to a served disk file', () => {
+    const { jTormComponentsUI } = require('../../src/uis/components-ui/src/components-ui.js');
+    assert.deepEqual(missingMapper(jTormComponentsUI, 'src/uis/components-ui/src/components-ui.js'), []);
+});

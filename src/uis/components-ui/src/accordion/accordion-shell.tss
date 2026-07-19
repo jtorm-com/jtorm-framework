@@ -1,0 +1,11 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@e.div';
+    t: '0';
+
+    div->attr {
+        n: 'class';
+        v: 'jtorm-accordion';
+    }
+}

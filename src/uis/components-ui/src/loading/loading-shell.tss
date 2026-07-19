@@ -1,0 +1,52 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@e.div';
+    t: '0';
+
+    div {
+        ->attr {
+            n: 'class';
+            v: 'jtorm-loading';
+        }
+
+        ->attr {
+            n: 'role';
+            v: 'status';
+        }
+
+        ->attr {
+            n: 'data-nosnippet';
+            v: '1';
+        }
+
+        ->append
+        ->ui {
+            c: '@e.span';
+            t: '0';
+
+            span {
+                ->attr {
+                    n: 'class';
+                    v: 'jtorm-loading__indicator';
+                }
+
+                ->attr {
+                    n: 'aria-hidden';
+                    v: 'true';
+                }
+            }
+        }
+
+        ->append
+        ->ui {
+            c: '@t.small';
+            t: '0';
+
+            small->attr {
+                n: 'class';
+                v: 'jtorm-loading__label';
+            }
+        }
+    }
+}

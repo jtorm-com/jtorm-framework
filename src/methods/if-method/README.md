@@ -14,7 +14,7 @@ npm install @jtorm/if-method
 
 | Option | Type     | Required | Description                                                        |
 |--------|----------|----------|--------------------------------------------------------------------|
-| `d`    | `data`   | `true`   | Data.                                                              |
+| `d`    | `data`   | `false`  | Data; when omitted, test the current model.                        |
 | `v`    | `string` or `boolean` | `false`  | Test the data within the `if` scope using a literal value or boolean. |
 | `el`   | `string` | `false`  | Element to check if exists.                                        |
 | `to`   | `string` | `false`  | Type check, check if `array`, `string`, `number`, etc for example. |
@@ -23,6 +23,8 @@ npm install @jtorm/if-method
 String values are literal substring checks. They are not regular expressions.
 Regular expression matching is opt-in via `r: true` and only accepts a single quoted TSS
 literal; model-derived or concatenated regex operands are rejected.
+When `d` is omitted, a null current model is a false condition rather than a compound
+binding expression.
 
 The host injects the bounded regex policy model before configuring the method:
 

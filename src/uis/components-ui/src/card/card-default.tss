@@ -1,0 +1,127 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->each(a: 'source')
+    ->if(
+        d: source.heading,
+        to: 'string'
+    )
+    ->data(
+        _card.heading: source.heading,
+        _card.summary: source.summary,
+        _card.action: source.action,
+        _card.id: source.id,
+        _card.class: source.class,
+        _card.lang: source.lang,
+        _card.dir: source.dir
+    ) {
+        ->append {
+            cid: 'jtorm/components-ui-0.1.0/card-shell';
+            cs: 'default';
+
+            ->get {
+                t: '@c/card/card-shell.tss';
+            }
+        }
+
+        .jtorm-card:last-child {
+            ->attr {
+                n: 'aria-label';
+                v: _card.heading;
+            }
+
+            ->if(
+                d: _card.id,
+                to: 'string'
+            )
+            ->attr {
+                n: 'id';
+                v: _card.id;
+            }
+
+            ->if(
+                d: _card.class,
+                to: 'string'
+            )
+            ->attr {
+                n: 'class';
+                v: _card.class;
+                m: 'a';
+            }
+
+            ->if(
+                d: _card.lang,
+                to: 'string'
+            )
+            ->attr {
+                n: 'lang';
+                v: _card.lang;
+            }
+
+            ->if(
+                d: _card.dir,
+                to: 'string',
+                v: '^(ltr|rtl|auto)$',
+                r: true
+            )
+            ->attr {
+                n: 'dir';
+                v: _card.dir;
+            }
+
+            .jtorm-card__title->inner {
+                t: _card.heading;
+            }
+
+            .jtorm-card__summary
+            ->if(
+                d: _card.summary,
+                to: 'string'
+            ) {
+                ->inner {
+                    t: _card.summary;
+                }
+
+                ->else
+                ->remove {}
+            }
+
+            .jtorm-card__action
+            ->if(d: _card.action) {
+                ->if(
+                    d: _card.action.href,
+                    to: 'string'
+                ) {
+                    ->if(
+                        d: _card.action.label,
+                        to: 'string'
+                    ) {
+                        ->before {
+                            t: ' ';
+                        }
+
+                        ->attr {
+                            n: 'href';
+                            v: _card.action.href;
+                        }
+
+                        ->inner {
+                            t: _card.action.label;
+                        }
+
+                        ->else
+                        ->remove {}
+                    }
+
+                    ->else
+                    ->remove {}
+                }
+
+                ->else
+                ->remove {}
+            }
+        }
+    }
+}

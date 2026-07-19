@@ -1,0 +1,18 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@f.button';
+    t: '0';
+
+    button {
+        ->attr {
+            n: 'class';
+            v: 'jtorm-button';
+        }
+
+        ->attr {
+            n: 'type';
+            v: 'button';
+        }
+    }
+}

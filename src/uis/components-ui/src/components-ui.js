@@ -2,7 +2,7 @@
 
 module.exports = {
     jTormComponentsUI: {
-        id: "jtorm/components-ui-0.0.4/src",
+        id: "jtorm/components-ui-0.1.0/src",
         alias: "@c",
         framework: "components",
         url: "http://localhost:4001/",
@@ -27,16 +27,42 @@ module.exports = {
             },
             badge: {
                 default: {
-                    ui: {
-                        c: '@e.span',
-                        t: 0
-                    },
                     t: ['@c/badge/badge-default.tss']
                 }
             },
             loading: {
                 default: {
                     t: ['@c/loading/loading-default.tss']
+                }
+            },
+            alert: {
+                default: {
+                    t: ['@c/alert/alert-default.tss']
+                },
+                info: {
+                    t: ['@c/alert/alert-info.tss']
+                },
+                success: {
+                    t: ['@c/alert/alert-success.tss']
+                },
+                warning: {
+                    t: ['@c/alert/alert-warning.tss']
+                },
+                error: {
+                    t: ['@c/alert/alert-error.tss']
+                }
+            },
+            card: {
+                default: {
+                    t: ['@c/card/card-default.tss']
+                }
+            },
+            accordion: {
+                default: {
+                    t: ['@c/accordion/accordion-default.tss']
+                },
+                item: {
+                    t: ['@c/accordion/accordion-item.tss']
                 }
             },
             grid: {
@@ -80,6 +106,18 @@ module.exports = {
                 }
             },
             button: {
+                default: {
+                    t: ['@c/button/button-default.tss']
+                },
+                primary: {
+                    t: ['@c/button/button-primary.tss']
+                },
+                secondary: {
+                    t: ['@c/button/button-secondary.tss']
+                },
+                destructive: {
+                    t: ['@c/button/button-destructive.tss']
+                },
                 primaryButton: {
                     t: ['@c/button/primary-button.tss']
                 },
