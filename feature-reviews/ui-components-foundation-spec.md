@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-18
 **Author:** Codex
-**Status:** Approved
+**Status:** Implemented — merged in PR #66 (`dev` at `6f6e8cf`, 2026-07-19)
 **Amended:** 2026-07-19 - user-approved static-shell/data-binding split using the existing UI fragment cache.
 
 ## Problem Statement
