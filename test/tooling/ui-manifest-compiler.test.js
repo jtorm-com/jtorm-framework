@@ -12,6 +12,7 @@ const {
 const {
   jTormUiManifestModel: manifest
 } = require('../../src/models/ui-manifest-model/src/ui-manifest-model.js');
+const manifestPackage = require('../../src/models/ui-manifest-model/package.json');
 const {
   jTormUiResolverModel: resolver
 } = require('../../src/models/ui-resolver-model/src/ui-resolver-model.js');
@@ -198,6 +199,9 @@ test('compiler output is deterministic and fingerprints raw reachable sources on
 
   assert.equal(second.json, first.json);
   assert.equal(second.hash, first.hash);
+  assert.equal(manifest.version, '1.0.0');
+  assert.notEqual(manifestPackage.version, manifest.version);
+  assert.equal(first.manifest.config.toolchain.manifestModel, manifest.version);
   assert.notEqual(rawChanged.hash, first.hash);
   assert.equal(unreachableChanged.hash, first.hash);
   assert.equal(urlChanged.hash, first.hash);

@@ -270,6 +270,7 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
     jTormPromiseCacheModel.clock = DEFAULT_CLOCK;
     jTormUiCacheModel.persistenceClock = DEFAULT_PERSISTENCE_CLOCK;
     jTormDataModel.ttl = jTormHtmlModel.ttl = jTormTssModel.ttl = jTormUiManifestModel.ttl = jTormUiCacheModel.ttl = 300000;
+    jTormDataModel.staleWindow = jTormHtmlModel.staleWindow = jTormTssModel.staleWindow = jTormUiManifestModel.staleWindow = 0;
     jTormUiManifestModel.max = 32;
     jTormUiManifestModel.maxText = 1048576;
     jTormUiManifestModel.maxValues = 262144;
@@ -368,7 +369,7 @@ function fixtureTransport(fixtures, metrics) {
  * @param {number|object} [c] create-doc mode, or an explicit render context.
  * @param {{url:string,hash:string,mode:'required'|'optional'}[]|null} [manifests] ordered UI packs prepared after root creation and before events/handler.
  * @param {number} [warm] when truthy, repeat prepare on the same root and report its request delta.
- * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,clock?:Function,persistenceClock?:Function,ttl?:number,uiCacheStore?:object|null,uiCacheInit?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
+ * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,clock?:Function,persistenceClock?:Function,ttl?:number,staleWindow?:number,uiCacheStore?:object|null,uiCacheInit?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
  * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
  */
 async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0, options = null) {
@@ -391,6 +392,9 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     ;
     if (options && Object.prototype.hasOwnProperty.call(options, 'ttl'))
         jTormDataModel.ttl = jTormHtmlModel.ttl = jTormTssModel.ttl = jTormUiManifestModel.ttl = jTormUiCacheModel.ttl = options.ttl
+    ;
+    if (options && Object.prototype.hasOwnProperty.call(options, 'staleWindow'))
+        jTormDataModel.staleWindow = jTormHtmlModel.staleWindow = jTormTssModel.staleWindow = jTormUiManifestModel.staleWindow = options.staleWindow
     ;
     if (options && Object.prototype.hasOwnProperty.call(options, 'uiCacheStore'))
         jTormUiCacheModel.saveModel = options.uiCacheStore

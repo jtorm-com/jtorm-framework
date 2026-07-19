@@ -13,6 +13,7 @@ module.exports = {
         c: new Map(),
         max: 32,
         ttl: 300000,
+        staleWindow: 0,// DI: opt-in request-triggered stale service after ttl; 0 waits for replacement
         maxText: 1048576,
         maxValues: 262144,
         maxDepth: 128,
@@ -327,6 +328,15 @@ module.exports = {
                         x.acquisition = 1;
                         throw x;
                     }
+                },
+                check: function (k) {
+                    let ok = 0;
+
+                    try { ok = s.cacheKey(d, c) === k; } catch (e) {}
+                    if (ok) return;
+                    const x = new Error('Manifest cache scope changed');
+                    x.acquisition = 1;
+                    throw x;
                 },
                 load: function () {
                     return (async function () {

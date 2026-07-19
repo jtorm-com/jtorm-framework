@@ -66,15 +66,23 @@ test('undefined is an actual cache bypass with no read, write, deduplication, re
   }
   const cache = new TrackedMap([['a', Promise.resolve('A')], [undefined, stale]]);
   const owner = {c: cache, max: 1, ttl: Infinity};
+  Object.defineProperty(owner, 'staleWindow', {
+    get() { throw new Error('bypass read stale window'); }
+  });
   const before = [...owner.c.entries()];
-  let loads = 0;
-  const load = () => Promise.resolve(++loads);
+  let checks = 0, hits = 0, loads = 0;
+  const op = {
+    load: () => Promise.resolve(++loads),
+    hit() { hits++; },
+    check() { checks++; }
+  };
   calls.get = calls.set = calls.delete = calls.keys = 0;
 
-  const a = pm.get(owner, undefined, {load});
-  const b = pm.get(owner, undefined, {load});
+  const a = pm.get(owner, undefined, op);
+  const b = pm.get(owner, undefined, op);
   assert.notStrictEqual(b, a);
   assert.deepEqual(await Promise.all([a, b]), [1, 2]);
+  assert.deepEqual({checks, hits}, {checks: 0, hits: 0});
   assert.deepEqual(calls, {get: 0, set: 0, delete: 0, keys: 0});
   assert.deepEqual([...owner.c.entries()], before);
 

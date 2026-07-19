@@ -2,6 +2,7 @@
 
 **Branch:** feat/ui-components-foundation
 **Base:** dev at 9ee8cc850224041498282a893eca7451dde8364b
+**Integrated base:** dev at 83c5ef6c788893367903d207637e624d75a6dba8
 **Date:** 2026-07-19
 **Status:** PASS locally; direct-model correction and source-ratchet hardening complete
 **Specification:** ui-components-foundation-spec.md
@@ -273,7 +274,7 @@ null-language/default key (or left unused until TTL/eviction); consumers may pin
 
 - [x] Local code, architecture, frontend, privacy, security, and production review completed
 - [x] STRIDE analysis reviewed
-- [x] 732 tests and typecheck passing
+- [x] 785 tests and typecheck passing on the integrated dev head
 - [x] Documentation and package payloads verified
 - [x] Initial cross-model skeptic, architect, and minimalist review completed
 - [x] Accepted null-model finding fixed red-first and focused follow-up review passed
@@ -289,7 +290,7 @@ null-language/default key (or left unused until TTL/eviction); consumers may pin
 | Review-found defects | PASS; all accepted findings reproduced and fixed |
 | Focused if-method and canonical-component suite | PASS; 41/41, including null owner, entry-point, and cold/warm cache coverage |
 | Parser snapshot and v1 differential | PASS; all 278 TSS files |
-| Exact npm test | PASS; 732 of 732 |
+| Exact npm test | PASS; 785 of 785 on the integrated dev head |
 | npm run typecheck | PASS |
 | Package dry-runs | PASS; components-ui 0.1.0 has 53 files and a 10,831-byte tarball; each-method 1.0.5 and if-method 1.0.6 have 3 files each |
 | Semgrep | PASS; 88 rules, 3 targets, zero findings |
