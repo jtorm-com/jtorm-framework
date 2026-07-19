@@ -1,7 +1,7 @@
 # STRIDE Threat Model: HTTP Validator Acquisition Caches
 
 **Date:** 2026-07-19
-**Status:** Pre-implementation design gate
+**Status:** Implemented; local controls verified; publication gates pending
 **Feature:** `feature-reviews/http-validator-acquisition.md`
 **Scope:** opt-in HTTP validators for the scoped data, HTML, TSS, and UI-manifest acquisition caches
 
@@ -165,7 +165,8 @@ OR
       Controls: timestamp only at exact successful publication; ordinary hits do not stamp
 ```
 
-All paths require at least one control failure. Planned red tests exercise each leaf with deterministic deferred policy, transport, parser, and cache-generation races.
+All paths require at least one control failure. The implemented red-first tests exercise each leaf
+with deterministic deferred policy, transport, parser, and cache-generation races.
 
 ## 7. Risk Ranking and Residual Acceptance
 
@@ -199,9 +200,9 @@ The repository maintainer's explicit implementation request accepts the document
 
 Enforcer triage selected `STRIDE_SUFFICIENT`. PASTA becomes mandatory if this metadata is persisted, shared across processes/keys/origins, applied to private or regulated content, used with credentials, or coupled to redirects/retries/new trust boundaries.
 
-## 10. Approval Gate
+## 10. Approval Gate and Verification
 
-Implementation may start only after independent code-explorer and code-architect reviews confirm that:
+Independent code-explorer and code-architect reviews confirmed that:
 
 1. the exact promise-cache record is the sole validator owner;
 2. the transaction cannot reuse or publish after detachment;
@@ -209,3 +210,8 @@ Implementation may start only after independent code-explorer and code-architect
 4. a 200 reaches `accept()` only after existing owner validation;
 5. default non-validator paths call the original loader/request surfaces unchanged; and
 6. rendered-fragment SWR and persistence remain untouched.
+
+All six conditions are implemented and covered by focused tests. The local architecture, security,
+differential, production-readiness, Semgrep, source-ratchet, and tech-debt gates pass with no
+unresolved valid finding. Current-head CI and GitHub Codex review remain the final publication
+controls.

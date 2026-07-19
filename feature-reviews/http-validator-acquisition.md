@@ -1,9 +1,9 @@
 # Feature Development: HTTP Validator Acquisition Caches
 
-**Status:** IN_PROGRESS
+**Status:** IMPLEMENTED — local verification passed; publication gates pending
 **Claimed:** 2026-07-19T09:06:42Z
 **Agent:** Codex `/root`
-**Current Mode:** Implement — red protocol tests
+**Current Mode:** Documentation and delivery
 **Worktree:** `/tmp/jtorm-http-validators`
 **Branch:** `feat/http-validator-acquisition`
 **Base:** `origin/dev` at `83c5ef62ae4cf29e0eceb3eb54263c6c16fac556`
@@ -12,27 +12,20 @@
 
 ## Resumption Context
 
-**Last Completed Mode:** Plan and Design (100/100, independent PASS)
-**Current Mode:** Implement — Checkpoint 2, shared protocol logic
-**Next Action:** Implement request-model conditional parsing and promise-cache generation transactions, then make only the shared focused tests green.
-**Files Created:**
-- `feature-reviews/http-validator-acquisition.md` - Feature workflow checkpoint and implementation-ready specification.
-- `feature-reviews/stride-http-validator-acquisition.md` - Full STRIDE model, attack tree, and control-to-test links.
-
-**Files Modified:** None in runtime yet.
-**Tests Written:**
-- `test/models/request-model-validators.test.js` - 37 assertions/subtests covering modified/not-modified/error, metadata bounds, policy drift, ABA, parser, and timeout behavior; RED 37/37 because `conditional()` is absent.
-- `test/models/promise-cache-validators.test.js` - 25 assertions/subtests covering atomic publication, freshness, SWR/hard identities, invalidation, caller-only detachment, hard guards, concurrency, and legacy arguments; RED 24/25 because transactions are absent, with the unchanged legacy case green.
-**Issues Found (not yet fixed):** None.
-**Design Decisions Made:**
-- The main checkout remains untouched; all work is isolated in `/tmp/jtorm-http-validators`.
-- Rendered-fragment SWR, persistence, timers, retries, and new stale fallback are out of scope.
-- Validator metadata is private state of the exact promise-cache generation record; it is never a parallel Map or public value wrapper.
-- Hard revalidation transfers the exact predecessor pair into the new pending record, preserving existing public promise, rejection, and LRU behavior.
-- The request model compares the captured key against the already-resolved URL after awaited policy, accepts only one safe entity-tag envelope, and retains the exact sent validator after 304.
-
-**Context for Next Session:**
-The requested worktree was created from freshly fetched `origin/dev`. Research is complete and the untouched focused baseline passes 169/169. The implementation-ready plan resolves atomic byte/validator/generation ownership without changing public cache promise/value shapes or bypassing request/manifest policy. Both independent reviewers returned PASS after all ten actionable findings were incorporated. Shared request/cache tests were written first and observed failing solely on the missing additive protocols; runtime source is still unchanged at this checkpoint.
+**Last Completed Mode:** Review and local verification (100/100)
+**Current Mode:** Documentation and delivery
+**Next Action:** commit review records, push a ready PR into `dev`, then iterate current-head CI and Codex review to green/clean.
+**Implementation:** request-model conditional parsing, promise-cache exact-generation transactions,
+four safe acquisition bridges, deterministic engine support, package releases, and focused
+model/pipeline/policy tests are complete.
+**Verification:** focused validator/regression suite 229/229, exact `npm test` 897/897,
+`npm run typecheck`, syntax/diff checks, six package dry-runs, zero-vulnerability audits,
+83-rule Semgrep, source-ratchet convergence, and full-feature tech-debt ratchet all pass.
+**Review findings fixed:** ten design findings and six implementation findings, including request
+and manifest TOCTOU observations plus exact base-validator detachment. Every implementation finding
+received a failing test before its fix.
+**Remaining gates:** ready PR, green current-head CI, clean current-head Codex review, and zero
+unresolved threads. The PR must not be merged.
 
 ---
 
@@ -548,7 +541,7 @@ No implementation-blocking questions remain in the draft. Decisions are locked a
 ### 23. Plan Quality Gate
 
 **Scope tags:** SECURITY, INFRA
-**Gate status:** IN_PROGRESS — pending independent code-explorer/code-architect challenge
+**Gate status:** PASSED — independent code-explorer/code-architect challenge incorporated
 **Personas applied:** architect, planner, backend-architect, Elysia expert (stack N/A), Bun expert (stack N/A), TypeScript pro (handwritten TS N/A; JSDoc/typecheck applicable), security-architect, threat-modeling-enforcer, platform-engineer, code-review-enforcer. The referenced database-architect file is absent from the installed resource profile and database scope is N/A.
 **Threat model:** full STRIDE 6/6, DFD, trust boundaries, attack tree, risk ranking, residual acceptance, and control-to-test linkage complete. Threat-model-deep-dive triage: `STRIDE_SUFFICIENT`.
 **Project override:** repository `AGENTS.md` dependency-free CommonJS/DI/Node-test rules supersede generic Bun/Elysia/TypeScript/database prescriptions.
@@ -585,45 +578,45 @@ The score becomes final only after independent review findings are incorporated 
 
 ### Plan Mode
 - [x] Saved pre-plan checkpoint
-- [ ] Wrote reviewed feature specification
-- [ ] Defined exact API and cache semantics
+- [x] Wrote reviewed feature specification
+- [x] Defined exact API and cache semantics
 
 ### Plan Quality Gate
-- [ ] Scope classified
-- [ ] Relevant agent personas consulted
-- [ ] All 10 dimensions pass at plan level
-- [ ] STRIDE pre-analysis complete
-- [ ] Threat model complete
-- [ ] Plan refined and implementation-ready
+- [x] Scope classified
+- [x] Relevant agent personas consulted
+- [x] All 10 dimensions pass at plan level
+- [x] STRIDE pre-analysis complete
+- [x] Threat model complete
+- [x] Plan refined and implementation-ready
 
 ### Design Mode
-- [ ] Loaded applicable design personas
-- [ ] Spawned code-explorer
-- [ ] Spawned code-architect
-- [ ] Validated atomic pairing design against red flags
+- [x] Loaded applicable design personas
+- [x] Spawned code-explorer
+- [x] Spawned code-architect
+- [x] Validated atomic pairing design against red flags
 
 ### Implement Mode
-- [ ] Checkpoint 1: Tests/scaffold
-- [ ] Checkpoint 2: Core logic
-- [ ] Checkpoint 3: Edge cases
-- [ ] Checkpoint 4: Integration
+- [x] Checkpoint 1: Tests/scaffold
+- [x] Checkpoint 2: Core logic
+- [x] Checkpoint 3: Edge cases
+- [x] Checkpoint 4: Integration
 
 ### Test Mode
-- [ ] Focused tests passing
-- [ ] Exact `npm test` passing
-- [ ] `npm run typecheck` passing
-- [ ] Syntax, package dry-run, and dependency checks passing
+- [x] Focused tests passing
+- [x] Exact `npm test` passing
+- [x] `npm run typecheck` passing
+- [x] Syntax, package dry-run, and dependency checks passing
 
 ### Review Mode
-- [ ] Relevant architecture/security/production reviews pass
-- [ ] Semgrep, source-ratchet, and tech-debt reviews pass
-- [ ] 100/100 code quality
-- [ ] Verification loop passes
+- [x] Relevant architecture/security/production reviews pass
+- [x] Semgrep, source-ratchet, and tech-debt reviews pass
+- [x] 100/100 code quality
+- [x] Verification loop passes
 
 ### Documentation Mode
-- [ ] Specification, threat model, and evaluation complete
-- [ ] Package versions and canonical backlog updated
-- [ ] Conventional commits created
+- [x] Specification, threat model, and evaluation complete
+- [x] Package versions and canonical backlog updated
+- [x] Conventional commits created
 - [ ] Ready PR opened into `dev`
 - [ ] Current-head CI green
 - [ ] Current-head Codex review clean with zero unresolved threads
