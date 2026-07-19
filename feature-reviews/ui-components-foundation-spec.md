@@ -91,6 +91,7 @@ Primary references:
 18. Later adapters can replace the fallback descriptors while consuming the same canonical names, variants, required fields, intent meanings, and accessibility contract.
 19. Every canonical component accepts one object model; top-level arrays, scalars, functions, and null emit no component, while accordion.items remains the sole bounded-by-host collection field.
 20. Cold and warm-cache renders are byte-equivalent for the same model; a warm shell must bind the current model and must never contain caller or localized values from any render.
+21. Composition owners must not wrap a completed canonical binding layer in another fragment-cache iteration; WebPage.default invokes loading.default outside its historical parent cache so only the literal private shell is reusable.
 
 ### Non-Functional Requirements
 
@@ -170,7 +171,7 @@ A future framework adapter may change templates, classes, and asset URLs, but it
 
 ### Rendering and Cache Boundary
 
-Every canonical fallback has two private layers. A *-shell.tss artifact uses only literal TSS parameters to build invariant native structure. Its binding artifact validates the canonical object model, appends that shell inside a cid iteration, and only then reads documented fields directly from the current `source` in the fresh detached fragment. Direct source-member `->data` copies are not an isolation boundary because data-method merges into the current model; a source ratchet rejects whole-model, same-key, and renamed-field copies while retaining genuinely derived values and the accordion alias handoff.
+Every canonical fallback has two private layers. A *-shell.tss artifact uses only literal TSS parameters to build invariant native structure. Its binding artifact validates the canonical object model, appends that shell inside a cid iteration, and only then reads documented fields directly from the current `source` in the fresh detached fragment. Direct source-member `->data` copies are not an isolation boundary because data-method merges into the current model; a source ratchet rejects whole-model, same-key, and renamed-field copies while retaining genuinely derived values and the accordion alias handoff. A caller must not put this completed binding layer inside another cid iteration, because the outer cache would retain the data-bound result; schema-ui 0.1.2 removes WebPage.default's legacy loading parent cache.
 
 The existing @jtorm/ui-cache-model and plugin remain the sole fragment-cache owners. Scoped hosts may reuse shell bytes; unscoped hosts and hosts without the plugin render the same path cold. The resolver cache remains separate and continues to cache descriptors, not HTML. Shell IDs are jtorm/components-ui-<package-version>/<shell> with structural variant default; source tests force the package version and IDs to advance together. A host changing its resolver/native-template configuration independently must purge these IDs or isolate cache storage. Future adapters own distinct versioned IDs unless their structure is intentionally byte-compatible.
 
@@ -196,6 +197,7 @@ Fallback jtorm-* classes are hooks for the unstyled base and are not framework-a
 | Accordion item open is false/missing | Omit the native open attribute |
 | Unknown field is present | Do not copy it to descendants |
 | Warm shell cache hit | Restore static bytes, then bind only the current model; cold/warm output must agree |
+| Completed component is nested in a parent cid iteration | Invalid composition; remove the parent cache and retain only the component's private shell identity |
 | Shell artifact contains a dynamic parameter or caller marker | Fail the components-ui source/cache-isolation tests |
 | Existing TSS artifact path drifts | Fail the artifact-path test |
 | Existing public key disappears | Fail the mapper-contract test |
@@ -214,6 +216,8 @@ Fallback jtorm-* classes are hooks for the unstyled base and are not framework-a
 | src/uis/components-ui/src/accordion/accordion-*.tss | New native disclosure group/item | Medium |
 | src/uis/components-ui/src/loading/loading-default.tss | Add status semantics, override label, remove implicit ID | Medium |
 | src/uis/components-ui/src/{button,badge,alert,card,accordion,loading}/*-shell.tss | New literal-only cached semantic shells | Medium: persisted fragment identity |
+| src/uis/schema-ui/src/web-page/web-page-default.tss | Remove the legacy whole-loading parent cache | High: cross-render data isolation |
+| src/uis/schema-ui/package.json | Patch bump to 0.1.2 | Low: release metadata |
 | src/methods/each-method/src/each-method.js | Ignore inherited/named array properties; preserve sparse index order | Medium: published runtime behavior |
 | src/methods/each-method/package.json and README.md | Patch bump to 1.0.5 and document traversal contract | Low |
 | src/methods/if-method/src/if-method.js | Skip compound parsing for null when no `d:` expression exists | Medium: published runtime behavior |
@@ -266,7 +270,7 @@ No new authentication, authorization, persistence owner, PII, payment, network, 
 | Existing consumers regress because published mapper keys or legacy button markup changes | Medium | High | Preserve all keys; do not modify four legacy button/anchor TSS files; lock mapper and pipeline goldens; use a minor version |
 | Caller data reaches raw HTML or an unsafe href | Medium | High | t-only copy, no rich slots, guarded href, payload/unsafe-scheme tests |
 | Root attributes leak onto descendants through implicit/global binding | Medium | Medium | Direct approved-field reads, `t: 0` leaves, and isolated each alias; test IDs/classes appear once |
-| Caller/localized data or a prior render leaks through a persisted shell | Low | High | Literal-only shell source ratchet; versioned IDs; cold/warm multi-family test asserts cache bytes contain no sentinels and second renders bind fresh data |
+| Caller/localized data or a prior render leaks through a persisted shell or enclosing parent cache | Low | High | Literal-only shell source ratchet; versioned IDs; cold/warm multi-family and WebPage composition tests assert second renders bind fresh data |
 | Resolver/native-template configuration changes while old shell IDs remain live | Low | Medium | Versioned component IDs; host must purge/isolate cache when structural dependencies change independently |
 | Future adapters reinterpret intent or accessibility differently | Medium | Medium | Durable README contract plus adapter invariants and canonical intent names |
 | Unstyled fallback is mistaken for full visual WCAG conformance | Medium | Medium | State the ownership boundary explicitly; require adapter contrast/focus/target/motion checks |
@@ -283,7 +287,7 @@ No new authentication, authorization, persistence owner, PII, payment, network, 
 | Explicit card link | Entire clickable card; click handler on article | Preserves normal link semantics, visible action wording, keyboard behavior, and text selection |
 | Alert roles fixed by intent | Caller-provided arbitrary role; role-free divs | A small reviewed mapping prevents invalid combinations while retaining region/status/alert semantics |
 | Shared base artifacts plus thin variant artifacts | Copy complete TSS per variant; dynamic framework class field | Keeps structure DRY without exposing adapter internals as data |
-| Cache invariant shells, bind data afterward | Cache completed components; do not cache components | Reuses the existing bounded lifecycle while excluding caller/localized values and preserving useful cold behavior |
+| Cache invariant shells, bind data afterward | Cache completed components; do not cache components | Reuses the existing bounded lifecycle while excluding caller/localized values; schema-ui's completed-loading parent cache is removed |
 | Direct canonical-model binding with explicit field reads | Mirror source fields into a private `->data` namespace; support arbitrary attrs | Removes a merge-only adapter that provided no isolation while approved sinks, `t: 0` leaves, and the shared model contract prevent disclosure/duplication |
 | Improve badge/loading in place | Add new parallel v2 keys; preserve every DOM detail | Keeps canonical defaults useful; 0.1.0 and migration docs communicate intentional output changes without deleting exports |
 | No base CSS | Ship opinionated CSS; inline styles | Avoids framework conflicts and extra bytes; semantic hooks let later layers own visual conformance |
@@ -317,7 +321,7 @@ No new authentication, authorization, persistence owner, PII, payment, network, 
 1. Create a clean dev-based feat/ui-components-foundation worktree and confirm a clean baseline.
 2. Write failing mapper/API, artifact-reference, and full-pipeline tests first, including legacy button output.
 3. Add private literal-only shell TSS, invoke each through a versioned cache identity, and keep model validation plus direct approved-field binding in the final artifact; then update the mapper and package version.
-4. Add edge-case coverage for missing fields, invalid button type, zero count, unsafe href, escaped payloads, root-field isolation, frozen accordion inputs, native open state, alert roles, and loading fallback.
+4. Add edge-case coverage for missing fields, invalid button type, zero count, unsafe href, escaped payloads, root-field isolation, frozen accordion inputs, native open state, alert roles, loading fallback, and fresh WebPage loading values across a scoped cache hit.
 5. Update the parser snapshot through the repository's deterministic fixture workflow.
 6. Expand the package README with catalog, data contracts, examples, use/do-not-use guidance, adapter invariants, accessibility ownership, ethical persuasion, migration, and rollback.
 7. Run targeted tests after each checkpoint, then npm test and npm run typecheck.
@@ -381,6 +385,7 @@ None. The requested framework layer, visual system, rich content, and behavior-h
 - [x] Frozen accordion data is unchanged after render.
 - [x] No runtime import, dependency, JS asset, CSS asset, UI-owner change, or handwritten TypeScript is added.
 - [x] All seven canonical shell identities contain only invariant structure; warm renders bind fresh values and live/persisted shell bytes contain no caller/localized data.
+- [x] WebPage.default does not enclose loading.default in a parent cache; two same-scope renders bind distinct loading labels and root attributes.
 - [x] Package README documents API, a11y ownership, ethical UX, adapters, migration, and rollback.
 - [x] TSS artifact and AST snapshot ratchets pass.
 - [x] npm test and npm run typecheck pass.

@@ -791,6 +791,38 @@ test('ui WebPage.default m:1 appends the active desktop mediatarget artifacts', 
     assert.doesNotMatch(html, /\btablet\b|\bmobile\b|\bdesktop-s\b|\bdesktop-l\b/);
 });
 
+test('ui WebPage.default binds fresh loading data outside its reusable shell', async t => {
+    t.after(async () => {
+        await render('<body></body>', '', {}, 'http://localhost/');
+    });
+    const context = {c: 0, s: null, a: null, request: {tenant: 'tenant-a'}};
+    const page = (marker, reuseSharedCaches) => render(
+        '<html><head></head><body></body></html>',
+        "html->ui { c: 'WebPage.default'; m: '1'; h: '0'; }",
+        {
+            name: 'Home',
+            inLanguage: 'en',
+            label: marker + '-loading',
+            id: marker + '-loading-id',
+            class: marker + '-loading-class'
+        },
+        'http://localhost/',
+        null,
+        context,
+        null,
+        0,
+        {jsonLd: false, reuseSharedCaches}
+    );
+    const first = await page('FIRST', false);
+    const second = await page('SECOND', true);
+
+    assert.match(first.body, /id="FIRST-loading-id"/);
+    assert.match(first.body, />FIRST-loading<\/small>/);
+    assert.match(second.body, /id="SECOND-loading-id"/);
+    assert.match(second.body, />SECOND-loading<\/small>/);
+    assert.doesNotMatch(second.body, /FIRST-loading/);
+});
+
 test('ui SearchAction preserves target arrays as EntryPoint groups', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',

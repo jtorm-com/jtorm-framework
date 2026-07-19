@@ -71,6 +71,19 @@ The correction skeptic invocation remained API-bound and ended with an execution
 recorded as partial coverage with no inferred verdict. Its absence is not presented as a clean
 review; the repository's green CI and clean current-head Codex PR review remain mandatory gates.
 
+## Current-head Codex cache follow-up
+
+Thread-aware inspection found one P1 even though a later top-level Codex summary reported no major
+issues: WebPage.default still enclosed loading.default in a legacy `cid: 'loading'` append. A
+same-tenant two-render pipeline test proved the outer cache returned the first render's loading
+label, ID, and class on the second render. The nested versioned loading shell could not protect data
+that an enclosing cache captured after binding.
+
+The owner-correct fix removes only that schema-ui parent cid, advances `@jtorm/schema-ui` from 0.1.1
+to 0.1.2, and leaves the canonical component's literal private shell as the sole loading fragment
+cache. The red regression is green, the TSS snapshot is updated, and full current-head gates are
+required again before resolution.
+
 ## Confirmed claims
 
 - All published mapper keys and four published button/anchor recipes remain unchanged.
@@ -88,6 +101,6 @@ review; the repository's green CI and clean current-head Codex PR review remain 
 ## Final decision
 
 The initial three-lens review and focused null-fix follow-up are complete. Both completed correction
-lenses' shared ratchet finding is fixed; their remaining observations are non-blocking. The
-correction skeptic lens is explicitly incomplete, and current-head PR gates remain required before
-the branch is mergeable.
+lenses' shared ratchet finding and the current-head Codex parent-cache finding are fixed red-first.
+The correction skeptic lens is explicitly incomplete, and fresh current-head PR gates remain
+required before the branch is mergeable.

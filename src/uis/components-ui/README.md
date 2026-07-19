@@ -89,6 +89,8 @@ Canonical fallbacks render in two phases:
 
 This is separate from the UI resolver cache, which stores resolved descriptors rather than rendered HTML. With the UI-cache plugin disabled, or without a valid scoped cache discriminator, the same layers render cold and retain identical output. A cache hit restores a fresh detached shell before binding, so concurrent or later renders cannot reuse a prior caller's values.
 
+Composition owners must not wrap the completed binding artifact in another `cid` iteration: that outer cache would snapshot caller-bound output even though the component's inner shell is safe. Invoke the canonical component on the ordinary render path and let its private shell own fragment reuse. `@jtorm/schema-ui` 0.1.2 removes the historical whole-component cache around `WebPage.default`'s loading fallback for this reason.
+
 Fallback cache IDs use `jtorm/components-ui-<package-version>/<shell>` with the `default` structural variant. The source ratchet requires every ID to match the package version and requires shell parameters to remain literal. A release that changes shell structure must therefore bump the package and its IDs together. A host that changes its resolver/native-template configuration independently must purge these fragment IDs or isolate the new configuration in another UI-cache namespace before serving it. Future framework adapters own distinct versioned shell IDs; they must not share fallback cache entries unless their structure is byte-compatible.
 
 ## Data contract
@@ -225,6 +227,8 @@ New code should use canonical label-based button variants. The legacy recipes re
 badge.default keeps the historical badge class and adds jtorm-badge. Its mapper no longer pre-injects an empty span; missing data now emits nothing, label takes precedence, and zero renders.
 
 loading.default intentionally changes structure: it removes the synthesized id="loading", adds status semantics and jtorm hooks, exposes a localized visible fallback, accepts a caller-owned id, and leaves transient `aria-busy` lifecycle to the host. Update selectors that depended on the historical nested wrapper or implicit ID.
+
+When composing loading.default through WebPage.default, use `@jtorm/schema-ui` 0.1.2 or newer. Earlier schema-ui releases cached the completed loading subtree under `cid: 'loading'`; 0.1.2 removes that parent cache so each render binds its current label and root fields while the private loading shell remains reusable.
 
 No framework adapter, CSS, runtime JavaScript, or resolver/compiler change is included.
 

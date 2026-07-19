@@ -49,11 +49,14 @@ found and proved these material defects before their fixes:
 - a null top-level model reached if-method compound-binding parsing without a `d:` expression and
   aborted the whole render;
 - canonical components created no reusable shell entry before the two-phase design.
+- WebPage.default's legacy whole-loading cache captured the first caller's label and root attributes even though loading.default's nested shell cache was data-free.
 
 The final each regression characterizes sparse indices 2 and 5, ascending render order, and existing
 public index values. The null regression covers the if-method owner plus every canonical component
 entry point. A red 1/19 focused run proves the cache gap before all seven static shell identities
-were added. All accepted findings now have focused green evidence.
+were added. A later red same-tenant WebPage run returned the first loading label, ID, and class on
+the second render; removing the enclosing schema-ui cache made it green. All accepted findings now
+have focused green evidence.
 
 ## Ownership and data flow
 
@@ -64,6 +67,7 @@ were added. All accepted findings now have focused green evidence.
 | Model validation and direct approved-field binding | canonical components-ui binding TSS |
 | Framework fallback, aliases, descriptor cache, and asset expansion | unchanged ui-resolver-model |
 | Rendered shell reuse, scope, TTL, persistence, and invalidation | unchanged ui-cache-model/plugin and handler-wrapper lifecycle |
+| WebPage loading composition | schema-ui 0.1.2 ordinary append; components-ui private loading shell owns reuse |
 | Descriptor compilation | unchanged ui-compiler-model |
 | Artifact loading and URL policy | unchanged get, manifest, and request owners |
 | Escaped visible text | unchanged insert text path |
@@ -95,6 +99,8 @@ existing fragment cache, whose miss/hit/disabled/unscoped paths are exercised di
   only versioned cid/default coordinates to the existing lifecycle.
 - Every shell parameter is literal, every binding owner references exactly one shell, and all
   caller/localized values are applied after the cached iteration.
+- No composition owner may cache the completed binding layer; schema-ui's WebPage loading path now
+  delegates reuse exclusively to the versioned literal shell.
 - Every canonical descriptor points to one public wrapper. Button and alert wrappers reject invalid
   whole models, inject trusted intent and role data, then fetch their shared structural base.
 - html-ui leaves always receive automatic global transforms disabled; component TSS writes only
@@ -198,6 +204,7 @@ depend, while preserving published recipes and the dependency-free isomorphic ar
 #### Modified
 
 - hardened badge and loading defaults;
+- removed schema-ui's stale whole-loading parent cache and patch-bumped it to 0.1.2;
 - components-ui mapper identity and package version;
 - each-method array enumeration and patch version;
 - if-method null/type-gate handling and patch version;
@@ -216,6 +223,8 @@ depend, while preserving published recipes and the dependency-free isomorphic ar
 | src/uis/components-ui/src/*/*-shell.tss | Added | seven invariant semantic shells cached before data binding |
 | src/uis/components-ui/src/card and accordion | Added | semantic static compositions |
 | src/uis/components-ui/src/badge and loading | Modified | safe hardened defaults |
+| src/uis/schema-ui/src/web-page/web-page-default.tss | Modified | loading composition outside the legacy parent cache |
+| src/uis/schema-ui/package.json | Modified | 0.1.2 patch release for the cache-isolation fix |
 | src/methods/each-method/src/each-method.js | Modified | own enumerable canonical array-index traversal |
 | src/methods/if-method/src/if-method.js | Modified | null-safe bare type gates without weakening compound bindings |
 | test/pipeline/components-ui.test.js | Added | real-pipeline behavior and hostile-model matrix |
@@ -237,9 +246,9 @@ depend, while preserving published recipes and the dependency-free isomorphic ar
 | Category | Before | After | Delta |
 |---|---:|---:|---:|
 | Mapper and source contracts | 0 | 4 | +4 |
-| Pipeline and integration contracts | 0 | 22 | +22 |
+| Pipeline and integration contracts | 0 | 23 | +23 |
 | Browser E2E | 0 | 0 | 0; visual adapter intentionally absent |
-| Full repository total | 706 | 732 | +26 |
+| Full repository total | 706 | 733 | +27 |
 
 ### Code quality score
 
@@ -251,7 +260,7 @@ depend, while preserving published recipes and the dependency-free isomorphic ar
 | Validation | 10/10 | whole-model, required-field, enum, URL, and collection-key matrices |
 | Error handling | 10/10 | safe omission for bad models; policy and drift failures remain loud |
 | Security and privacy | 10/10 | escaped copy, narrow attrs, literal-only persisted shells, no data collection or new dependency |
-| Performance | 10/10 | seven bounded cache identities, one sparse-safe O(n) collection pass, 10,831-byte package tarball |
+| Performance | 10/10 | seven bounded cache identities, one sparse-safe O(n) collection pass, 11,093-byte components-ui tarball |
 | Maintainability | 10/10 | small shared bases, thin wrappers, stable adapter invariants |
 | Testability | 10/10 | real resolver-to-DOM pipeline plus deterministic ratchets |
 | Readability | 10/10 | package README, spec, threat model, and terse source contracts align |
@@ -274,7 +283,7 @@ null-language/default key (or left unused until TTL/eviction); consumers may pin
 
 - [x] Local code, architecture, frontend, privacy, security, and production review completed
 - [x] STRIDE analysis reviewed
-- [x] 785 tests and typecheck passing on the integrated dev head
+- [x] 786 tests and typecheck passing on the integrated dev head
 - [x] Documentation and package payloads verified
 - [x] Initial cross-model skeptic, architect, and minimalist review completed
 - [x] Accepted null-model finding fixed red-first and focused follow-up review passed
@@ -289,10 +298,11 @@ null-language/default key (or left unused until TTL/eviction); consumers may pin
 | Red-first component contracts | PASS |
 | Review-found defects | PASS; all accepted findings reproduced and fixed |
 | Focused if-method and canonical-component suite | PASS; 41/41, including null owner, entry-point, and cold/warm cache coverage |
+| WebPage parent-cache regression | PASS; red-first same-scope second render binds only its current loading label/id/class |
 | Parser snapshot and v1 differential | PASS; all 278 TSS files |
-| Exact npm test | PASS; 785 of 785 on the integrated dev head |
+| Exact npm test | PASS; 786 of 786 on the integrated dev head |
 | npm run typecheck | PASS |
-| Package dry-runs | PASS; components-ui 0.1.0 has 53 files and a 10,831-byte tarball; each-method 1.0.5 and if-method 1.0.6 have 3 files each |
+| Package dry-runs | PASS; components-ui 0.1.0 has 53 files and an 11,093-byte tarball; schema-ui 0.1.2 has 84 files and a 10,028-byte tarball; each-method 1.0.5 and if-method 1.0.6 have 3 files each |
 | Semgrep | PASS; 88 rules, 3 targets, zero findings |
 | Full and production dependency audit | PASS; zero vulnerabilities |
 | Diff whitespace | PASS |

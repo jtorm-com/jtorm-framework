@@ -119,7 +119,7 @@ Actors:
 - An application author accidentally treating a visual variant as authorization or audited execution.
 - A future adapter author weakening semantic, escaping, or intent guarantees.
 - A maintainer accidentally re-enabling html-ui global propagation or raw HTML.
-- A maintainer moving data binding inside a cached cid iteration or reusing a stale shell identity after structural configuration changes.
+- A maintainer moving data binding inside a cached cid iteration, wrapping a completed component in a parent cid, or reusing a stale shell identity after structural configuration changes.
 - A compromised host. This actor already owns the render model and remains a residual risk outside package control.
 
 ## STRIDE Analysis
@@ -202,7 +202,9 @@ Controls:
 - No implicit loading ID is generated.
 - Every cid-bearing shell uses only literal parameters and contains no data, text, each, if, nested cache identity, or runtime method.
 - Binding executes outside the cached iteration against a fresh detached fragment on both cold and warm paths.
+- Composition owners invoke the complete binding layer outside any parent cid; schema-ui 0.1.2 removes WebPage.default's legacy whole-loading cache.
 - Source closure and cold/warm sentinel tests prove all seven cached byte strings exclude caller/localized values and remain unchanged when the next render uses different data.
+- A scoped two-render WebPage regression proves its second loading label, ID, and class cannot come from the first render.
 - DOM and frozen-input tests ratchet these controls.
 
 Residual risk:
@@ -273,7 +275,7 @@ Residual risk:
 ### Goal: Leak or corrupt caller data
 
 - Cache a completed data-bearing component:
-  - Prevented by literal-only shell iterations and post-cache binding.
+  - Prevented by literal-only shell iterations, post-cache binding, and removal of WebPage's parent loading cid.
 - Reuse a first render's caller/localized values in a second render:
   - Prevented by fresh detached restoration plus cold/warm sentinel regression.
 - Let html-ui global.tss copy unknown root fields:
@@ -321,6 +323,7 @@ Residual risk:
 | Artifact determinism | components-ui artifact scanner and TSS snapshot fixture |
 | Literal-only cache boundary | parsed source closure requires exactly one versioned/default shell per binding and rejects dynamic methods/params, data verbs, and nested cache identities |
 | Cold/warm cache isolation | seven cache IDs contain no first/second-render sentinel; warm output binds only fresh values and cached bytes remain identical |
+| Parent-cache isolation | two same-tenant WebPage renders bind distinct loading label/id/class values; schema-ui owns no enclosing loading cid |
 | Linear collection shape | representative larger array produces exactly one details element per valid item |
 | Collection-key integrity | each pipeline regression with inherited and named enumerable array properties |
 
@@ -353,6 +356,7 @@ Completion evidence:
 - Targeted mapper, artifact, pipeline, and parser tests passed.
 - Exact npm test and npm run typecheck passed.
 - Diff review found no raw `h:`, arbitrary attrs, runtime imports/dependencies, `di`/event wiring, missing `t: 0`, unguarded href, source mutation, or unbounded nested iteration.
+- Current-head Codex review found a WebPage parent-cache leak; the real pipeline reproduced it red-first, schema-ui 0.1.2 removed the enclosing cid, and the focused regression passed.
 - README ownership and ethical-use guidance were confirmed.
 - The initial three-lens adversarial review passed; its one Low null-model finding was fixed red-first and the focused follow-up passed.
 - A later direct-binding review completed architect and minimalist lenses, fixed their shared source-ratchet coverage finding red-first, and records the skeptic lens as incomplete after an execution error rather than inferring a clean result.

@@ -22,3 +22,10 @@ Numeric `price: 0` is preserved. Canonical HTTP(S) schema.org
 escaped text. Rendering does not mutate caller-owned `Product` or `Offer`
 objects. Every field is optional, and all data-bound text uses the framework's
 escaped text path.
+
+## WebPage loading cache
+
+Version 0.1.2 removes WebPage.default's historical whole-component `loading`
+fragment cache. The canonical loading component now binds every render's current
+label and root fields outside any parent cache while its private, literal-only
+shell remains reusable through `@jtorm/components-ui`.
