@@ -1,6 +1,7 @@
 # Bootstrap UI Adapter Evaluation
 
 **Date:** 2026-07-19
+**Status:** COMPLETE — PR #71 merged into `dev` as `d97556c`
 **Scope:** `@jtorm/bootstrap-ui@0.1.0` and its test/documentation integration
 **Verdict:** PASS with zero open blocker, high, or medium findings; three-lens
 opposite-model adversarial review completed and adjudicated
@@ -145,6 +146,8 @@ risk.
 - Focused adapter/source/artifact tests after adversarial hardening: 23/23 pass.
 - Parser snapshot/differential gates: 15/15 pass; all 285 TSS files equal the frozen v1 oracle.
 - Full repository suite after rebasing onto current `dev`: 912/912 pass.
+- Delivery: final head `3fd58ed` passed CI and a clean current-head Codex review with zero
+  unresolved threads before the maintainer merged PR #71 into `dev` as `d97556c`.
 - Typecheck: `tsc -p jsconfig.json` passes.
 - Dependency audit: zero production vulnerabilities.
 - Package dry-run: 10 intended files; 4,828 bytes packed; 17,094 bytes unpacked; no bundled dependency.
