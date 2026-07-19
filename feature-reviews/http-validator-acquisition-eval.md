@@ -1,27 +1,26 @@
 # HTTP validator acquisition — Evaluation
 
-**Status:** LOCAL PASS — ready PR #69; GitHub gates are authoritative
+**Status:** COMPLETE — PR #69 merged into `dev` as `f252ab0`
 **Claimed:** 2026-07-19T09:06:42Z
 **Agent:** Codex `/root`
-**Mode:** Pre-PR branch evaluation
-**Current Phase:** 7 — PR validation
+**Mode:** Post-merge record
+**Current Phase:** Complete
 **Base ref:** `origin/dev` at `af5c62c`
-**Diff range:** `af5c62c...feat/http-validator-acquisition` plus current review records
-**PR review comments:** PR #69; current-head GitHub state is authoritative
+**Diff range:** `af5c62c...cfba4b0`
+**PR review comments:** clean current-head Codex review; zero unresolved threads
 **Specification:** [http-validator-acquisition.md](http-validator-acquisition.md)
 **Threat model:** [stride-http-validator-acquisition.md](stride-http-validator-acquisition.md)
 
 ## Resumption Context
 
-**Last Completed Phase:** 5 — local review and verification
-**Next Action:** iterate PR #69 current-head CI/Codex review
+**Last Completed Phase:** 7 — delivery
+**Next Action:** evaluate rendered-fragment SWR independently.
 **Issues Found (not yet fixed):** none
 **Files Modified:** request-model; promise-cache-model; data/HTML/TSS/UI-manifest acquisition owners; package metadata/READMEs; engine and focused model/pipeline/policy tests; root architecture and feature records
 **Source-ratchet status:** PASS — exact allowlist/negative fixtures and no-edit convergence
-**Context for Next Session:** local implementation, documentation, package, test, security, and
-readiness gates pass. Six additive packages are coordinated at `1.2.0`; UI-cache runtime/package
-and manifest wire remain unchanged. Only ready-PR, current-head CI, and current-head Codex review
-remain.
+**Context for Next Session:** PR #69 merged final head `cfba4b0` into `dev` as `f252ab0`
+after green CI, a clean current-head Codex review, and zero unresolved threads. Six additive
+packages are coordinated at `1.2.0`; UI-cache runtime/package and manifest wire remain unchanged.
 
 ## Discovery and feature map
 
@@ -115,7 +114,7 @@ guard. No valid finding remains.
 | Source ratchet | PASS — 5/5 ownership/policy tests and no-edit convergence |
 | Semgrep | PASS — 83 JavaScript/security rules, six runtime targets, zero findings, full parse |
 | Tech-debt ratchet | PASS — full diff from current `origin/dev`, zero patterns after terminology cleanup |
-| Adversarial | LOCAL PASS — cross-model export blocked by policy; independent reviewers passed; GitHub Codex pending |
+| Adversarial | PASS — cross-model export remained policy-blocked; independent reviewers and current-head GitHub Codex passed |
 
 Review-router initially selected refactor and source-ratchet coverage from file patterns. Because the
 diff creates an outbound conditional-request/cache-generation trust path, architecture,
@@ -146,8 +145,8 @@ already installed pinned Terser binary. The expectation was updated to the requi
 minor, the worktree used the existing dependency installation, the focused parser gate passed
 2/2, and the exact suite then passed 897/897.
 
-## PR-Controlled Completion Gates
+## Completion Gates
 
-- Require green CI for the current PR head.
-- Require a clean Codex review against that same head and zero unresolved threads.
-- Do not merge.
+- [x] CI passed on final head `cfba4b0`.
+- [x] Codex reviewed that same head cleanly with zero unresolved threads.
+- [x] The maintainer merged PR #69 into `dev` as `f252ab0`; the delivery agent did not merge it.

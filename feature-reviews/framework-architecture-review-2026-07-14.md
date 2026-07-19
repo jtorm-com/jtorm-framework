@@ -109,17 +109,19 @@
 > intentionally byte-compatible with the fallback. Selecting and implementing the first reference
 > framework is the next UI-system follow-up, independent of the open P4 cache-policy work.
 >
-> **Backlog update — 2026-07-19 (this change):** HTTP validators are now implemented as an exact
+> **Backlog update — 2026-07-19 (`dev` at `f252ab0`):** PR #69 completed HTTP validators as an exact
 > opt-in on those same four acquisition caches. One bounded opaque ETag or Last-Modified value is
 > atomically paired with the exact scoped promise-cache generation; every conditional request
 > re-runs request-model URL policy and resolved-key discrimination. A 200 publishes bytes and
 > metadata only after the owner's full parser/manifest validation path; a 304 reads no body and
 > can publish fresh only by reusing its exact current content+validator pair. Default traffic,
 > public promise/value shapes, manifest wire v1, and rendered-fragment cache/persistence remain
-> unchanged. Rendered-fragment SWR remains the independent P4 follow-up.
+> unchanged. Rendered-fragment SWR remains the independent P4 follow-up. Final head `cfba4b0`
+> passed CI and a clean current-head Codex review with zero unresolved threads before the
+> maintainer merged PR #69 into `dev` as `f252ab0`.
 >
-> **Backlog update — 2026-07-19 (current Bootstrap adapter change):** the first
-> reference framework adapter is implemented as `@jtorm/bootstrap-ui@0.1.0`.
+> **Backlog update — 2026-07-19 (`dev` at `d97556c`):** PR #71 completed the first
+> reference framework adapter as `@jtorm/bootstrap-ui@0.1.0`.
 > All fourteen canonical variants resolve through the unchanged `@c` model/binding
 > artifacts before one fixed-literal `@b` presentation overlay. The adapter adds no
 > model translation, runtime import, JavaScript, automatic Bootstrap asset request,
@@ -127,7 +129,9 @@
 > `^5.3.8` stylesheet, while accordion interaction remains native `details`/`summary`.
 > Full-pipeline tests cover
 > explicit/global resolution, fallback, invalid models, escaping/URL safety, and all
-> seven canonical shell caches across cold, neutral, warm, and persisted renders.
+> seven canonical shell caches across cold, neutral, warm, and persisted renders. Final head
+> `3fd58ed` passed CI and a clean current-head Codex review with zero unresolved threads before
+> the maintainer merged PR #71 into `dev` as `d97556c`.
 
 ---
 
@@ -276,9 +280,9 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P4** | Version the persisted fragment schema for absolute age across restarts | ✅ Done — merged PR #63 | Wire v1 preserves original successful settlement time, applies current TTL to remaining age, and defines fail-closed migration/deployment/rollback | M |
 | **P4** | Add opt-in request-triggered SWR to safe acquisition caches | ✅ Done — merged PR #65 | Data/HTML/TSS/manifest packs default to zero, preserve strict scope/policy/validation, and refresh once per retained generation | M |
 | **P4** | Evaluate rendered-fragment SWR | Next independent follow-up | Background rendering crosses handler/event completion, independent timestamps, save adapters, persistence, and downstream revocation | L |
-| **P4** | Add opt-in HTTP validators to safe acquisition caches | ✅ Done — PR #69 | Exact scoped generation pairing, bounded opaque ETag/Last-Modified metadata, validated 200 replacement, and bodyless 304 reuse; rendered fragments remain excluded | M |
+| **P4** | Add opt-in HTTP validators to safe acquisition caches | ✅ Done — merged PR #69 | Exact scoped generation pairing, bounded opaque ETag/Last-Modified metadata, validated 200 replacement, and bodyless 304 reuse; rendered fragments remain excluded | M |
 | **P5** | Establish a framework-neutral common-component foundation | ✅ Done — merged PR #66 | Stable intent-based names and canonical models make visual-framework backends testable without coupling caller data to one framework | L |
-| **P5** | Design the UI-framework adapter layer and implement one reference adapter | ✅ Implemented — current Bootstrap adapter change | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
+| **P5** | Design the UI-framework adapter layer and implement one reference adapter | ✅ Done — merged PR #71 | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.

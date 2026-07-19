@@ -1,7 +1,7 @@
 # STRIDE Threat Model: HTTP Validator Acquisition Caches
 
 **Date:** 2026-07-19
-**Status:** Implemented; local controls verified; publication gates pending
+**Status:** COMPLETE — PR #69 merged after green CI and clean current-head Codex review
 **Feature:** `feature-reviews/http-validator-acquisition.md`
 **Scope:** opt-in HTTP validators for the scoped data, HTML, TSS, and UI-manifest acquisition caches
 
@@ -213,5 +213,5 @@ Independent code-explorer and code-architect reviews confirmed that:
 
 All six conditions are implemented and covered by focused tests. The local architecture, security,
 differential, production-readiness, Semgrep, source-ratchet, and tech-debt gates pass with no
-unresolved valid finding. Current-head CI and GitHub Codex review remain the final publication
-controls.
+unresolved valid finding. Final head `cfba4b0` then passed CI and a clean GitHub Codex review with
+zero unresolved threads before the maintainer merged PR #69.

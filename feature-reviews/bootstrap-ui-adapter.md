@@ -1,17 +1,17 @@
 # Feature Development: Bootstrap UI Adapter
 
-**Status:** READY_FOR_PR
+**Status:** MERGED — PR #71 landed in `dev` as `d97556c`
 **Claimed:** 2026-07-19T11:56:24Z
 **Agent:** Codex `/root`
-**Current Mode:** Delivery
+**Current Mode:** Complete
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Documentation
-**Current Mode:** Delivery
-**Next Action:** Commit the reviewed scope, open a ready PR into `dev`, then satisfy CI and current-head Codex review.
+**Last Completed Mode:** Delivery
+**Current Mode:** Complete
+**Next Action:** Evaluate rendered-fragment SWR as its independent P4 architecture item.
 **Files Created:**
 - `feature-reviews/bootstrap-ui-adapter.md`
 - `feature-reviews/bootstrap-ui-adapter-spec.md`
@@ -42,7 +42,9 @@
 - The default accordion overlay styles neutral nested items idempotently when an explicit outer `f: 'bootstrap'` does not propagate.
 
 **Context for Next Session:**
-Work is isolated in `/tmp/jtorm-bootstrap-ui` on `feat/bootstrap-ui-adapter`, based exactly on merged `dev` at `af5c62c`.
+PR #71 merged final head `3fd58ed` into `dev` as `d97556c` after green CI, a clean
+current-head Codex review, and zero unresolved threads. The merged worktree and local/remote
+feature branches were removed.
 
 ---
 
@@ -88,7 +90,7 @@ Work is isolated in `/tmp/jtorm-bootstrap-ui` on `feat/bootstrap-ui-adapter`, ba
 - [x] Source and tech-debt ratchets converged with no open blocker/high/medium finding
 - [x] Local verification loop passed
 - [x] Opposite-model adversarial review: PASS after maintainer-approved disclosure; skeptic, architect, and minimalist lenses completed, accepted hardening landed, and no valid high/medium remains
-- [ ] PR CI and clean current-head Codex review (delivery gates)
+- [x] PR #71 CI green and current-head Codex review clean with zero unresolved threads
 
 ### Documentation Mode
 - [x] Package README updated

@@ -1,7 +1,7 @@
 # STRIDE: Bootstrap UI Adapter
 
 **Date:** 2026-07-19
-**Status:** Implemented and verified
+**Status:** COMPLETE — PR #71 merged after green CI and clean current-head Codex review
 **Feature spec:** [bootstrap-ui-adapter-spec.md](bootstrap-ui-adapter-spec.md)
 **Scope owner:** `@jtorm/bootstrap-ui`
 

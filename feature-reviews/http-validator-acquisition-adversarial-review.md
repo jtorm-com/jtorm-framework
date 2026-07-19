@@ -1,7 +1,7 @@
 # HTTP Validator Acquisition — Adversarial Review
 
 **Date:** 2026-07-19
-**Status:** LOCAL PASS; external gate is current-head GitHub Codex review on PR #69
+**Status:** PASS — current-head GitHub Codex review clean with zero unresolved threads
 
 ## Skeptic Lens
 
@@ -40,5 +40,5 @@ runtime dependency was added. ETag strength/payload and Last-Modified date seman
 - The cross-model adversarial CLI was not run because it required sending repository-derived
   prompts outside the authorized workspace. The policy guard blocked the attempt before export;
   no repository data was sent and no bypass was used.
-- The mandatory ready-PR current-head Codex review remains the external publication gate. This
-  record must not be marked fully complete until that review is clean and all threads are resolved.
+- The mandatory external gate passed on final head `cfba4b0`: Codex reported no major issues and
+  the thread-aware review query returned zero unresolved threads before PR #69 merged.

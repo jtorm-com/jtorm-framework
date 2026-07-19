@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-19
 **Author:** Codex
-**Status:** Implemented and locally verified; PR delivery gates pending
+**Status:** COMPLETE — PR #71 merged into `dev` as `d97556c` after green CI and clean current-head Codex review
 **Approved by:** Maintainer in the current conversation on 2026-07-19
 
 ## Problem Statement
