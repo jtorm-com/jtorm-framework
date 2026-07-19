@@ -291,11 +291,11 @@ isolated('purge during a paired owner request makes 304 fail closed and cannot r
   assert.equal(dm.c.size, 0);
 });
 
-isolated('disabled, unscoped, missing, inaccessible, and old cache collaborators use the exact legacy request path', async t => {
+isolated('disabled, unscoped, missing, inaccessible, and old cache collaborators use the original request path', async t => {
   for (const config of models) {
     await t.test(config.name, async () => {
       const model = config.model;
-      let conditional = 0, legacy = 0;
+      let conditional = 0, unconditional = 0;
       model.c = new Map();
       model.max = 512;
       model.ttl = Infinity;
@@ -306,7 +306,7 @@ isolated('disabled, unscoped, missing, inaccessible, and old cache collaborators
       const adapter = {
         cacheKey: () => 'key',
         conditional: () => { conditional++; throw new Error('conditional used'); },
-        get: () => ({[config.method]: async () => { legacy++; return body; }})
+        get: () => ({[config.method]: async () => { unconditional++; return body; }})
       };
 
       for (const setting of [false, 1, 'true']) {
@@ -343,7 +343,7 @@ isolated('disabled, unscoped, missing, inaccessible, and old cache collaborators
       await model.get(config.path, context());
 
       assert.equal(conditional, 0);
-      assert.equal(legacy, 7);
+      assert.equal(unconditional, 7);
     });
   }
 });

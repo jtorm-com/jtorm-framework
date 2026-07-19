@@ -396,16 +396,16 @@ isolated('detached optional manifest 304 is acquisition fallthrough while requir
   }
 });
 
-isolated('disabled, unscoped, missing, inaccessible, and old cache manifest collaborators stay legacy', async () => {
+isolated('disabled, unscoped, missing, inaccessible, and old cache manifest collaborators stay on the original path', async () => {
   const time = {value: 0};
   configure(time, 13);
   const built = await build('A');
   const descriptor = {url: 'pack.json', hash: built.hash, mode: 'required'};
-  let conditional = 0, legacy = 0;
+  let conditional = 0, unconditional = 0;
   const adapter = {
     cacheKey: () => 'key',
     conditional: () => { conditional++; throw new Error('conditional used'); },
-    get: () => ({text: async () => { legacy++; return JSON.stringify(built.manifest); }}),
+    get: () => ({text: async () => { unconditional++; return JSON.stringify(built.manifest); }}),
     url: value => value,
     allow: async () => true
   };
@@ -444,5 +444,5 @@ isolated('disabled, unscoped, missing, inaccessible, and old cache manifest coll
   await mm.load(descriptor, context());
 
   assert.equal(conditional, 0);
-  assert.equal(legacy, 7);
+  assert.equal(unconditional, 7);
 });
