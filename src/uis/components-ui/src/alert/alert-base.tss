@@ -1,0 +1,97 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->each(a: 'source')
+->if(
+    d: source.heading,
+    to: 'string'
+)
+->if(
+    d: source.message,
+    to: 'string'
+) {
+    ->append {
+        cid: 'jtorm/components-ui-0.1.0/alert-shell';
+        cs: 'default';
+
+        ->get {
+            t: '@c/alert/alert-shell.tss';
+        }
+    }
+
+    .jtorm-alert:last-child {
+        ->attr {
+            n: 'aria-label';
+            v: source.heading;
+        }
+
+        ->if(
+            d: source.id,
+            to: 'string'
+        )
+        ->attr {
+            n: 'id';
+            v: source.id;
+        }
+
+        ->if(
+            d: source.class,
+            to: 'string'
+        )
+        ->attr {
+            n: 'class';
+            v: source.class;
+            m: 'a';
+        }
+
+        ->if(
+            d: source.lang,
+            to: 'string'
+        )
+        ->attr {
+            n: 'lang';
+            v: source.lang;
+        }
+
+        ->if(
+            d: source.dir,
+            to: 'string',
+            v: '^(ltr|rtl|auto)$',
+            r: true
+        )
+        ->attr {
+            n: 'dir';
+            v: source.dir;
+        }
+
+        ->if(
+            d: source.intent,
+            to: 'string',
+            v: '^(default|info|success|warning|error)$',
+            r: true
+        )
+        ->attr {
+            n: 'class';
+            v: 'jtorm-alert--' + source.intent;
+            m: 'a';
+        }
+
+        ->if(
+            d: source.role,
+            to: 'string',
+            v: '^(region|status|alert)$',
+            r: true
+        )
+        ->attr {
+            n: 'role';
+            v: source.role;
+        }
+
+        .jtorm-alert__title->inner {
+            t: source.heading;
+        }
+
+        .jtorm-alert__message->inner {
+            t: source.message;
+        }
+    }
+}

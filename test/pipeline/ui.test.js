@@ -791,6 +791,38 @@ test('ui WebPage.default m:1 appends the active desktop mediatarget artifacts', 
     assert.doesNotMatch(html, /\btablet\b|\bmobile\b|\bdesktop-s\b|\bdesktop-l\b/);
 });
 
+test('ui WebPage.default binds fresh loading data outside its reusable shell', async t => {
+    t.after(async () => {
+        await render('<body></body>', '', {}, 'http://localhost/');
+    });
+    const context = {c: 0, s: null, a: null, request: {tenant: 'tenant-a'}};
+    const page = (marker, reuseSharedCaches) => render(
+        '<html><head></head><body></body></html>',
+        "html->ui { c: 'WebPage.default'; m: '1'; h: '0'; }",
+        {
+            name: 'Home',
+            inLanguage: 'en',
+            label: marker + '-loading',
+            id: marker + '-loading-id',
+            class: marker + '-loading-class'
+        },
+        'http://localhost/',
+        null,
+        context,
+        null,
+        0,
+        {jsonLd: false, reuseSharedCaches}
+    );
+    const first = await page('FIRST', false);
+    const second = await page('SECOND', true);
+
+    assert.match(first.body, /id="FIRST-loading-id"/);
+    assert.match(first.body, />FIRST-loading<\/small>/);
+    assert.match(second.body, /id="SECOND-loading-id"/);
+    assert.match(second.body, />SECOND-loading<\/small>/);
+    assert.doesNotMatch(second.body, /FIRST-loading/);
+});
+
 test('ui SearchAction preserves target arrays as EntryPoint groups', async () => {
     const { body } = await render(
         '<body><div class="a"></div></body>',
@@ -866,7 +898,9 @@ test('ui SearchResultsPage composes WebPage, SearchAction, and mainEntity ItemLi
         + '<main id="body"><div id="contents"><ol><li value="1"><section class="thing">'
         + '<div class="contents"><header class="header"><h1><a href="https://e.com/schema">Schema result</a></h1></header>'
         + '<section class="body"></section><footer class="footer"></footer></div></section></li></ol></div></main>'
-        + '<div id="loading" data-nosnippet="1"><div><span></span><small>Loading</small></div></div>');
+        + '<div class="jtorm-loading" role="status" data-nosnippet="1">'
+        + '<span class="jtorm-loading__indicator" aria-hidden="true"></span>'
+        + '<small class="jtorm-loading__label">Loading</small></div>');
 });
 
 // The items path (thing-update-1.0.1.tss `ul->each{ d:items; e:'li'; li->inner{h:name} }`).

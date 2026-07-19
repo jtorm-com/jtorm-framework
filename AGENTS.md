@@ -83,7 +83,7 @@ An **isomorphic** (SSR + SPA/PWA), **dependency-free**, vanilla-JS template/comp
   `i <= ps.length` and whitespace/offset code in `test/fixtures/tss-parser-oracle.js` were reviewed
   and piecemeal fixes were **DEBUNKED**; changing them corrupts the compatibility baseline. Do not
   edit that oracle or restore its fixed-point parser to production. The active v2 parser is the
-  bounded tokenizer/recursive-descent implementation, locked against all 257 `src/**/*.tss` files.
+  bounded tokenizer/recursive-descent implementation, locked against all 278 `src/**/*.tss` files.
   To preserve valid offset-era ASTs exactly, parsed one-character interleavings may enter one
   bounded compatibility-layout/blanking pass; it never executes, reparses, or fixed-point rescans
   the oracle/source.

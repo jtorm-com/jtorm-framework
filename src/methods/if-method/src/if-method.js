@@ -85,7 +85,7 @@ module.exports = {
                 ;
             }
 
-            if (v.d.d === null) {
+            if (v.d.d === null && v.t.p.d !== undefined) {
                 t = this.bindings(v.t);
                 if (t.o === 1) {
                     for (k in t.d) {

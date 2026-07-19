@@ -47,7 +47,7 @@ test('badge.default escapes count (was live <img>)', async () => {
     { count: XSS }
   );
   assert.doesNotMatch(body, /<img/);
-  assert.equal(body, `<div class="a"><span class="badge">${ESC}</span></div>`);
+  assert.equal(body, `<div class="a"><span class="badge jtorm-badge">${ESC}</span></div>`);
 });
 
 test('@e.a escapes its html content slot — the link label (was live <img>)', async () => {

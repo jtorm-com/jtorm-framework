@@ -16,6 +16,9 @@ const SHIPPED_REGEXES = new Map([
   ['^(?!ListItem$).+', ['Thing', 'ListItem']],
   ['^([0-9]+x[0-9]+)|(any)$', ['32x32', '32-by-32']],
   ['^([a-z][a-z]-?([A-Z][A-Z]|Hans|Hant|x-default)?)$', ['en-US', 'e-US']],
+  ['^(default|info|success|warning|error)$', ['warning', 'danger']],
+  ['^(default|primary|secondary|destructive)$', ['destructive', 'danger']],
+  ['^(region|status|alert)$', ['status', 'dialog']],
   ['^(allow-forms|allow-pointer-lock|allow-popups|allow-same-origin|allow-scripts|allow-top-navigation)$', ['allow-forms', 'forms']],
   ['^(alternate|author|bookmark|help|license|next|nofollow|noreferrer|prefetch|prev|search|tag)$', ['alternate', 'canonical']],
   ['^(application\\/x-www-form-urlencoded|multipart\\/form-data|text\\/plain)$', ['text/plain', 'application/json']],
@@ -26,6 +29,7 @@ const SHIPPED_REGEXES = new Map([
   ['^(get|post)$', ['post', 'put']],
   ['^(hard|soft)$', ['soft', 'wrap']],
   ['^(ltr|rtl)$', ['rtl', 'auto']],
+  ['^(ltr|rtl|auto)$', ['auto', 'sideways']],
   ['^(no-referrer|no-referrer-when-downgrade|origin|origin-when-cross-origin|unsafe-url)$', ['origin', 'same-origin']],
   ['^(on|off)$', ['off', 'yes']],
   ['^WPFooter', ['WPFooter', 'Footer']],
@@ -84,6 +88,11 @@ test('if(to: type) gates on the data type', async () => {
   const t = "p->if(d: list, to: 'array')->attr { n: 'data-a'; v: '1'; }";
   assert.equal((await render('<body><p>x</p></body>', t, { list: [1] })).body, '<p data-a="1">x</p>');
   assert.equal((await render('<body><p>x</p></body>', t, { list: 'no' })).body, '<p>x</p>');
+});
+
+test('if(to:) without d treats a null model as a false condition', async () => {
+  const t = "p->if(to: 'array')->attr { n: 'data-a'; v: '1'; }";
+  assert.equal((await render('<body><p>x</p></body>', t, null)).body, '<p>x</p>');
 });
 
 test('if(v:) treats malformed regex data as literal text', async () => {

@@ -50,6 +50,39 @@ test('each(e:) does not break the handler scope restore', async () => {
   assert.equal(body, '<ul><li>A</li></ul>');
 });
 
+test('each arrays iterate only canonical own enumerable indices', async () => {
+  const inherited = [{ name: 'Own' }];
+  const prototype = Object.create(Array.prototype);
+  Object.defineProperty(prototype, 'inherited', { value: { name: 'Inherited' }, enumerable: true });
+  Object.setPrototypeOf(inherited, prototype);
+
+  const named = [{ name: 'Own' }];
+  named.extra = { name: 'Named' };
+
+  const sparse = [];
+  sparse[2] = { name: 'Third' };
+  sparse[5] = { name: 'Sixth' };
+
+  for (const items of [inherited, named]) {
+    const { body } = await render(
+      '<body><ul><li>seed</li></ul></body>',
+      "ul->each { e: 'li'; d: items; li->inner { t: name; } }",
+      { items }
+    );
+    assert.equal(body, '<ul><li>Own</li></ul>');
+  }
+
+  const { body } = await render(
+    '<body><ul><li>seed</li></ul></body>',
+    "ul->each { e: 'li'; d: items; li->attr { n: 'data-index'; v: index; } li->inner { t: name; } }",
+    { items: sparse }
+  );
+  assert.equal(
+    body,
+    '<ul><li data-index="2">Third</li><li data-index="5">Sixth</li></ul>'
+  );
+});
+
 // Regression: the each iteration path must compose with a nested get's ancestor
 // scope. This mirrors the real component shape (e.g. schema-ui Text): an OUTER get
 // fetches a component tss — parsed standalone, so its rules are genuinely

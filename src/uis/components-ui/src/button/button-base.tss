@@ -1,0 +1,120 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->each(a: 'source')
+->if(
+    d: source.label,
+    to: 'string'
+) {
+    ->append {
+        cid: 'jtorm/components-ui-0.1.0/button-shell';
+        cs: 'default';
+
+        ->get {
+            t: '@c/button/button-shell.tss';
+        }
+    }
+
+    .jtorm-button:last-child {
+        ->inner {
+            t: source.label;
+        }
+
+        ->if(
+            d: source.type,
+            to: 'string',
+            v: '^(button|reset|submit)$',
+            r: true
+        )
+        ->attr {
+            n: 'type';
+            v: source.type;
+        }
+
+        ->if(
+            d: source.disabled,
+            v: true
+        )
+        ->attr {
+            n: 'disabled';
+            v: true;
+        }
+
+        ->if(
+            d: source.form,
+            to: 'string'
+        )
+        ->attr {
+            n: 'form';
+            v: source.form;
+        }
+
+        ->if(
+            d: source.name,
+            to: 'string'
+        )
+        ->attr {
+            n: 'name';
+            v: source.name;
+        }
+
+        ->if(
+            d: source.value,
+            to: 'string'
+        )
+        ->attr {
+            n: 'value';
+            v: source.value;
+        }
+
+        ->if(
+            d: source.id,
+            to: 'string'
+        )
+        ->attr {
+            n: 'id';
+            v: source.id;
+        }
+
+        ->if(
+            d: source.class,
+            to: 'string'
+        )
+        ->attr {
+            n: 'class';
+            v: source.class;
+            m: 'a';
+        }
+
+        ->if(
+            d: source.lang,
+            to: 'string'
+        )
+        ->attr {
+            n: 'lang';
+            v: source.lang;
+        }
+
+        ->if(
+            d: source.dir,
+            to: 'string',
+            v: '^(ltr|rtl|auto)$',
+            r: true
+        )
+        ->attr {
+            n: 'dir';
+            v: source.dir;
+        }
+
+        ->if(
+            d: source.intent,
+            to: 'string',
+            v: '^(default|primary|secondary|destructive)$',
+            r: true
+        )
+        ->attr {
+            n: 'class';
+            v: 'jtorm-button--' + source.intent;
+            m: 'a';
+        }
+    }
+}

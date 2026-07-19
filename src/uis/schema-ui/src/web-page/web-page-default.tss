@@ -113,11 +113,7 @@ body {
         }
     }
 
-    ->append(
-        l: inLanguage,
-        cid: 'loading',
-        cs: 'default'
-    )
+    ->append
     ->ui {
         c: 'loading.default';
         m: '1';

@@ -107,7 +107,7 @@ test('compiler emits the deterministic model-free Product closure and ten diagno
   assert.deepEqual(result.manifest.dynamic, PRODUCT_DYNAMIC);
   assert.equal(
     result.hash,
-    'sha256-99604a0217bc7d486071efce14b45bcaeaf04b87ffe0faaa335474463ce14f85'
+    'sha256-910d349afb6795b7df6fa72fa95d91beff16c3cc5a6aacf8ac6eb65372548cb8'
   );
   assert.equal(Buffer.byteLength(result.json), 32068);
   const gzipBytes = gzipSync(result.json, { level: 9, mtime: 0 }).length;

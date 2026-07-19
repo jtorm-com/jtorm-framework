@@ -32,13 +32,13 @@ module.exports = {
         },
 
         /**
-         * Iterate `v.d.d` (or `v.m`), boil `v.t.c` per item, and apply the collected fragment via the chosen insert method (default append).
+         * Iterate canonical own enumerable array indices from `v.d.d` (or `v.m`), boil `v.t.c` per item, and apply the collected fragment via the chosen insert method (default append).
          * @param {ViewModel} v
          * @returns {Promise<MethodEffect>}
          */
         handle: async function (v) {
             const s = this;
-            let r = '', d, k, h, sv, i = 0, e, pc = v.c && typeof v.c === 'object' ? v.c : null, l = pc && pc.locale, c;
+            let r = '', d, k, n, h, sv, i = 0, e, pc = v.c && typeof v.c === 'object' ? v.c : null, l = pc && pc.locale, c;
 
             if (!v.d.d)
                 v.d.d = v.m
@@ -53,8 +53,10 @@ module.exports = {
                 v.c = 1;
             }
 
-            for (k in v.d.d) {
-                if (['isLoop', 'index'].indexOf(k) !== -1)
+            for (k of Object.keys(v.d.d)) {
+                n = Number(k);
+
+                if (!Number.isInteger(n) || n < 0 || n >= v.d.d.length || String(n) !== k)
                     continue
                 ;
 

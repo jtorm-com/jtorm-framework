@@ -1,0 +1,118 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->each(a: 'source')
+    ->if(
+        d: source.heading,
+        to: 'string'
+    ) {
+        ->append {
+            cid: 'jtorm/components-ui-0.1.0/card-shell';
+            cs: 'default';
+
+            ->get {
+                t: '@c/card/card-shell.tss';
+            }
+        }
+
+        .jtorm-card:last-child {
+            ->attr {
+                n: 'aria-label';
+                v: source.heading;
+            }
+
+            ->if(
+                d: source.id,
+                to: 'string'
+            )
+            ->attr {
+                n: 'id';
+                v: source.id;
+            }
+
+            ->if(
+                d: source.class,
+                to: 'string'
+            )
+            ->attr {
+                n: 'class';
+                v: source.class;
+                m: 'a';
+            }
+
+            ->if(
+                d: source.lang,
+                to: 'string'
+            )
+            ->attr {
+                n: 'lang';
+                v: source.lang;
+            }
+
+            ->if(
+                d: source.dir,
+                to: 'string',
+                v: '^(ltr|rtl|auto)$',
+                r: true
+            )
+            ->attr {
+                n: 'dir';
+                v: source.dir;
+            }
+
+            .jtorm-card__title->inner {
+                t: source.heading;
+            }
+
+            .jtorm-card__summary
+            ->if(
+                d: source.summary,
+                to: 'string'
+            ) {
+                ->inner {
+                    t: source.summary;
+                }
+
+                ->else
+                ->remove {}
+            }
+
+            .jtorm-card__action
+            ->if(d: source.action) {
+                ->if(
+                    d: source.action.href,
+                    to: 'string'
+                ) {
+                    ->if(
+                        d: source.action.label,
+                        to: 'string'
+                    ) {
+                        ->before {
+                            t: ' ';
+                        }
+
+                        ->attr {
+                            n: 'href';
+                            v: source.action.href;
+                        }
+
+                        ->inner {
+                            t: source.action.label;
+                        }
+
+                        ->else
+                        ->remove {}
+                    }
+
+                    ->else
+                    ->remove {}
+                }
+
+                ->else
+                ->remove {}
+            }
+        }
+    }
+}

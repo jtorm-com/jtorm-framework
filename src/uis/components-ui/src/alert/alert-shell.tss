@@ -1,0 +1,35 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->ui {
+    c: '@e.section';
+    t: '0';
+
+    section {
+        ->attr {
+            n: 'class';
+            v: 'jtorm-alert';
+        }
+
+        ->append
+        ->ui {
+            c: '@t.strong';
+            t: '0';
+
+            strong->attr {
+                n: 'class';
+                v: 'jtorm-alert__title';
+            }
+        }
+
+        ->append
+        ->ui {
+            c: '@t.p';
+            t: '0';
+
+            p->attr {
+                n: 'class';
+                v: 'jtorm-alert__message';
+            }
+        }
+    }
+}
