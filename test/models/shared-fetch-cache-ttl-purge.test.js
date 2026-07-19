@@ -11,6 +11,7 @@ const nativeClock = pm.clock;
 function cold(model, ttl = 300000) {
   model.c = new Map();
   model.max = 512;
+  model.staleWindow = 0;
   model.ttl = ttl;
   model.promiseCacheModel = pm;
   if (pm.reset) pm.reset(model);
@@ -24,6 +25,9 @@ test('all shared fetch caches publish the finite five-minute default', () => {
   assert.equal(dm.ttl, 300000);
   assert.equal(hm.ttl, 300000);
   assert.equal(tm.ttl, 300000);
+  assert.equal(dm.staleWindow, 0);
+  assert.equal(hm.staleWindow, 0);
+  assert.equal(tm.staleWindow, 0);
 });
 
 test('data, HTML, and TSS keep pre-expiry identity then observe changed sources at the exact boundary', async () => {
@@ -163,5 +167,42 @@ test('unscoped exact purge and fetch bypass never touch cache metadata or invoke
     assert.equal(model.purge('/same', {}), 0);
     await model.get('/same', {});
     assert.strictEqual(model.c.get('kept'), kept);
+  }
+});
+
+test('data, HTML, and TSS serve one stale generation while one refresh publishes changed source', async () => {
+  let now = 0;
+  pm.clock = () => now;
+
+  for (const [model, method, first, next, value] of [
+    [dm, 'json', {version: 1}, {version: 2}, v => v.version],
+    [hm, 'text', '<b>one</b>', '<b>two</b>', v => v],
+    [tm, 'text', 'a{x:1;}', 'a{x:2;}', v => v[0].value]
+  ]) {
+    cold(model, 10);
+    model.staleWindow = 10;
+    if (model === tm) model.tssParser = {handle: v => [{value: v}]};
+    let loads = 0, release;
+    model.requestModel = {
+      cacheKey: u => String(u),
+      get: () => ({[method]: () => {
+        loads++;
+        if (loads === 1) return Promise.resolve(first);
+        return new Promise(resolve => { release = () => resolve(next); });
+      }})
+    };
+
+    const old = await model.get('/same');
+    now = 10;
+    assert.strictEqual(await model.get('/same'), old);
+    assert.equal(loads, 2);
+    release();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const fresh = await model.get('/same');
+    assert.equal(value(fresh), value(model === tm ? [{value: next}] : next));
+    if (model !== hm) assert.notStrictEqual(fresh, old);
+    assert.equal(loads, 2);
+    now = 0;
   }
 });

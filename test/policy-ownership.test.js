@@ -144,15 +144,15 @@ test('ownership analyzer catches representative bypass families without comment/
 test('coordinated package releases declare their policy owners and dependency minima', () => {
   const releases = {
     'src/models/render-context-model': '1.0.1',
-    'src/models/promise-cache-model': '1.0.3',
+    'src/models/promise-cache-model': '1.1.0',
     'src/models/asset-plugin-model': '1.0.0',
     'src/models/request-model': '1.1.5',
-    'src/models/ui-manifest-model': '1.0.3',
+    'src/models/ui-manifest-model': '1.1.0',
     'src/models/layer-model': '1.0.2',
     'src/models/ui-cache-model': '2.0.0',
-    'src/models/data-model': '1.0.7',
-    'src/models/html-model': '1.0.7',
-    'src/models/tss-model': '1.0.8',
+    'src/models/data-model': '1.1.0',
+    'src/models/html-model': '1.1.0',
+    'src/models/tss-model': '1.1.0',
     'src/models/event-model': '1.0.2',
     'src/handlers/handler-wrapper': '1.0.7',
     'src/parsers/tss-parser': '2.0.0',
@@ -166,7 +166,7 @@ test('coordinated package releases declare their policy owners and dependency mi
   const dependencies = {
     'src/models/request-model': {'@jtorm/render-context-model': '^1.0.1'},
     'src/models/ui-manifest-model': {
-      '@jtorm/promise-cache-model': '^1.0.2',
+      '@jtorm/promise-cache-model': '^1.1.0',
       '@jtorm/render-context-model': '^1.0.0',
       '@jtorm/request-model': '^1.1.5'
     },
@@ -176,10 +176,10 @@ test('coordinated package releases declare their policy owners and dependency mi
       '@jtorm/render-context-model': '^1.0.1',
       '@jtorm/request-model': '^1.1.5'
     },
-    'src/models/data-model': {'@jtorm/promise-cache-model': '^1.0.2', '@jtorm/request-model': '^1.1.5'},
-    'src/models/html-model': {'@jtorm/promise-cache-model': '^1.0.2', '@jtorm/request-model': '^1.1.5'},
+    'src/models/data-model': {'@jtorm/promise-cache-model': '^1.1.0', '@jtorm/request-model': '^1.1.5'},
+    'src/models/html-model': {'@jtorm/promise-cache-model': '^1.1.0', '@jtorm/request-model': '^1.1.5'},
     'src/models/tss-model': {
-      '@jtorm/promise-cache-model': '^1.0.2',
+      '@jtorm/promise-cache-model': '^1.1.0',
       '@jtorm/request-model': '^1.1.5',
       '@jtorm/tss-parser': '^2.0.0'
     },
@@ -203,4 +203,33 @@ test('coordinated package releases declare their policy owners and dependency mi
     for (const [name, version] of Object.entries(expected))
       assert.equal(pkg(dir).dependencies[name], version, dir + ' -> ' + name)
     ;
+});
+
+test('request-triggered stale policy stays on the four acquisition exports', () => {
+  const acquisition = [
+    ['src/models/data-model/src/data-model.js', 'jTormDataModel'],
+    ['src/models/html-model/src/html-model.js', 'jTormHtmlModel'],
+    ['src/models/tss-model/src/tss-model.js', 'jTormTssModel'],
+    ['src/models/ui-manifest-model/src/ui-manifest-model.js', 'jTormUiManifestModel']
+  ];
+
+  for (const [p, name] of acquisition)
+    assert.deepEqual(
+      Object.getOwnPropertyDescriptor(require(file(p))[name], 'staleWindow'),
+      {value: 0, writable: true, enumerable: true, configurable: true},
+      p
+    )
+  ;
+  assert.equal(
+    Object.getOwnPropertyDescriptor(
+      require(file('src/models/ui-cache-model/src/ui-cache-model.js')).jTormUiCacheModel,
+      'staleWindow'
+    ),
+    undefined
+  );
+  assert.equal(pkg('src/models/ui-cache-model').version, '2.0.0');
+  assert.equal(
+    pkg('src/models/ui-cache-model').dependencies['@jtorm/promise-cache-model'],
+    '^1.0.3'
+  );
 });
