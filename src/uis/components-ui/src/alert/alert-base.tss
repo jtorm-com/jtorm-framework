@@ -10,7 +10,7 @@
     to: 'string'
 ) {
     ->append {
-        cid: 'jtorm/components-ui-0.1.0/alert-shell';
+        cid: 'jtorm/components-ui-0.2.0/alert-shell';
         cs: 'default';
 
         ->get {

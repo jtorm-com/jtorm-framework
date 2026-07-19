@@ -54,6 +54,8 @@ const PRODUCT_DYNAMIC = [
   implicit: false
 }));
 
+const FAQ_DYNAMIC = [];
+
 async function productManifest() {
   const uis = [schemaUi, componentsUi, htmlUi];
 
@@ -96,4 +98,46 @@ async function productManifest() {
   });
 }
 
-module.exports = { PRODUCT_DYNAMIC, productManifest };
+async function faqManifest() {
+  const uis = [schemaUi, componentsUi, htmlUi];
+
+  tssParser.config({});
+  dataParser.tssParser = tssParser;
+  dataParser.init();
+  resolver.default = 'default';
+  resolver.framework = 'schema';
+  resolver.ui = { mapper: null };
+  resolver.uis = uis;
+  manifest.digest = async bytes => new Uint8Array(
+    createHash('sha256').update(bytes).digest()
+  );
+  compiler.manifest = manifest;
+
+  return compiler.compile({
+    id: 'faq',
+    roots: [{ c: 'FAQPage.accordion', f: 'self', t: 1, h: 1, m: 0 }],
+    resolver,
+    tssParser,
+    dataParser,
+    methods: { get: getMethod, ui: uiMethod },
+    uis,
+    source: {
+      version: 'uis-disk-v1',
+      read: async ({ type, request }) => {
+        const filename = uisDiskPath(request);
+        if (!filename) throw new Error('missing ' + type + ' ' + request);
+        const raw = fs.readFileSync(filename);
+        return { id: request, raw, text: raw.toString('utf8') };
+      }
+    },
+    namespaces: ['@c/', '@h/', '@s/'],
+    dynamicAllow: FAQ_DYNAMIC,
+    toolchain: {
+      resolver: '1.0.0',
+      dataParser: '1.0.3',
+      tssParser: '1.0.0'
+    }
+  });
+}
+
+module.exports = { FAQ_DYNAMIC, PRODUCT_DYNAMIC, faqManifest, productManifest };

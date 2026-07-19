@@ -9,7 +9,7 @@
         to: 'string'
     ) {
         ->append {
-            cid: 'jtorm/components-ui-0.1.0/card-shell';
+            cid: 'jtorm/components-ui-0.2.0/card-shell';
             cs: 'default';
 
             ->get {

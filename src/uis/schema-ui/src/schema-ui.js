@@ -87,6 +87,11 @@ module.exports = {
                     t: [
                         '@s/faq-page/faq-page-default.tss'
                     ]
+                },
+                accordion: {
+                    t: [
+                        '@s/faq-page/faq-page-accordion.tss'
+                    ]
                 }
             },
             ItemPage: {

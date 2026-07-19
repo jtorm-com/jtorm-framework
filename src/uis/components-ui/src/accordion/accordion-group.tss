@@ -3,18 +3,17 @@
 ->if(to: 'array') {
     ->else
     ->if(to: 'object')
-    ->each(a: 'source')
-    ->data(value: source.label || source.count) {
+    ->each(a: 'source') {
         ->append {
-            cid: 'jtorm/components-ui-0.2.0/badge-shell';
+            cid: 'jtorm/components-ui-0.2.0/accordion-shell';
             cs: 'default';
 
             ->get {
-                t: '@c/badge/badge-shell.tss';
+                t: '@c/accordion/accordion-shell.tss';
             }
         }
 
-        .jtorm-badge:last-child {
+        .jtorm-accordion:last-child {
             ->if(
                 d: source.id,
                 to: 'string'
@@ -52,10 +51,6 @@
             ->attr {
                 n: 'dir';
                 v: source.dir;
-            }
-
-            ->inner {
-                t: value;
             }
         }
     }

@@ -150,6 +150,31 @@ test('native accordion receives Bootstrap treatment once with global Bootstrap r
     assert.equal(accordion.querySelector('[aria-expanded]'), null);
 });
 
+test('accordion.group receives only the Bootstrap root presentation', async () => {
+    const global = await mount(
+        'accordion.group',
+        {class: 'host-group', items: [{summary: 'Ignored', content: 'Ignored'}]},
+        {explicit: false, framework: 'bootstrap'}
+    );
+    const globalDocument = documentOf(global.body);
+    const globalGroup = globalDocument.querySelector('.jtorm-accordion');
+
+    assert.equal(globalGroup.className, 'jtorm-accordion host-group accordion');
+    assert.equal(globalGroup.children.length, 0);
+    assert.equal(globalGroup.querySelector('.accordion-item'), null);
+    assert.equal(globalGroup.querySelector('[data-bs-toggle]'), null);
+
+    const explicit = await mount('accordion.group', {}, {framework: 'components'});
+    assert.equal(
+        documentOf(explicit.body).querySelector('.jtorm-accordion').className,
+        'jtorm-accordion accordion'
+    );
+    assert.deepEqual(explicit.requests.slice(0, 2), [
+        '@c/accordion/accordion-group.tss',
+        '@b/accordion/accordion-group.tss'
+    ]);
+});
+
 test('an explicit Bootstrap accordion styles neutral nested items idempotently', async () => {
     const result = await mount('accordion.default', {
         items: [{summary: 'Explicit', content: 'Nested'}]
@@ -182,6 +207,13 @@ test('invalid models neither throw nor restyle pre-existing canonical hooks', as
             'jtorm-alert jtorm-alert--error'
         ],
         ['card.default', {heading: ''}, '<article class="jtorm-card">Old</article>', '.jtorm-card', 'jtorm-card'],
+        [
+            'accordion.group',
+            [],
+            '<div class="jtorm-accordion">Old</div>',
+            '.jtorm-accordion',
+            'jtorm-accordion'
+        ],
         [
             'accordion.default',
             {items: 'invalid'},
@@ -350,13 +382,13 @@ test('all seven canonical caches stay static while mixed frameworks bind and dec
     assert.deepEqual(
         Object.keys(jTormUiCacheModel.cache.null || {}).sort(),
         [
-            'jtorm/components-ui-0.1.0/accordion-item-shell',
-            'jtorm/components-ui-0.1.0/accordion-shell',
-            'jtorm/components-ui-0.1.0/alert-shell',
-            'jtorm/components-ui-0.1.0/badge-shell',
-            'jtorm/components-ui-0.1.0/button-shell',
-            'jtorm/components-ui-0.1.0/card-shell',
-            'jtorm/components-ui-0.1.0/loading-shell'
+            'jtorm/components-ui-0.2.0/accordion-item-shell',
+            'jtorm/components-ui-0.2.0/accordion-shell',
+            'jtorm/components-ui-0.2.0/alert-shell',
+            'jtorm/components-ui-0.2.0/badge-shell',
+            'jtorm/components-ui-0.2.0/button-shell',
+            'jtorm/components-ui-0.2.0/card-shell',
+            'jtorm/components-ui-0.2.0/loading-shell'
         ]
     );
 

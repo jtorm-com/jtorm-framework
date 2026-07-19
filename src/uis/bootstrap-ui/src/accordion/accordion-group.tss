@@ -1,0 +1,14 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object') {
+        .jtorm-accordion:last-child:not(.accordion)
+        ->if(el: '.jtorm-accordion:last-child:not(.accordion)')
+        ->attr {
+            n: 'class';
+            v: 'accordion';
+            m: 'a';
+        }
+    }
+}

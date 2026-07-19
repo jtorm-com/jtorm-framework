@@ -310,7 +310,62 @@ test('card escapes all copy and routes action href through the unsafe-scheme gua
     ;
 });
 
-test('accordion group renders ordered native disclosures and skips invalid items', async () => {
+test('accordion.group exposes one reusable root without consuming caller item fields', async () => {
+    const data = Object.freeze({
+        id: 'faq-group',
+        class: 'host-group',
+        lang: 'en',
+        dir: 'rtl',
+        items: [{summary: 'Must not render', content: 'Must not render'}],
+        summary: 'Must not render',
+        content: 'Must not render',
+        open: true
+    });
+    const body = await mount('accordion.group', data);
+    const doc = documentOf(body);
+    const group = doc.querySelector('.jtorm-accordion');
+
+    assert.ok(group);
+    assert.equal(group.id, 'faq-group');
+    assert.equal(group.className, 'jtorm-accordion host-group');
+    assert.equal(group.lang, 'en');
+    assert.equal(group.dir, 'rtl');
+    assert.equal(group.children.length, 0);
+    assert.equal(group.textContent, '');
+    assert.equal(group.hasAttribute('open'), false);
+
+    for (const invalid of [null, true, 1, 'group', [], [{}]])
+        assert.equal(await mount('accordion.group', invalid), '<div class="mount"></div>')
+    ;
+
+    const inherited = Object.create({id: 'inherited-id', class: 'inherited-class'});
+    const inheritedDocument = documentOf(await mount('accordion.group', inherited));
+    assert.equal(inheritedDocument.querySelector('.jtorm-accordion').id, 'inherited-id');
+    assert.equal(
+        inheritedDocument.querySelector('.jtorm-accordion').className,
+        'jtorm-accordion inherited-class'
+    );
+});
+
+test('accordion.group composes directly with accordion.item', async () => {
+    const result = await render(
+        '<body><div class="mount"></div></body>',
+        ".mount->ui { c: 'accordion.group'; }"
+            + ".jtorm-accordion:last-child->append->ui { c: 'accordion.item'; }",
+        {summary: 'Question', content: 'Answer'}
+    );
+
+    assert.equal(
+        result.body,
+        '<div class="mount"><div class="jtorm-accordion">'
+            + '<details class="jtorm-accordion__item">'
+            + '<summary class="jtorm-accordion__summary">Question</summary>'
+            + '<div class="jtorm-accordion__content">Answer</div></details>'
+            + '</div></div>'
+    );
+});
+
+test('accordion.default renders ordered native disclosures and skips invalid items', async () => {
     assert.equal(
         await mount('accordion.default', {
             items: [
@@ -404,6 +459,40 @@ test('accordion output stays one-to-one for a representative larger collection',
     assert.equal(doc.querySelectorAll('.jtorm-accordion__content').length, items.length);
 });
 
+test('accordion.default adds one constant group artifact without per-item acquisition', async () => {
+    const expected = [
+        '@c/accordion/accordion-default.tss',
+        '@c/accordion/accordion-group.tss',
+        '@c/accordion/accordion-shell.tss',
+        '@h/@e/div.html',
+        '@c/accordion/accordion-item.tss',
+        '@c/accordion/accordion-item-shell.tss',
+        '@h/@e/details.html',
+        '@h/@e/summary.html'
+    ];
+
+    for (const length of [1, 32]) {
+        const items = Array.from({length}, (_, i) => ({
+            summary: 'Question ' + i,
+            content: 'Answer ' + i
+        }));
+        const result = await render(
+            '<body><div class="mount"></div></body>',
+            ".mount->ui { c: 'accordion.default'; f: 'components'; }",
+            {items},
+            'http://localhost/',
+            null,
+            0,
+            null,
+            0,
+            {jsonLd: false, framework: 'components'}
+        );
+
+        assert.deepEqual(result.requests, expected);
+        assert.equal(documentOf(result.body).querySelectorAll('details').length, length);
+    }
+});
+
 test('loading renders a localized named status with safe fallback and no implicit busy state', async t => {
     const get = jTormLanguageModel.get;
     const translated = [];
@@ -480,6 +569,7 @@ test('enum attributes reject string-coercible non-string values', async () => {
         ['badge.default', { label: 'Safe', dir: ['rtl'] }, '.jtorm-badge'],
         ['alert.info', { heading: 'Safe', message: 'Message', dir: ['rtl'] }, '.jtorm-alert'],
         ['card.default', { heading: 'Safe', dir: ['rtl'] }, '.jtorm-card'],
+        ['accordion.group', { dir: ['rtl'] }, '.jtorm-accordion'],
         ['accordion.default', { items: [], dir: ['rtl'] }, '.jtorm-accordion'],
         ['accordion.item', { summary: 'Safe', content: 'Content', dir: ['rtl'] }, '.jtorm-accordion__item'],
         ['loading.default', { label: 'Safe', dir: ['rtl'] }, '.jtorm-loading']
@@ -554,13 +644,13 @@ test('canonical cached shells contain no caller data and warm renders bind fresh
 
     const coldBytes = JSON.stringify(jTormUiCacheModel.cache);
     const expectedIds = [
-        'jtorm/components-ui-0.1.0/accordion-item-shell',
-        'jtorm/components-ui-0.1.0/accordion-shell',
-        'jtorm/components-ui-0.1.0/alert-shell',
-        'jtorm/components-ui-0.1.0/badge-shell',
-        'jtorm/components-ui-0.1.0/button-shell',
-        'jtorm/components-ui-0.1.0/card-shell',
-        'jtorm/components-ui-0.1.0/loading-shell'
+        'jtorm/components-ui-0.2.0/accordion-item-shell',
+        'jtorm/components-ui-0.2.0/accordion-shell',
+        'jtorm/components-ui-0.2.0/alert-shell',
+        'jtorm/components-ui-0.2.0/badge-shell',
+        'jtorm/components-ui-0.2.0/button-shell',
+        'jtorm/components-ui-0.2.0/card-shell',
+        'jtorm/components-ui-0.2.0/loading-shell'
     ];
     const fragments = Object.values(jTormUiCacheModel.cache)
         .flatMap(language => Object.values(language)
