@@ -15,7 +15,7 @@ Relevant history included:
 - faa7a5e — fail-closed scoped cache participation.
 - e791896 — absolute successful-settlement TTL and generation-safe purge.
 - 4d6a2cd — persisted rendered-fragment age boundary.
-- Current locked AGENTS.md rules for request scope, UI-manifest validation, UI-cache ownership, DI-only source, and patch SemVer.
+- Current locked AGENTS.md rules for request scope, UI-manifest validation, UI-cache ownership, DI-only source, and SemVer.
 
 ## Changed entry points
 

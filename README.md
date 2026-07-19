@@ -119,8 +119,8 @@ indexes, rendered fragments, or persisted fragment envelopes.
 
 The runtime kill switch is `staleWindow = 0`. Rollback then purges the affected acquisition
 cache. For sensitive content, also dispose prepared roots, purge the UI cache, and clear/save its
-persistence before rolling consumers back; publish/retain promise-cache `1.0.4+` before data
-`1.0.8+`, HTML `1.0.8+`, TSS `1.0.9+`, and manifest-model `1.0.4+`. UI-cache remains on its
+persistence before rolling consumers back; publish/retain promise-cache `1.1.0+` before data,
+HTML, TSS, and manifest-model `1.1.0+`. UI-cache remains on its
 separate `2.x` rendered-fragment contract and does not expose `staleWindow`.
 
 Rendered-fragment age now survives restart under the current finite/zero/Infinity TTL by combining

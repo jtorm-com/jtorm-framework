@@ -85,6 +85,6 @@ getMethod.manifest = manifest;
 ```
 
 Removing the `prepare()` call and the optional `getMethod.manifest` injection restores the legacy
-waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.0.4` and
+waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.1.0` and
 `@jtorm/request-model@1.1.5` before this package and the fetch consumers. Package release
-`1.0.4` does not change the exported manifest wire/compiler version `1.0.0`.
+`1.1.0` does not change the exported manifest wire/compiler version `1.0.0`.

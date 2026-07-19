@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/promise-cache-model",
   "description": "jTorm shared promise-cache and bounded LRU policy model",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"

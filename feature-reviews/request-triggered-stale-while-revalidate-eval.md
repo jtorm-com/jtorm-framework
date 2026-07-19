@@ -3,9 +3,9 @@
 **Branch:** feat/request-triggered-swr
 **Base:** dev at 9ee8cc850224041498282a893eca7451dde8364b
 **Started:** 2026-07-18
-**Status:** COMPLETED
-**Current Phase:** Complete
-**Delivery state:** Local completion gates pass; commit, ready PR, current-head CI, and clean Codex review remain
+**Status:** DELIVERING
+**Current Phase:** PR review correction
+**Delivery state:** Ready PR #65 is open. Initial head `5d79d5f6ac05ab35780cb17115fe1d2cbb62299c` passed CI; its current-head Codex review raised one valid SemVer P2. The coordinated `1.1.0` correction passes all local gates; corrected-head CI and a clean Codex review remain.
 **Specification:** [request-triggered-stale-while-revalidate.md](request-triggered-stale-while-revalidate.md)
 **Threat model:** [stride-request-triggered-stale-while-revalidate.md](stride-request-triggered-stale-while-revalidate.md)
 **Security review:** [request-triggered-stale-while-revalidate-security-review.md](request-triggered-stale-while-revalidate-security-review.md)
@@ -33,7 +33,7 @@ The first runtime witness failed on untouched dev at age equal to ttl: existing 
 - Source stays dependency-free CommonJS with no runtime require/import edge and no handwritten TypeScript or declaration.
 - Pending work retains existing deduplication. ttl zero remains pending-only, ttl Infinity remains non-expiring, and missing staleWindow means zero for third-party compatibility.
 - Refresh publication checks the current owner Map, key, old promise, record, refresh promise, and opaque token. Purge, eviction, reset, Map replacement, and newer insertion all detach authority.
-- UI-manifest runtime wire version remains 1.0.0 even though its package receives a patch release.
+- UI-manifest runtime wire version remains 1.0.0 even though its package receives a minor release.
 - UI-cache code, package version, persisted wire, save timing, settledAt pairing, and public nested HTML cache are unchanged.
 
 **Architecture/refactor verdict:** PASS. No unresolved ownership, lifecycle, compatibility, dead-code, or package-boundary finding remains in local review.
@@ -64,17 +64,17 @@ Rollback is set all four windows to zero, purge acquisition keys, coordinate roo
 
 ## Package SemVer
 
-Five published packages receive patch releases:
+Five published packages receive minor releases for their backward-compatible public functionality:
 
 | Package | Version |
 |---|---:|
-| @jtorm/promise-cache-model | 1.0.4 |
-| @jtorm/data-model | 1.0.8 |
-| @jtorm/html-model | 1.0.8 |
-| @jtorm/tss-model | 1.0.9 |
-| @jtorm/ui-manifest-model | 1.0.4 |
+| @jtorm/promise-cache-model | 1.1.0 |
+| @jtorm/data-model | 1.1.0 |
+| @jtorm/html-model | 1.1.0 |
+| @jtorm/tss-model | 1.1.0 |
+| @jtorm/ui-manifest-model | 1.1.0 |
 
-Each acquisition consumer requires @jtorm/promise-cache-model ^1.0.4. Package dry-runs contain exactly README.md, package.json, and canonical source. No dependency was added.
+Each acquisition consumer requires @jtorm/promise-cache-model ^1.1.0. Package dry-runs contain exactly README.md, package.json, and canonical source. No dependency was added.
 
 ## Verification ledger
 
@@ -93,13 +93,18 @@ Each acquisition consumer requires @jtorm/promise-cache-model ^1.0.4. Package dr
 | Source-ratchet review | PASS — no analyzer edit required; policy ratchet 5/5 |
 | Staged tech-debt ratchet | PASS — zero new debt patterns on the exact staged candidate |
 | Opposite-model adversarial review | PASS — authorized skeptic, architect, and minimalist round; six accepted remediations implemented |
-| Ready PR, current-head CI, clean Codex review | PENDING — local candidate is ready for commit and delivery |
+| Ready PR and initial-head CI | PASS — ready PR #65 targets `dev`; CI passed on `5d79d5f6ac05ab35780cb17115fe1d2cbb62299c` |
+| Initial current-head Codex review | VALID FINDING — additive public cache functionality requires coordinated minor releases, not patches; exact package assertions failed red before correction |
+| Corrected candidate | PASS locally — all five packages and four direct floors use `1.1.0`; focused 7/7, exact full 759/759, typecheck, audits, and exact package dry-runs pass |
+| Corrected-head CI and clean Codex review | PENDING — correction is ready to commit and push |
 
 ## Current verdict
 
-**LOCAL EVALUATION COMPLETE; DELIVERY PENDING.** The authorized skeptic, architect, and minimalist outputs contain no high-severity finding. Six accepted remediations plus the cold-review guarded hard-state correction are implemented; focused cache/consumer tests pass 90/90 and the exact suite passes 759/759 with all local completion gates green. Commit, ready PR, current-head CI, and clean Codex review remain.
+**LOCAL EVALUATION COMPLETE; PR CORRECTION PENDING DELIVERY.** The authorized skeptic, architect, and minimalist outputs contain no high-severity finding. Six accepted remediations plus the cold-review guarded hard-state correction are implemented. PR #65 is ready and its initial head passed CI; the one valid current-head Codex finding is corrected red-first with coordinated `1.1.0` releases. Corrected-head CI, a clean Codex review, and zero unresolved threads remain.
 
-## Pre-PR feature-eval checkpoints
+## Pre-PR feature-eval checkpoints (historical snapshot)
+
+This section records the local evaluation state before PR #65 opened; the delivery state and verification ledger above supersede its pending-delivery wording.
 
 ### Phase 1 — Discovery
 
@@ -161,7 +166,7 @@ All mandatory persona files and their declared engineering/security checklists w
 - **architect:** PASS — one deep DI policy owner, minimal additive public fields, exact information hiding, no Shotgun Surgery in state logic, and no new package/import.
 - **backend-architect:** PASS — exact generation checks cover every event-loop gap; no DB, queue, transaction, Worker, or external-service layer exists.
 - **code-reviewer:** PASS — complete staged diff is scoped, terse, dependency-free, red-first, and free of unrelated behavior.
-- **code-review-enforcer:** PASS — SOLID ownership, public Map/promise contracts, package boundaries, source guards, limits, failure cleanup, and patch SemVer hold.
+- **code-review-enforcer:** PASS — SOLID ownership, public Map/promise contracts, package boundaries, source guards, limits, failure cleanup, and minor SemVer hold.
 - **elysia-expert:** N/A — no route, Elysia instance, macro, lifecycle hook, validator, request/response contract, or middleware changed.
 - **elysia-route-expert:** N/A — no route prefix, AOT scope, hook order, endpoint path, header, auth, or controller surface changed.
 - **bun-expert:** N/A for runtime adoption — AGENTS.md requires Node built-in tests and dependency-free CommonJS; no Bun API or dependency was introduced.
@@ -244,7 +249,7 @@ A cold pass reread every changed runtime file in full, then reviewed the complet
 
 - **Runtime trace:** PASS — finite phase classification, retained-generation refresh, hard join, guarded post-await reclassification, exact publication, rejection cleanup, clock identity, LRU, purge, reset, replacement, and untracked-state paths remain coherent.
 - **Call-site trace:** PASS — only data, HTML, TSS, and validated manifest-pack acquisition expose the default-zero window; UI-cache still uses `fresh()` and has no stale-window surface.
-- **Public compatibility:** PASS — Maps still contain exact promises, methods/exports remain, manifest wire stays `1.0.0`, package changes are patch-only, and no runtime dependency/import was added.
+- **Public compatibility:** PASS — Maps still contain exact promises, methods/exports remain, manifest wire stays `1.0.0`, package changes are backward-compatible minor releases, and no runtime dependency/import was added.
 - **Failure and abuse trace:** PASS — invalid window disables stale service without discarding TTL freshness, invalid TTL/clock fails hard, stale authorization precedes refresh, scope drift rejects, failed validation never publishes, detached work cannot resurrect, and downstream revocation limits are explicit.
 - **Fresh architect fallback:** PASS — `architect-review.md` is unavailable, so the installed project architect contract was applied from a clean reread; no ownership, dependency-direction, lifecycle, or deploy-order finding remained.
 - **Self-review/deploy check:** PASS — central package first, four consumer floors second, default-zero rollout, per-owner enablement, kill switch, coordinated sensitive purge, and rollback ordering are documented and testable.
@@ -305,7 +310,7 @@ Fallback batch matrix:
 | Boundaries/concurrency | PASS — strict fresh/stale/hard edges, one refresh, hard join, settlement publication |
 | Failure/detachment | PASS — sync/async failure, retry, purge/reset/eviction/replacement/newer-generation isolation |
 | Security/downstream | PASS — manifest post-await key check, validation, tenant isolation, derivative rollback limits |
-| Packages/docs | PASS — patch versions, dependency floors, three-file packs, manifest wire, operator guidance |
+| Packages/docs | PASS — minor versions, dependency floors, three-file packs, manifest wire, operator guidance |
 | Delivery | IN PROGRESS — adversarial gate passed; current-candidate verification and repository/GitHub delivery remain |
 
 The scoped pre-PR feature evaluation is complete at 100/100. This does not authorize or claim PR delivery.

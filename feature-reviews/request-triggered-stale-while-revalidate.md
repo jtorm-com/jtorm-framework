@@ -11,7 +11,7 @@
 
 **Last Completed Mode:** Final local verification
 **Current Mode:** Delivery
-**Next Action:** Commit the exact candidate, open a ready PR into dev, and obtain current-head green CI plus a clean Codex review.
+**Next Action:** Commit and push the valid SemVer review correction, resolve its thread, then obtain corrected-head green CI plus a clean Codex review.
 **Files Created:**
 - `feature-reviews/request-triggered-stale-while-revalidate.md`
 - `feature-reviews/stride-request-triggered-stale-while-revalidate.md`
@@ -22,7 +22,7 @@
 
 **Files Modified:** Central promise-cache policy, four acquisition owners, harness, package/root/architecture documentation, package metadata, policy ratchets, and deterministic model/pipeline/tooling tests
 **Tests Written:** Central state/race/configuration coverage; data/HTML/TSS/manifest owner coverage; manifest guard transition races; scoped/unscoped pipeline and downstream-fragment boundary proofs
-**Issues Found and Fixed in Design:** Ten independent design-review findings were incorporated. The authorized skeptic/architect/minimalist round then accepted six bounded remediations: zero-window fallback for invalid configuration, transition deduplication, two regression witnesses, policy/observability clarification, and private phase/token clarity. The post-remediation cold reread found and closed one guarded hard-state policy re-read that could otherwise bypass `hit()` under a side-effecting TTL getter.
+**Issues Found and Fixed in Design:** Ten independent design-review findings were incorporated. The authorized skeptic/architect/minimalist round then accepted six bounded remediations: zero-window fallback for invalid configuration, transition deduplication, two regression witnesses, policy/observability clarification, and private phase/token clarity. The post-remediation cold reread found and closed one guarded hard-state policy re-read that could otherwise bypass `hit()` under a side-effecting TTL getter. PR #65's initial current-head Codex review found one valid P2: the additive public cache API and consumer fields require coordinated minor, not patch, releases. Exact package assertions failed red before all five packages and four direct dependency floors moved to `1.1.0`.
 **Design Decisions Made:**
 - Four opt-in staleWindow fields default to zero; one central absolute-age state machine owns acquisition SWR.
 - Manifest reuse adds same-continuation URL authorization, exact captured-key validation, and one-shot current-generation classification.
@@ -30,7 +30,7 @@
 - Missing/invalid staleWindow disables stale service without discarding ordinary TTL freshness; every finite nonnegative window is admitted through subtraction-based boundaries.
 - Acquisition purge controls future participation only; downstream root/UI/persistence invalidation and detached loader work are explicit host-owned operational boundaries.
 
-**Verification:** Post-remediation focused cache/consumer gates pass 90/90; exact `npm test` passes 759/759. Typecheck, syntax, package dry-runs, audits, fresh 83-rule Semgrep, source/policy guards, staged tech-debt ratchet, and diff checks pass.
+**Verification:** Post-remediation focused cache/consumer gates pass 90/90; the SemVer correction witnesses pass 7/7; exact `npm test` passes 759/759. Typecheck, syntax, five exact `1.1.0` three-file package dry-runs, zero-vulnerability audits, fresh 83-rule Semgrep, source/policy guards, staged tech-debt ratchet, and diff checks pass.
 ---
 
 ## Progress Log
@@ -84,9 +84,11 @@
 - [x] Delivery records updated with the authorized review and remediation retained
 
 ### Delivery Mode
-- [ ] Ready PR opened into `dev`
-- [ ] CI green on current head
-- [ ] Codex review clean on current head
+- [x] Ready PR #65 opened into `dev`
+- [x] Initial head `5d79d5f6ac05ab35780cb17115fe1d2cbb62299c` CI green
+- [x] Initial current-head Codex finding triaged and corrected red-first
+- [ ] CI green on corrected head
+- [ ] Codex review clean on corrected head
 - [ ] Zero unresolved review threads
 
 ## Research Summary
@@ -107,7 +109,7 @@
 
 ### Metadata
 
-- **Status:** IMPLEMENTING; required RED gate observed
+- **Status:** DELIVERING; implementation and local gates complete
 - **Feature owner and implementer:** Codex /root
 - **Decision authority:** the explicit continuation handoff; it pre-authorizes autonomous progress after a complete, self-reviewed specification
 - **Base:** dev at 9ee8cc850224041498282a893eca7451dde8364b
@@ -155,7 +157,7 @@ Accessibility is N/A because no rendered UI or interaction changes.
 - Wire deterministic host reset/test controls for only those four acquisition owners.
 - Add unit, owner, manifest-policy, isolation, wiring, pipeline, and rendered-fragment regression tests.
 - Update package/root documentation, the locked architecture contract, the P4 backlog, threat/security records, and delivery ledger.
-- Apply patch SemVer bumps only to changed published runtime packages and coordinate direct dependency floors.
+- Apply minor SemVer bumps to the five changed published runtime packages because they add backward-compatible public functionality; coordinate direct dependency floors.
 
 #### Out of scope / no-gos
 
@@ -376,21 +378,21 @@ No database, route, schema, frontend, mobile, queue, payment, AI, authentication
 
 No third-party dependency is added or updated. The existing lockfile remains the only dependency inventory, and dependency audit/Semgrep gates still run.
 
-Planned patch releases:
+Planned minor releases:
 
 | Package | From | To | Reason |
 |---|---:|---:|---|
-| @jtorm/promise-cache-model | 1.0.3 | 1.0.4 | New opt-in central behavior with default-compatible semantics |
-| @jtorm/data-model | 1.0.7 | 1.0.8 | New public staleWindow field and dependency floor |
-| @jtorm/html-model | 1.0.7 | 1.0.8 | New public staleWindow field and dependency floor |
-| @jtorm/tss-model | 1.0.8 | 1.0.9 | New public staleWindow field and dependency floor |
-| @jtorm/ui-manifest-model | 1.0.3 | 1.0.4 | New public staleWindow field and dependency floor |
+| @jtorm/promise-cache-model | 1.0.3 | 1.1.0 | New opt-in central behavior and public helper surface |
+| @jtorm/data-model | 1.0.7 | 1.1.0 | New public staleWindow field and dependency floor |
+| @jtorm/html-model | 1.0.7 | 1.1.0 | New public staleWindow field and dependency floor |
+| @jtorm/tss-model | 1.0.8 | 1.1.0 | New public staleWindow field and dependency floor |
+| @jtorm/ui-manifest-model | 1.0.3 | 1.1.0 | New public staleWindow field and dependency floor |
 
-The four acquisition consumers will require @jtorm/promise-cache-model ^1.0.4. @jtorm/ui-cache-model remains 2.0.0 and retains its existing promise-cache range because its runtime behavior is untouched and it does not call get().
+The four acquisition consumers will require @jtorm/promise-cache-model ^1.1.0. @jtorm/ui-cache-model remains 2.0.0 and retains its existing promise-cache range because its runtime behavior is untouched and it does not call get().
 
 The @jtorm/ui-manifest-model package version changes only in package.json. Its exported runtime wire/compiler version remains exactly 1.0.0; the build-only compiler continues to embed that unchanged value, and compiler determinism/output regression tests are release gates.
 
-Publication/deployment order is promise-cache 1.0.4 first, then the four consumer packages, then host configuration. Rollback starts with staleWindow = 0 and acquisition purge; sensitive content also requires the documented root/UI/persistence invalidation before consumer packages roll back ahead of the central package. A positive window is never required for compatibility.
+Publication/deployment order is promise-cache 1.1.0 first, then the four 1.1.0 consumer packages, then host configuration. Rollback starts with staleWindow = 0 and acquisition purge; sensitive content also requires the documented root/UI/persistence invalidation before consumer packages roll back ahead of the central package. A positive window is never required for compatibility.
 Dependency map:
 
 - [x] Depends on merged discriminator, TTL/purge, and persisted-age contracts from PRs #59, #61, and #63.
@@ -481,7 +483,7 @@ Full PASTA/deep-dive applicability was re-evaluated after modeling personal data
 | R4 | Fast refresh failure causes request-triggered retry pressure | Medium | Medium | host transport owner | One concurrent refresh per retained generation, no hidden loop/timer, existing request caps/metrics, zero-window kill switch |
 | R5 | Serverless host freezes refresh after returning stale | High in such hosts | Medium | host integration owner | Best-effort caveat, no durability claim, later request retries, choose zero window where completion is required |
 | R6 | Runtime policy/clock mutation extends age accidentally | Medium | High | promise-cache owner | Invalid-window zero fallback, overflow-free subtraction, absolute timestamp, deterministic boundary/regression tests |
-| R7 | Generic promise-cache consumer without the new field loses compatibility | Low | High | promise-cache owner | Missing/undefined means zero; patch SemVer; existing TTL suite unchanged |
+| R7 | Generic promise-cache consumer without the new field loses compatibility | Low | High | promise-cache owner | Missing/undefined means zero; minor SemVer; existing TTL suite unchanged |
 | R8 | A fragment derived from stale acquisition content outlives the acquisition deadline | Medium | High | host + UI-cache owner | Explicit independent-lifecycle contract, existing UI purge/persistence controls, wire/timestamp/save/plugin regression tests |
 | R9 | Background rejection becomes unhandled or deletes newer state | Medium | High | promise-cache owner | Immediate rejection observer and exact refresh-token cleanup tests |
 | R10 | Stale LRU semantics become nondeterministic | Low | Medium | promise-cache owner | Touch only successful stale service, preserve Map order at publication, explicit eviction tests |
@@ -532,7 +534,7 @@ Every checkpoint is independently verifiable and updates this state file. No imp
 - Async guard crossing the hard boundary returns/joins fresh work, not old.
 - Deferred guard tests cover every transition-table row: stable pending/fresh/stale/hard, refresh publication, different recognized generation, untracked newer promise, purge/eviction/reset/map replacement absence, and refresh rejection; detached work is never returned or refreshed and newer work is never removed merely because identity changed.
 - Manifest request/digest/schema/bounds failure never installs replacement; required/optional/root supersession remain unchanged.
-- Manifest runtime version stays exactly 1.0.0 and compiler output remains deterministic despite the package patch release.
+- Manifest runtime version stays exactly 1.0.0 and compiler output remains deterministic despite the package minor release.
 
 #### Pipeline and excluded UI regression
 
