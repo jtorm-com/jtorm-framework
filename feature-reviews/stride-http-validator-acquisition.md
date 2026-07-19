@@ -213,5 +213,5 @@ Independent code-explorer and code-architect reviews confirmed that:
 
 All six conditions are implemented and covered by focused tests. The local architecture, security,
 differential, production-readiness, Semgrep, source-ratchet, and tech-debt gates pass with no
-unresolved valid finding. Current-head CI and GitHub Codex review remain the final publication
-controls.
+unresolved valid finding. Final head `cfba4b0` then passed CI and a clean GitHub Codex review with
+zero unresolved threads before the maintainer merged PR #69.
