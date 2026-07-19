@@ -144,15 +144,15 @@ test('ownership analyzer catches representative bypass families without comment/
 test('coordinated package releases declare their policy owners and dependency minima', () => {
   const releases = {
     'src/models/render-context-model': '1.0.1',
-    'src/models/promise-cache-model': '1.1.0',
+    'src/models/promise-cache-model': '1.2.0',
     'src/models/asset-plugin-model': '1.0.0',
-    'src/models/request-model': '1.1.5',
-    'src/models/ui-manifest-model': '1.1.0',
+    'src/models/request-model': '1.2.0',
+    'src/models/ui-manifest-model': '1.2.0',
     'src/models/layer-model': '1.0.2',
     'src/models/ui-cache-model': '2.0.0',
-    'src/models/data-model': '1.1.0',
-    'src/models/html-model': '1.1.0',
-    'src/models/tss-model': '1.1.0',
+    'src/models/data-model': '1.2.0',
+    'src/models/html-model': '1.2.0',
+    'src/models/tss-model': '1.2.0',
     'src/models/event-model': '1.0.2',
     'src/handlers/handler-wrapper': '1.0.7',
     'src/parsers/tss-parser': '2.0.0',
@@ -166,9 +166,9 @@ test('coordinated package releases declare their policy owners and dependency mi
   const dependencies = {
     'src/models/request-model': {'@jtorm/render-context-model': '^1.0.1'},
     'src/models/ui-manifest-model': {
-      '@jtorm/promise-cache-model': '^1.1.0',
+      '@jtorm/promise-cache-model': '^1.2.0',
       '@jtorm/render-context-model': '^1.0.0',
-      '@jtorm/request-model': '^1.1.5'
+      '@jtorm/request-model': '^1.2.0'
     },
     'src/models/layer-model': {'@jtorm/render-context-model': '^1.0.0'},
     'src/models/ui-cache-model': {
@@ -176,11 +176,11 @@ test('coordinated package releases declare their policy owners and dependency mi
       '@jtorm/render-context-model': '^1.0.1',
       '@jtorm/request-model': '^1.1.5'
     },
-    'src/models/data-model': {'@jtorm/promise-cache-model': '^1.1.0', '@jtorm/request-model': '^1.1.5'},
-    'src/models/html-model': {'@jtorm/promise-cache-model': '^1.1.0', '@jtorm/request-model': '^1.1.5'},
+    'src/models/data-model': {'@jtorm/promise-cache-model': '^1.2.0', '@jtorm/request-model': '^1.2.0'},
+    'src/models/html-model': {'@jtorm/promise-cache-model': '^1.2.0', '@jtorm/request-model': '^1.2.0'},
     'src/models/tss-model': {
-      '@jtorm/promise-cache-model': '^1.1.0',
-      '@jtorm/request-model': '^1.1.5',
+      '@jtorm/promise-cache-model': '^1.2.0',
+      '@jtorm/request-model': '^1.2.0',
       '@jtorm/tss-parser': '^2.0.0'
     },
     'src/handlers/handler-wrapper': {'@jtorm/event-model': '^1.0.2'},
@@ -205,7 +205,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     ;
 });
 
-test('request-triggered stale policy stays on the four acquisition exports', () => {
+test('stale and HTTP-validator policies stay on the four acquisition exports', () => {
   const acquisition = [
     ['src/models/data-model/src/data-model.js', 'jTormDataModel'],
     ['src/models/html-model/src/html-model.js', 'jTormHtmlModel'],
@@ -214,19 +214,22 @@ test('request-triggered stale policy stays on the four acquisition exports', () 
   ];
 
   for (const [p, name] of acquisition)
-    assert.deepEqual(
-      Object.getOwnPropertyDescriptor(require(file(p))[name], 'staleWindow'),
-      {value: 0, writable: true, enumerable: true, configurable: true},
-      p
+    for (const [field, value] of [['staleWindow', 0], ['validators', false]])
+      assert.deepEqual(
+        Object.getOwnPropertyDescriptor(require(file(p))[name], field),
+        {value, writable: true, enumerable: true, configurable: true},
+        p + ' ' + field
+      )
+  ;
+  for (const field of ['staleWindow', 'validators'])
+    assert.equal(
+      Object.getOwnPropertyDescriptor(
+        require(file('src/models/ui-cache-model/src/ui-cache-model.js')).jTormUiCacheModel,
+        field
+      ),
+      undefined
     )
   ;
-  assert.equal(
-    Object.getOwnPropertyDescriptor(
-      require(file('src/models/ui-cache-model/src/ui-cache-model.js')).jTormUiCacheModel,
-      'staleWindow'
-    ),
-    undefined
-  );
   assert.equal(pkg('src/models/ui-cache-model').version, '2.0.0');
   assert.equal(
     pkg('src/models/ui-cache-model').dependencies['@jtorm/promise-cache-model'],

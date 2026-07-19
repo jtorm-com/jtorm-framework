@@ -155,3 +155,28 @@ test('prepared Product closure leaves only model-bound @id data outside the bund
   assert.deepEqual(packed.requests, [url, '/product-image']);
   assert.equal(packed.bytes, Buffer.byteLength(result.json) + 108);
 });
+
+test('prepared Product pack revalidates with its paired ETag and a bodyless 304', async () => {
+  let now = 0;
+  const clock = () => now;
+  const result = await productManifest();
+  const url = '/ui/' + result.filename;
+  const descriptors = [{ url, hash: result.hash, mode: 'required' }];
+  const first = await render(
+    HTML, TSS, product(IMAGE), 'http://localhost/',
+    {[url]: {text: result.json, headers: {etag: '"pack-a"'}}},
+    {c: 0, s: null, a: null, request: {tenant: 'tenant-a'}}, descriptors, 0,
+    {clock, ttl: 10, validators: true}
+  );
+  now = 10;
+  const validated = await render(
+    HTML, TSS, product(IMAGE), 'http://localhost/', {[url]: {status: 304}},
+    {c: 0, s: null, a: null, request: {tenant: 'tenant-a'}}, descriptors, 0,
+    {reuseSharedCaches: true, clock, ttl: 10, validators: true}
+  );
+
+  assert.equal(validated.body, first.body);
+  assert.deepEqual(validated.requests, [url]);
+  assert.deepEqual(validated.requestHeaders, [{'If-None-Match': '"pack-a"'}]);
+  assert.equal(validated.bytes, 0);
+});

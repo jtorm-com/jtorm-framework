@@ -271,6 +271,7 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
     jTormUiCacheModel.persistenceClock = DEFAULT_PERSISTENCE_CLOCK;
     jTormDataModel.ttl = jTormHtmlModel.ttl = jTormTssModel.ttl = jTormUiManifestModel.ttl = jTormUiCacheModel.ttl = 300000;
     jTormDataModel.staleWindow = jTormHtmlModel.staleWindow = jTormTssModel.staleWindow = jTormUiManifestModel.staleWindow = 0;
+    jTormDataModel.validators = jTormHtmlModel.validators = jTormTssModel.validators = jTormUiManifestModel.validators = false;
     jTormUiManifestModel.max = 32;
     jTormUiManifestModel.maxText = 1048576;
     jTormUiManifestModel.maxValues = 262144;
@@ -333,13 +334,33 @@ function artifactText(fixtures, part) {
  * 1-part case. Any missing part → 404 (a miss → get throws → loud). get{d} (json) is
  * always single-artifact, so json resolves from the first part.
  */
+function fixtureHeaders(f) {
+    return {
+        get: function (n) {
+            const h = f && f.headers;
+
+            if (!h || typeof h !== 'object') return null;
+            n = String(n).toLowerCase();
+            for (const k of Object.keys(h))
+                if (k.toLowerCase() === n) return h[k]
+            ;
+            return null;
+        }
+    };
+}
+
 function fixtureTransport(fixtures, metrics) {
-    return async function (u) {
+    return async function (u, o) {
         const parts = String(u).split(',').map(s => s.replace(/^['"]|['"]$/g, ''));
         const texts = parts.map(p => artifactText(fixtures, p));
         const f0 = fixtures && fixtures[parts[0]];
+        const status = f0 && f0.status || 200;
         metrics.requests.push(String(u));
+        metrics.requestHeaders.push(o && o.headers ? {...o.headers} : {});
         metrics.requestDepths.push(metrics.depth);
+        if (status !== 200)
+            return {ok: status >= 200 && status < 300, status, headers: fixtureHeaders(f0)}
+        ;
         if (texts.some(t => t === null)) return { ok: false, status: 404 };
         metrics.bytes += Buffer.byteLength(
             f0 && Object.prototype.hasOwnProperty.call(f0, 'json')
@@ -349,6 +370,7 @@ function fixtureTransport(fixtures, metrics) {
         return {
             ok: true,
             status: 200,
+            headers: fixtureHeaders(f0),
             text: async () => texts.join('\n'),
             json: async () => (f0 ? f0.json : JSON.parse(texts[0]))
         };
@@ -365,18 +387,19 @@ function fixtureTransport(fixtures, metrics) {
  * injected <head> content (components-ui head.default/head.id → doc.meta/doc.link).
  *
  * @param {string} [url] document URL (jsdom origin); some flows need an absolute base.
- * @param {object|null} [fixtures] { url: {json?, text?} } map → injected fetch transport for `get`.
+ * @param {object|null} [fixtures] { url: {json?, text?, status?, headers?} } map → injected fetch transport for `get`.
  * @param {number|object} [c] create-doc mode, or an explicit render context.
  * @param {{url:string,hash:string,mode:'required'|'optional'}[]|null} [manifests] ordered UI packs prepared after root creation and before events/handler.
  * @param {number} [warm] when truthy, repeat prepare on the same root and report its request delta.
- * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,clock?:Function,persistenceClock?:Function,ttl?:number,staleWindow?:number,uiCacheStore?:object|null,uiCacheInit?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
- * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
+ * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,clock?:Function,persistenceClock?:Function,ttl?:number,staleWindow?:number,validators?:boolean,uiCacheStore?:object|null,uiCacheInit?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
+ * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestHeaders:object[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
  */
 async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0, options = null) {
     const { window } = new JSDOM('', { url });
     const metrics = {
         requests: [],
         warmRequests: [],
+        requestHeaders: [],
         requestDepths: [],
         bytes: 0,
         depth: 0,
@@ -395,6 +418,9 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     ;
     if (options && Object.prototype.hasOwnProperty.call(options, 'staleWindow'))
         jTormDataModel.staleWindow = jTormHtmlModel.staleWindow = jTormTssModel.staleWindow = jTormUiManifestModel.staleWindow = options.staleWindow
+    ;
+    if (options && Object.prototype.hasOwnProperty.call(options, 'validators'))
+        jTormDataModel.validators = jTormHtmlModel.validators = jTormTssModel.validators = jTormUiManifestModel.validators = options.validators
     ;
     if (options && Object.prototype.hasOwnProperty.call(options, 'uiCacheStore'))
         jTormUiCacheModel.saveModel = options.uiCacheStore
@@ -443,6 +469,7 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
             body: v2.h.body(),
             requests: metrics.requests,
             warmRequests: metrics.warmRequests,
+            requestHeaders: metrics.requestHeaders,
             requestDepths: metrics.requestDepths,
             bytes: metrics.bytes,
             handlerDepth: metrics.handlerDepth

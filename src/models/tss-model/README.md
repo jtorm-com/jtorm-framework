@@ -32,7 +32,17 @@ Choose the window for transformation sensitivity and revocation needs. Use finit
 lifetime and source/concurrency controls because detached work is not cancelled and serverless
 execution may freeze after returning stale. `staleWindow = 0` is the kill switch. Acquisition
 purge affects only future model participation and cannot revoke parsed trees or rendered/persisted
-fragments already derived from them. HTTP validators and rendered-fragment SWR remain separate.
+fragments already derived from them. HTTP validators do not change those downstream lifetimes, and
+rendered-fragment SWR remains separate.
+
+`validators` defaults to `false`. Exact `true`, a scoped per-part cache key, and compatible
+injected request/promise-cache models enable conditional acquisition. A modified text response
+must parse successfully before its bounded ETag (preferred) or Last-Modified value is paired with
+that exact parsed generation. At TTL/SWR reacquisition, a matching 304 sends one condition, reads
+and parses no body, reuses the exact current AST, and publishes a new successful generation
+timestamp. Missing, invalid, or oversized response metadata keeps ordinary caching; a modified
+response never carries its predecessor validator. Disable instantly with `validators = false` and
+purge affected parts when authorization or source ownership changes.
 
 Cache admission remains the request-model key derived at call start. As before, a cache hit does
 not rerun URL or authorization policy; hosts tightening that policy must purge affected keys.

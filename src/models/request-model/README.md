@@ -25,6 +25,33 @@ URLs and URLs on `base`'s origin are allowed; other absolute URLs are blocked.
 `renderContextModel` is required and provides bounded, cycle-safe resolution for per-render
 request options plus strict own-link resolution for cache authority.
 
+## Conditional acquisition
+
+`conditional(url, context, transaction).json()` and `.text()` are the opt-in scoped transport
+facade for acquisition-cache validators. Pass the exact key captured for the cache call and a
+function that returns its current paired validator:
+
+```js
+const key = request.cacheKey('/page.html', context);
+const result = await request.conditional('/page.html', context, {
+  key,
+  validator: () => ({name: 'etag', value: '"page-a"'})
+}).text();
+```
+
+A modified response resolves to `{status, value, validator?}` after JSON/text parsing. A valid
+not-modified response resolves to `{status: 304, validator}` with no value or body read. It is
+accepted only when the model emitted one recognized condition and returns the exact validator it
+sent; response headers cannot retag existing bytes. ETag is preferred over Last-Modified on a
+modified response. Each value is opaque, limited to 1024 UTF-8 bytes, and rejected as metadata if
+it contains an unsafe header envelope; invalid or missing metadata does not reject valid content.
+
+Every conditional call still resolves the URL, awaits `allow()`, rederives the scoped key from the
+resolved URL under the current tenant/origin/base policy, applies the current timeout, and only
+then reads the validator and calls the injected transport. Scope drift rejects before a header is
+sent. Direct unscoped conditional calls reject; acquisition owners use the unchanged `get()` path
+when sharing is unavailable. Ordinary `get()` behavior and transport options are unchanged.
+
 ## Shared-cache discriminator
 
 `policy(context)` is the cache-authority decision. It preserves the tagged `tenant`, `origin`,

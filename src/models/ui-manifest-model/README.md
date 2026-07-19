@@ -50,7 +50,19 @@ pack promise; an already prepared root keeps its independent root-local index un
 disposed. Packs are public static assets, but positive windows still require finite transport
 lifetime/source controls; request-model timeout `0` is not cancellation and serverless refresh is
 best effort. `staleWindow = 0` plus exact/full pack purge is the acquisition rollback. HTTP
-validators and rendered-fragment SWR remain separate policies.
+validators do not change root-local/downstream lifetimes, and rendered-fragment SWR remains
+separate.
+
+`manifest.validators` defaults to `false`. Exact `true`, a scoped request key, and compatible
+injected request/promise-cache models enable conditional pack acquisition. A modified response's
+bounded ETag (preferred) or Last-Modified value is staged only after text, JSON, expected/declared/
+computed digest, schema, structure, bounds, and per-value validation all succeed. A matching 304
+sends one condition, reads no body, and can reuse only the exact validated pack under the same raw
+request key plus expected-hash composite key. It publishes a new successful pack generation and
+TTL at fulfillment. Missing/invalid metadata keeps ordinary caching; a modified pack never carries
+the prior validator. Policy drift, unsolicited 304, and detached reuse are acquisition failures,
+so optional descriptors may fall through while required descriptors reject; received invalid 200
+content remains loud in both modes.
 
 This per-reuse authorization is intentionally stronger than the pre-existing data/HTML/TSS
 key-at-call admission model. Request/transport instrumentation sees refresh as an ordinary pack
@@ -85,6 +97,6 @@ getMethod.manifest = manifest;
 ```
 
 Removing the `prepare()` call and the optional `getMethod.manifest` injection restores the legacy
-waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.1.0` and
-`@jtorm/request-model@1.1.5` before this package and the fetch consumers. Package release
-`1.1.0` does not change the exported manifest wire/compiler version `1.0.0`.
+waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.2.0` and
+`@jtorm/request-model@1.2.0` before this package and the fetch consumers. Package release
+`1.2.0` does not change the exported manifest wire/compiler version `1.0.0`.
