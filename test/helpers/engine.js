@@ -85,10 +85,11 @@ const { jTormLayerMethod } = require('../../src/methods/layer-method/src/layer-m
 const { jTormLayerModel } = require('../../src/models/layer-model/src/layer-model.js');
 const { jTormLayerPlugin } = require('../../src/plugins/layer-plugin/src/layer-plugin.js');
 // The uis array members — each a published @jtorm/*-ui package with a baked-in
-// `mapper`; the .tss/.html/.json artifacts they reference (`@s/…`, `@h/@e/…`) are
+// `mapper`; the .tss/.html/.json artifacts they reference (`@s/…`, `@b/…`, `@h/@e/…`) are
 // fetched at render time and served from src/uis/** by the transport below.
 const { jTormSchemaUi } = require('../../src/uis/schema-ui/src/schema-ui.js');
 const { jTormComponentsUI } = require('../../src/uis/components-ui/src/components-ui.js');
+const { jTormBootstrapUI } = require('../../src/uis/bootstrap-ui/src/bootstrap-ui.js');
 const { jTormHtmlUi } = require('../../src/uis/html-ui/src/html-ui.js');
 
 // insert aliases — each/insert dispatch insert modes through the methods map
@@ -192,8 +193,8 @@ const matchMedia = (q) => {
     return { matches: m, media: q };
 };
 jTormMediaqueryMethod.windowModel = { matchMedia };
-jTormUiMethod.uis = [jTormSchemaUi, jTormComponentsUI, jTormHtmlUi];
-for (const u of jTormUiMethod.uis) u.url = ''; // transport resolves the `@s/@c/@h` alias directly (parseUrl is css/js-only, never on the get path), so .url is unused — neutralise the baked CDN host
+jTormUiMethod.uis = [jTormSchemaUi, jTormComponentsUI, jTormBootstrapUI, jTormHtmlUi];
+for (const u of jTormUiMethod.uis) u.url = ''; // transport resolves the `@s/@c/@b/@h` alias directly (parseUrl is css/js-only, never on the get path), so .url is unused — neutralise the baked CDN host
 jTormUiMethod.mediatargetMethod = jTormMediatargetMethod;
 jTormUiMethod.ui = { mapper: null }; // host UI-mapper override slot (no custom mapper in the harness)
 jTormUiMethod.framework = 'schema';
@@ -391,7 +392,7 @@ function fixtureTransport(fixtures, metrics) {
  * @param {number|object} [c] create-doc mode, or an explicit render context.
  * @param {{url:string,hash:string,mode:'required'|'optional'}[]|null} [manifests] ordered UI packs prepared after root creation and before events/handler.
  * @param {number} [warm] when truthy, repeat prepare on the same root and report its request delta.
- * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,clock?:Function,persistenceClock?:Function,ttl?:number,staleWindow?:number,validators?:boolean,uiCacheStore?:object|null,uiCacheInit?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
+ * @param {{jsonLd?:boolean,reuseSharedCaches?:boolean,framework?:string,clock?:Function,persistenceClock?:Function,ttl?:number,staleWindow?:number,validators?:boolean,uiCacheStore?:object|null,uiCacheInit?:boolean}|null} [options] harness switches; JSON-LD is registered unless explicitly false.
  * @returns {Promise<{html:string, head:string, body:string, requests:string[], warmRequests:string[], requestHeaders:object[], requestDepths:number[], bytes:number, handlerDepth:number}>} full-doc HTML, <head>/<body> innerHTML, and transport/traversal metrics.
  */
 async function render(html, tss, data, url = 'http://localhost/', fixtures = null, c = 0, manifests = null, warm = 0, options = null) {
@@ -407,6 +408,7 @@ async function render(html, tss, data, url = 'http://localhost/', fixtures = nul
     };
     jTormDocumentModel.windowModel = window;
     reset(!options || options.jsonLd !== false, options && options.reuseSharedCaches);
+    jTormUiMethod.framework = options && options.framework || 'schema';
     if (options && typeof options.clock === 'function')
         jTormPromiseCacheModel.clock = options.clock
     ;

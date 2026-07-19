@@ -7,7 +7,7 @@ const { UIS_DIR, uisDiskPath } = require('../helpers/uis-disk-path.js');
 const { makeTssParser } = require('../helpers/parser.js');
 
 const ROOT = path.resolve(__dirname, '../..');
-const ARTIFACT = /['"](@[sch]\/[^'"]+\.(?:tss|html|json))['"]/g;
+const ARTIFACT = /['"](@[schb]\/[^'"]+\.(?:tss|html|json))['"]/g;
 
 function walk(d) {
     const a = [];
@@ -38,7 +38,7 @@ function mapperRefs(o) {
     for (const [k, v] of Object.entries(o)) {
         if ((k === 't' || k === 'h') && Array.isArray(v))
             for (const u of v)
-                if (typeof u === 'string' && /^@[sch]\//.test(u))
+                if (typeof u === 'string' && /^@[schb]\//.test(u))
                     a.push(u)
         ;
         if (v && typeof v === 'object')
@@ -83,6 +83,10 @@ test('uisDiskPath mirrors the harness artifact serving aliases', () => {
     assert.equal(
         path.relative(UIS_DIR, uisDiskPath('@c/head/facebook.tss')),
         'components-ui/src/head/facebook.tss'
+    );
+    assert.equal(
+        path.relative(UIS_DIR, uisDiskPath('@b/button/button.tss')),
+        'bootstrap-ui/src/button/button.tss'
     );
     assert.equal(uisDiskPath('/plain.tss'), null);
 });
@@ -165,4 +169,9 @@ test('every schema-ui mapper t/h artifact resolves to a served disk file', () =>
 test('every components-ui mapper t/h artifact resolves to a served disk file', () => {
     const { jTormComponentsUI } = require('../../src/uis/components-ui/src/components-ui.js');
     assert.deepEqual(missingMapper(jTormComponentsUI, 'src/uis/components-ui/src/components-ui.js'), []);
+});
+
+test('every bootstrap-ui mapper t/h artifact resolves to a served disk file', () => {
+    const { jTormBootstrapUI } = require('../../src/uis/bootstrap-ui/src/bootstrap-ui.js');
+    assert.deepEqual(missingMapper(jTormBootstrapUI, 'src/uis/bootstrap-ui/src/bootstrap-ui.js'), []);
 });

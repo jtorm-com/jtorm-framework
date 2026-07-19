@@ -1,0 +1,44 @@
+/*! (c) jTorm and other contributors | www.jtorm.com/license */
+
+->if(to: 'array') {
+    ->else
+    ->if(to: 'object')
+    ->if(
+        d: items,
+        to: 'array'
+    ) {
+        .jtorm-accordion:last-child:not(.accordion)
+        ->if(el: '.jtorm-accordion:last-child:not(.accordion)')
+        ->attr {
+            n: 'class';
+            v: 'accordion';
+            m: 'a';
+        }
+
+        .jtorm-accordion:last-child {
+            .jtorm-accordion__item:not(.accordion-item)
+            ->if(el: '.jtorm-accordion__item:not(.accordion-item)')
+            ->attr {
+                n: 'class';
+                v: 'accordion-item';
+                m: 'a';
+            }
+
+            .jtorm-accordion__summary:not(.accordion-header)
+            ->if(el: '.jtorm-accordion__summary:not(.accordion-header)')
+            ->attr {
+                n: 'class';
+                v: 'accordion-header p-3 fw-semibold';
+                m: 'a';
+            }
+
+            .jtorm-accordion__content:not(.accordion-body)
+            ->if(el: '.jtorm-accordion__content:not(.accordion-body)')
+            ->attr {
+                n: 'class';
+                v: 'accordion-body';
+                m: 'a';
+            }
+        }
+    }
+}
