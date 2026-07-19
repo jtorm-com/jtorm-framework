@@ -33,7 +33,16 @@ new threat review. Use finite transport lifetime and source/concurrency controls
 work is not cancelled and serverless execution may freeze after returning stale. `staleWindow = 0`
 is the kill switch. Acquisition purge affects only future model participation and cannot revoke
 already returned data, prepared roots, rendered fragments, or persisted fragment bytes. HTTP
-validators and rendered-fragment SWR remain separate policies.
+validators do not change those downstream lifetimes, and rendered-fragment SWR remains separate.
+
+`validators` defaults to `false`. Exact `true`, a scoped cache key, and compatible injected
+request/promise-cache models enable conditional acquisition. A valid modified JSON response is
+parsed before its bounded ETag (preferred) or Last-Modified value is paired with that exact cache
+generation. At TTL/SWR reacquisition, a matching 304 sends one condition, reads no body, reuses the
+exact current JSON value, and publishes a new successful generation timestamp. Missing, invalid,
+or oversized response metadata keeps ordinary caching; a modified response never carries its
+predecessor validator. Disable instantly with `validators = false` and purge affected keys when
+authorization or source ownership changes.
 
 Cache admission remains the request-model key derived at call start. As before, a cache hit does
 not rerun URL or authorization policy; hosts tightening that policy must purge affected keys.

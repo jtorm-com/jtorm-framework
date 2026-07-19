@@ -1,6 +1,30 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+function conditional(s) {
+    let f;
+
+    try {
+        f = s.validators === true && s.requestModel && s.requestModel.conditional;
+        return typeof f === 'function' ? f : undefined;
+    } catch (e) {}
+}
+
+function transaction(x) {
+    try {
+        return !!x && typeof x.validator === 'function'
+            && typeof x.accept === 'function' && typeof x.reuse === 'function';
+    } catch (e) {
+        return false;
+    }
+}
+
+function acquisition(e) {
+    const x = new Error(e && e.message || String(e));
+    x.acquisition = 1;
+    return x;
+}
+
 module.exports = {
     jTormUiManifestModel: {
         // DI
@@ -14,6 +38,7 @@ module.exports = {
         max: 32,
         ttl: 300000,
         staleWindow: 0,// DI: opt-in request-triggered stale service after ttl; 0 waits for replacement
+        validators: false,// DI: exact true opts into paired HTTP-validator revalidation
         maxText: 1048576,
         maxValues: 262144,
         maxDepth: 128,
@@ -288,8 +313,15 @@ module.exports = {
         },
 
         cacheKey: function (d, c) {
-            const q = this.requestModel && typeof this.requestModel.cacheKey === 'function'
-                ? this.requestModel.cacheKey(d.url, c) : undefined;
+            let q;
+
+            if (arguments.length < 3)
+                q = this.requestModel && typeof this.requestModel.cacheKey === 'function'
+                    ? this.requestModel.cacheKey(d.url, c) : undefined
+            ;
+            else
+                q = arguments[2]
+            ;
 
             return q == null || q === '' ? undefined : JSON.stringify([q, d.hash]);
         },
@@ -318,15 +350,19 @@ module.exports = {
         },
 
         load: function (d, c) {
-            const s = this, q = s.cacheKey(d, c);
+            const s = this,
+                k = s.requestModel && typeof s.requestModel.cacheKey === 'function'
+                    ? s.requestModel.cacheKey(d.url, c) : undefined,
+                q = s.cacheKey(d, c, k),
+                f = conditional(s);
+
             return s.promiseCacheModel.get(s, q, {
+                validators: !!f,
                 hit: async function () {
                     try {
                         await s.allowed(d.url, c);
                     } catch (e) {
-                        const x = new Error(e && e.message || String(e));
-                        x.acquisition = 1;
-                        throw x;
+                        throw acquisition(e);
                     }
                 },
                 check: function (k) {
@@ -338,16 +374,26 @@ module.exports = {
                     x.acquisition = 1;
                     throw x;
                 },
-                load: function () {
+                load: function (x) {
                     return (async function () {
-                        let t;
+                        let g, r, t;
 
                         try {
-                            t = await s.requestModel.get(d.url, c).text();
+                            g = conditional(s);
+                            if (g && transaction(x)) {
+                                r = await g.call(s.requestModel, d.url, c, {
+                                    key: k,
+                                    validator: function () { return x.validator(); }
+                                }).text();
+                                if (r.status === 304)
+                                    return await x.reuse(r.validator)
+                                ;
+                                t = r.value;
+                            } else
+                                t = await s.requestModel.get(d.url, c).text()
+                            ;
                         } catch (e) {
-                            const x = new Error(e && e.message || String(e));
-                            x.acquisition = 1;
-                            throw x;
+                            throw acquisition(e);
                         }
 
                         if (typeof t !== 'string' || t.length > s.maxText)
@@ -355,7 +401,9 @@ module.exports = {
                         ;
 
                         try {
-                            return await s.pack(JSON.parse(t), d.hash);
+                            const p = await s.pack(JSON.parse(t), d.hash);
+                            if (g && transaction(x)) x.accept(r.validator);
+                            return p;
                         } catch (e) {
                             if (e instanceof SyntaxError)
                                 throw new Error('Manifest JSON invalid')

@@ -15,6 +15,28 @@ return promiseCacheModel.get(consumer, key, {
 });
 ```
 
+Validator-aware acquisition is an additive loader transaction. It is enabled only by exact
+`validators: true`; otherwise `load()` is called with zero arguments exactly as before:
+
+```js
+return promiseCacheModel.get(consumer, key, {
+  validators: true,
+  load: transaction => conditionalRequest(transaction.validator()).then(async result => {
+    if (result.status === 304) return transaction.reuse(result.validator);
+    const value = await validate(result.value);
+    transaction.accept(result.validator);
+    return value;
+  })
+});
+```
+
+`validator()` returns metadata only while the exact owner Map/key/content promise/record and
+generation are current. `accept()` stages a modified response's validator; call it only after all
+consumer parsing and validation succeeds. `reuse()` accepts a bodyless result only when its
+validator exactly matches the current pair and returns the exact prior public promise. Successful
+settlement or SWR publication stores content and staged metadata in one private generation record.
+Missing staged metadata clears any predecessor instead of pairing it with new bytes.
+
 The owner deduplicates in-flight work, bumps successful-hit recency, removes only the rejecting
 insertion's map/key/token identity, evicts least-recently-used entries, and retains the newest entry
 when `max <= 0`. Successful settlement starts the absolute TTL; hits never slide it. Pending work
@@ -67,6 +89,14 @@ a `WeakMap` keyed by the current cache Map and are bounded by its exact keys; re
 is not retained. Detached loader promises can outlive those records but cannot publish back into a
 purged, evicted, reset, replaced, or newer generation. Runtime source has no imports.
 
+For an expired record with paired validator metadata, guarded consumers run their existing
+`hit()`/`check()` policy before any hard revalidation. A successful 304 publishes a new public
+promise adopting the exact prior value and starts a new TTL at fulfillment. Ordinary cache hits,
+request start, and failures do not slide age. Purge, purge-all, eviction, `reset()`, Map
+replacement, manual supersession, rejection, and newer work detach both content-reuse and metadata
+authority. Work detached before pending installation remains caller-only and cannot touch the
+public Map, LRU, records, or later publication.
+
 Persistence owners that already validated a trustworthy elapsed age may call
 `restore(owner, age, sampledTime)`. It applies the owner's current finite/zero/Infinity policy and
 returns an opaque process-local insertion record; callers pass that record back to `stamp()` and
@@ -101,6 +131,7 @@ may freeze best-effort refresh after returning stale. Use `staleWindow = 0` when
 must precede the response.
 
 Acquisition purge cannot revoke values already returned or independently retained downstream.
-Sensitive rollback sets `staleWindow = 0`, purges the acquisition owner, disposes prepared roots,
-and separately purges/saves rendered-fragment persistence. Rendered-fragment SWR and HTTP
-`ETag`/`Last-Modified` validators are outside this model's `get()` contract.
+Sensitive rollback sets `staleWindow = 0` and each acquisition owner's `validators = false`,
+purges the acquisition owner, disposes prepared roots, and separately purges/saves
+rendered-fragment persistence. Validator metadata is process-local and is never exported,
+persisted, or available to rendered-fragment caching; rendered-fragment SWR remains out of scope.

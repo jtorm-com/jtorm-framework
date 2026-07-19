@@ -1,6 +1,110 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+function validators(x) {
+    try { return x.validators === true; } catch (e) { return false; }
+}
+function validatorPair(a, b) {
+    try {
+        return !!a && !!b && typeof a === 'object' && typeof b === 'object'
+            && a.name === b.name && a.value === b.value;
+    } catch (e) {
+        return false;
+    }
+}
+function transactionCurrent(s) {
+    let d, r;
+
+    if (s.closed || !s.base)
+        return false
+    ;
+    try {
+        if (s.owner.c !== s.map)
+            return false
+        ;
+        if (s.phase === 0)
+            return s.map.get(s.key) === s.base.value
+                && s.model.record(s.map, s.key, s.base.value) === s.base.record
+                && s.base.record.validator === s.base.validator;
+
+        if (s.phase === 1) {
+            r = s.model.record(s.map, s.key, s.value);
+            return s.map.get(s.key) === s.value && !!r
+                && r.token === s.token && r.transaction === s && r.base === s.base
+                && s.base.record.validator === s.base.validator;
+        }
+
+        if (s.phase === 2) {
+            r = s.model.record(s.map, s.key, s.base.value);
+            d = r && r.refresh;
+            return s.map.get(s.key) === s.base.value && r === s.base.record
+                && d === s.descriptor && d.transaction === s
+                && s.base.record.validator === s.base.validator;
+        }
+    } catch (e) {}
+
+    return false;
+}
+
+function transactionClose(s, detached) {
+    if (s.closed)
+        return
+    ;
+    if (detached && s.base) {
+        try { delete s.base.record.validator; } catch (e) {}
+    }
+    s.closed = 1;
+    s.phase = 3;
+    delete s.base;
+    delete s.descriptor;
+    delete s.staged;
+}
+
+function transaction(model, owner, map, key, base) {
+    const s = {
+        accepted: 0,
+        base: base,
+        closed: 0,
+        key: key,
+        map: map,
+        model: model,
+        owner: owner,
+        phase: 0
+    };
+
+    s.api = Object.freeze({
+        validator: function () {
+            if (!s.base)
+                return
+            ;
+            if (!transactionCurrent(s)) {
+                transactionClose(s, 1);
+                return;
+            }
+
+            return s.base.validator;
+        },
+        accept: function (v) {
+            if (s.closed)
+                return
+            ;
+            s.accepted = 1;
+            s.staged = v;
+        },
+        reuse: function (v) {
+            if (!transactionCurrent(s) || !validatorPair(s.base.validator, v)) {
+                transactionClose(s, 1);
+                throw new Error('Cache validator detached');
+            }
+            s.accepted = 1;
+            s.staged = v;
+            return s.base.value;
+        }
+    });
+
+    return s;
+}
+
 module.exports = {
     jTormPromiseCacheModel: {
         clock: function () { return Date.now(); },// DI: monotonic-enough millisecond wall clock
@@ -164,8 +268,14 @@ module.exports = {
             return r && r.value === v ? r : undefined;
         },
 
-        pending: function (m, q, v, n) {
-            this.records(m, 1).set(q, {value: v, token: n, pending: 1, at: undefined});
+        pending: function (m, q, v, n, s) {
+            const r = {value: v, token: n, pending: 1, at: undefined};
+
+            if (s) {
+                r.transaction = s;
+                r.base = s.base;
+            }
+            this.records(m, 1).set(q, r);
         },
 
         stamp: function (o, m, q, v, a, s) {
@@ -206,19 +316,21 @@ module.exports = {
             this.metadata.delete(m);
         },
 
-        settle: function (o, q, p, n, ok) {
-            let a, c, r;
+        settle: function (o, q, p, n, ok, s) {
+            let a, c, r, v;
 
             try {
                 c = o.c;
                 r = this.record(c, q, p);
-                if (!r || r.token !== n || c.get(q) !== p)
-                    return
-                ;
+                if (!r || r.token !== n || c.get(q) !== p) {
+                    if (s) transactionClose(s, 1);
+                    return;
+                }
 
                 if (!ok) {
                     c.delete(q);
                     this.forget(c, q, p, n);
+                    if (s) transactionClose(s, 0);
                     return;
                 }
 
@@ -226,12 +338,19 @@ module.exports = {
                 if (a === undefined) {
                     c.delete(q);
                     this.forget(c, q, p, n);
+                    if (s) transactionClose(s, 0);
                     return;
                 }
 
+                v = s && s.accepted ? s.staged : undefined;
                 r.token = null;
                 r.pending = 0;
                 r.at = a;
+                if (v !== undefined) r.validator = v;
+                else delete r.validator;
+                delete r.transaction;
+                delete r.base;
+                if (s) transactionClose(s, 0);
             } catch (e) {
                 try {
                     c = o.c;
@@ -241,6 +360,7 @@ module.exports = {
                         this.forget(c, q, p, n);
                     }
                 } catch (x) {}
+                if (s) transactionClose(s, 1);
             }
         },
 
@@ -324,6 +444,9 @@ module.exports = {
             if (r.refresh)
                 return r.refresh.value
             ;
+            if (validators(x))
+                return this.validatorRefresh(o, q, x, p, r)
+            ;
 
             try { f = x.load(); } catch (e) { return; }
             n = {};
@@ -343,14 +466,52 @@ module.exports = {
             return f;
         },
 
-        publish: function (o, q, p, r, f, n, ok) {
-            let a, c, d = r.refresh;
+        validatorRefresh: function (o, q, x, p, r) {
+            const b = {value: p, record: r, validator: r.validator};
+            let d, f, n, s = transaction(this, o, o.c, q, b);
 
-            if (!d || d.value !== f || d.token !== n)
+            try { f = x.load(s.api); } catch (e) {
+                transactionClose(s, 0);
+                return;
+            }
+            if (!transactionCurrent(s)) {
+                transactionClose(s, 1);
+                return;
+            }
+
+            n = {};
+            d = {value: f, token: n, transaction: s};
+            s.descriptor = d;
+            s.phase = 2;
+            s.token = n;
+            s.value = f;
+            r.refresh = d;
+
+            try {
+                f.then(
+                    () => { this.publish(o, q, p, r, f, n, 1, s); },
+                    () => { this.publish(o, q, p, r, f, n, 0, s); }
+                );
+            } catch (e) {
+                if (r.refresh === d) delete r.refresh;
+                transactionClose(s, 0);
+                return;
+            }
+
+            return f;
+        },
+
+        publish: function (o, q, p, r, f, n, ok, s) {
+            let a, c, v, z, d = r.refresh;
+
+            if (!d || d.value !== f || d.token !== n) {
+                if (s) transactionClose(s, 1);
                 return
             ;
+            }
             if (!ok) {
                 delete r.refresh;
+                if (s) transactionClose(s, 0);
                 return;
             }
 
@@ -358,6 +519,7 @@ module.exports = {
                 c = o.c;
                 if (c.get(q) !== p || this.record(c, q, p) !== r) {
                     delete r.refresh;
+                    if (s) transactionClose(s, 1);
                     return;
                 }
 
@@ -365,13 +527,19 @@ module.exports = {
                 if (a === undefined) {
                     delete r.refresh;
                     this.remove(o, c, q, p);
+                    if (s) transactionClose(s, 0);
                     return;
                 }
 
+                v = s && s.accepted ? s.staged : undefined;
                 c.set(q, f);
-                this.records(c, 1).set(q, {
+                z = {
                     value: f, token: null, pending: 0, at: a, scope: r.scope
-                });
+                };
+                if (v !== undefined) z.validator = v;
+                this.records(c, 1).set(q, z);
+                delete r.refresh;
+                if (s) transactionClose(s, 0);
             } catch (e) {
                 if (r.refresh === d) delete r.refresh;
                 try {
@@ -381,11 +549,31 @@ module.exports = {
                         this.forget(c, q);
                     }
                 } catch (x) {}
+                if (s) transactionClose(s, 1);
+            }
+        },
+
+        discard: function (o, c, q, p, r) {
+            try {
+                if (o.c !== c || c.get(q) !== p || this.record(c, q, p) !== r)
+                    return 0
+                ;
+                c.delete(q);
+                this.forget(c, q, p);
+                return 1;
+            } catch (e) {
+                return 0;
             }
         },
 
         insert: function (o, q, x, c) {
-            let k, n, p = x.load();
+            let k, n, p;
+
+            if (validators(x))
+                return this.validatorInsert(o, q, x, c)
+            ;
+
+            p = x.load();
 
             n = {};
             this.pending(c, q, p, n);
@@ -393,6 +581,94 @@ module.exports = {
                 () => { this.settle(o, q, p, n, 1); },
                 () => { this.settle(o, q, p, n, 0); }
             );
+            c.set(q, p);
+
+            while (c.size > o.max) {
+                k = c.keys().next().value;
+                if (k === q) break;
+                this.forget(c, k, c.get(k));
+                c.delete(k);
+            }
+
+            return p;
+        },
+
+        validatorInsert: function (o, q, x, c) {
+            let k, n, p, s = transaction(this, o, c, q);
+
+            try { p = x.load(s.api); } catch (e) {
+                transactionClose(s, 0);
+                throw e;
+            }
+
+            try {
+                if (o.c !== c || c.get(q) !== undefined) {
+                    transactionClose(s, 1);
+                    return p;
+                }
+            } catch (e) {
+                transactionClose(s, 1);
+                return p;
+            }
+
+            n = {};
+            s.phase = 1;
+            s.token = n;
+            s.value = p;
+            this.pending(c, q, p, n, s);
+            try {
+                p.then(
+                    () => { this.settle(o, q, p, n, 1, s); },
+                    () => { this.settle(o, q, p, n, 0, s); }
+                );
+            } catch (e) {
+                this.forget(c, q, p, n);
+                transactionClose(s, 0);
+                throw e;
+            }
+            c.set(q, p);
+
+            while (c.size > o.max) {
+                k = c.keys().next().value;
+                if (k === q) break;
+                this.forget(c, k, c.get(k));
+                c.delete(k);
+            }
+
+            return p;
+        },
+
+        validatorReplace: function (o, q, x, c, old, r) {
+            const b = {value: old, record: r, validator: r.validator};
+            let k, n, p, s = transaction(this, o, c, q, b);
+
+            try { p = x.load(s.api); } catch (e) {
+                if (transactionCurrent(s)) this.discard(o, c, q, old, r);
+                transactionClose(s, 1);
+                throw e;
+            }
+            if (!transactionCurrent(s)) {
+                transactionClose(s, 1);
+                return p;
+            }
+
+            n = {};
+            s.phase = 1;
+            s.token = n;
+            s.value = p;
+            this.pending(c, q, p, n, s);
+            try {
+                p.then(
+                    () => { this.settle(o, q, p, n, 1, s); },
+                    () => { this.settle(o, q, p, n, 0, s); }
+                );
+            } catch (e) {
+                this.forget(c, q, p, n);
+                try { if (o.c === c && c.get(q) === old) c.delete(q); } catch (v) {}
+                transactionClose(s, 1);
+                throw e;
+            }
+            c.delete(q);
             c.set(q, p);
 
             while (c.size > o.max) {
@@ -442,6 +718,10 @@ module.exports = {
                 return r.refresh.value
             ;
 
+            if (validators(x) && r.validator !== undefined)
+                return this.validatorReplace(o, q, x, c, p, r)
+            ;
+
             this.remove(o, c, q, p, r.token);
             return this.insert(o, q, x, c);
         },
@@ -452,6 +732,21 @@ module.exports = {
             return (async function () {
                 await x.hit();
                 if (x.check) x.check(q);
+                return s.current(o, q, x, a);
+            })();
+        },
+
+        hardGuard: function (o, q, x, a) {
+            const s = this;
+
+            return (async function () {
+                try {
+                    await x.hit();
+                    if (x.check) x.check(q);
+                } catch (e) {
+                    s.discard(o, a.c, q, a.p, a.r);
+                    throw e;
+                }
                 return s.current(o, q, x, a);
             })();
         },
@@ -488,6 +783,10 @@ module.exports = {
                     if (r.refresh)
                         return this.guard(o, q, x, {c: c, p: p, r: r, touched: 0})
                         ;
+
+                    if (validators(x) && r.validator !== undefined)
+                        return this.hardGuard(o, q, x, {c: c, p: p, r: r, touched: 0})
+                    ;
 
                     // Initial hard state is a miss; never reclassify it without the hit guard.
                     this.remove(o, c, q, p, r.token);

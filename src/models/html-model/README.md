@@ -30,8 +30,17 @@ Choose the window for this template's sensitivity and revocation needs. Use fini
 lifetime and source/concurrency controls because detached work is not cancelled and serverless
 execution may freeze after returning stale. `staleWindow = 0` is the kill switch. Acquisition
 purge affects only future model participation and cannot revoke already returned templates,
-prepared roots, rendered fragments, or persisted fragment bytes. HTTP validators and
-rendered-fragment SWR are separate policies.
+prepared roots, rendered fragments, or persisted fragment bytes. HTTP validators do not change
+those downstream lifetimes, and rendered-fragment SWR remains separate.
+
+`validators` defaults to `false`. Exact `true`, a scoped cache key, and compatible injected
+request/promise-cache models enable conditional acquisition. A valid modified text response is
+received before its bounded ETag (preferred) or Last-Modified value is paired with that exact cache
+generation. At TTL/SWR reacquisition, a matching 304 sends one condition, reads no body, reuses the
+exact current HTML string, and publishes a new successful generation timestamp. Missing, invalid,
+or oversized response metadata keeps ordinary caching; a modified response never carries its
+predecessor validator. Disable instantly with `validators = false` and purge affected keys when
+authorization or source ownership changes.
 
 Cache admission remains the request-model key derived at call start. As before, a cache hit does
 not rerun URL or authorization policy; hosts tightening that policy must purge affected keys.

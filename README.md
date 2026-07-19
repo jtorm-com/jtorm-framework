@@ -60,7 +60,8 @@ Hosts compose three shared policy models before rendering:
   cache-root resolution, and namespaced root state. Normal render traversal remains compatible.
 - `@jtorm/promise-cache-model` owns in-flight promise dedupe, insertion-safe rejection cleanup,
   bounded LRU mechanics, overridable clock policy, absolute TTLs, request-triggered acquisition
-  refresh, and purge metadata while each cache retains its public value store, key, loader/render
+  refresh, atomic acquisition-validator generation records, and purge metadata while each cache
+  retains its public value store, key, loader/render
   path, and independently configurable `ttl` and, where supported, `staleWindow`.
 - `@jtorm/asset-plugin-model` owns the shared CSS/JS collection, URL-policy, DOM insertion,
   dedupe, and cleanup lifecycle while both plugins retain their public facades.
@@ -96,8 +97,7 @@ during the strict interval `ttl <= age < ttl + staleWindow` and lets that reques
 best-effort refresh for the retained generation. Successful refresh publishes at fulfillment and
 starts a new absolute TTL; failure keeps the old hard deadline and a later eligible request may
 retry. At the hard boundary, callers join an already-running refresh or wait for one cold
-replacement. There are no timers, refresh-ahead, failure backoff, HTTP validators, or
-rendered-fragment SWR.
+replacement. There are no timers, refresh-ahead, failure backoff, or rendered-fragment SWR.
 
 Missing, invalid, or inaccessible `staleWindow` behaves as `0`: ordinary TTL freshness remains
 available, but stale service is disabled. Every finite nonnegative window is accepted; strict
@@ -109,6 +109,22 @@ must purge affected acquisition keys. Manifest packs instead re-run URL policy a
 check on every shared reuse. Existing loader/transport instrumentation sees acquisition attempts
 and failures but receives no signal that distinguishes a background refresh from foreground work.
 
+Those same four acquisition owners expose `validators`, defaulting to `false`. Exact `true` uses
+the injected request model's additive conditional facade when an explicit scoped key and compatible
+promise-cache transaction are available. A cold/modified 200 follows the ordinary parser and, for
+manifests, the complete integrity/schema/bounds path before one bounded ETag (preferred) or
+Last-Modified value is paired with that exact successful generation. Missing or invalid metadata
+does not reject valid bytes and never carries a predecessor validator onto replacement content.
+
+At TTL expiry or during SWR, the request model re-runs URL policy and rederives the exact scoped key
+from the resolved URL immediately before sending one condition. A 304 reads no body and may publish
+a new TTL only by reusing the exact current authorized content+validator pair. Ordinary hits never
+slide or send. Purge, reset, eviction, owner Map replacement, rejection, and newer work detach both
+content reuse and metadata authority. Validators are process-local response metadata: they are not
+logged, exported, persisted, copied into rendered fragments, or interpreted as dates/server cache
+semantics. Disabled, unscoped, or older/incompatible collaborators use the exact legacy request and
+zero-argument loader paths.
+
 Choose a positive window per content sensitivity, never as an authorization substitute. Avoid it
 for authentication/authorization state, secrets, payments, or regulated/erasure-sensitive content
 without a new threat review. Configure finite transport lifetime and source/concurrency controls:
@@ -117,11 +133,11 @@ serverless runtimes may freeze after a stale response. Acquisition purge affects
 acquisition-cache participation; it cannot revoke already returned data, prepared manifest
 indexes, rendered fragments, or persisted fragment envelopes.
 
-The runtime kill switch is `staleWindow = 0`. Rollback then purges the affected acquisition
-cache. For sensitive content, also dispose prepared roots, purge the UI cache, and clear/save its
-persistence before rolling consumers back; publish/retain promise-cache `1.1.0+` before data,
-HTML, TSS, and manifest-model `1.1.0+`. UI-cache remains on its
-separate `2.x` rendered-fragment contract and does not expose `staleWindow`.
+The runtime kill switches are `staleWindow = 0` and `validators = false`. Rollback then purges the
+affected acquisition cache. For sensitive content, also dispose prepared roots, purge the UI
+cache, and clear/save its persistence before rolling consumers back; publish/retain promise-cache
+and request-model `1.2.0+` before data, HTML, TSS, and manifest-model `1.2.0+`. UI-cache remains on
+its separate `2.x` rendered-fragment contract and exposes neither `staleWindow` nor `validators`.
 
 Rendered-fragment age now survives restart under the current finite/zero/Infinity TTL by combining
 that persisted absolute timestamp with promise-cache-owned process-local freshness. Hosts inject a
@@ -132,7 +148,8 @@ snapshot; older readers are not assumed to reject the new envelope safely. Persi
 by calling `save(scopedRootView)` afterward. The plugin preserves its non-awaited after-view save
 timing; an operator requiring persistence completion or error visibility explicitly awaits that
 `save()` call. See the UI-cache model README for wire, clock, privacy, deployment, and rollback
-details. Rendered-fragment SWR and HTTP validators remain independent follow-ups.
+details. Rendered-fragment SWR remains an independent follow-up; validator metadata never enters
+the rendered-fragment wire or runtime cache.
 
 ## Credits
 The idea is heavily inspired from [Transphporm](https://github.com/Level-2/Transphporm), all credits go to them in finding a different way to handle template rendering.

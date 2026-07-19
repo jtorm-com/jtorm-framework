@@ -1,6 +1,107 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+const validatorMax = 1024;
+
+function validatorBytes(v) {
+    if (typeof v !== 'string' || !v || v.length > validatorMax)
+        return false
+    ;
+
+    try {
+        return new TextEncoder().encode(v).length <= validatorMax;
+    } catch (e) {
+        return false;
+    }
+}
+
+function validatorValue(n, v) {
+    if (!validatorBytes(v))
+        return
+    ;
+    if (n === 'etag' && !/^(?:W\/)?"[\x21\x23-\x7E]*"$/.test(v)
+        || n === 'last-modified' && /[\u0000-\u0008\u000A-\u001F\u007F]/.test(v)
+        || n !== 'etag' && n !== 'last-modified')
+        return
+    ;
+
+    return Object.freeze({name: n, value: v});
+}
+
+function validatorHeader(r, n) {
+    try {
+        return r && r.headers && typeof r.headers.get === 'function'
+            ? r.headers.get(n) : undefined;
+    } catch (e) {}
+}
+
+function responseValidator(r) {
+    return validatorValue('etag', validatorHeader(r, 'etag'))
+        || validatorValue('last-modified', validatorHeader(r, 'last-modified'));
+}
+
+function requestValidator(x) {
+    let n, v;
+
+    try {
+        if (!x || typeof x !== 'object')
+            return
+        ;
+        n = x.name;
+        v = x.value;
+    } catch (e) {
+        return;
+    }
+
+    return validatorValue(n, v);
+}
+
+async function conditionalFetch(s, url, c, x) {
+    let f, k, r, v;
+
+    try { k = x && x.key; } catch (e) {}
+
+    const o = {},
+        u = s.url(url, c),
+        t = s.option(c, 'timeout', s.timeout)
+    ;
+
+    if (t)
+        o.signal = AbortSignal.timeout(t)
+    ;
+
+    if (!(await s.allow(u, c)))
+        throw new Error('URL blocked ' + u)
+    ;
+
+    if (k == null || k === '' || s.cacheKey(u, c) !== k)
+        throw new Error('Request cache scope changed for ' + url)
+    ;
+
+    try { f = x && x.validator; } catch (e) {}
+    if (typeof f === 'function')
+        v = requestValidator(f.call(x))
+    ;
+    if (v)
+        o.headers = v.name === 'etag'
+            ? {'If-None-Match': v.value}
+            : {'If-Modified-Since': v.value}
+    ;
+
+    r = await s.transport(u, o);
+    if (r.status === 304) {
+        if (!v)
+            throw new Error('HTTP 304 for ' + url)
+        ;
+        return {response: r, status: 304, validator: v};
+    }
+    if (!r.ok)
+        throw new Error('HTTP ' + r.status + ' for ' + url)
+    ;
+
+    return {response: r, status: r.status};
+}
+
 /**
  * @callback jTormTransport
  * @param {string} url Fully-resolved URL (already passed through url()).
@@ -317,6 +418,29 @@ module.exports = {
             ;
 
             return r;
+        },
+
+        conditional: function (url, c, x) {
+            const s = this;
+
+            function parse(n) {
+                return conditionalFetch(s, url, c, x).then(async function (r) {
+                    if (r.status === 304)
+                        return {status: 304, validator: r.validator}
+                    ;
+
+                    return {
+                        status: r.status,
+                        value: await r.response[n](),
+                        validator: responseValidator(r.response)
+                    };
+                });
+            }
+
+            return {
+                json: function () { return parse('json'); },
+                text: function () { return parse('text'); }
+            };
         },
 
         get: function (url, c) {
