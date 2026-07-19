@@ -10,6 +10,7 @@ module.exports = {
         c: new Map(),
         max: 512,// DI: LRU cap on cached fetch promises; least-recently-used evicted beyond this
         ttl: 300000,// DI: absolute successful-result retention in milliseconds; Infinity opts out
+        staleWindow: 0,// DI: opt-in request-triggered stale service after ttl; 0 waits for replacement
 
         key: function (v, c) {
             const q = this.requestModel && typeof this.requestModel.cacheKey === 'function'

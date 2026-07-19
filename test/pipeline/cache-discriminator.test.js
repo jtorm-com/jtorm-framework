@@ -7,6 +7,9 @@ const { jTormDataModel } = require('../../src/models/data-model/src/data-model.j
 
 const unscoped = () => ({c: 0, s: null, a: null});
 const scoped = tenant => ({c: 0, s: null, a: null, request: {tenant}});
+test.afterEach(() => {
+  jTormUiCacheModel.saveModel = null;
+});
 
 test('same-identity unscoped get renders observe fresh fetched content across shared-cache reuse', async () => {
   const tss = ".a->get { d: '/same.json'; span->inner { h: value; } }";
@@ -199,4 +202,99 @@ test('an explicitly scoped warm pipeline is byte-stable before TTL, refreshes fe
   );
   assert.equal(purged.body, '<div>C</div>');
   assert.deepEqual(purged.requests, ['/same.json']);
+});
+test('scoped request-triggered SWR serves stale once, refreshes in the background, and stays isolated from unscoped renders', async () => {
+  let now = 0;
+  const clock = () => now;
+  const options = {reuseSharedCaches: true, clock, ttl: 10, staleWindow: 10};
+  const tss = ".a->get { d: '/same.json'; span->inner { h: value; } }";
+  const html = '<body><div class="a"><span></span></div></body>';
+
+  const first = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'A'}}}, scoped('tenant-a'), null, 0,
+    {clock, ttl: 10, staleWindow: 10}
+  );
+  now = 10;
+  const stale = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'B'}}}, scoped('tenant-a'), null, 0, options
+  );
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.equal(first.body, '<div class="a"><span>A</span></div>');
+  assert.equal(stale.body, first.body);
+  assert.deepEqual(first.requests, ['/same.json']);
+  assert.deepEqual(stale.requests, ['/same.json']);
+
+  now = 11;
+  const fresh = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'C'}}}, scoped('tenant-a'), null, 0, options
+  );
+  const untrusted = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'C'}}}, unscoped(), null, 0, options
+  );
+  const stillScoped = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'D'}}}, scoped('tenant-a'), null, 0, options
+  );
+
+  assert.equal(fresh.body, '<div class="a"><span>B</span></div>');
+  assert.deepEqual(fresh.requests, []);
+  assert.equal(untrusted.body, '<div class="a"><span>C</span></div>');
+  assert.deepEqual(untrusted.requests, ['/same.json']);
+  assert.equal(stillScoped.body, fresh.body);
+  assert.deepEqual(stillScoped.requests, []);
+});
+
+test('a stale acquisition can publish a newer derived fragment that acquisition purge alone cannot revoke', async () => {
+  let now = 0;
+  const clock = () => now;
+  const context = scoped('tenant-a');
+  const store = {uiCacheScoped: true, value: null, set(value) { this.value = value; }};
+  const options = {
+    reuseSharedCaches: true, clock, persistenceClock: clock, ttl: 10, staleWindow: 10,
+    uiCacheStore: store
+  };
+  const tss = "div->append { cid: 'frag'; body->get { d: '/same.json'; ->inner { h: value; } } }";
+  const html = '<body><div></div></body>';
+
+  await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'A'}}}, context, null, 0,
+    {clock, persistenceClock: clock, ttl: 10, staleWindow: 10, uiCacheStore: store}
+  );
+  now = 10;
+  const stale = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'B'}}}, context, null, 0, options
+  );
+  await new Promise(resolve => setImmediate(resolve));
+
+  const settlements = jTormUiCacheModel.settlements.get(jTormUiCacheModel.order);
+  assert.equal(stale.body, '<div>A</div>');
+  assert.deepEqual(stale.requests, ['/same.json']);
+  assert.equal(jTormUiCacheModel.cache.null.frag['tenant-a\0default'], 'A');
+  assert.deepEqual([...settlements.values()].map(r => r.settledAt), [10]);
+  assert.equal(store.value.fragments[0].html, 'A');
+  assert.equal(store.value.fragments[0].settledAt, 10);
+
+  assert.equal(jTormDataModel.purge('/same.json', context), 1);
+  now = 11;
+  const retained = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'C'}}}, context, null, 0, options
+  );
+  assert.equal(retained.body, '<div>A</div>');
+  assert.deepEqual(retained.requests, []);
+
+  assert.equal(jTormUiCacheModel.purge(context, null, 'frag', 'default'), 1);
+  const cleared = await render(
+    html, tss, {}, 'http://localhost/',
+    {'/same.json': {json: {value: 'C'}}}, context, null, 0, options
+  );
+  assert.equal(cleared.body, '<div>C</div>');
+  assert.deepEqual(cleared.requests, ['/same.json']);
 });

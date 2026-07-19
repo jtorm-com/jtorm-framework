@@ -36,9 +36,26 @@ The model validates received text, schema, structure, per-value hashes, and comp
 expected SHA-256 before installing an index. Installation is atomic on the topmost render context.
 Pack promises use the request model's policy-aware cache key and a bounded 32-entry LRU.
 Successful cross-render packs have an absolute `ttl` of `300000` ms by default; hosts may set
-`manifest.ttl` independently (`0` pending-only, `Infinity` non-expiring rollback). Expired packs
-re-enter the unchanged request URL/allow, timeout, acquisition classification, digest, schema,
-and value-validation path.
+`manifest.ttl` independently (`0` pending-only, `Infinity` non-expiring rollback).
+`manifest.staleWindow` defaults to `0`. A finite positive value returns the prior validated pack
+during `ttl <= age < ttl + staleWindow` while that request starts one best-effort refresh.
+Concurrent stale roots share one refresh; successful fulfillment publishes only after the complete
+unchanged acquisition, digest, schema, and value-validation path. Failure keeps the original hard
+deadline. At the hard boundary, callers join an already-running refresh or await one cold pack.
+
+Every guarded reuse first awaits current URL policy, then rederives the exact captured cache key
+before using current cache state. Tenant, origin, context base, or singleton base drift rejects the
+attempt without serving stale or starting a refresh. The window applies only to the cross-render
+pack promise; an already prepared root keeps its independent root-local index until that root is
+disposed. Packs are public static assets, but positive windows still require finite transport
+lifetime/source controls; request-model timeout `0` is not cancellation and serverless refresh is
+best effort. `staleWindow = 0` plus exact/full pack purge is the acquisition rollback. HTTP
+validators and rendered-fragment SWR remain separate policies.
+
+This per-reuse authorization is intentionally stronger than the pre-existing data/HTML/TSS
+key-at-call admission model. Request/transport instrumentation sees refresh as an ordinary pack
+acquisition and receives no background-refresh marker from this API.
+
 When that request key is unscoped, each render root reacquires and validates its pack without
 touching the cross-render promise cache. Repeated `prepare()` calls on that same root still reuse
 the root-local prepared promise/index; this bypass does not change atomic installation,
@@ -58,7 +75,8 @@ Serve the content-addressed file with Brotli or gzip and
 `mode: 'optional'` falls back only when acquiring the pack fails. Received malformed, oversized,
 stale, tampered, or conflicting content always fails loud. `mode: 'required'` additionally makes
 declared namespaces strict: an absent owned asset fails instead of using the legacy model. Every
-packed hit and required miss still awaits `requestModel.url()` and `requestModel.allow()`.
+packed hit and required miss still awaits `requestModel.url()` and `requestModel.allow()`;
+cross-render cache reuse additionally rechecks the exact post-await cache identity.
 
 Inject the same model into `@jtorm/get-method`:
 
@@ -67,5 +85,6 @@ getMethod.manifest = manifest;
 ```
 
 Removing the `prepare()` call and the optional `getMethod.manifest` injection restores the legacy
-waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.0.2` and
-`@jtorm/request-model@1.1.5` before this package and the fetch/UI cache consumers.
+waterfall without changing asset URLs. Publish `@jtorm/promise-cache-model@1.0.4` and
+`@jtorm/request-model@1.1.5` before this package and the fetch consumers. Package release
+`1.0.4` does not change the exported manifest wire/compiler version `1.0.0`.

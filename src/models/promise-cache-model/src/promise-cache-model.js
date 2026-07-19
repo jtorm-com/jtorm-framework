@@ -104,6 +104,49 @@ module.exports = {
             return !!n && n.clock === a.clock && n.value >= a.value && n.value - a.value < t;
         },
 
+        windowPolicy: function (o) {
+            let w;
+
+            try { w = o.staleWindow; } catch (e) { return 0; }
+
+            if (w === undefined)
+                return 0
+            ;
+            if (typeof w !== 'number' || !Number.isFinite(w) || w < 0)
+                return 0
+            ;
+
+            return w;
+        },
+
+        phase: function (o, a) {// 0 hard/cold, 1 fresh, 2 stale
+            const t = this.policy(o);
+            let n, w;
+
+            if (a === undefined || t === undefined || t === 0)
+                return 0
+            ;
+            if (t === Infinity)
+                return 1
+            ;
+
+            w = this.windowPolicy(o);
+            if (!a || a === Infinity || typeof a.value !== 'number')
+                return 0
+            ;
+
+            n = this.read(o);
+            if (!n || n.clock !== a.clock || n.value < a.value)
+                return 0
+            ;
+            n = n.value - a.value;
+            if (n < t)
+                return 1
+            ;
+
+            return w > 0 && n - t < w ? 2 : 0;
+        },
+
         records: function (m, add) {
             let r = this.metadata.get(m);
 
@@ -186,6 +229,7 @@ module.exports = {
                     return;
                 }
 
+                r.token = null;
                 r.pending = 0;
                 r.at = a;
             } catch (e) {
@@ -261,37 +305,88 @@ module.exports = {
             } catch (e) {}
         },
 
-        get: function (o, q, x) {
-            let c, p, k, n, r;
+        touch: function (c, q, p) {
+            try {
+                if (c.get(q) !== p)
+                    return 0
+                ;
+                c.delete(q);
+                c.set(q, p);
+                return 1;
+            } catch (e) {
+                return 0;
+            }
+        },
 
-            if (q === undefined)
-                return x.load()
+        refresh: function (o, q, x, p, r) {
+            let d, f, n;
+
+            if (r.refresh)
+                return r.refresh.value
             ;
+
+            try { f = x.load(); } catch (e) { return; }
+            n = {};
+            d = {value: f, token: n};
+            r.refresh = d;
+
+            try {
+                f.then(
+                    () => { this.publish(o, q, p, r, f, n, 1); },
+                    () => { this.publish(o, q, p, r, f, n, 0); }
+                );
+            } catch (e) {
+                if (r.refresh === d) delete r.refresh;
+                return;
+            }
+
+            return f;
+        },
+
+        publish: function (o, q, p, r, f, n, ok) {
+            let a, c, d = r.refresh;
+
+            if (!d || d.value !== f || d.token !== n)
+                return
+            ;
+            if (!ok) {
+                delete r.refresh;
+                return;
+            }
 
             try {
                 c = o.c;
-                p = c.get(q);
-            } catch (e) {
-                return x.load();
-            }
-
-            if (p !== undefined) {
-                r = this.record(c, q, p);
-                if (r && (r.pending || this.live(o, r.at))) {
-                    c.delete(q);
-                    c.set(q, p);
-
-                    if (x.hit)
-                        return (async function () { await x.hit(); return p; })()
-                    ;
-
-                    return p;
+                if (c.get(q) !== p || this.record(c, q, p) !== r) {
+                    delete r.refresh;
+                    return;
                 }
 
-                this.remove(o, c, q, p, r && r.token);
-            }
+                a = this.time(o);
+                if (a === undefined) {
+                    delete r.refresh;
+                    this.remove(o, c, q, p);
+                    return;
+                }
 
-            p = x.load();
+                c.set(q, f);
+                this.records(c, 1).set(q, {
+                    value: f, token: null, pending: 0, at: a, scope: r.scope
+                });
+            } catch (e) {
+                if (r.refresh === d) delete r.refresh;
+                try {
+                    c = o.c;
+                    if (c.get(q) === p || c.get(q) === f) {
+                        c.delete(q);
+                        this.forget(c, q);
+                    }
+                } catch (x) {}
+            }
+        },
+
+        insert: function (o, q, x, c) {
+            let k, n, p = x.load();
+
             n = {};
             this.pending(c, q, p, n);
             p.then(
@@ -308,6 +403,99 @@ module.exports = {
             }
 
             return p;
+        },
+
+        current: function (o, q, x, a) {
+            let c, p, r, same, z;
+
+            try {
+                c = o.c;
+                p = c.get(q);
+            } catch (e) {
+                return x.load();
+            }
+
+            if (p === undefined)
+                return this.insert(o, q, x, c)
+            ;
+
+            r = this.record(c, q, p);
+            if (!r) {
+                if (a) return x.load();
+                this.remove(o, c, q, p);
+                return this.insert(o, q, x, c);
+            }
+
+            same = !!a && a.c === c && a.p === p && a.r === r;
+            if (r.pending) {
+                if (!same || !a.touched) this.touch(c, q, p);
+                return p;
+            }
+
+            z = this.phase(o, r.at);
+            if (z) {
+                if (!same || !a.touched) this.touch(c, q, p);
+                if (z === 2) this.refresh(o, q, x, p, r);
+                return p;
+            }
+            if (r.refresh)
+                return r.refresh.value
+            ;
+
+            this.remove(o, c, q, p, r.token);
+            return this.insert(o, q, x, c);
+        },
+
+        guard: function (o, q, x, a) {
+            const s = this;
+
+            return (async function () {
+                await x.hit();
+                if (x.check) x.check(q);
+                return s.current(o, q, x, a);
+            })();
+        },
+
+        get: function (o, q, x) {
+            let a, c, p, r, z;
+
+            if (q === undefined)
+                return x.load()
+            ;
+            if (!x.hit)
+                return this.current(o, q, x)
+            ;
+
+            try {
+                c = o.c;
+                p = c.get(q);
+            } catch (e) {
+                return x.load();
+            }
+
+            if (p !== undefined) {
+                r = this.record(c, q, p);
+                if (r && r.pending) {
+                    a = {c: c, p: p, r: r, touched: this.touch(c, q, p)};
+                    return this.guard(o, q, x, a);
+                }
+                if (r) {
+                    z = this.phase(o, r.at);
+                    if (z) {
+                        a = {c: c, p: p, r: r, touched: z === 1 ? this.touch(c, q, p) : 0};
+                        return this.guard(o, q, x, a);
+                    }
+                    if (r.refresh)
+                        return this.guard(o, q, x, {c: c, p: p, r: r, touched: 0})
+                        ;
+
+                    // Initial hard state is a miss; never reclassify it without the hit guard.
+                    this.remove(o, c, q, p, r.token);
+                    return this.insert(o, q, x, c);
+                }
+            }
+
+            return this.current(o, q, x);
         }
     }
 };

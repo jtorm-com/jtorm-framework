@@ -1,7 +1,7 @@
 {
   "name": "@jtorm/data-model",
   "description": "jTorm Data Model",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "license": "GPL-3.0",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,7 @@
     "directory": "src/models/data-model"
   },
   "dependencies": {
-    "@jtorm/promise-cache-model": "^1.0.2",
+    "@jtorm/promise-cache-model": "^1.0.4",
     "@jtorm/request-model": "^1.1.5"
   }
 }

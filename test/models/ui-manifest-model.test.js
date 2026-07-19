@@ -24,6 +24,7 @@ function reset() {
   mm.c = new Map();
   mm.max = 32;
   mm.ttl = 300000;
+  mm.staleWindow = 0;
   mm.maxText = 1048576;
   mm.maxValues = 262144;
   mm.maxDepth = 128;
