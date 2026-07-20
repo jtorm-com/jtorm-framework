@@ -1,11 +1,11 @@
-# Rendered-Fragment SWR — Implementation and Pre-PR Evaluation
+# Rendered-Fragment SWR — Implementation and Delivery Evaluation
 
-**Status:** COMPLETE — LOCAL IMPLEMENTATION AND REVIEW GATE PASSED
+**Status:** MERGED — PR #74 landed in `dev` as `ca4cef2`
 **Date:** 2026-07-19
-**Branch:** `feat/rendered-fragment-swr`
+**Branch:** deleted after merge
 **Target:** `dev`
 **Agent:** Codex `/root`
-**Current mode:** Delivery; ready-PR, CI, and current-head Codex review remain external gates.
+**Current mode:** Complete
 
 ## Outcome
 
@@ -232,7 +232,7 @@ is a dependency-free server/client cache lifecycle model with no new UI or netwo
 The real wrapper/event/plugin lifecycle integration test is the highest applicable end-to-end
 boundary.
 
-## Pre-PR Scorecard
+## Delivery Scorecard
 
 | Dimension | Score |
 |-----------|-------|
@@ -248,6 +248,7 @@ boundary.
 | Readability | 10/10 |
 | **Total** | **100/100** |
 
-The score is local implementation readiness, not a claim about unrun external gates. Delivery
-completes only after rebasing onto current `origin/dev`, committing the exact reviewed diff,
-opening a ready PR into `dev`, green CI, and a clean Codex review against the current PR head.
+The score is final. Feature head `f379d8f` passed the focused 77/77 suite, exact 952/952 repository
+suite, typecheck, package/security/source ratchets, green CI, and a clean current-head Codex review
+with zero unresolved threads. The maintainer merged PR #74 into `dev` as `ca4cef2`; the delivery
+agent did not merge it.

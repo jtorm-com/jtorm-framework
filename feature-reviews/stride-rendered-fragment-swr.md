@@ -1,6 +1,6 @@
 # STRIDE and PASTA Threat Model: Request-Triggered Rendered-Fragment SWR
 
-**Status:** IMPLEMENTED — HIGH/BLOCKER CONTROLS VERIFIED; HOST RESIDUALS DOCUMENTED
+**Status:** MERGED — PR #74; HIGH/BLOCKER CONTROLS VERIFIED, HOST RESIDUALS DOCUMENTED
 **Date:** 2026-07-19
 **Scope:** opt-in request-triggered stale-while-revalidate for persisted/process-local rendered UI fragments
 **Specification:** `feature-reviews/rendered-fragment-swr-implementation.md`

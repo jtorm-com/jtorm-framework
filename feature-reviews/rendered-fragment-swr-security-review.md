@@ -1,7 +1,7 @@
 # Request-Triggered Rendered-Fragment SWR — Security Review
 
 **Date:** 2026-07-19
-**Status:** COMPLETE — IMPLEMENTATION APPROVED WITH HOST-OWNED RESIDUALS
+**Status:** MERGED — PR #74; IMPLEMENTATION APPROVED WITH HOST-OWNED RESIDUALS
 **Specification:** [rendered-fragment-swr-implementation.md](rendered-fragment-swr-implementation.md)
 **Threat model:** [stride-rendered-fragment-swr.md](stride-rendered-fragment-swr.md)
 **Evaluation:** [rendered-fragment-swr-evaluation.md](rendered-fragment-swr-evaluation.md)

@@ -149,6 +149,18 @@
 > UI-system follow-up is accessible form-field and validation composition over existing `html-ui`
 > primitives; behavior-heavy widgets remain deferred until a framework-neutral interaction and
 > focus owner exists.
+>
+> **Backlog update — 2026-07-20 (`dev` at `ca4cef2`):** PR #74 completed the
+> rendered-fragment SWR P4 as a default-off, host-authorized isolated lifecycle. The cache never
+> replays handler, event, method, or plugin work itself: a stable injected host snapshots canonical
+> inputs, authorizes at most one refresh attempt per retained process generation, and runs the
+> unchanged lifecycle.
+> Exact-generation checks, hard followers, atomic HTML/timestamp/dirty publication, retryable save
+> failure, process-local attempt bounds, wire-v1 persistence, purge/revocation detachment, and the
+> existing scoped request policy remain owned by their established models. Missing or malformed
+> policy/host wiring keeps the exact blocking path. Final head `f379d8f` passed 952/952 local tests,
+> green CI, and a clean current-head Codex review with zero unresolved threads before the maintainer
+> merged PR #74 into `dev` as `ca4cef2`. This closes the final open P4 cache-policy follow-up.
 
 ---
 
@@ -210,7 +222,7 @@ Live in production on a Magento store via a Node host engine.
 9. **Binding re-parse per node per render** (handler.js:73; data-parser has no cache). The AST is cached but every binding string is re-regexed and re-split on every render. Cheapest large perf win available: compile bindings onto the AST node once.
 10. **DRY debt from the isolation retrofit.** 5 near-identical `context(v)` walks, 4 `state(v)` copies, 3 near-clone fetch models (tss/data/html, ~85% identical), 2 near-clone css/js plugins (~90% identical). Every isolation fix had to be applied in ≥4 places — the slice history shows exactly that. Directly against the CLAUDE.md DRY/smallest-bundle mandate.
 11. **`Thing.default` ships demo junk.** `thing-update-1.0.1.tss` (schema-ui.js:336-338) appends a stray `<input type=email>` and a `ul` to `<body>` — so any bare `ui:{c:'Thing'}` (e.g. `Person.default`, schema-ui.js:427-430) inherits it. The one live instance of the "versioned update file" mechanic is a landmine; no end-to-end test covers `Thing.default` or `Person.default`.
-12. **✅ Closed in two bounded halves — PR #59 fixed fail-open tenant scoping; PR #61 bounded live retention and added administrative invalidation.** Shared cache participation still requires a valid explicit tenant/origin/base discriminator. Scoped data, HTML, TSS, manifest-pack, and rendered-fragment results default to a five-minute absolute in-process TTL, and hosts can invalidate one exact scoped identity or explicitly purge a whole participating cache without restarting. Pending work remains deduplicated and successful hits do not slide expiry. Persisted rendered-fragment age is versioned, while safe acquisition caches now have dormant-by-default request-triggered SWR and HTTP validators under their separate contracts. Rendered-fragment SWR remains a separate P4 enhancement, not an unresolved part of this weakness closure.
+12. **✅ Closed in two bounded halves — PR #59 fixed fail-open tenant scoping; PR #61 bounded live retention and added administrative invalidation.** Shared cache participation still requires a valid explicit tenant/origin/base discriminator. Scoped data, HTML, TSS, manifest-pack, and rendered-fragment results default to a five-minute absolute in-process TTL, and hosts can invalidate one exact scoped identity or explicitly purge a whole participating cache without restarting. Pending work remains deduplicated and successful hits do not slide expiry. Persisted rendered-fragment age is versioned; safe acquisition caches have dormant-by-default request-triggered SWR and HTTP validators; rendered fragments have separate default-off, host-authorized isolated-lifecycle SWR. All four P4 cache-policy follow-ups preserve their distinct owners and are complete.
 
 ### DRY / SOLID grade
 
@@ -296,7 +308,7 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P3** | Add cache TTL and explicit purge APIs | ✅ Done — merged PR #61; TTL/purge half of weakness #12 | Makes template/cache invalidation operational without process restart while preserving scoped warm behavior | M |
 | **P4** | Version the persisted fragment schema for absolute age across restarts | ✅ Done — merged PR #63 | Wire v1 preserves original successful settlement time, applies current TTL to remaining age, and defines fail-closed migration/deployment/rollback | M |
 | **P4** | Add opt-in request-triggered SWR to safe acquisition caches | ✅ Done — merged PR #65 | Data/HTML/TSS/manifest packs default to zero, preserve strict scope/policy/validation, and refresh once per retained generation | M |
-| **P4** | Evaluate rendered-fragment SWR | Next independent follow-up | Background rendering crosses handler/event completion, independent timestamps, save adapters, persistence, and downstream revocation | L |
+| **P4** | Add opt-in host-authorized rendered-fragment SWR | ✅ Done — merged PR #74 | Isolated host lifecycle avoids cache-owned replay; exact generations and atomic publication preserve timestamps, persistence, purge, and revocation boundaries | L |
 | **P4** | Add opt-in HTTP validators to safe acquisition caches | ✅ Done — merged PR #69 | Exact scoped generation pairing, bounded opaque ETag/Last-Modified metadata, validated 200 replacement, and bodyless 304 reuse; rendered fragments remain excluded | M |
 | **P5** | Establish a framework-neutral common-component foundation | ✅ Done — merged PR #66 | Stable intent-based names and canonical models make visual-framework backends testable without coupling caller data to one framework | L |
 | **P5** | Design the UI-framework adapter layer and implement one reference adapter | ✅ Done — merged PR #71 | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
