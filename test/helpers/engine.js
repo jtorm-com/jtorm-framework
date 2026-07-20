@@ -199,7 +199,9 @@ jTormUiMethod.mediatargetMethod = jTormMediatargetMethod;
 jTormUiMethod.ui = { mapper: null }; // host UI-mapper override slot (no custom mapper in the harness)
 jTormUiMethod.framework = 'schema';
 jTormUiCacheModel.saveModel = null;
+jTormUiCacheModel.refreshModel = null;
 jTormUiCachePlugin.uiCacheModel = jTormUiCacheModel;
+jTormUiCachePlugin.refreshModel = null;
 jTormJsonLdPlugin.jsonLdModel = jTormJsonLdModel;
 // layer DI (mirrors context.js): method + plugin share the layer-model; the plugin
 // replays stashed fragments through the handler against a copied view. saveModel=null
@@ -272,6 +274,7 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
     jTormUiCacheModel.persistenceClock = DEFAULT_PERSISTENCE_CLOCK;
     jTormDataModel.ttl = jTormHtmlModel.ttl = jTormTssModel.ttl = jTormUiManifestModel.ttl = jTormUiCacheModel.ttl = 300000;
     jTormDataModel.staleWindow = jTormHtmlModel.staleWindow = jTormTssModel.staleWindow = jTormUiManifestModel.staleWindow = 0;
+    jTormUiCacheModel.staleWindow = 0;
     jTormDataModel.validators = jTormHtmlModel.validators = jTormTssModel.validators = jTormUiManifestModel.validators = false;
     jTormUiManifestModel.max = 32;
     jTormUiManifestModel.maxText = 1048576;
@@ -286,6 +289,8 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
     jTormUiManifestModel.requestModel = jTormRequestModel;
     jTormUiCacheModel.requestModel = jTormRequestModel;
     jTormUiCacheModel.saveModel = null;
+    jTormUiCacheModel.refreshModel = null;
+    jTormUiCachePlugin.refreshModel = null;
     jTormUiManifestModel.digest = async bytes => new Uint8Array(
         createHash('sha256').update(bytes).digest()
     );
@@ -299,6 +304,10 @@ function reset(jsonLd = 1, reuseSharedCaches = 0) {
         jTormUiCacheModel.persistenceObserved = new WeakMap();
         jTormUiCacheModel.flights = new WeakMap();
         jTormUiCacheModel.iterations = new WeakMap();
+        jTormUiCacheModel.refreshes = new WeakMap();
+        jTormUiCacheModel.refreshHosts = new WeakMap();
+        jTormUiCacheModel.requests = new WeakMap();
+        jTormUiCacheModel.executions = new WeakMap();
     }
     jTormUiCacheModel.updated = 0;
     jTormUiCacheModel.revision = 0;

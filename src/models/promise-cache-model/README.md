@@ -1,9 +1,10 @@
 # @jtorm/promise-cache-model
 
-Dependency-injected owner for bounded promise-cache mechanics, process-local absolute
-expiration, and opt-in request-triggered stale acquisition. The caller retains its public
-`c: Map`, `max`, `ttl`, `staleWindow`, key, loader, parser, and policy surfaces. Participating
-jTorm acquisition caches default `ttl` to `300000` milliseconds and `staleWindow` to `0`.
+Dependency-injected owner for bounded promise-cache mechanics, process-local absolute expiration,
+opt-in request-triggered stale acquisition, and non-executing phase/record primitives used by the
+rendered-fragment cache owner. The caller retains its public `c: Map`, `max`, `ttl`, `staleWindow`,
+key, loader, parser, and policy surfaces. Participating jTorm acquisition caches default `ttl` to
+`300000` milliseconds and `staleWindow` to `0`.
 
 ```js
 consumer.promiseCacheModel = promiseCacheModel;
@@ -104,6 +105,20 @@ must not inspect or synthesize its fields. This keeps strict `< ttl`, clock iden
 and timestamp representation in this model while a separate persistence owner retains an absolute
 timestamp. `restore()` performs no clock read and never serializes clock identity.
 
+The rendered-fragment owner uses `restorePhase(owner, age, sampledTime)` when a trusted wire record
+may be either fresh or inside the current strict stale window. It returns the same opaque insertion
+record shape as `restore()` and still performs no render, acquisition, scheduling, or clock read.
+`entryPhase(owner, map, key, value, scope)` classifies one exact settled scoped record as hard (`0`),
+fresh (`1`), or stale (`2`). It never starts work or exposes the record representation.
+
+Insertion-record rollback also stays behind this owner. A cache owner may begin one synchronous
+transaction with `checkpointRecords(map)`, then either consume the frozen zero-key token with
+`restoreRecords(theSameMap, token)` after a failed publication or with `releaseRecords(token)` after
+success. Tokens are one-shot, map-bound, process-local, and contain no enumerable authority or
+record data. Supplying the wrong map consumes and rejects the token. These methods exist so a
+rendered-fragment cache can roll its public HTML/order/timestamp state and private insertion records
+back together; consumers must not inspect `metadata`, synthesize records, or persist a token.
+
 An `undefined` key is the fail-closed bypass: `load()` runs normally, but the owner does not read,
 insert, deduplicate, evict, or alter recency in `c`. Other key identities, including `null`, remain
 generic API-compatible cache keys; request/cache consumers normalize their unscoped result to
@@ -134,4 +149,6 @@ Acquisition purge cannot revoke values already returned or independently retaine
 Sensitive rollback sets `staleWindow = 0` and each acquisition owner's `validators = false`,
 purges the acquisition owner, disposes prepared roots, and separately purges/saves
 rendered-fragment persistence. Validator metadata is process-local and is never exported,
-persisted, or available to rendered-fragment caching; rendered-fragment SWR remains out of scope.
+persisted, or available to rendered-fragment caching. This model only classifies rendered records
+and protects their insertion metadata; `@jtorm/ui-cache-model` plus the injected host collaborator
+own rendered lifecycle authorization, execution, publication, invalidation, and persistence.

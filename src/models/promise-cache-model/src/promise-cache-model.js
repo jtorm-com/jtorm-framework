@@ -109,6 +109,7 @@ module.exports = {
     jTormPromiseCacheModel: {
         clock: function () { return Date.now(); },// DI: monotonic-enough millisecond wall clock
         metadata: new WeakMap(),// cache Map -> exact-key insertion records; weakly releases replaced host maps
+        recordCheckpoints: new WeakMap(),// metadata-free capability -> one synchronous insertion-record rollback
         observed: new WeakMap(),// owner -> {clock,last}; detects regressions across that owner's keys
 
         policy: function (o) {
@@ -178,6 +179,31 @@ module.exports = {
                 return Infinity
             ;
             if (age >= t || !a || a === Infinity || typeof a.clock !== 'function'
+                || typeof a.value !== 'number' || !Number.isFinite(a.value) || a.value < 0)
+                return
+            ;
+
+            r = this.observed.get(o);
+            if (!r || r.clock !== a.clock || r.last < a.value)
+                return
+            ;
+
+            return {clock: a.clock, value: a.value - age};
+        },
+
+        restorePhase: function (o, age, a) {// restore a settled insertion inside the current fresh/stale policy; no acquisition behavior
+            const t = this.policy(o);
+            let r, w;
+
+            if (!Number.isSafeInteger(age) || age < 0 || t === undefined || t === 0)
+                return
+            ;
+            if (t === Infinity)
+                return Infinity
+            ;
+            w = this.windowPolicy(o);
+            if (age >= t && !(w > 0 && age - t < w)
+                || !a || a === Infinity || typeof a.clock !== 'function'
                 || typeof a.value !== 'number' || !Number.isFinite(a.value) || a.value < 0)
                 return
             ;
@@ -262,10 +288,61 @@ module.exports = {
             return r;
         },
 
-        record: function (m, q, v) {
+        record: function (m, q, v, s) {
             const a = this.records(m), r = a && a.get(q);
 
-            return r && r.value === v ? r : undefined;
+            return r && r.value === v
+                && (arguments.length < 4 || r.scope === s) ? r : undefined;
+        },
+
+        checkpointRecords: function (m) {
+            let r, t;
+
+            try {
+                r = this.records(m);
+                if (!r) return;
+                t = Object.freeze({});
+                this.recordCheckpoints.set(t, {map: m, records: r, entries: [...r.entries()]});
+                return t;
+            } catch (e) {
+                return;
+            }
+        },
+
+        restoreRecords: function (m, t) {
+            let r;
+
+            try {
+                r = t && this.recordCheckpoints.get(t);
+                if (!r) return false;
+                this.recordCheckpoints.delete(t);
+                if (r.map !== m) return false;
+                this.metadata.set(m, r.records);
+                r.records.clear();
+                for (const x of r.entries) r.records.set(x[0], x[1]);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        },
+
+        releaseRecords: function (t) {
+            try {
+                if (!t || !this.recordCheckpoints.has(t)) return false;
+                this.recordCheckpoints.delete(t);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        },
+        entryPhase: function (o, m, q, v, s) {
+            const r = this.record(m, q, v);
+
+            if (!r || r.pending || arguments.length > 4 && r.scope !== s)
+                return 0
+            ;
+
+            return this.phase(o, r.at);
         },
 
         pending: function (m, q, v, n, s) {

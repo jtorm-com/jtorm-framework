@@ -230,9 +230,11 @@ const publish = function (s, l, id, c, d, a, t) {
             s.order.delete(e);
             s.promiseCacheModel.forget(s.order, e, o);
             p.delete(e);
+            refreshDrop(s, s.order, e, new Error('Rendered fragment refresh evicted'));
             s.prune(o.l, o.id, o.c);
         }
         if (!p.size) s.settlements.delete(s.order);
+        refreshDrop(s, s.order, k, new Error('Rendered fragment refresh superseded'));
         s.persistenceObserved.set(s.order, t);
         change();
         return true;
@@ -253,6 +255,315 @@ const publish = function (s, l, id, c, d, a, t) {
             }
             if (made && p && !p.size) s.settlements.delete(s.order);
         } catch (x) {}
+        return false;
+    }
+};
+
+const refreshReady = function (s, h) {
+    try {
+        return !!h && h === s.refreshModel
+            && typeof h.authorize === 'function' && typeof h.current === 'function'
+            && typeof h.render === 'function' && typeof h.session === 'function'
+            && typeof h.owns === 'function';
+    } catch (e) {
+        return false;
+    }
+};
+
+const refreshHost = function (s) {
+    let h;
+
+    try {
+        if (!s.refreshHosts.has(s.order)) return;
+        h = s.refreshHosts.get(s.order);
+    } catch (e) { return; }
+
+    return refreshReady(s, h) ? h : undefined;
+};
+
+const refreshMap = function (s, o, add) {
+    let m;
+
+    try { m = s.refreshes.get(o); } catch (e) { return; }
+    if (!m && add) {
+        m = new Map();
+        try { s.refreshes.set(o, m); } catch (e) { return; }
+    }
+
+    return m;
+};
+
+const restoreMap = function (m, entries) {
+    m.clear();
+    for (const x of entries) m.set(x[0], x[1]);
+};
+
+const restoreProperty = function (o, k, d) {
+    if (d) Object.defineProperty(o, k, d);
+    else delete o[k];
+};
+
+const refreshBase = function (s, r) {
+    let d, p, q;
+
+    try {
+        if (!r || s.cache !== r.cache || s.order !== r.order
+            || s.store() !== r.store || limit(s) !== r.limit
+            || s.promiseCacheModel.policy(s) !== r.ttl
+            || s.promiseCacheModel.windowPolicy(s) !== r.window)
+            return false
+        ;
+        d = lookup(s.cache, r.l, r.id, r.c);
+        p = pairs(s, s.order);
+        q = s.promiseCacheModel.record(s.order, r.k, r.value, r.store);
+        return d.status === 1 && d.value === r.html
+            && s.order.get(r.k) === r.value && p && p.get(r.k) === r.pair
+            && r.pair.value === r.value && r.pair.scope === r.store
+            && r.pair.html === r.html && q === r.record;
+    } catch (e) {
+        return false;
+    }
+};
+
+const refreshCurrent = function (s, r) {
+    const m = r && refreshMap(s, r.order);
+
+    return !r.detached && !r.completed && refreshBase(s, r)
+        && m && m.get(r.k) === r;
+};
+
+const refreshAuthorized = function (s, r, v, owned) {
+    if (!refreshCurrent(s, r) || refreshHost(s) !== r.host)
+        return false
+    ;
+    try {
+        if (s.scope(v, r.coordinates.variant) !== r.c)
+            return false
+        ;
+        if (r.host.current(v, r.authority, r.coordinates) !== true)
+            return false
+        ;
+        if (owned && r.host.owns(v, r.session, r.cap, r.authority, r.coordinates) !== true)
+            return false
+        ;
+    } catch (e) {
+        return false;
+    }
+
+    try {
+        return refreshHost(s) === r.host
+            && s.scope(v, r.coordinates.variant) === r.c && refreshCurrent(s, r);
+    } catch (e) { return false; }
+};
+
+const refreshCaller = function (s, r, v, variant, active) {
+    try {
+        if (refreshHost(s) !== r.host || s.scope(v, variant) !== r.c
+            || (active ? !refreshCurrent(s, r) : !r.completed || r.failed || r.detached))
+            return false
+        ;
+        if (r.host.authorize(v, r.coordinates) !== r.authority
+            || r.host.current(v, r.authority, r.coordinates) !== true)
+            return false
+        ;
+        return refreshHost(s) === r.host && s.scope(v, variant) === r.c
+            && (active ? refreshCurrent(s, r) : r.completed && !r.failed && !r.detached);
+    } catch (e) {
+        return false;
+    }
+};
+
+const refreshClose = function (s, r) {
+    if (!r || !r.completed || r.viewClosed)
+        return 0
+    ;
+    r.viewClosed = 1;
+    if (r.root && s.executions.get(r.root) === r) s.executions.delete(r.root);
+    delete r.root;
+    delete r.session;
+    return 1;
+};
+
+const refreshFail = function (s, r, e) {
+    if (!r || r.failed || r.detached)
+        return 0
+    ;
+    if (r.completed) return refreshClose(s, r);
+    r.failed = 1;
+    r.running = 0;
+    r.error = e === undefined ? new Error('Rendered fragment refresh failed') : e;
+    if (r.iteration) s.iterations.delete(r.iteration);
+    if (r.root && s.executions.get(r.root) === r) s.executions.delete(r.root);
+    delete r.iteration;
+    delete r.root;
+    delete r.session;
+    if (!r.settled) {
+        r.settled = 1;
+        r.reject(r.error);
+    }
+
+    return 1;
+};
+
+const refreshDetach = function (s, r, e) {
+    let m;
+
+    if (!r || r.detached || r.completed)
+        return 0
+    ;
+    r.detached = 1;
+    r.running = 0;
+    m = refreshMap(s, r.order);
+    if (m && m.get(r.k) === r) {
+        m.delete(r.k);
+        if (!m.size) try { s.refreshes.delete(r.order); } catch (x) {}
+    }
+    if (r.iteration) s.iterations.delete(r.iteration);
+    if (r.root && s.executions.get(r.root) === r) s.executions.delete(r.root);
+    try { s.requests.delete(r.cap); } catch (x) {}
+    delete r.iteration;
+    delete r.root;
+    delete r.session;
+    if (!r.settled) {
+        r.settled = 1;
+        r.reject(e === undefined ? new Error('Rendered fragment refresh detached') : e);
+    }
+
+    return 1;
+};
+
+const refreshDrop = function (s, o, k, e) {
+    const m = refreshMap(s, o), r = m && m.get(k);
+
+    return r ? refreshDetach(s, r, e) : 0;
+};
+
+const refreshDropAll = function (s, o, e) {
+    const m = refreshMap(s, o);
+
+    if (!m) return;
+    for (const r of [...m.values()]) refreshDetach(s, r, e);
+};
+
+const dirtyCapture = function (s, v) {
+    let c, cd, q, rd, root, ud, vd;
+
+    try {
+        root = s.context(v);
+        c = v && v.c && typeof v.c === 'object' ? v.c : null;
+        if (!root || typeof root !== 'object') return;
+        rd = descriptor(root, state.n);
+        if (rd === false || !rd && state.n in root) return;
+        q = rd ? rd.value : s.freshState();
+        if (!q || typeof q !== 'object') return;
+        if (c && c !== root) {
+            cd = descriptor(c, state.n);
+            if (cd === false || !cd && state.n in c) return;
+        } else cd = null;
+        ud = descriptor(q, 'updated');
+        vd = descriptor(q, 'revision');
+        if (ud === false || vd === false
+            || !ud && 'updated' in q || !vd && 'revision' in q)
+            return
+        ;
+    } catch (e) {
+        return;
+    }
+
+    return {context: c, contextDescriptor: cd, root: root, rootDescriptor: rd,
+        state: q, updated: ud, revision: vd};
+};
+
+const dirtyApply = function (d) {
+    if (!d.rootDescriptor) d.root[state.n] = d.state;
+    if (d.context && d.context !== d.root
+        && (!d.contextDescriptor || d.contextDescriptor.value !== d.state))
+        d.context[state.n] = d.state
+    ;
+    d.state.updated = 1;
+    d.state.revision = Number.isSafeInteger(d.state.revision) && d.state.revision >= 0
+        ? d.state.revision + 1 : 1;
+};
+
+const dirtyUndo = function (d) {
+    if (!d) return;
+    try { restoreProperty(d.state, 'updated', d.updated); } catch (e) {}
+    try { restoreProperty(d.state, 'revision', d.revision); } catch (e) {}
+    if (d.context && d.context !== d.root)
+        try { restoreProperty(d.context, state.n, d.contextDescriptor); } catch (e) {}
+    ;
+    try { restoreProperty(d.root, state.n, d.rootDescriptor); } catch (e) {}
+};
+
+const refreshPublish = function (s, r, v) {
+    let a, checkpoint, dirty, made, observed, observedValue,
+        orderEntries, p, pairEntries, t, undo, value;
+
+    if (!r.staged || !refreshAuthorized(s, r, v, 1))
+        return false
+    ;
+    try {
+        a = s.promiseCacheModel.time(s);
+        t = absolute(s, s.order);
+        dirty = dirtyCapture(s, v);
+        p = pairs(s, s.order);
+        if (a === undefined || t === undefined || !dirty || !p)
+            return false
+        ;
+        checkpoint = s.promiseCacheModel.checkpointRecords(s.order);
+        if (!checkpoint) return false;
+        orderEntries = [...s.order.entries()];
+        pairEntries = [...p.entries()];
+        observed = s.persistenceObserved.has(s.order);
+        observedValue = s.persistenceObserved.get(s.order);
+
+        undo = write(s.cache, r.l, r.id, r.c, r.data);
+        if (!undo) throw new Error('cache');
+        s.order.delete(r.k);
+        s.promiseCacheModel.forget(s.order, r.k, r.value);
+        value = {l: r.l, id: r.id, c: r.c};
+        s.order.set(r.k, value);
+        if (!s.promiseCacheModel.stamp(s, s.order, r.k, value, a, r.store))
+            throw new Error('stamp')
+        ;
+        p.set(r.k, {value: value, scope: r.store, html: r.data, settledAt: t});
+        dirtyApply(dirty);
+        s.persistenceObserved.set(s.order, t);
+        made = 1;
+    } catch (e) {
+        try { if (undo) undo(); } catch (x) {}
+        try { restoreMap(s.order, orderEntries || []); } catch (x) {}
+        try { if (checkpoint) s.promiseCacheModel.restoreRecords(s.order, checkpoint); } catch (x) {}
+        try {
+            if (p) {
+                s.settlements.set(s.order, p);
+                restoreMap(p, pairEntries || []);
+            }
+        } catch (x) {}
+        try {
+            if (observed) s.persistenceObserved.set(s.order, observedValue);
+            else s.persistenceObserved.delete(s.order);
+        } catch (x) {}
+        dirtyUndo(dirty);
+    }
+    if (!made) return false;
+    try { s.promiseCacheModel.releaseRecords(checkpoint); } catch (e) {}
+    change();
+    return true;
+};
+
+const coldCurrent = function (s, r) {
+    let d, p;
+
+    try {
+        if (!r || s.cache !== r.cache || s.order !== r.order || s.store() !== r.store)
+            return false
+        ;
+        d = lookup(s.cache, r.l, r.id, r.c);
+        p = pairs(s, s.order);
+        return (d.status !== 1 || d.value === undefined) && !s.order.has(r.k)
+            && !(p && p.has(r.k)) && !s.promiseCacheModel.record(s.order, r.k, r.value);
+    } catch (e) {
         return false;
     }
 };
@@ -299,14 +610,20 @@ module.exports = {
         order: new Map(),// LRU recency tracker parallel to `cache`: composite-key -> {l,id,c}; drives eviction
         max: 512,// DI: LRU cap on cached fragments; least-recently-used evicted beyond this
         ttl: 300000,// DI: absolute successful-render retention in milliseconds; Infinity opts out
+        staleWindow: 0,// DI: optional host-authorized rendered-fragment stale window; zero is blocking
+        refreshModel: null,// DI: one stable host lifecycle/session owner, configured before init
         persistenceClock: function () { return Date.now(); },// DI: restart-stable Unix-epoch milliseconds
         updated: 0,
         revision: 0,
         flights: new WeakMap(),// current order Map -> bounded exact-key render leases
         iterations: new WeakMap(),// ephemeral handler-wrapper iteration token -> leader lease
         stores: new WeakMap(),// cache object -> opaque identity; never retains a replaced exported cache
+        refreshHosts: new WeakMap(),// initialized order Map -> stable admitted refresh host (or null)
         settlements: new WeakMap(),// current order Map -> bounded exact fragment/timestamp pairs
         persistenceObserved: new WeakMap(),// current order Map -> absolute-clock high-water
+        refreshes: new WeakMap(),// current order Map -> bounded exact-generation attempt records
+        requests: new WeakMap(),// frozen metadata-free capability -> private refresh record
+        executions: new WeakMap(),// exact isolated root -> active refresh lifecycle
         sep: String.fromCharCode(0),// NUL order-key separator (runtime-built, never a raw NUL in source); can't occur in a language/id/variant, so distinct (l,id,c) never collide
 
         freshState: function () {
@@ -378,9 +695,12 @@ module.exports = {
         },
 
         init: async function () {
-            let a, candidateOrder, d, g, m, n, now, o, p, records, sampled = 0;
+            let a, candidateOrder, d, g, host, m, n, now, o, p, records,
+                requiresHost = 0, sampled = 0;
             const old = this.order, token = change();
 
+            host = refreshReady(this, this.refreshModel) ? this.refreshModel : null;
+            refreshDropAll(this, old, new Error('Rendered fragment refresh reset'));
             this.cache = {};
             this.order = new Map();
             this.updated = 0;// a reloaded cache is clean — never carry a stale dirty flag into the next save()
@@ -388,6 +708,11 @@ module.exports = {
             this.stores = new WeakMap();
             this.settlements = new WeakMap();
             this.persistenceObserved = new WeakMap();
+            this.refreshes = new WeakMap();
+            this.requests = new WeakMap();
+            this.executions = new WeakMap();
+            this.refreshHosts = new WeakMap();
+            this.refreshHosts.set(this.order, host);
             if (this.promiseCacheModel && typeof this.promiseCacheModel.reset === 'function')
                 this.promiseCacheModel.reset(this, old)
             ;
@@ -428,7 +753,12 @@ module.exports = {
             candidateOrder = new Map();
             try {
                 for (const r of records) {
-                    const at = this.promiseCacheModel.restore(this, now - r.settledAt, a);
+                    let at = this.promiseCacheModel.restore(this, now - r.settledAt, a);
+                    if (at === undefined && host && this.refreshModel === host
+                        && refreshReady(this, host)) {
+                        at = this.promiseCacheModel.restorePhase(this, now - r.settledAt, a);
+                        if (at !== undefined) requiresHost = 1;
+                    }
                     if (at === undefined) continue;
                     if (!n) { n = {}; candidateStores.set(candidate, n); }
                     const k = this.key(r.language, r.cid, r.variant), value = {l: r.language, id: r.cid, c: r.variant};
@@ -441,12 +771,14 @@ module.exports = {
 
             try {
                 if (lifecycle !== token || this.cache !== cache || this.order !== order
+                    || requiresHost && (this.refreshModel !== host || !refreshReady(this, host))
                     || Reflect.ownKeys(cache).length || order.size)
                     { discard(); return; }
             } catch (e) { discard(); return; }
 
             this.cache = candidate;
             this.order = candidateOrder;
+            this.refreshHosts.set(candidateOrder, host);
             this.stores = candidateStores;
             this.settlements = new WeakMap();
             if (candidatePairs.size) this.settlements.set(candidateOrder, candidatePairs);
@@ -488,7 +820,7 @@ module.exports = {
 
             p = new Promise(function (a, b) { resolve = a; reject = b; });
             p.catch(function () {});
-            r = {key: k, l: l, id: id, c: c, root: root, store: n, promise: p,
+            r = {key: k, k: k, cache: this.cache, order: this.order, l: l, id: id, c: c, root: root, store: n, promise: p,
                 resolve: resolve, reject: reject, staged: 0, data: null};
             this.iterations.set(x, r);
             f.set(k, r);
@@ -553,6 +885,239 @@ module.exports = {
             ;
 
             return null;
+        },
+
+        reserve: function (v, l, id, variant, c, k, d, o, q, n, z) {
+            const s = this;
+            let a, cap, h, m, p, reject, resolve, root, r;
+
+            h = refreshHost(s);
+            if (!h) return;
+            try {
+                root = s.context(v);
+                if (!root || typeof root !== 'object') return;
+                r = {cache: s.cache, order: s.order, store: n, key: k, k: k, l: l, id: id,
+                    c: c, html: d, value: o, pair: q, record: z, host: h,
+                    coordinates: Object.freeze({language: l, cid: id, variant: variant}),
+                    limit: limit(s), ttl: s.promiseCacheModel.policy(s),
+                    window: s.promiseCacheModel.windowPolicy(s)};
+                if (!refreshBase(s, r)) return;
+                a = h.authorize(v, r.coordinates);
+                if (!a || !['object', 'function'].includes(typeof a)
+                    || h.current(v, a, r.coordinates) !== true
+                    || refreshHost(s) !== h || s.scope(v, variant) !== c
+                    || !refreshBase(s, r))
+                    return
+                ;
+                m = refreshMap(s, s.order, 1);
+                if (!m || m.has(k)) return;
+                cap = Object.freeze({});
+                p = new Promise(function (yes, no) { resolve = yes; reject = no; });
+                p.catch(function () {});
+                Object.assign(r, {authority: a, cap: cap, promise: p, reject: reject,
+                    resolve: resolve, foregrounds: new WeakSet(), started: 0,
+                    running: 0, failed: 0, completed: 0, detached: 0, settled: 0, refresh: 1,
+                    staged: 0, data: null});
+                r.foregrounds.add(root);
+                s.requests.set(cap, r);
+                m.set(k, r);
+                while (m.size > limit(s)) {
+                    const x = m.keys().next().value;
+                    if (x === k) break;
+                    refreshDetach(s, m.get(x));
+                }
+                change();
+                return cap;
+            } catch (e) {
+                return;
+            }
+        },
+
+        lookup: async function (v, l, id, c, x) {
+            const s = this, variant = c;
+            let cap, d, k, m, n, o, p, phase, q, r, root, target = 0, valid, z;
+
+            try { root = s.context(v); } catch (e) { root = null; }
+            r = root && s.executions.get(root);
+            if (r) {
+                try {
+                    target = String(r.l) === String(l) && String(r.id) === String(id)
+                        && String(r.coordinates.variant) === String(variant);
+                } catch (e) { target = 1; }
+            }
+            valid = s.part(l) && s.part(id);
+            c = valid ? s.scope(v, c) : undefined;
+            if (!valid || c === undefined) {
+                if (r && (!r.iteration || !valid || target)) {
+                    const e = new Error('Rendered fragment refresh execution denied');
+                    refreshFail(s, r, e);
+                    throw e;
+                }
+                return Object.freeze({value: null, refresh: undefined});
+            }
+            k = s['key'](l, id, c);
+            if (r && (!r.iteration || r.k === k || target)) {
+                if (r.k !== k || !x || typeof x !== 'object' || r.iteration
+                    || !refreshAuthorized(s, r, v, 1)) {
+                    const e = new Error('Rendered fragment refresh execution denied');
+                    refreshFail(s, r, e);
+                    throw e;
+                }
+                r.iteration = x;
+                s.iterations.set(x, r);
+                return Object.freeze({value: null, refresh: undefined});
+            }
+
+            try {
+                n = s.store(x && typeof x === 'object');
+                d = lookup(s.cache, l, id, c);
+                o = s.order.get(k);
+                p = pairs(s, s.order);
+                q = p && p.get(k);
+                z = o && s.promiseCacheModel.record(s.order, k, o, n);
+                phase = d.status === 1 && d.value !== undefined && n && o && q
+                    && q.value === o && q.scope === n && q.html === d.value
+                    && Number.isSafeInteger(q.settledAt) && q.settledAt >= 0
+                    ? s.promiseCacheModel.entryPhase(s, s.order, k, o, n) : 0;
+                m = refreshMap(s, s.order);
+                r = m && m.get(k);
+            } catch (e) {
+                return Object.freeze({value: null, refresh: undefined});
+            }
+
+            if (phase === 1) {
+                if (r) refreshFail(s, r, new Error('Rendered fragment refresh became fresh'));
+                s.order.delete(k);
+                s.order.set(k, o);
+                return Object.freeze({value: d.value, refresh: undefined});
+            }
+
+            if (phase === 2) {
+                if (r && refreshAuthorized(s, r, v, 0))
+                    return Object.freeze({value: d.value, refresh: undefined})
+                ;
+                if (r) refreshDetach(s, r);
+                else {
+                    cap = s.reserve(v, l, id, variant, c, k, d.value, o, q, n, z);
+                    if (cap)
+                        return Object.freeze({value: d.value, refresh: cap})
+                    ;
+                }
+            }
+
+            if (phase === 0 && r && refreshCurrent(s, r) && r.running && !r.failed) {
+                if (root && (r.foregrounds.has(root) || r.root === root))
+                    return Object.freeze({value: null, refresh: undefined})
+                ;
+                if (refreshCaller(s, r, v, variant, 1)) {
+                    await r.promise;
+                    if (!refreshCaller(s, r, v, variant, 0))
+                        throw new Error('Rendered fragment refresh join denied')
+                    ;
+                    return s.lookup(v, l, id, variant, x);
+                }
+            }
+
+            if (d.status === 1 && d.value !== undefined || o || q || r) {
+                try { z = s.state(v); } catch (e) {
+                    return Object.freeze({value: null, refresh: undefined});
+                }
+                s.order.delete(k);
+                if (o === undefined) s.promiseCacheModel.forget(s.order, k);
+                else s.promiseCacheModel.forget(s.order, k, o);
+                unpair(s, k);
+                s.prune(l, id, c);
+                refreshDrop(s, s.order, k);
+                s.touch(z);
+                change();
+            }
+
+            if (x && typeof x === 'object') {
+                z = s.acquire(v, l, id, c, k, x, n);
+                if (z && typeof z.then === 'function') z = await z;
+                return Object.freeze({value: z, refresh: undefined});
+            }
+
+            return Object.freeze({value: null, refresh: undefined});
+        },
+
+        start: function (v, cap) {
+            const s = this;
+            let o, p, r, root;
+
+            try { r = cap && s.requests.get(cap); } catch (e) { return false; }
+            if (!r || r.cap !== cap || r.started)
+                return false
+            ;
+            r.started = 1;
+            try { root = s.context(v); } catch (e) { root = null; }
+            if (!root || !r.foregrounds.has(root) || !refreshAuthorized(s, r, v, 0)) {
+                refreshFail(s, r, new Error('Rendered fragment refresh start denied'));
+                return false;
+            }
+            r.running = 1;
+            try { o = r.host.render(v, cap, r.coordinates, r.authority); }
+            catch (e) { refreshFail(s, r, e); return false; }
+            p = promised(o);
+            if (!p) {
+                refreshFail(s, r, new Error('Rendered fragment refresh must return a native Promise'));
+                return false;
+            }
+            r.observed = p;
+            p.then(function () {
+                if (!r.completed && !r.failed && !r.detached)
+                    refreshFail(s, r, new Error('Rendered fragment refresh lifecycle incomplete'))
+                ;
+            }, function (e) { refreshFail(s, r, e); }).catch(function () {});
+            return true;
+        },
+
+        fail: function (cap, e) {
+            let r;
+
+            try { r = cap && this.requests.get(cap); } catch (x) { return false; }
+            return !!refreshFail(this, r, e);
+        },
+
+        activate: function (v, cap, session) {
+            const s = this;
+            let r, root;
+
+            try {
+                r = cap && s.requests.get(cap);
+                root = s.context(v);
+            } catch (e) { return false; }
+            if (!r || r.cap !== cap || !r.started || !r.running || r.activated
+                || !root || typeof root !== 'object' || r.foregrounds.has(root)
+                || !session || !['object', 'function'].includes(typeof session)
+                || s.executions.get(root))
+                return false
+            ;
+            r.session = session;
+            if (!refreshAuthorized(s, r, v, 1)) {
+                delete r.session;
+                return false;
+            }
+            r.activated = 1;
+            r.root = root;
+            s.executions.set(root, r);
+            return true;
+        },
+
+        refreshView: function (v) {
+            let r, root;
+
+            try { root = this.context(v); r = root && this.executions.get(root); }
+            catch (e) { return false; }
+            return !!r && r.root === root && r.completed && !r.viewClosed;
+        },
+
+        closeRefreshView: function (v) {
+            let r, root;
+
+            try { root = this.context(v); r = root && this.executions.get(root); }
+            catch (e) { return false; }
+            return !!r && r.root === root && !!refreshClose(this, r);
         },
 
         set: function (v, l, id, c, d) {
@@ -628,13 +1193,31 @@ module.exports = {
 
         complete: function (v, x) {
             const r = x && this.iterations.get(x), f = this.flight();
-            let a, c, i, q;
+            let a, c, i, m, q;
 
             if (!r) return;
             this.iterations.delete(x);
+            if (r.refresh) {
+                delete r.iteration;
+                if (refreshPublish(this, r, v)) {
+                    r.completed = 1;
+                    r.running = 0;
+                    m = refreshMap(this, r.order);
+                    if (m && m.get(r.k) === r) {
+                        m.delete(r.k);
+                        if (!m.size) this.refreshes.delete(r.order);
+                    }
+                    this.requests.delete(r.cap);
+                    r.settled = 1;
+                    r.resolve(r.data);
+                } else
+                    refreshFail(this, r, new Error('Rendered fragment refresh publication denied'))
+                ;
+                return;
+            }
             if (f && f.get(r.key) === r) {
                 f.delete(r.key);
-                if (this.store() === r.store && r.staged) {
+                if (this.store() === r.store && r.staged && coldCurrent(this, r)) {
                     try {
                         i = r.c.indexOf(this.sep);
                         c = i > 0 ? this.scope(v, r.c.slice(i + 1)) : undefined;
@@ -654,12 +1237,17 @@ module.exports = {
 
             if (!r) return;
             this.iterations.delete(x);
+            if (r.refresh) {
+                delete r.iteration;
+                refreshFail(this, r, e);
+                return;
+            }
             if (f && f.get(r.key) === r) f.delete(r.key);
             r.reject(e);
         },
 
         purge: function (v, l, id, c) {
-            let d, f, k, live, o, p, q, r, tracked;
+            let d, f, k, live, o, p, q, r, tracked, z;
 
             if (!this.part(l) || !this.part(id))
                 return 0
@@ -678,7 +1266,8 @@ module.exports = {
                 p = p && p.get(k);
                 f = this.flight();
                 r = f && f.get(k);
-                if (!live && !tracked && !p && !r) return 0;
+                z = refreshMap(this, this.order); z = z && z.get(k);
+                if (!live && !tracked && !p && !r && !z) return 0;
             } catch (e) { return 0; }
 
             if (live || p)
@@ -697,12 +1286,13 @@ module.exports = {
                 if (q) this.touch(q);
             }
             if (r) f.delete(k);
+            if (z) refreshDetach(this, z, new Error('Rendered fragment refresh purged'));
             change();
             return 1;
         },
 
         purgeAll: function (v) {
-            const f = this.flight(), q = new Set();
+            const f = this.flight(), m = refreshMap(this, this.order), q = new Set();
             let d, id, l, c, p, s, stored = 0;
 
             if (!this.tenant(v))
@@ -726,6 +1316,7 @@ module.exports = {
                 p = pairs(this, this.order);
                 if (p) for (const k of p.keys()) q.add(k);
                 if (f) for (const k of f.keys()) q.add(k);
+                if (m) for (const k of m.keys()) q.add(k);
                 stored = Object.keys(this.cache).length || p && p.size;
                 if (stored) s = this.state(v);
             } catch (e) {
@@ -748,6 +1339,7 @@ module.exports = {
                 this.promiseCacheModel.clear(this.order);
             }
             if (f) f.clear();
+            refreshDropAll(this, this.order, new Error('Rendered fragment refresh purge-all'));
             change();
             return q.size;
         },
