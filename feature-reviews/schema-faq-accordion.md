@@ -1,17 +1,17 @@
 # Feature Development: Schema FAQ Accordion
 
-**Status:** BLOCKED
+**Status:** MERGED — PR #72 landed in `dev` as `9f0fe28`; browser pre-publication evidence remains open
 **Claimed:** 2026-07-19T15:38:07Z
 **Agent:** /root
-**Current Mode:** Browser QA — external evidence blocked
+**Current Mode:** Delivery complete — external browser evidence pending
 
 ---
 
 ## Resumption Context
 
-**Last Completed Mode:** Documentation
-**Current Mode:** Browser QA — external evidence blocked
-**Next Action:** Run Phase 9 against a configured host page when Chrome MCP/browser integration is available, then re-score Validation and Testability to 10/10.
+**Last Completed Mode:** Delivery
+**Current Mode:** Delivery complete — external browser evidence pending
+**Next Action:** Before publishing the coordinated package trio, run Phase 9 against a configured host page with browser integration, then re-score Validation and Testability to 10/10.
 **Files Created:**
 - `feature-reviews/schema-faq-accordion.md` - Feature-dev state and decision record.
 - `feature-reviews/schema-faq-accordion-spec.md` - Approved and implemented public contracts, architecture, package/version plan, risk, rollback, and checkpoints.
@@ -39,7 +39,11 @@
 **Design Decisions Made:** Seven handoff decisions resolved; see the decision record below and the feature specification.
 
 **Context for Next Session:**
-The feature is isolated in `/tmp/jtorm-schema-faq-accordion` on `feat/schema-faq-accordion`, based on freshly fetched `origin/dev` at `8b821b2cdefc5c124c753fc79c9493ca6f340aa7`. The dirty primary checkout must remain untouched. Implementation and automated verification are complete; the only open pre-publish evidence is live browser accessibility QA through a configured host page and Chrome integration.
+Final feature head `314eb71` passed 928/928 local tests, green CI, and a clean current-head Codex
+review with zero unresolved threads before the maintainer merged PR #72 into `dev` as `9f0fe28`.
+The feature worktree and local/remote feature branches were removed. Implementation and automated
+delivery are complete; live browser accessibility QA through a configured host page remains an
+explicit pre-publication gate.
 
 ---
 
@@ -189,7 +193,8 @@ The generic database-architect persona and frontend-eval prompt referenced by re
 - [x] Architecture implementation score: 100/100.
 - [x] Privacy/compliance implementation score: 100/100.
 - [x] Automated verification loop passed: 928 tests, typecheck, package dry-runs, source ratchets, manifest determinism, and `git diff --check`.
-- [ ] Feature-dev completion score is 100/100; live browser evidence holds Validation and Testability at 9/10.
+- [x] PR #72 passed green CI and a clean current-head Codex review, then merged into `dev` as `9f0fe28`.
+- [ ] Live browser evidence is required to move the feature-dev score from 98/100 to 100/100.
 - [ ] Phase 9 browser verification loop passed.
 
 ### Documentation Mode
@@ -197,6 +202,7 @@ The generic database-architect persona and frontend-eval prompt referenced by re
 - [x] Specification, test plan, STRIDE, progress, batch, and review ledger records reconciled.
 - [x] Generic feature-dev application documents are N/A: this repository has no `docs/`, `docs/frontend/feature-actions.md`, or `feature-reviews/PROGRESS.md`; package READMEs and feature-review records are its established owners.
 - [x] On-demand batch-simulator record written.
+- [x] Canonical architecture backlog records the merge, remaining browser gate, and next UI tranche.
 
 ---
 

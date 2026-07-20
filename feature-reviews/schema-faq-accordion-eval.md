@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-19
 **Author:** /root
-**Status:** In Progress — implementation verified; browser ratification blocked
+**Status:** MERGED — PR #72 landed in `dev` as `9f0fe28`; browser ratification remains a pre-publication host gate
 
 ## Summary
 
@@ -103,5 +103,6 @@ isolated and caller-data-free.
 - [x] STRIDE analysis reviewed.
 - [x] Automated tests, typecheck, package dry-runs, and diff checks pass.
 - [x] Documentation updated.
+- [x] Final head `314eb71` passed green CI and clean current-head Codex review before PR #72 merged as `9f0fe28`.
 - [ ] Live browser accessibility evidence complete.
 - [ ] Ready for publication.

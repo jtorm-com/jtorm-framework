@@ -132,6 +132,23 @@
 > seven canonical shell caches across cold, neutral, warm, and persisted renders. Final head
 > `3fd58ed` passed CI and a clean current-head Codex review with zero unresolved threads before
 > the maintainer merged PR #71 into `dev` as `d97556c`.
+>
+> **Backlog update — 2026-07-19 (`dev` at `9f0fe28`):** PR #72 completed the
+> opt-in `FAQPage.accordion` repository implementation. Supported
+> `FAQPage` → `Question` → `acceptedAnswer: Answer` pairs are narrowed to
+> `summary` / `content` and projected through the new public canonical
+> `accordion.group` plus existing native `details` / `summary` items. Optional Bootstrap remains a
+> fixed-literal presentation overlay; the original root remains owned by JSON-LD, and existing
+> `FAQPage.default`, `FAQPage.link`, accordion defaults, and framework-resolution policy remain
+> unchanged. All three package versions advance to `0.2.0`; only the components/Bootstrap
+> singleton identities and components-owned canonical cache IDs advance, while schema retains its
+> published `jtorm/schema-ui-0.0.4/src` asset namespace. Final head `314eb71` passed 928/928 local
+> tests, green CI, and a clean current-head
+> Codex review with zero unresolved threads before the maintainer merged it as `9f0fe28`.
+> Live browser accessibility evidence remains an explicit pre-publication host gate. The next
+> UI-system follow-up is accessible form-field and validation composition over existing `html-ui`
+> primitives; behavior-heavy widgets remain deferred until a framework-neutral interaction and
+> focus owner exists.
 
 ---
 
@@ -283,6 +300,8 @@ Native `AbortSignal.timeout` (already used), `DocumentFragment` for detached bui
 | **P4** | Add opt-in HTTP validators to safe acquisition caches | ✅ Done — merged PR #69 | Exact scoped generation pairing, bounded opaque ETag/Last-Modified metadata, validated 200 replacement, and bodyless 304 reuse; rendered fragments remain excluded | M |
 | **P5** | Establish a framework-neutral common-component foundation | ✅ Done — merged PR #66 | Stable intent-based names and canonical models make visual-framework backends testable without coupling caller data to one framework | L |
 | **P5** | Design the UI-framework adapter layer and implement one reference adapter | ✅ Done — merged PR #71 | Proves the multi-framework seam while preserving fallback semantics, accessibility, direct binding, and cache isolation | L |
+| **P5** | Project `FAQPage` / `Question` / `Answer` into the canonical accordion | ✅ Merged — PR #72; browser publication gate remains | Reuses schema.org fields and canonical native disclosures without changing defaults, JSON-LD ownership, or adapter boundaries | M |
+| **P5** | Compose accessible form fields and validation over existing `html-ui` primitives | Next UI-system follow-up | Extends schema-first canonical composition without inventing behavior-heavy interaction ownership | L |
 
 ### Comparable projects worth studying
 - **Transphporm** (the acknowledged inspiration) — for how it handles the same selector-verb model in PHP.

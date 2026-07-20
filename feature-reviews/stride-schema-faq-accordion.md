@@ -1,6 +1,6 @@
 # STRIDE — FAQPage Accordion Projection
 
-**Status:** Controls implemented and automated evidence complete; live browser QA pending
+**Status:** MERGED — PR #72 landed in `dev` as `9f0fe28`; controls and automated evidence complete, live browser QA pending
 **Date:** 2026-07-19
 **Feature specification:** `feature-reviews/schema-faq-accordion-spec.md`
 **Scope tags:** `FRONTEND`, `SECURITY`
