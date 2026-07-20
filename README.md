@@ -60,9 +60,10 @@ Hosts compose three shared policy models before rendering:
   cache-root resolution, and namespaced root state. Normal render traversal remains compatible.
 - `@jtorm/promise-cache-model` owns in-flight promise dedupe, insertion-safe rejection cleanup,
   bounded LRU mechanics, overridable clock policy, absolute TTLs, request-triggered acquisition
-  refresh, atomic acquisition-validator generation records, and purge metadata while each cache
-  retains its public value store, key, loader/render
-  path, and independently configurable `ttl` and, where supported, `staleWindow`.
+  refresh, atomic acquisition-validator generation records, rendered-fragment phase classification,
+  opaque insertion-record rollback checkpoints, and purge metadata. Each cache retains its public
+  value store, key, loader/render path, and independently configurable `ttl` and, where supported,
+  `staleWindow`; the promise-cache owner never runs a rendered lifecycle.
 - `@jtorm/asset-plugin-model` owns the shared CSS/JS collection, URL-policy, DOM insertion,
   dedupe, and cleanup lifecycle while both plugins retain their public facades.
 
@@ -97,7 +98,7 @@ during the strict interval `ttl <= age < ttl + staleWindow` and lets that reques
 best-effort refresh for the retained generation. Successful refresh publishes at fulfillment and
 starts a new absolute TTL; failure keeps the old hard deadline and a later eligible request may
 retry. At the hard boundary, callers join an already-running refresh or wait for one cold
-replacement. There are no timers, refresh-ahead, failure backoff, or rendered-fragment SWR.
+replacement. There are no timers, refresh-ahead, or failure backoff on the acquisition path.
 
 Missing, invalid, or inaccessible `staleWindow` behaves as `0`: ordinary TTL freshness remains
 available, but stale service is disabled. Every finite nonnegative window is accepted; strict
@@ -133,23 +134,50 @@ serverless runtimes may freeze after a stale response. Acquisition purge affects
 acquisition-cache participation; it cannot revoke already returned data, prepared manifest
 indexes, rendered fragments, or persisted fragment envelopes.
 
-The runtime kill switches are `staleWindow = 0` and `validators = false`. Rollback then purges the
-affected acquisition cache. For sensitive content, also dispose prepared roots, purge the UI
-cache, and clear/save its persistence before rolling consumers back; publish/retain promise-cache
-and request-model `1.2.0+` before data, HTML, TSS, and manifest-model `1.2.0+`. UI-cache remains on
-its separate `2.x` rendered-fragment contract and exposes neither `staleWindow` nor `validators`.
+The acquisition kill switches are `staleWindow = 0` and `validators = false`; rollback then purges
+the affected acquisition cache. Publish/retain promise-cache and request-model `1.2.0+` before
+data, HTML, TSS, and manifest-model `1.2.0+`.
 
-Rendered-fragment age now survives restart under the current finite/zero/Infinity TTL by combining
-that persisted absolute timestamp with promise-cache-owned process-local freshness. Hosts inject a
-nondecreasing restart-stable Unix-ms clock, deploy promise-cache `1.0.3+`, UI-cache `2.x`, and UI
-plugin `1.0.3+` together, and finish `init()` before creating render roots. Mixed readers must not
-share a store. Before downgrade, disable persistence and clear v1 or restore a reader-compatible
-snapshot; older readers are not assumed to reject the new envelope safely. Persist a live UI purge
-by calling `save(scopedRootView)` afterward. The plugin preserves its non-awaited after-view save
-timing; an operator requiring persistence completion or error visibility explicitly awaits that
-`save()` call. See the UI-cache model README for wire, clock, privacy, deployment, and rollback
-details. Rendered-fragment SWR remains an independent follow-up; validator metadata never enters
-the rendered-fragment wire or runtime cache.
+Rendered fragments expose an independent `staleWindow`, also defaulting to `0`, but no validators.
+A positive window serves no rendered stale HTML unless the exact same stable `refreshModel` is
+injected into UI-cache model and plugin before `init()`. The host supplies
+`authorize/current/render/session/owns`, snapshots canonical inputs synchronously, creates one
+isolated root, and returns a native Promise for its complete normal lifecycle. Literal current and
+ownership decisions, exact authority identity, and a host-minted root session gate the work.
+
+At `ttl <= age` while `age - ttl < staleWindow`, the first authorized caller receives exact
+retained HTML and may start one attempt for that process generation; concurrent stale callers do
+not wait or duplicate it. A start throw, malformed Promise, rejection, or lifecycle failure never
+slides age or changes bytes, timestamp, recency, or dirty state, and the same generation is not
+retried. A temporary fresh reclassification preserves its consumed-attempt marker. At the hard boundary no stale HTML is returned: an authorized independent root joins the
+private running Promise, the refresh root bypasses itself, and otherwise the ordinary blocking
+render lease applies. After settlement, the hard caller rechecks current scope/authority and runs
+ordinary classification again, so purge, supersession, identity replacement, and re-init win
+before consumption.
+
+The cache's frozen zero-key capability contains no coordinates or authority. Exact generation,
+scope, host epoch, and root-session checks repeat at activation, execution lookup, and publication.
+Before the target's first iteration binds, coordinate drift or missing/malformed scope fails loud
+before handler effects; after that bind, unrelated nested components retain ordinary lookup.
+Completion publishes HTML, settlement time, process stamp, LRU position, and isolated-root dirty
+revision in one synchronous rollback transaction. The refresh after-view path then awaits the
+adapter save; adapter or later hook failure is host-visible but does not undo already-published
+live HTML. Host rejection also closes a completed execution when an earlier after-view hook
+prevents the cache save; dirty state remains retryable and no save is claimed. Exact/full purge, eviction, init, identity replacement, newer publication, scope drift,
+session failure, or authority rotation detaches late work.
+
+Wire v1 and its original Unix-ms `settledAt` remain unchanged. A restored stale record is a new
+process-local generation and is admitted only while the same valid host stays configured.
+Deploy promise-cache `1.3.0+`, UI-cache `2.1.0+`, and UI plugin `1.1.0+` together, inject a
+nondecreasing restart-stable Unix clock, and finish `init()` before render roots. No framework
+timer, retry loop, worker, or durability mechanism is added; the host owns lifetime extension,
+cancellation, concurrency, and privacy-safe outcome telemetry, and serverless work may be frozen.
+
+For sensitive rollback, set both stale windows to `0`, disable validators, rotate host authority,
+dispose prepared/refresh roots, purge the affected caches, and clear/save UI persistence before
+pinning the coordinated prior packages and DI graph. Mixed readers never share a store; before
+downgrade, disable persistence and clear v1 or restore a reader-compatible snapshot. See the
+UI-cache model README for the full host, wire, clock, privacy, deployment, and rollback contract.
 
 ## Credits
 The idea is heavily inspired from [Transphporm](https://github.com/Level-2/Transphporm), all credits go to them in finding a different way to handle template rendering.

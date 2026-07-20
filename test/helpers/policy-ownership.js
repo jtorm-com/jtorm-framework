@@ -15,14 +15,31 @@ function receiver(n) {
   if (n.kind === ts.SyntaxKind.ThisKeyword) return 'this';
 }
 
+function path(n) {
+  if (!n) return;
+  if (ts.isIdentifier(n)) return n.text;
+  if (n.kind === ts.SyntaxKind.ThisKeyword) return 'this';
+  if (ts.isPropertyAccessExpression(n)) {
+    const p = path(n.expression);
+    return p ? p + '.' + n.name.text : undefined;
+  }
+  if (ts.isElementAccessExpression(n) && ts.isStringLiteralLike(n.argumentExpression)) {
+    const p = path(n.expression);
+    return p ? p + '.' + n.argumentExpression.text : undefined;
+  }
+}
+
 function scanMethods(body, file, names) {
   const sf = ts.createSourceFile(file, body, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const wanted = new Set(names);
   const out = {
+    accesses: {},
     assetCalls: 0,
     cacheAccess: 0,
+    calls: {},
     delegations: {assetPluginModel: 0, promiseCacheModel: 0, renderContextModel: 0},
     found: {},
+    ownerEscapes: 0,
     parentAccess: 0,
     promiseCatch: 0,
     stateWrites: 0,
@@ -43,12 +60,37 @@ function scanMethods(body, file, names) {
   function inspect(n) {
     const k = key(n);
 
+    if (ts.isPropertyAccessExpression(n) || ts.isElementAccessExpression(n)) {
+      const p = path(n);
+      if (p) out.accesses[p] = (out.accesses[p] || 0) + 1;
+      if (p && /(?:^|\.)promiseCacheModel$/.test(p)) {
+        const q = n.parent, member = q && (ts.isPropertyAccessExpression(q) || ts.isElementAccessExpression(q));
+        const call = member && q.expression === n
+          && ts.isCallExpression(q.parent) && q.parent.expression === q;
+        const guard = ts.isBinaryExpression(q) && ts.isIfStatement(q.parent)
+          && q.parent.expression === q;
+        const type = member && q.expression === n && ts.isTypeOfExpression(q.parent);
+        if (!call && !guard && !type)
+          out.ownerEscapes++
+        ;
+      }
+    }
+
+    if (ts.isCallExpression(n)) {
+      const p = path(n.expression);
+      if (p) out.calls[p] = (out.calls[p] || 0) + 1;
+    }
+
     if ((ts.isPropertyAccessExpression(n) || ts.isElementAccessExpression(n)) && k === 'p')
       out.parentAccess++
     ;
     if ((ts.isPropertyAccessExpression(n) || ts.isElementAccessExpression(n))
       && k === 'c' && ['s', 'this'].includes(receiver(n.expression)))
       out.cacheAccess++
+    ;
+    if (ts.isBindingElement(n) && key(n.propertyName || n.name) === 'promiseCacheModel'
+      && ts.isObjectBindingPattern(n.parent))
+      out.ownerEscapes++
     ;
     if (ts.isBindingElement(n) && key(n.propertyName || n.name) === 'c'
       && ts.isObjectBindingPattern(n.parent) && ts.isVariableDeclaration(n.parent.parent)

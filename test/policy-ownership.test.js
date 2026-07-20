@@ -52,9 +52,33 @@ test('shared runtime policies have one injected source owner per family', () => 
   assert.match(read(owners[1]), /\.keys\(\)\.next\(\)/);
   assert.match(read(owners[1]), /r\.token !== n \|\| c\.get\(q\) !== p/);
   assert.match(read(owners[1]), /metadata: new WeakMap\(\)/);
-  assert.match(read(owners[1]), /restore: function \(o, age, a\)/);
-  assert.match(read('src/models/ui-cache-model/src/ui-cache-model.js'), /promiseCacheModel\.fresh\(/);
-  assert.match(read('src/models/ui-cache-model/src/ui-cache-model.js'), /promiseCacheModel\.restore\(this, now - r\.settledAt, a\)/);
+
+  const promiseOwner = require(file(owners[1])).jTormPromiseCacheModel;
+  for (const method of ['restore', 'restorePhase', 'entryPhase', 'checkpointRecords', 'restoreRecords', 'releaseRecords'])
+    assert.equal(typeof promiseOwner[method], 'function', method)
+  ;
+
+  const uiPath = 'src/models/ui-cache-model/src/ui-cache-model.js';
+  const uiSource = read(uiPath);
+  const uiScan = scanMethods(uiSource, uiPath, []);
+  const calls = uiScan.calls;
+  const expectedCalls = {
+    's.promiseCacheModel.checkpointRecords': 1,
+    's.promiseCacheModel.entryPhase': 1,
+    's.promiseCacheModel.fresh': 1,
+    's.promiseCacheModel.releaseRecords': 1,
+    's.promiseCacheModel.restoreRecords': 1,
+    'this.promiseCacheModel.restore': 1,
+    'this.promiseCacheModel.restorePhase': 1
+  };
+  for (const [call, count] of Object.entries(expectedCalls))
+    assert.equal(calls[call], count, call)
+  ;
+  const representationAccess = Object.keys(uiScan.accesses).filter(p => /(?:^|\.)promiseCacheModel\.(?:metadata|records)$/.test(p));
+  assert.deepEqual(representationAccess, [],
+    'promise-cache insertion-record representation stays behind its owner facade');
+  assert.equal(uiScan.ownerEscapes, 0,
+    'the injected promise-cache collaborator is used only through direct method calls');
   assert.match(read(owners[2]), /renderContextModel/);
   assert.match(read(owners[2]), /\.parseUrl\(|\.createElement\(|\.appendChild\(|URL blocked/);
 });
@@ -131,25 +155,39 @@ test('ownership analyzer catches representative bypass families without comment/
   };`, 'relocated.js', ['get']);
   assert.ok(relocated.cacheAccess && relocated.promiseCatch, 'relocated helper bypass');
 
-  const safe = scanMethods(`module.exports = {
+  const safe = scanMethods(`const note = 's.promiseCacheModel.entryPhase(s)';
+  module.exports = {
     context: function(c) {
-      // while (c.p) and "s.c.get(q)" are inert examples
+      // while (c.p), "s.c.get(q)", and s.promiseCacheModel.restorePhase(this) are inert examples
       return this.renderContextModel.context(c);
     }
   };`, 'safe.js', ['context']);
   assert.equal(safe.parentAccess + safe.cacheAccess + safe.promiseCatch + safe.assetCalls, 0);
   assert.equal(safe.delegations.renderContextModel, 1);
+  assert.equal(safe.calls['s.promiseCacheModel.entryPhase'], undefined);
+  assert.equal(safe.calls['s.promiseCacheModel.restorePhase'], undefined);
+  assert.equal(safe.calls['this.renderContextModel.context'], 1);
+  assert.equal(safe.accesses['s.promiseCacheModel.metadata'], undefined);
+
+  const representation = scanMethods("const r = s['promiseCacheModel']['metadata'];", 'representation.js', []);
+  assert.equal(representation.accesses['s.promiseCacheModel.metadata'], 1);
+
+  const aliased = scanMethods('const p = s.promiseCacheModel; return p.metadata;', 'aliased.js', []);
+  assert.equal(aliased.ownerEscapes, 1);
+
+  const destructured = scanMethods('const {promiseCacheModel: p} = s; return p.records;', 'destructured.js', []);
+  assert.equal(destructured.ownerEscapes, 1);
 });
 
 test('coordinated package releases declare their policy owners and dependency minima', () => {
   const releases = {
     'src/models/render-context-model': '1.0.1',
-    'src/models/promise-cache-model': '1.2.0',
+    'src/models/promise-cache-model': '1.3.0',
     'src/models/asset-plugin-model': '1.0.0',
     'src/models/request-model': '1.2.0',
     'src/models/ui-manifest-model': '1.2.0',
     'src/models/layer-model': '1.0.2',
-    'src/models/ui-cache-model': '2.0.0',
+    'src/models/ui-cache-model': '2.1.0',
     'src/models/data-model': '1.2.0',
     'src/models/html-model': '1.2.0',
     'src/models/tss-model': '1.2.0',
@@ -161,7 +199,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     'tooling/ui-manifest-compiler': '1.0.1',
     'src/plugins/css-plugin': '1.0.5',
     'src/plugins/js-plugin': '1.0.5',
-    'src/plugins/ui-cache-plugin': '1.0.3'
+    'src/plugins/ui-cache-plugin': '1.1.0'
   };
   const dependencies = {
     'src/models/request-model': {'@jtorm/render-context-model': '^1.0.1'},
@@ -172,7 +210,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     },
     'src/models/layer-model': {'@jtorm/render-context-model': '^1.0.0'},
     'src/models/ui-cache-model': {
-      '@jtorm/promise-cache-model': '^1.0.3',
+      '@jtorm/promise-cache-model': '^1.3.0',
       '@jtorm/render-context-model': '^1.0.1',
       '@jtorm/request-model': '^1.1.5'
     },
@@ -187,7 +225,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     'src/plugins/ui-cache-plugin': {
       '@jtorm/event-model': '^1.0.2',
       '@jtorm/handler-wrapper': '^1.0.7',
-      '@jtorm/ui-cache-model': '^2.0.0'
+      '@jtorm/ui-cache-model': '^2.1.0'
     },
     'src/parsers/data-parser': {'@jtorm/tss-parser': '^2.0.0'},
     'src/methods/attrs-method': {'@jtorm/tss-parser': '^2.0.0'},
@@ -205,7 +243,7 @@ test('coordinated package releases declare their policy owners and dependency mi
     ;
 });
 
-test('stale and HTTP-validator policies stay on the four acquisition exports', () => {
+test('HTTP validators stay acquisition-only while rendered stale policy stays isolated', () => {
   const acquisition = [
     ['src/models/data-model/src/data-model.js', 'jTormDataModel'],
     ['src/models/html-model/src/html-model.js', 'jTormHtmlModel'],
@@ -221,18 +259,15 @@ test('stale and HTTP-validator policies stay on the four acquisition exports', (
         p + ' ' + field
       )
   ;
-  for (const field of ['staleWindow', 'validators'])
-    assert.equal(
-      Object.getOwnPropertyDescriptor(
-        require(file('src/models/ui-cache-model/src/ui-cache-model.js')).jTormUiCacheModel,
-        field
-      ),
-      undefined
-    )
-  ;
-  assert.equal(pkg('src/models/ui-cache-model').version, '2.0.0');
+  const rendered = require(file(
+    'src/models/ui-cache-model/src/ui-cache-model.js'
+  )).jTormUiCacheModel;
+  assert.deepEqual(Object.getOwnPropertyDescriptor(rendered, 'staleWindow'),
+    {value: 0, writable: true, enumerable: true, configurable: true});
+  assert.equal(Object.getOwnPropertyDescriptor(rendered, 'validators'), undefined);
+  assert.equal(pkg('src/models/ui-cache-model').version, '2.1.0');
   assert.equal(
     pkg('src/models/ui-cache-model').dependencies['@jtorm/promise-cache-model'],
-    '^1.0.3'
+    '^1.3.0'
   );
 });

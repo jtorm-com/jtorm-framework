@@ -1,11 +1,24 @@
 /*! (c) jTorm and other contributors | www.jtorm.com/license */
 'use strict';
 
+const refresh = function (m, h) {
+    try {
+        return !!h && h === m.refreshModel
+            && typeof m.lookup === 'function' && typeof m.start === 'function'
+            && typeof h.authorize === 'function' && typeof h.current === 'function'
+            && typeof h.render === 'function' && typeof h.session === 'function'
+            && typeof h.owns === 'function';
+    } catch (e) {
+        return false;
+    }
+};
+
 module.exports = {
     jTormUiCachePlugin: {
         // DI
         // uiCacheModel: null,
 
+        refreshModel: null,// DI: must be the same stable host configured on uiCacheModel
         event: {
             before: {
                 iteration: {
@@ -23,8 +36,19 @@ module.exports = {
         },
 
         beforeIteration: async function (v, x) {
-            if (v.cid)
-                v.r = await this.uiCacheModel.get(v, v.l == null ? null : v.l, v.cid, v.cs ? v.cs : 'default', x);
+            if (v.cid) {
+                const m = this.uiCacheModel, h = this.refreshModel;
+
+                if (refresh(m, h)) {
+                    const r = await m.lookup(v, v.l == null ? null : v.l,
+                        v.cid, v.cs ? v.cs : 'default', x);
+                    v.r = r.value;
+                    if (r.refresh) m.start(v, r.refresh);
+                } else
+                    v.r = await m.get(v, v.l == null ? null : v.l,
+                        v.cid, v.cs ? v.cs : 'default', x)
+                ;
+            }
         },
 
         afterIteration: function (v, x) {
@@ -43,7 +67,17 @@ module.exports = {
         },
 
         afterView: function (v) {
-            this.uiCacheModel.save(v);
+            const m = this.uiCacheModel;
+
+            if (typeof m.refreshView !== 'function' || m.refreshView(v) !== true) {
+                m.save(v);
+                return;
+            }
+
+            return (async function () {
+                try { await m.save(v); }
+                finally { m.closeRefreshView(v); }
+            })();
         }
     }
 };

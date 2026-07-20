@@ -64,6 +64,74 @@ test('restore() keeps elapsed age inside the promise-cache owner and preserves s
   assert.equal(pm.restore(forever, 999, Infinity), Infinity);
 });
 
+test('restorePhase() admits only the current fresh/stale window and entryPhase() validates the exact settled record', () => {
+  let now = 20;
+  const o = owner(10), m = new Map(), scope = {}, value = {};
+  o.staleWindow = 5;
+  pm.clock = () => now;
+  const sample = pm.time(o);
+
+  assert.equal(pm.restore(o, 10, sample), undefined, 'the historical strict restore contract is unchanged');
+  const at = pm.restorePhase(o, 10, sample);
+  assert.ok(at);
+  m.set('k', value);
+  assert.equal(pm.stamp(o, m, 'k', value, at, scope), true);
+  assert.equal(pm.entryPhase(o, m, 'k', value, scope), 2);
+  assert.equal(pm.entryPhase(o, m, 'k', value, {}), 0);
+  assert.equal(pm.entryPhase(o, m, 'k', {}, scope), 0);
+
+  now = 24;
+  assert.equal(pm.entryPhase(o, m, 'k', value, scope), 2);
+  now = 25;
+  assert.equal(pm.entryPhase(o, m, 'k', value, scope), 0, 'age equal to ttl plus window is hard');
+  assert.equal(pm.restorePhase(o, 15, sample), undefined);
+  assert.equal(pm.restorePhase(o, 14, sample).value, sample.value - 14);
+
+  for (const window of [undefined, -1, NaN, Infinity, '5']) {
+    const invalid = owner(10);
+    invalid.staleWindow = window;
+    const invalidSample = pm.time(invalid);
+    assert.equal(pm.restorePhase(invalid, 10, invalidSample), undefined, String(window));
+  }
+
+  const zero = owner(0);
+  zero.staleWindow = 5;
+  assert.equal(pm.restorePhase(zero, 0, undefined), undefined);
+  const forever = owner(Infinity);
+  Object.defineProperty(forever, 'staleWindow', {get() { throw new Error('Infinity must not read window'); }});
+  assert.equal(pm.restorePhase(forever, 999, Infinity), Infinity);
+});
+
+test('record scope and opaque checkpoints keep insertion-record rollback inside its owner', () => {
+  let now = 0;
+  const o = owner(10), m = new Map(), oldScope = {}, newScope = {};
+  const oldValue = {}, newValue = {};
+  pm.clock = () => now;
+  m.set('k', oldValue);
+  assert.equal(pm.stamp(o, m, 'k', oldValue, pm.time(o), oldScope), true);
+  const oldRecord = pm.record(m, 'k', oldValue, oldScope);
+
+  assert.ok(oldRecord);
+  assert.equal(pm.record(m, 'k', oldValue, newScope), undefined);
+  const checkpoint = pm.checkpointRecords(m);
+  assert.equal(Object.isFrozen(checkpoint), true);
+  assert.deepEqual(Reflect.ownKeys(checkpoint), []);
+
+  pm.forget(m, 'k', oldValue);
+  now = 1;
+  m.set('k', newValue);
+  assert.equal(pm.stamp(o, m, 'k', newValue, pm.time(o), newScope), true);
+  assert.equal(pm.restoreRecords(m, checkpoint), true);
+  assert.strictEqual(pm.record(m, 'k', oldValue, oldScope), oldRecord);
+  assert.equal(pm.record(m, 'k', newValue, newScope), undefined);
+  assert.equal(pm.restoreRecords(m, checkpoint), false, 'checkpoint restoration is one-shot');
+
+  const released = pm.checkpointRecords(m);
+  assert.equal(pm.releaseRecords(released), true);
+  assert.equal(pm.restoreRecords(m, released), false, 'released checkpoints cannot roll back');
+  assert.equal(pm.releaseRecords(released), false);
+});
+
 test('pending work never expires, while exact purge detaches it without aborting or letting late completion own a newer insertion', async () => {
   let now = 0, releaseOld, releaseNew, loads = 0;
   const o = owner(1);
